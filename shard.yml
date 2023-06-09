@@ -5,8 +5,8 @@ authors:
   - Roberto Alsina <roberto.alsina@gmail.com>
 
 targets:
-  nicoletta:
-    main: src/nicoletta.cr
+  nicolino:
+    main: src/nicolino.cr
 
 crystal: 1.8.2
 
@@ -19,3 +19,5 @@ dependencies:
    github: MakeNowJust/crustache
   crystalline:
     github: jtomschroeder/crystalline
+  pixie:
+    github: watzon/pixie
