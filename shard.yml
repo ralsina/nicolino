@@ -1,0 +1,21 @@
+name: nicolino
+version: 0.1.0
+
+authors:
+  - Roberto Alsina <roberto.alsina@gmail.com>
+
+targets:
+  nicoletta:
+    main: src/nicoletta.cr
+
+crystal: 1.8.2
+
+license: MIT
+
+dependencies:
+  markd:
+   github: icyleaf/markd
+  crustache:
+   github: MakeNowJust/crustache
+  crystalline:
+    github: jtomschroeder/crystalline
