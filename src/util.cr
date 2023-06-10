@@ -1,8 +1,8 @@
 module Util
-    extend self
+  extend self
 
-    # Log thing
-    def self.log(thing)
-        puts %(#{Time.local} -- #{thing})
-    end
+  # Log thing
+  def self.log(thing)
+    puts %(#{Time.local} -- #{thing})
+  end
 end

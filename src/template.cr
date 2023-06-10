@@ -27,7 +27,7 @@ module Templates
     Util.log "Loading templates"
     # Load templates
     Dir.glob("templates/**/*.tmpl").each do |path|
-        Util.log "    #{path}"
+      Util.log "    #{path}"
       Template.templates[path] = Template.new(path)
     end
   end
