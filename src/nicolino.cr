@@ -4,6 +4,7 @@ require "yaml"
 require "./post"
 require "./template"
 require "./util"
+require "./render"
 
 VERSION = "0.1.0"
 
@@ -14,19 +15,12 @@ config = File.open("conf") do |file|
 end
 
 Templates.init("templates")
-
 page_template = Templates::Template.templates["templates/page.tmpl"].@compiled
+
 posts = Post::Markdown.read_all("posts")
 Util.log("Rendering output")
 posts.each do |post|
   output = "output/#{post.@link}"
   Util.log("    #{output}")
-  rendered_page = Crustache.render(page_template,
-    config.merge({
-      "content" => post.rendered,
-    }))
-  Dir.mkdir_p(File.dirname output)
-  File.open(output, "w") do |io|
-    io.puts rendered_page
-  end
+  Render.write(post.rendered, page_template, output, config)
 end
