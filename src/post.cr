@@ -13,11 +13,33 @@ module Post
       @html = Markd.to_html(@text)
     end
 
+    def template
+        @metadata.fetch("template", "templates/post.tmpl")
+    end
+
     def render
       # Render the markdown HTML into the right template for the fragment
       # TODO: un-hardcode post.tmpl
-      template = Templates::Template.templates["templates/post.tmpl"]
-      Crustache.render template.@compiled, @metadata.merge({"link" => @link, "text" => @html})
+      t= Templates::Template.templates[template()]
+      Crustache.render t.@compiled, @metadata.merge({"link" => @link, "text" => @html})
+    end
+
+    def self.render_all(config)
+      # Parse all markdown files and render them
+      # Uses config as template data
+      Util.log("Processing Markdown")
+      Dir.glob("posts/*.md").each do |path|
+        post = Post::Markdown.new(path)
+        Util.log("    #{path}")
+        rendered_post = post.render
+        rendered_page = Crustache.render(Templates::Template.templates["templates/page.tmpl"].@compiled,
+          config.merge({
+            "content" => rendered_post,
+          }))
+        File.open("output/#{post.@link}", "w") do |io|
+          io.puts rendered_page
+        end
+      end
     end
   end
 end
