@@ -26,7 +26,7 @@ module Templates
   def self.init(path)
     Util.log "Loading templates"
     # Load templates
-    Dir.glob("templates/*.tmpl").each do |path|
+    Dir.glob("templates/**/*.tmpl").each do |path|
         Util.log "    #{path}"
       Template.templates[path] = Template.new(path)
     end

@@ -15,7 +15,7 @@ module Post
       contents = File.read(path)
       _, metadata, @text = contents.split("---\n", 3)
       @metadata = YAML.parse(metadata).as_h
-      @link = path.split("/")[-1][0..-4] + ".html"
+      @link = path.split("/", 2)[1][0..-4] + ".html"
       @html = Markd.to_html(@text)
       @source = path
       @rendered = rendered
@@ -38,13 +38,11 @@ module Post
       Crustache.render t.@compiled, @metadata.merge({"link" => @link, "text" => @html})
     end
 
-    # Parse all markdown posts and build Markdown objects out of them
-    def self.read_all
-      # Parse all markdown files and render them
-      # Uses config as template data
+    # Parse all markdown posts in a path and build Markdown objects out of them
+    def self.read_all(path)
       Util.log("Processing Markdown")
       posts = [] of Markdown
-      Dir.glob("posts/*.md").each do |path|
+      Dir.glob("#{path}/**/*.md").each do |path|
         Util.log("    #{path}")
         posts << Post::Markdown.new(path)
       end

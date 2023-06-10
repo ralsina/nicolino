@@ -16,7 +16,7 @@ end
 Templates.init("templates")
 
 page_template = Templates::Template.templates["templates/page.tmpl"].@compiled
-posts = Post::Markdown.read_all
+posts = Post::Markdown.read_all("posts")
 Util.log("Rendering output")
 posts.each do |post|
   output = "output/#{post.@link}"
@@ -25,6 +25,7 @@ posts.each do |post|
     config.merge({
       "content" => post.rendered,
     }))
+  Dir.mkdir_p(File.dirname output)
   File.open(output, "w") do |io|
     io.puts rendered_page
   end
