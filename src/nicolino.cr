@@ -19,21 +19,10 @@ page_template = Templates::Template.templates["templates/page.tmpl"].@compiled
 
 posts = Markdown::File.read_all("posts")
 Util.log("Rendering output for posts")
-posts.each do |post|
-  output = "output/#{post.@link}"
-  Util.log("    #{output}")
-  if post.date == nil
-    Util.log("Error: #{post.@source} has no date")
-    next
-  end
-  Render.write(post.rendered, page_template, output, config)
-end
+# TODO make config a singleton
+Render.render(posts, page_template, config)
 
 pages = Markdown::File.read_all("pages")
 Util.log("Rendering output for pages")
-pages.each do |post|
-  output = "output/#{post.@link}"
-  Util.log("    #{output}")
-  Render.write(post.rendered, page_template, output, config)
-end
+Render.render(pages, page_template, config, false)
 
