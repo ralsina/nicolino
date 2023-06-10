@@ -1,4 +1,4 @@
-# Nicoletta, a minimal static site generator.
+# Nicolino, a basic static site generator.
 
 require "yaml"
 require "markd"
