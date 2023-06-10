@@ -22,4 +22,4 @@ dependencies:
   pixie:
     github: watzon/pixie
   RSS:
-    github: ga2mer/RSS.cr  
+    github: ralsina/RSS.cr  
