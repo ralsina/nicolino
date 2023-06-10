@@ -1,9 +1,10 @@
 module Post
   class Markdown
     @metadata = {} of YAML::Any => YAML::Any
-    @text : String
-    @link : String
-    @html : String
+    @text   : String
+    @link   : String
+    @html   : String
+    @source : String
 
     def initialize(path)
       contents = File.read(path)
@@ -11,10 +12,15 @@ module Post
       @metadata = YAML.parse(metadata).as_h
       @link = path.split("/")[-1][0..-4] + ".html"
       @html = Markd.to_html(@text)
+      @source = path
     end
 
     def template
         @metadata.fetch("template", "templates/post.tmpl")
+    end
+
+    def dependencies
+        [@source, template()]
     end
 
     def render
