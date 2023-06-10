@@ -21,3 +21,5 @@ dependencies:
     github: jtomschroeder/crystalline
   pixie:
     github: watzon/pixie
+  RSS:
+    github: ga2mer/RSS.cr  

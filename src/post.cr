@@ -9,16 +9,27 @@ module Post
     @html : String
     @source : String
     @rendered : String = ""
+    @date : Time | Nil
 
     # Initialize the post with proper data
     def initialize(path)
       contents = File.read(path)
       _, metadata, @text = contents.split("---\n", 3)
+      # TODO normalize metadata key case
       @metadata = YAML.parse(metadata).as_h
       @link = path.split("/", 2)[1][0..-4] + ".html"
       @html = Markd.to_html(@text)
       @source = path
       @rendered = rendered
+    end
+
+    def date
+        t = @metadata.fetch("date", nil)
+        if t != nil
+            # TODO, un-hardcode UTC
+            return Time.parse(t.to_s, "%Y-%m-%d %H:%M:%S", Time::Location::UTC)
+        end 
+        nil
     end
 
     # Path for the `Templates::Template` this post should be rendered with

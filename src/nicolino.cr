@@ -22,5 +22,10 @@ Util.log("Rendering output")
 posts.each do |post|
   output = "output/#{post.@link}"
   Util.log("    #{output}")
+  if post.date == nil
+    Util.log("Error: #{post.@source} has no date")
+    next
+  end
   Render.write(post.rendered, page_template, output, config)
 end
+
