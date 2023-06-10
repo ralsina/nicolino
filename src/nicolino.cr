@@ -18,7 +18,7 @@ Templates.init("templates")
 page_template = Templates::Template.templates["templates/page.tmpl"].@compiled
 
 posts = Post::Markdown.read_all("posts")
-Util.log("Rendering output")
+Util.log("Rendering output for posts")
 posts.each do |post|
   output = "output/#{post.@link}"
   Util.log("    #{output}")
@@ -26,6 +26,14 @@ posts.each do |post|
     Util.log("Error: #{post.@source} has no date")
     next
   end
+  Render.write(post.rendered, page_template, output, config)
+end
+
+pages = Post::Markdown.read_all("pages")
+Util.log("Rendering output for pages")
+pages.each do |post|
+  output = "output/#{post.@link}"
+  Util.log("    #{output}")
   Render.write(post.rendered, page_template, output, config)
 end
 
