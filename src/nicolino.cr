@@ -1,7 +1,7 @@
 # Nicolino, a basic static site generator.
 
 require "yaml"
-require "./post"
+require "./markdown"
 require "./template"
 require "./util"
 require "./render"
@@ -17,7 +17,7 @@ end
 Templates.init("templates")
 page_template = Templates::Template.templates["templates/page.tmpl"].@compiled
 
-posts = Post::Markdown.read_all("posts")
+posts = Markdown::File.read_all("posts")
 Util.log("Rendering output for posts")
 posts.each do |post|
   output = "output/#{post.@link}"
@@ -29,7 +29,7 @@ posts.each do |post|
   Render.write(post.rendered, page_template, output, config)
 end
 
-pages = Post::Markdown.read_all("pages")
+pages = Markdown::File.read_all("pages")
 Util.log("Rendering output for pages")
 pages.each do |post|
   output = "output/#{post.@link}"

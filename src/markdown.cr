@@ -1,8 +1,8 @@
 require "markd"
 
-module Post
+module Markdown
   # A class representing a Markdown file
-  class Markdown
+  class File
     @metadata = {} of YAML::Any => YAML::Any
     @text : String
     @link : String
@@ -13,7 +13,7 @@ module Post
 
     # Initialize the post with proper data
     def initialize(path)
-      contents = File.read(path)
+      contents = ::File.read(path)
       _, metadata, @text = contents.split("---\n", 3)
       # TODO normalize metadata key case
       @metadata = YAML.parse(metadata).as_h
@@ -51,11 +51,11 @@ module Post
 
     # Parse all markdown posts in a path and build Markdown objects out of them
     def self.read_all(path)
-      Util.log("Processing Markdown")
-      posts = [] of Markdown
+      Util.log("Processing Markdown in #{path}")
+      posts = [] of File
       Dir.glob("#{path}/**/*.md").each do |path|
         Util.log("    #{path}")
-        posts << Post::Markdown.new(path)
+        posts << File.new(path)
       end
       return posts
 
