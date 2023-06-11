@@ -13,11 +13,10 @@ VERSION = "0.1.0"
 # Load config file
 Config.config
 
-Templates.init("templates")
-page_template = Templates::Template.templates["templates/page.tmpl"].@compiled
+page_template = Templates::Template.get("templates/page.tmpl")
 
 posts = Markdown::File.read_all("posts")
-Render.render(posts, page_template)
+Render.render(posts, page_template, require_date: true)
 
 Render.render_rss(
   posts[..10],
@@ -26,7 +25,7 @@ Render.render_rss(
 )
 
 pages = Markdown::File.read_all("pages")
-Render.render(pages, page_template, false)
+Render.render(pages, page_template, require_date: false)
 
 Util.log("Writing output files:")
 Croupier::Task.run_tasks

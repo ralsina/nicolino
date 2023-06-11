@@ -1,6 +1,6 @@
 # Stuff that could be done
 
-* Load templates lazy
+* ~~Load templates lazy~~
 * Write real templates
 * Try ECR?
 * Implement index page generation
@@ -9,4 +9,4 @@
 * Asset copying
 * Image gallery
 * Support tags
-* Normalize metadata key case
+* ~~Normalize metadata key case~~

@@ -6,7 +6,21 @@ module Templates
 
   # Wrapper class for a Crustache template
   class Template
+    # Per-path hash of all templates
     @@templates = {} of String => Template
+
+    def self.templates
+      @@templates
+    end
+
+    # Get a template's compiled version by path
+    def self.get(path)
+      if !Template.templates.has_key?(path)
+        Template.templates[path] = Template.new(path)
+      end
+      Template.templates[path].@compiled
+    end
+
     @text : String
     @compiled : Crustache::Syntax::Template
 
@@ -14,21 +28,6 @@ module Templates
     def initialize(path)
       @text = File.read(path)
       @compiled = Crustache.parse(@text)
-    end
-
-    # Per-path hash of all templates
-    def self.templates
-      @@templates
-    end
-  end
-
-  # Load all the templates into the system
-  def self.init(path)
-    Util.log "Loading templates"
-    # Load templates
-    Dir.glob("templates/**/*.tmpl").each do |p|
-      Util.log "    #{p}"
-      Template.templates[p] = Template.new(p)
     end
   end
 end

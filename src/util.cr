@@ -3,6 +3,6 @@ module Util
 
   # Log thing
   def self.log(thing)
-    puts %(#{Time.local} -- #{thing})
+    puts %(#{thing})
   end
 end
