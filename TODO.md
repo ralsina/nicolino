@@ -10,3 +10,5 @@
 * Image gallery
 * Support tags
 * ~~Normalize metadata key case~~
+* Teasers
+* Add text/teaser to the RSS feed
