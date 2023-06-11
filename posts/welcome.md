@@ -1,5 +1,5 @@
 ---
-title: Hi there, Welcome to Nicoletta!
+title: Hi there, Welcome to Nicolino!
 Date: 2013-02-01
 ---
 
