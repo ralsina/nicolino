@@ -6,7 +6,7 @@ module Markdown
     @metadata = {} of YAML::Any => YAML::Any
     @text : String
     @link : String
-    @html : String
+    @html : String = ""
     @title : String
     @source : String
     @rendered : String = ""
@@ -20,8 +20,14 @@ module Markdown
       @metadata = YAML.parse(metadata).as_h
       @title = @metadata["title"].to_s
       @link = path.split("/", 2)[1][0..-4] + ".html"
-      @html = Markd.to_html(@text)
       @source = path
+    end
+
+    def html
+      if @html == ""
+        @html = Markd.to_html(@text)
+      end
+      @html
     end
 
     def date
@@ -41,7 +47,7 @@ module Markdown
     # Render the markdown HTML into the right template for the fragment
     def rendered
       t = Templates::Template.templates[template()]
-      Crustache.render t.@compiled, @metadata.merge({"link" => @link, "text" => @html})
+      Crustache.render t.@compiled, @metadata.merge({"link" => @link, "text" => html})
     end
 
     # Parse all markdown posts in a path and build Markdown objects out of them
