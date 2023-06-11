@@ -22,7 +22,6 @@ module Markdown
       @link = path.split("/", 2)[1][0..-4] + ".html"
       @html = Markd.to_html(@text)
       @source = path
-      @rendered = rendered
     end
 
     def date
@@ -36,7 +35,7 @@ module Markdown
 
     # Path for the `Templates::Template` this post should be rendered with
     def template
-      @metadata.fetch("template", "templates/post.tmpl")
+      @metadata.fetch("template", "templates/post.tmpl").to_s
     end
 
     # Paths for dependencies, things that would mark this post as stale
@@ -45,7 +44,6 @@ module Markdown
     end
 
     # Render the markdown HTML into the right template for the fragment
-    # TODO: un-hardcode post.tmpl
     def rendered
       t = Templates::Template.templates[template()]
       Crustache.render t.@compiled, @metadata.merge({"link" => @link, "text" => @html})
@@ -53,15 +51,13 @@ module Markdown
 
     # Parse all markdown posts in a path and build Markdown objects out of them
     def self.read_all(path)
-      Util.log("Processing Markdown in #{path}")
+      Util.log("Reading Markdown from #{path}")
       posts = [] of File
-      Dir.glob("#{path}/**/*.md").each do |path|
-        Util.log("    #{path}")
-        posts << File.new(path)
+      Dir.glob("#{path}/**/*.md").each do |p|
+        Util.log("    #{p}")
+        posts << File.new(p)
       end
-      return posts
-
-      rendered_post = post.render
+      posts
     end
   end
 end

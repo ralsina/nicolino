@@ -17,9 +17,9 @@ dependencies:
    github: icyleaf/markd
   crustache:
    github: MakeNowJust/crustache
-  crystalline:
-    github: jtomschroeder/crystalline
   pixie:
     github: watzon/pixie
   RSS:
-    github: ralsina/RSS.cr  
+    github: ralsina/RSS.cr
+  croupier:
+    github: ralsina/croupier
