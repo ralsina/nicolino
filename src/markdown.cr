@@ -38,11 +38,6 @@ module Markdown
       @metadata.fetch("template", "templates/post.tmpl").to_s
     end
 
-    # Paths for dependencies, things that would mark this post as stale
-    def dependencies
-      [@source, template()]
-    end
-
     # Render the markdown HTML into the right template for the fragment
     def rendered
       t = Templates::Template.templates[template()]
