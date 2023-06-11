@@ -1,6 +1,6 @@
 # WARNING
 
-This is a toy. Do not use this for anything important.
+This is a toy. Do not use this for anything important. Yet, maybe.
 
 # What is it tho?
 
@@ -25,19 +25,14 @@ Not much:
 * Pages and Posts (which have dates)
 * RSS feed generation
 * Generates HTML
+* Incremental builds
 
 It's pretty fast?
 
 # What's planned?
 
 Nothing is planned, this is strictly a make it up as you go operation.
-BUT:
-
-* Tags
-* Output conflicts
-* Incremental builds
-* Image galleries
-* Nice things
+BUT check out the [TODO list](TODO.md)
 
 # What's NOT planned?
 
