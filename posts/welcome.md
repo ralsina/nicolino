@@ -1,6 +1,6 @@
 ---
 title: Hi there, Welcome to Nicoletta!
-date: 2013-02-01
+Date: 2013-02-01
 ---
 
 [TOC]

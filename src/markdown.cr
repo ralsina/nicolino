@@ -3,7 +3,7 @@ require "markd"
 module Markdown
   # A class representing a Markdown file
   class File
-    @metadata = {} of YAML::Any => YAML::Any
+    @metadata = Hash(String, String).new
     @text : String
     @link : String
     @html : String = ""
@@ -17,7 +17,7 @@ module Markdown
       contents = ::File.read(path)
       _, metadata, @text = contents.split("---\n", 3)
       # TODO normalize metadata key case
-      @metadata = YAML.parse(metadata).as_h
+      @metadata = YAML.parse(metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
       @title = @metadata["title"].to_s
       @link = path.split("/", 2)[1][0..-4] + ".html"
       @source = path
