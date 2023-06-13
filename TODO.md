@@ -12,3 +12,5 @@
 * ~~Normalize metadata key case~~
 * Teasers
 * Add text/teaser to the RSS feed
+* Verbosity levels
+* CLI arg to only build a specific thing
