@@ -5,7 +5,7 @@
 * Try ECR?
 * Implement index page generation
 * Live / autoreload mode?
-* Real CLI interface
+* ~~Real CLI interface~~
 * Asset copying
 * Image gallery
 * Support tags
