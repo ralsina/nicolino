@@ -31,9 +31,9 @@ def run(options, arguments)
 
   Util.log("Writing output files:")
   if options.bool["parallel"]
-    Croupier::Task.run_tasks_parallel
+    Croupier::TaskManager.run_tasks_parallel
   else
-    Croupier::Task.run_tasks
+    Croupier::TaskManager.run_tasks
   end
   Util.log("Done!")
 end
