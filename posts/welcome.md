@@ -1,6 +1,6 @@
 ---
-title: Hi there, Welcome to Nicolino!
-Date: 2013-02-01
+title: "Hi there, Welcome to Nicolino!"
+date: 2013-02-01
 ---
 
 [TOC]
