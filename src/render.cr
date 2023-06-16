@@ -20,7 +20,7 @@ module Render
         name: name,
         output: output,
         inputs: ["conf", post.@source, post.template],
-        proc: ->{
+        proc: Croupier::TaskProc.new {
           Util.log("    #{output}")
           apply_template(post.rendered, template)
         }
@@ -36,7 +36,7 @@ module Render
       name: name,
       output: output,
       inputs: inputs,
-      proc: ->{
+      proc: Croupier::TaskProc.new {
         Util.log("    #{output}")
         feed = RSS.new title: title
         posts.each do |post|
