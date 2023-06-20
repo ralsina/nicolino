@@ -12,8 +12,8 @@
 * Add text/teaser to the RSS feed
 * CLI arg to only build a specific thing
 * HTML manipulation using kostya/lexbor
-* Verbosity levels
 
+* ~~Verbosity levels~~
 * ~~Asset copying~~
 * ~~Fix bug where pages are rebuilt uselessly~~
 * ~~Load templates lazy~~
