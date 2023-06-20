@@ -10,7 +10,7 @@ module Render
   def self.render(posts, template, require_date = true)
     posts.each do |post|
       if require_date && post.date == nil
-        Util.log("Error: #{post.@source} has no date")
+        Log.info { "Error: #{post.@source} has no date" }
         next
       end
 
@@ -21,7 +21,7 @@ module Render
         output: output,
         inputs: ["conf", post.@source, post.template],
         proc: Croupier::TaskProc.new {
-          Util.log("    #{output}")
+          Log.info { "    #{output}" }
           apply_template(post.rendered, template)
         }
       )
@@ -37,7 +37,7 @@ module Render
       output: output,
       inputs: inputs,
       proc: Croupier::TaskProc.new {
-        Util.log("    #{output}")
+        Log.info { "    #{output}" }
         feed = RSS.new title: title
         posts.each do |post|
           feed.item(

@@ -1,5 +1,4 @@
 require "crustache"
-require "./util"
 
 module Templates
   extend self

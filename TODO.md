@@ -10,9 +10,9 @@
 * Support tags
 * Teasers
 * Add text/teaser to the RSS feed
-* Verbosity levels
 * CLI arg to only build a specific thing
 * HTML manipulation using kostya/lexbor
+* Verbosity levels
 
 * ~~Asset copying~~
 * ~~Fix bug where pages are rebuilt uselessly~~

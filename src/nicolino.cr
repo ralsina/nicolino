@@ -5,7 +5,6 @@ require "./config"
 require "./markdown"
 require "./render"
 require "./template"
-require "./util"
 require "croupier"
 require "yaml"
 
@@ -18,7 +17,7 @@ def run(options, arguments)
   page_template = Templates::Template.get("templates/page.tmpl")
 
   # Copy assets/ to output/
-  Assets.render()
+  Assets.render
 
   # Render posts and RSS feed
   posts = Markdown::File.read_all("posts")
@@ -35,11 +34,11 @@ def run(options, arguments)
   Render.render(pages, page_template, require_date: false)
 
   # Run tasks for real
-  Util.log("Writing output files:")
+  Log.info { "Writing output files:" }
   if options.bool["parallel"]
     Croupier::TaskManager.run_tasks_parallel
   else
     Croupier::TaskManager.run_tasks
   end
-  Util.log("Done!")
+  Log.info { "Done!" }
 end

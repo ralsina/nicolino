@@ -8,7 +8,7 @@ module Assets
         output: dest.to_s,
         inputs: [src],
         proc: Croupier::TaskProc.new {
-          Util.log("    #{dest}")
+          Log.info {"    #{dest}"}
           File.copy(src, dest)
         },
         no_save: true,

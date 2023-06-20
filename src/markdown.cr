@@ -52,10 +52,10 @@ module Markdown
 
     # Parse all markdown posts in a path and build Markdown objects out of them
     def self.read_all(path)
-      Util.log("Reading Markdown from #{path}")
+      Log.info { "Reading Markdown from #{path}" }
       posts = [] of File
       Dir.glob("#{path}/**/*.md").each do |p|
-        Util.log("    #{p}")
+        Log.info { "    #{p}" }
         posts << File.new(p)
       end
       posts
