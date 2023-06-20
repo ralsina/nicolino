@@ -6,7 +6,6 @@
   or crinja
 * Implement index page generation
 * Live / autoreload mode?
-* Asset copying
 * Image gallery
 * Support tags
 * Teasers
@@ -14,6 +13,7 @@
 * Verbosity levels
 * CLI arg to only build a specific thing
 * HTML manipulation using kostya/lexbor
+* Asset copying
 
 * ~~Fix bug where pages are rebuilt uselessly~~
 * ~~Load templates lazy~~
