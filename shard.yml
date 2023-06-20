@@ -6,7 +6,7 @@ authors:
 
 targets:
   nicolino:
-    main: src/nicolino.cr
+    main: src/main.cr
 
 crystal: 1.8.2
 

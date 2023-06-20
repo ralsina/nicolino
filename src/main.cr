@@ -1,3 +1,4 @@
+require "./nicolino"
 require "commander"
 
 cli = Commander::Command.new do |cmd|

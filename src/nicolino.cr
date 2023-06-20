@@ -1,5 +1,6 @@
 # Nicolino, a basic static site generator.
 
+require "./assets"
 require "./config"
 require "./markdown"
 require "./render"
@@ -16,6 +17,10 @@ def run(options, arguments)
 
   page_template = Templates::Template.get("templates/page.tmpl")
 
+  # Copy assets/ to output/
+  Assets.render()
+
+  # Render posts and RSS feed
   posts = Markdown::File.read_all("posts")
   Render.render(posts, page_template, require_date: true)
 
@@ -25,9 +30,11 @@ def run(options, arguments)
     "output/rss.xml"
   )
 
+  # Render pages
   pages = Markdown::File.read_all("pages")
   Render.render(pages, page_template, require_date: false)
 
+  # Run tasks for real
   Util.log("Writing output files:")
   if options.bool["parallel"]
     Croupier::TaskManager.run_tasks_parallel

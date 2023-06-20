@@ -13,8 +13,8 @@
 * Verbosity levels
 * CLI arg to only build a specific thing
 * HTML manipulation using kostya/lexbor
-* Asset copying
 
+* ~~Asset copying~~
 * ~~Fix bug where pages are rebuilt uselessly~~
 * ~~Load templates lazy~~
 * ~~Normalize metadata key case~~
