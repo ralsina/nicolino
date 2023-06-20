@@ -1,13 +1,12 @@
 # Nicolino, a basic static site generator.
 
-require "commander"
-require "croupier"
-require "yaml"
 require "./config"
 require "./markdown"
+require "./render"
 require "./template"
 require "./util"
-require "./render"
+require "croupier"
+require "yaml"
 
 VERSION = "0.1.0"
 
@@ -37,24 +36,3 @@ def run(options, arguments)
   end
   Util.log("Done!")
 end
-
-cli = Commander::Command.new do |cmd|
-  cmd.use = "nicolino"
-  cmd.long = "nicolino builds websites from markdown files."
-
-  cmd.flags.add do |flag|
-    flag.name = "parallel"
-    flag.short = "-p"
-    flag.long = "--parallel"
-    flag.default = false
-    flag.description = "Run tasks in parallel."
-    flag.persistent = true
-  end
-
-  cmd.run do |options, arguments|
-    options.bool["parallel"]
-    run(options, arguments)
-  end
-end
-
-Commander.run(cli, ARGV)
