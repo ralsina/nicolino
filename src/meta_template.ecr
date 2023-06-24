@@ -2,8 +2,14 @@ require "ecr"
 require "yaml"
 
 module Templates
+
+  class Tpl
+    def initialize(@context : Hash(YAML::Any, Yaml::Any))
+    end
+  end
+
     <%- @templates.each do |t| -%>
-    class Tpl<%= t.titleize.split(".ecr")[0] %>
+    class Tpl<%= t.titleize.split(".ecr")[0] %> << Tpl
         def initialize(@context : Hash(YAML::Any, Yaml::Any))
         end
 

@@ -14,7 +14,7 @@ def run(options, arguments)
   # Load config file
   Config.config
 
-  page_template = Templates::Template.get("templates/page.tmpl")
+  page_template = Templates::Template["templates/page.tmpl"]
 
   # Copy assets/ to output/
   Assets.render

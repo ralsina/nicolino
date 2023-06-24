@@ -49,8 +49,7 @@ module Markdown
 
     # Render the markdown HTML into the right template for the fragment
     def rendered
-      t = Templates::Template.get(template)
-      Crustache.render t, @metadata.merge({"link" => @link, "text" => html})
+      t = Templates::Template[template](@metadata.merge({"link" => @link, "text" => html})).to_s
     end
 
     # Parse all markdown posts in a path and build Markdown objects out of them
