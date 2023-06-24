@@ -1,0 +1,19 @@
+require "ecr"
+require "yaml"
+
+module Templates
+    <%- @templates.each do |t| -%>
+    class Tpl<%= t.titleize.split(".ecr")[0] %>
+        def initialize(@context : Hash(YAML::Any, Yaml::Any))
+        end
+
+        ECR.def_to_s "templates/<%= t %>.ecr"
+    end
+    <%- end -%>
+
+    Template = {
+    <%- @templates.each do |t| -%>
+    "templates/<%= t %>.tmpl" => Tpl<%= t.titleize %>,
+    <%- end -%>
+    }
+end
