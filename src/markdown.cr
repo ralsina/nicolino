@@ -14,6 +14,7 @@ module Markdown
 
     # Initialize the post with proper data
     def initialize(path)
+      # TODO: lazy load data
       contents = ::File.read(path)
       _, metadata, @text = contents.split("---\n", 3)
       # TODO normalize metadata key case
@@ -24,6 +25,8 @@ module Markdown
     end
 
     def html
+      # TODO: do not instantiate a whole new Markd.Renderer
+      # for each file (needs subclassing Markd.Renderer)
       if @html == ""
         @html = Markd.to_html(@text)
       end
