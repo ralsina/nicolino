@@ -27,11 +27,13 @@
 * Use ECR as template engine
 
   ECR is too static, all templates need to be declared
-  at compile time. That means that although performance
-  may be great (not tested) it's not possible to have
+  at compile time. That means it's not possible to have
   a post say "I want to use template 'whatever' and
-  have it.
+  have it do so if the template was unknown at nicolino
+  compile time.
 
-  It *would* be possible to generate code for all templates
-  and rebuild nicolino every time a template is added, but
-  that looks like a lot of work.
+  It *is* be possible to generate code for all templates
+  and rebuild nicolino every time a template is added,
+  a POC is in the [ecr-templates branch](https://github.com/ralsina/nicolino/tree/ecr-templates)
+  but some testing indicates the performance gains are
+  marginal.
