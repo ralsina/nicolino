@@ -1,4 +1,5 @@
 require "./nicolino"
+require "./meta_template"
 require "commander"
 require "colorize"
 
@@ -67,6 +68,17 @@ cli = Commander::Command.new do |cmd|
     )
     options.bool["parallel"]
     run(options, arguments)
+  end
+
+  cmd.commands.add do |c|
+    c.use = "rebuild"
+    c.long = "rebuild templates from source"
+    c.run do |_, _|
+      Log.info { "rebuilding templates" }
+      File.open("src/template.cr", "w") do |f|
+        f << Meta::Template.generate
+      end
+    end
   end
 end
 

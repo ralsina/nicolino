@@ -1,11 +1,11 @@
 module Config
-  @@config = {} of YAML::Any => YAML::Any
+  @@config = {} of String => String
 
   def self.config
     if @@config.empty?
       Log.info { "Loading configuration" }
       @@config = File.open("conf") do |file|
-        YAML.parse(file).as_h
+        Hash(String, String).from_yaml(file)
       end
     end
     @@config

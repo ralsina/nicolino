@@ -44,12 +44,12 @@ module Markdown
 
     # Path for the `Templates::Template` this post should be rendered with
     def template
-      @metadata.fetch("template", "templates/post.tmpl").to_s
+      @metadata.fetch("template", "templates/post.ecr").to_s
     end
 
     # Render the markdown HTML into the right template for the fragment
     def rendered
-      t = Templates::Template[template](@metadata.merge({"link" => @link, "text" => html})).to_s
+      Templates::Template[template].new(@metadata.merge({"link" => @link, "text" => html})).to_s
     end
 
     # Parse all markdown posts in a path and build Markdown objects out of them

@@ -54,9 +54,8 @@ module Render
   # Writes html, templated properly with config, into path
   def self.apply_template(html, template)
     # TODO: use a copy of config
-    Crustache.render(template,
-      Config.config.merge({
-        "content" => html,
-      }))
+    template.new(Config.config.merge({
+      "content" => html,
+    })).to_s
   end
 end

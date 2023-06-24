@@ -8,9 +8,11 @@ module Meta
     end
 
     ECR.def_to_s "src/meta_template.ecr"
+
+    def self.generate
+      Template.new(Dir.glob("templates/*.ecr").map(&.split("/")[1].split(".")[0])).to_s
+    end
+
   end
 
-  def generate
-    Template.new(Dir.glob("templates/*.ecr").map(&.split("/")[1].split(".")[0])).to_s
-  end
 end

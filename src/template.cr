@@ -1,13 +1,27 @@
 require "ecr"
-require "yaml"
-
-
 
 module Templates
+
   class Tpl
-    def initialize(@context : Hash(YAML::Any, Yaml::Any))
+    def initialize(@context : Hash(String, String))
     end
   end
 
-  Template = {"Tpl" => Tpl}
+    class TplPage < Tpl
+        def initialize(@context : Hash(String,String))
+        end
+
+        ECR.def_to_s "templates/page.ecr"
+    end
+    class TplPost < Tpl
+        def initialize(@context : Hash(String,String))
+        end
+
+        ECR.def_to_s "templates/post.ecr"
+    end
+
+    Template = {
+    "templates/page.ecr" => TplPage,
+    "templates/post.ecr" => TplPost,
+    }
 end
