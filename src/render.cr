@@ -17,7 +17,6 @@ module Render
       output = "output/#{post.@link}"
       name = "render #{output}"
       Croupier::Task.new(
-        name: name,
         output: output,
         inputs: ["conf", post.@source, post.template],
         proc: Croupier::TaskProc.new {
@@ -33,7 +32,6 @@ module Render
     name = "render #{output}"
 
     Croupier::Task.new(
-      name: name,
       output: output,
       inputs: inputs,
       proc: Croupier::TaskProc.new {
