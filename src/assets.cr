@@ -8,6 +8,7 @@ module Assets
         inputs: [src],
         proc: Croupier::TaskProc.new {
           Log.info { "    #{dest}" }
+          Dir.mkdir_p(dest.parent)
           File.copy(src, dest)
         },
         no_save: true,
