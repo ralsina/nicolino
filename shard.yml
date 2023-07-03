@@ -23,6 +23,6 @@ dependencies:
     github: ralsina/RSS.cr
   croupier:
     github: ralsina/croupier
-    version: 0.3.0
+    version: 0.3.3
   commander:
     github: mrrooijen/commander
