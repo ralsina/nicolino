@@ -14,6 +14,7 @@
 * Add text/teaser to the RSS feed
 * CLI arg to only build a specific thing
 * HTML manipulation using kostya/lexbor
+* Add auto mode
 
 * ~~Verbosity levels~~
 * ~~Asset copying~~
