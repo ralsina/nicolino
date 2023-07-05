@@ -13,7 +13,7 @@
 * Teasers
 * Add text/teaser to the RSS feed
 * CLI arg to only build a specific thing
-* HTML manipulation using kostya/lexbor
+* HTML manipulation using kostya/lexbor or madeindjs/crystagiri
 * Add auto mode
 
 * ~~Verbosity levels~~
