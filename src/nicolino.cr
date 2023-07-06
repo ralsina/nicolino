@@ -13,6 +13,7 @@ VERSION = "0.1.0"
 def run(options, arguments)
   # Load config file
   Config.config
+  Croupier::TaskManager.fast_mode = options.bool["fastmode"]
 
   page_template = Templates::Template.get("templates/page.tmpl")
 
@@ -37,7 +38,9 @@ def run(options, arguments)
   Log.info { "Writing output files:" }
   Croupier::TaskManager.run_tasks(
     parallel: options.bool["parallel"],
-    keep_going: options.bool["keep_going"]
+    keep_going: options.bool["keep_going"],
+    dry_run: options.bool["dry_run"],
+    run_all: options.bool["run_all"],
   )
   Log.info { "Done!" }
 end

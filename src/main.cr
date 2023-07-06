@@ -43,8 +43,16 @@ cli = Commander::Command.new do |cmd|
     flag.name = "verbosity"
     flag.short = "-v"
     flag.long = "--verbosity"
-    flag.description = "Control the logging verbosity, 0 to 5 "
+    flag.description = "Control the logging verbosity, 0 to 5"
     flag.default = 3
+    flag.persistent = true
+  end
+
+  cmd.flags.add do |flag|
+    flag.name = "fastmode"
+    flag.long = "--fast-mode"
+    flag.description = "Use file timestamps rather than contents to decide rebuilds"
+    flag.default = false
     flag.persistent = true
   end
 
@@ -53,6 +61,24 @@ cli = Commander::Command.new do |cmd|
     flag.short = "-k"
     flag.long = "--keep-going"
     flag.description = "Keep going when a task fails"
+    flag.default = false
+    flag.persistent = true
+  end
+
+  cmd.flags.add do |flag|
+    flag.name = "dry_run"
+    flag.short = "-n"
+    flag.long = "--dry-run"
+    flag.description = "Dry run: don't actually do anything"
+    flag.default = false
+    flag.persistent = true
+  end
+
+  cmd.flags.add do |flag|
+    flag.name = "run_all"
+    flag.short = "-B"
+    flag.long = "--run-all"
+    flag.description = "Run all tasks, even up-to-date ones"
     flag.default = false
     flag.persistent = true
   end

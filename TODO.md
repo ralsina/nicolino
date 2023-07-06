@@ -18,11 +18,11 @@
 * TUI using termbox2.cr
 * Minifier via html-minifier
 * live-reload via LiveReload.cr
-* Add flag for "run all / keep runningi / fast mode" and whatever
-  other flags Croupier has now.
-* Use croupier's k/v store to avoid reading parsing data all the
-  time
+* Use croupier's k/v store to avoid reading parsing post data
+  all the time
 
+* ~~Add flag for "run all / keep running / fast mode" and whatever
+  other flags Croupier has now.~~
 * ~~Verbosity levels~~
 * ~~Asset copying~~
 * ~~Fix bug where pages are rebuilt uselessly~~
