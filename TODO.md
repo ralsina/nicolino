@@ -16,6 +16,8 @@
 * HTML manipulation using kostya/lexbor or madeindjs/crystagiri
 * Add auto mode
 * TUI using termbox2.cr
+* Minifier via html-minifier
+* live-reload via LiveReload.cr
 
 * ~~Verbosity levels~~
 * ~~Asset copying~~
