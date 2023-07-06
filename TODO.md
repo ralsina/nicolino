@@ -15,6 +15,7 @@
 * CLI arg to only build a specific thing
 * HTML manipulation using kostya/lexbor or madeindjs/crystagiri
 * Add auto mode
+* TUI using termbox2.cr
 
 * ~~Verbosity levels~~
 * ~~Asset copying~~
