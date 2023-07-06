@@ -34,9 +34,11 @@ def run(options, arguments)
   pages = Markdown::File.read_all("pages")
   Render.render(pages, page_template, require_date: false)
 
+  arguments = Croupier::TaskManager.tasks.keys if arguments.empty?
   # Run tasks for real
-  Log.info { "Writing output files:" }
+  Log.info { "Running tasks..." }
   Croupier::TaskManager.run_tasks(
+    targets: arguments,
     parallel: options.bool["parallel"],
     keep_going: options.bool["keep_going"],
     dry_run: options.bool["dry_run"],

@@ -12,7 +12,6 @@
 * Support tags
 * Teasers
 * Add text/teaser to the RSS feed
-* CLI arg to only build a specific thing
 * HTML manipulation using kostya/lexbor or madeindjs/crystagiri
 * Add auto mode
 * TUI using termbox2.cr
@@ -21,8 +20,9 @@
 * Use croupier's k/v store to avoid reading parsing post data
   all the time
 
-* ~~Add flag for "run all / keep running / fast mode" and whatever
-  other flags Croupier has now.~~
+* ~~CLI arg to only build a specific thing~~
+* ~~Add flag for "run all / keep running / fast mode" and whatever~~
+  ~~other flags Croupier has now.~~
 * ~~Verbosity levels~~
 * ~~Asset copying~~
 * ~~Fix bug where pages are rebuilt uselessly~~

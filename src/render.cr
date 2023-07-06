@@ -19,7 +19,7 @@ module Render
         output: output,
         inputs: ["conf", post.@source, post.template],
         proc: Croupier::TaskProc.new {
-          Log.info { "    #{output}" }
+          Log.info { ">> #{output}" }
           apply_template(post.rendered, template)
         }
       )
@@ -33,7 +33,7 @@ module Render
       output: output,
       inputs: inputs,
       proc: Croupier::TaskProc.new {
-        Log.info { "    #{output}" }
+        Log.info { ">> #{output}" }
         feed = RSS.new title: title
         posts.each do |post|
           feed.item(
@@ -47,7 +47,7 @@ module Render
     )
   end
 
-  # Writes html, templated properly with config, into path
+  # Generates HTML properly templated
   def self.apply_template(html, template)
     # TODO: use a copy of config
     Crustache.render(template,
