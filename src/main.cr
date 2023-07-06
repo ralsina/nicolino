@@ -48,6 +48,15 @@ cli = Commander::Command.new do |cmd|
     flag.persistent = true
   end
 
+  cmd.flags.add do |flag|
+    flag.name = "keep_going"
+    flag.short = "-k"
+    flag.long = "--keep-going"
+    flag.description = "Keep going when a task fails"
+    flag.default = false
+    flag.persistent = true
+  end
+
   cmd.run do |options, arguments|
     if options.@bool["quiet"]
       verbosity = Log::Severity::Fatal

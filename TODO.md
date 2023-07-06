@@ -20,6 +20,8 @@
 * live-reload via LiveReload.cr
 * Add flag for "run all / keep runningi / fast mode" and whatever
   other flags Croupier has now.
+* Use croupier's k/v store to avoid reading parsing data all the
+  time
 
 * ~~Verbosity levels~~
 * ~~Asset copying~~

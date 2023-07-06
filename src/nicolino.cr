@@ -35,6 +35,9 @@ def run(options, arguments)
 
   # Run tasks for real
   Log.info { "Writing output files:" }
-  Croupier::TaskManager.run_tasks(parallel: options.bool["parallel"])
+  Croupier::TaskManager.run_tasks(
+    parallel: options.bool["parallel"],
+    keep_going: options.bool["keep_going"]
+  )
   Log.info { "Done!" }
 end

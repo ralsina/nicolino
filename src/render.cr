@@ -15,7 +15,6 @@ module Render
       end
 
       output = "output/#{post.@link}"
-      name = "render #{output}"
       Croupier::Task.new(
         output: output,
         inputs: ["conf", post.@source, post.template],
@@ -29,7 +28,6 @@ module Render
 
   def self.render_rss(posts, title, output)
     inputs = ["conf"] + posts.map { |post| post.@source }
-    name = "render #{output}"
 
     Croupier::Task.new(
       output: output,
