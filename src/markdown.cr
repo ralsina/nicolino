@@ -58,7 +58,7 @@ module Markdown
       Log.info { "Reading Markdown from #{path}" }
       posts = [] of File
       Dir.glob("#{path}/**/*.md").each do |p|
-        Log.info { "    #{p}" }
+        Log.info { "<< #{p}" }
         posts << File.new(p)
       end
       posts

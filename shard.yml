@@ -17,8 +17,8 @@ dependencies:
    github: icyleaf/markd
   crinja:
    github: straight-shoota/crinja
-  pixie:
-    github: watzon/pixie
+     #  pixie:
+     #github: watzon/pixie
   RSS:
     github: ralsina/RSS.cr
   croupier:
