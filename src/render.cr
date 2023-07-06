@@ -50,7 +50,7 @@ module Render
   # Generates HTML properly templated
   def self.apply_template(html, template)
     # TODO: use a copy of config
-    Crustache.render(template,
+    template.render(
       Config.config.merge({
         "content" => html,
       }))

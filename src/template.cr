@@ -1,32 +1,26 @@
-require "crustache"
+require "crinja"
 
 module Templates
   extend self
 
-  # Wrapper class for a Crustache template
-  class Template
+  Env = Crinja.new
+  Env.loader = Crinja::Loader::FileSystemLoader.new("./")
+
+  # Wrapper class for a Crinja template
+  struct Template
     # Per-path hash of all templates
-    @@templates = {} of String => Template
+    @@templates = {} of String => Crinja::Template
 
     def self.templates
       @@templates
     end
 
-    # Get a template's compiled version by path
+    # Get a template by path
     def self.get(path)
       if !Template.templates.has_key?(path)
-        Template.templates[path] = Template.new(path)
+        Template.templates[path] = Env.get_template(path)
       end
-      Template.templates[path].@compiled
-    end
-
-    @text : String
-    @compiled : Crustache::Syntax::Template
-
-    # Load from a file and compile template
-    def initialize(path)
-      @text = File.read(path)
-      @compiled = Crustache.parse(@text)
+      Template.templates[path]
     end
   end
 end

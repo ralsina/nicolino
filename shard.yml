@@ -15,8 +15,8 @@ license: MIT
 dependencies:
   markd:
    github: icyleaf/markd
-  crustache:
-   github: MakeNowJust/crustache
+  crinja:
+   github: straight-shoota/crinja
   pixie:
     github: watzon/pixie
   RSS:
