@@ -18,6 +18,8 @@
 * TUI using termbox2.cr
 * Minifier via html-minifier
 * live-reload via LiveReload.cr
+* Add flag for "run all / keep runningi / fast mode" and whatever
+  other flags Croupier has now.
 
 * ~~Verbosity levels~~
 * ~~Asset copying~~
