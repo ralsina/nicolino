@@ -4,7 +4,6 @@
 
 * Write real templates
 * Implement index page generation
-* Live / autoreload mode?
 * Image gallery
 * Support tags
 * Teasers
