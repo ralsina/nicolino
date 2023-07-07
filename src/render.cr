@@ -13,8 +13,6 @@ module Render
         next
       end
 
-      template = "templates/page.tmpl"
-
       output = "output/#{post.@link}"
       Croupier::Task.new(
         output: output,

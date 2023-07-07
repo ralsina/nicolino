@@ -78,7 +78,7 @@ def auto(options, arguments)
 end
 
 def serve(options, arguments)
-  server = HTTP::Server.new ([HTTP::StaticFileHandler.new("output")])
+  server = HTTP::Server.new([HTTP::StaticFileHandler.new("output")])
   address = server.bind_tcp 8080
   Log.info { "Server listening on http://#{address}" }
   server.listen
