@@ -3,9 +3,6 @@
 ## Things that could be done
 
 * Write real templates
-* Try maybe gunbolt.org
-  or shootingfly/water
-  or crinja
 * Implement index page generation
 * Live / autoreload mode?
 * Image gallery
@@ -13,13 +10,15 @@
 * Teasers
 * Add text/teaser to the RSS feed
 * HTML manipulation using kostya/lexbor or madeindjs/crystagiri
-* Add auto mode
 * TUI using termbox2.cr
 * Minifier via html-minifier
 * live-reload via LiveReload.cr
 * Use croupier's k/v store to avoid reading parsing post data
   all the time
 
+* ~~Add server mode~~
+* ~~Add auto mode~~
+* ~~Try crinja~~
 * ~~CLI arg to only build a specific thing~~
 * ~~Add flag for "run all / keep running / fast mode" and whatever~~
   ~~other flags Croupier has now.~~
