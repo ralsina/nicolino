@@ -46,6 +46,20 @@ module Render
     )
   end
 
+  def self.render_index(posts, output)
+    inputs = ["conf", "kv://templates/index.tmpl"] + posts.map { |post| post.@source } + posts.map { |post| post.template }
+    inputs = inputs.uniq
+    Croupier::Task.new(
+      output: output,
+      inputs: inputs,
+      proc: Croupier::TaskProc.new {
+        Log.info { ">> #{output}" }
+        content = Templates::Env.get_template("templates/index.tmpl").render({"posts" => posts.map(&.value)})
+        apply_template(content, "templates/page.tmpl")
+      }
+    )
+  end
+
   # Generates HTML properly templated
   def self.apply_template(html, template)
     # TODO: use a copy of config

@@ -31,6 +31,11 @@ def create_tasks
     "output/rss.xml"
   )
 
+  Render.render_index(
+    posts[..10],
+    "output/index.html"
+  )
+
   # Render pages
   pages = Markdown::File.read_all("pages")
   Render.render(pages, require_date: false)

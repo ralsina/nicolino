@@ -2,7 +2,6 @@
 
 ## Things that could be done
 
-* Implement index page generation
 * Image gallery
 * Support tags
 * Teasers
@@ -15,6 +14,7 @@
   all the time
 * Use nanobowers/cronic to parse dates
 
+* ~~Implement index page generation~~ (at least ONE index page)
 * ~~Write real templates (used picocss)~~
 * ~~Add server mode~~
 * ~~Add auto mode~~
