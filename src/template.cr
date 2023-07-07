@@ -5,7 +5,7 @@ module Templates
 
   class StoreLoader < Crinja::Loader
     def get_source(env : Crinja, template : String) : {String, String?}
-      source = Croupier::TaskManager.@store.get("#{template}")
+      source = Croupier::TaskManager.get("#{template}")
       raise "Template #{template} not found" if source.nil?
       {source, nil}
     end
@@ -22,7 +22,7 @@ module Templates
         output: "kv://#{template}",
         proc: Croupier::TaskProc.new {
           Log.info { "<< #{template}" }
-          Croupier::TaskManager.@store.set("kv://#{template}", File.read(template))
+          File.read(template)
         })
     end
   end
