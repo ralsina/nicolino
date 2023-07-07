@@ -17,7 +17,7 @@ module Render
       output = "output/#{post.@link}"
       Croupier::Task.new(
         output: output,
-        inputs: ["conf", post.@source, post.template],
+        inputs: ["conf", post.@source, post.template, template.filename.as(String)],
         proc: Croupier::TaskProc.new {
           Log.info { ">> #{output}" }
           apply_template(post.rendered, template)
