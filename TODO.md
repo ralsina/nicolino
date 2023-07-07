@@ -14,6 +14,7 @@
 * live-reload via LiveReload.cr and ~~server in auto mode~~
 * Use croupier's k/v store to avoid reading parsing post data
   all the time
+* Use nanobowers/cronic to parse dates
 
 * ~~Add server mode~~
 * ~~Add auto mode~~
