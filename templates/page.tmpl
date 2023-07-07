@@ -3,16 +3,16 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{{title}}</title>
-    <meta
-      name="description"
-      content="{{description}}"
-    />
+    <title>{{ title }}</title>
+    <meta name="description" content="{{ description }}" />
     <link rel="shortcut icon" href="/favicon.ico" />
-    <link rel="canonical" href="{{canonical_url}}" />
+    <link rel="canonical" href="{{ canonical_url }}" />
 
     <!-- Pico.css -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"
+    />
 
     <!-- Custom template-->
     <link rel="stylesheet" href="css/custom.css" />
@@ -21,44 +21,25 @@
     <!-- Header -->
     <header class="container">
       <hgroup>
-        <h1>{{title}}</h1>
-        <h2>{{description}}</h2>
+        <h1><span id="theme_switcher"></span> {{ title }}</h1>
+        <h2>{{ description }}</h2>
       </hgroup>
-      <nav>
-        <ul>
-          <li>
-            <details role="list">
-              <summary aria-haspopup="listbox" role="button" class="secondary">Theme</summary>
-              <ul role="listbox">
-                <li><a href="#" data-theme-switcher="auto">Auto</a></li>
-                <li><a href="#" data-theme-switcher="light">Light</a></li>
-                <li><a href="#" data-theme-switcher="dark">Dark</a></li>
-              </ul>
-            </details>
-          </li>
-        </ul>
-      </nav>
     </header>
     <!-- ./ Header -->
 
     <!-- Main -->
     <main class="container">
-      {{content}}
+      {{ content }}
     </main>
     <!-- ./ Main -->
 
     <!-- Footer -->
     <footer class="container">
-      <small
-        >Built with <a href="https://picocss.com">Pico</a> •
-        <a href="https://github.com/picocss/examples/blob/master/v1-basic-template/"
-          >Source code</a
-        ></small
-      >
+      <small>Built with <a href="https://picocss.com">Pico</a></small>
     </footer>
     <!-- ./ Footer -->
 
     <!-- Minimal theme switcher -->
-    <script src="js/minimal-theme-switcher.js"></script>
+    <script src="js/theme-switcher.js"></script>
   </body>
 </html>
