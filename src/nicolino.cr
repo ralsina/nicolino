@@ -61,6 +61,9 @@ def auto(options, arguments)
   # Now run in auto mode
   begin
     Log.info { "Running in auto mode, press Ctrl+C to stop" }
+    spawn do
+      serve(options, arguments)
+    end
     Croupier::TaskManager.auto_run(arguments) # FIXME: check options
   rescue ex
     Log.error { ex }
@@ -75,6 +78,6 @@ end
 def serve(options, arguments)
   server = HTTP::Server.new ([HTTP::StaticFileHandler.new("output")])
   address = server.bind_tcp 8080
-  Log.info { "Server listening on http://#{address}, press Ctrl+C to stop" }
+  Log.info { "Server listening on http://#{address}" }
   server.listen
 end
