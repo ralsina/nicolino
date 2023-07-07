@@ -11,7 +11,7 @@
 * HTML manipulation using kostya/lexbor or madeindjs/crystagiri
 * TUI using termbox2.cr
 * Minifier via html-minifier
-* live-reload via LiveReload.cr
+* live-reload via LiveReload.cr and server in auto mode
 * Use croupier's k/v store to avoid reading parsing post data
   all the time
 
