@@ -49,7 +49,7 @@ module Markdown
 
     # Render the markdown HTML into the right template for the fragment
     def rendered
-      Templates::Template.get(template).render(
+      Templates::Env.get_template(template).render(
         @metadata.merge({"link" => @link, "text" => html}))
     end
 

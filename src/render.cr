@@ -5,22 +5,23 @@ module Render
   #
   # posts is an Array of `Markdown::File`
   # config is a Hash used for template context
-  # template is a compiled crustache template
   # if require_date is true, posts *must* have a date
-  def self.render(posts, template, require_date = true)
+  def self.render(posts, require_date = true)
     posts.each do |post|
       if require_date && post.date == nil
         Log.info { "Error: #{post.@source} has no date" }
         next
       end
 
+      template = "templates/page.tmpl"
+
       output = "output/#{post.@link}"
       Croupier::Task.new(
         output: output,
-        inputs: ["conf", post.@source, post.template, template.filename.as(String)],
+        inputs: ["conf", post.@source, "kv://#{post.template}", "kv://templates/page.tmpl"],
         proc: Croupier::TaskProc.new {
           Log.info { ">> #{output}" }
-          apply_template(post.rendered, template)
+          apply_template(post.rendered, "templates/page.tmpl")
         }
       )
     end
@@ -50,7 +51,7 @@ module Render
   # Generates HTML properly templated
   def self.apply_template(html, template)
     # TODO: use a copy of config
-    template.render(
+    Templates::Env.get_template(template).render(
       Config.config.merge({
         "content" => html,
       }))

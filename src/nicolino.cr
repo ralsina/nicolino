@@ -14,14 +14,16 @@ VERSION = "0.1.0"
 def create_tasks
   # Load config file
   Config.config
-  page_template = Templates::Template.get("templates/page.tmpl")
+
+  # Load templates to k/v store
+  Templates.load_templates
 
   # Copy assets/ to output/
   Assets.render
 
   # Render posts and RSS feed
   posts = Markdown::File.read_all("posts")
-  Render.render(posts, page_template, require_date: true)
+  Render.render(posts, require_date: true)
 
   Render.render_rss(
     posts[..10],
@@ -31,7 +33,7 @@ def create_tasks
 
   # Render pages
   pages = Markdown::File.read_all("pages")
-  Render.render(pages, page_template, require_date: false)
+  Render.render(pages, require_date: false)
 end
 
 def run(options, arguments)
