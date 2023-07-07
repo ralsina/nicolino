@@ -17,8 +17,6 @@ dependencies:
    github: icyleaf/markd
   crinja:
    github: straight-shoota/crinja
-     #  pixie:
-     #github: watzon/pixie
   RSS:
     github: ralsina/RSS.cr
   croupier:
@@ -26,3 +24,5 @@ dependencies:
     branch: main
   commander:
     github: mrrooijen/commander
+  live_reload:
+    github: bcardiff/live_reload.cr

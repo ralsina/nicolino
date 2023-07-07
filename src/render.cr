@@ -47,7 +47,11 @@ module Render
   end
 
   def self.render_index(posts, output)
-    inputs = ["conf", "kv://templates/index.tmpl"] + posts.map { |post| post.@source } + posts.map { |post| post.template }
+    inputs = [
+      "conf",
+      "kv://templates/index.tmpl",
+      "kv://templates/page.tmpl",
+    ] + posts.map(&.@source) + posts.map(&.template)
     inputs = inputs.uniq
     Croupier::Task.new(
       output: output,

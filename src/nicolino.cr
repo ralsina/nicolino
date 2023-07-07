@@ -7,6 +7,7 @@ require "./render"
 require "./template"
 require "croupier"
 require "http/server"
+require "live_reload"
 require "yaml"
 
 VERSION = "0.1.0"
@@ -59,18 +60,45 @@ def run(options, arguments)
   0
 end
 
-# Run forver automatically rebuilding the site
+# Run forever automatically rebuilding the site
 def auto(options, arguments)
-  # First do a normal run
-  arguments = Croupier::TaskManager.tasks.keys if arguments.empty?
-  run(options, arguments)
+  create_tasks
+  Croupier::TaskManager.fast_mode = options.bool.fetch("fastmode", false)
 
   # Now run in auto mode
   begin
     Log.info { "Running in auto mode, press Ctrl+C to stop" }
+    # Launch HTTP server
     spawn do
       serve(options, arguments)
     end
+
+    # Launch LiveReload server
+    live_reload = LiveReload::Server.new
+    Log.info { "LiveReload on http://#{live_reload.address}" }
+    spawn do
+      live_reload.listen
+    end
+
+    # Create task that will be triggered in rebuilds
+    Croupier::Task.new(
+      id: "LiveReload",
+      inputs: Croupier::TaskManager.tasks.keys,
+      proc: Croupier::TaskProc.new {
+        Croupier::TaskManager.modified.each do |path|
+          next if path.lchop? "kv://"
+          path = path.lchop "output/"
+          Log.info { "LiveReload: #{path}" }
+          live_reload.send_reload(path: path, liveCSS: path.ends_with?(".css"))
+        end
+      }
+    )
+
+    # First do a normal run
+    arguments = Croupier::TaskManager.tasks.keys if arguments.empty?
+    run(options, arguments)
+
+    # Then run in auto mode
     Croupier::TaskManager.auto_run(arguments) # FIXME: check options
   rescue ex
     Log.error { ex }

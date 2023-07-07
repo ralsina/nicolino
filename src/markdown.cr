@@ -56,11 +56,11 @@ module Markdown
     # Return a value Crinja can use in templates
     def value
       {
-        "title" => @title,
-        "link" => @link,
-        "date" => date,
-        "html" => html,
-        "source" => @source,
+        "title"    => @title,
+        "link"     => @link,
+        "date"     => date,
+        "html"     => html,
+        "source"   => @source,
         "rendered" => rendered,
       }
     end
@@ -75,6 +75,5 @@ module Markdown
       end
       posts
     end
-
   end
 end
