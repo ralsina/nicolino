@@ -26,3 +26,5 @@ dependencies:
     github: mrrooijen/commander
   live_reload:
     github: bcardiff/live_reload.cr
+  lexbor:
+    github: kostya/lexbor

@@ -5,8 +5,8 @@ require "./config"
 require "./markdown"
 require "./render"
 require "./template"
+require "./server"
 require "croupier"
-require "http/server"
 require "live_reload"
 require "yaml"
 
@@ -111,7 +111,7 @@ def auto(options, arguments)
 end
 
 def serve(options, arguments)
-  server = HTTP::Server.new([HTTP::StaticFileHandler.new("output")])
+  server = HTTP::Server.new([Server::LiveReloadHandler.new, HTTP::StaticFileHandler.new("output")])
   address = server.bind_tcp 8080
   Log.info { "Server listening on http://#{address}" }
   server.listen
