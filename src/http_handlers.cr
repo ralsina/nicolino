@@ -8,7 +8,6 @@ module Handler
   # Takes a FilterProc which takes the next handler's
   # output and modifies it
   class Filter < IO
-
     def initialize(
       @proc : FilterProc,
       @context : HTTP::Server::Context
@@ -34,7 +33,6 @@ module Handler
       raise NotImplementedError.new("read")
     end
   end
-
 
   alias HTMLFilterProc = Proc(Lexbor::Parser, Nil)
 
