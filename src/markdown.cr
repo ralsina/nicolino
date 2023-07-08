@@ -54,6 +54,8 @@ module Markdown
     end
 
     # Return a value Crinja can use in templates
+    # FIXME: can Crinja handle the object directly
+    # if it uses properties?
     def value
       {
         "title"    => @title,

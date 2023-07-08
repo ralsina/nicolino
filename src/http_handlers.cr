@@ -1,4 +1,5 @@
 require "http/server"
+require "lexbor"
 
 module Handler
   alias FilterProc = Proc(Bytes, Bytes)
@@ -7,13 +8,17 @@ module Handler
   # Takes a FilterProc which takes the next handler's
   # output and modifies it
   class Filter < IO
-    def initialize(@proc : FilterProc, @context : HTTP::Server::Context)
+
+    def initialize(
+      @proc : FilterProc,
+      @context : HTTP::Server::Context
+    )
       @io = @context.response.output
     end
 
     def write(slice : Bytes) : Nil
       @context.response.headers.delete("Content-Length")
-      @io.write(@proc.call(slice))
+      @io.write(@proc.as(FilterProc).call(slice))
       @io.flush
     end
 
@@ -30,16 +35,32 @@ module Handler
     end
   end
 
+  alias HTMLFilterProc = Proc(Lexbor::Parser, Nil)
+
+  class HTMLFilter < Filter
+    def initialize(htmlproc : HTMLFilterProc, @context : HTTP::Server::Context)
+      @io = @context.as(HTTP::Server::Context).response.output
+      @proc = FilterProc.new { |slice|
+        parser = Lexbor::Parser.new(slice)
+        htmlproc.call(parser)
+        parser.to_pretty_html.to_slice
+      }
+    end
+  end
+
   # A handler that injects a script tag for livereload
   class LiveReloadHandler
     include HTTP::Handler
 
     def call(context) : Nil
       if context.request.path.ends_with?(".html")
-        context.response.output = Filter.new(
-          FilterProc.new { |slice|
-            data = String.new(slice) + %(<script src="http://localhost:35729/livereload.js"></script>)
-            data.to_slice
+        context.response.output = HTMLFilter.new(
+          HTMLFilterProc.new { |doc|
+            s = doc.create_node(:script)
+            s["src"] = "http://localhost:35729/livereload.js"
+            doc.head!.append_child(s)
+            # data = String.new(slice) + %(<script src="http://localhost:35729/livereload.js"></script>)
+            # data.to_slice
           }, context)
       end
       call_next(context)
