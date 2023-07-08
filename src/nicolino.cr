@@ -3,6 +3,7 @@
 require "./assets"
 require "./config"
 require "./http_handlers"
+require "./image"
 require "./markdown"
 require "./render"
 require "./template"
@@ -23,7 +24,7 @@ def create_tasks
   Assets.render
 
   # Render posts and RSS feed
-  posts = Markdown::File.read_all("posts")
+  posts = Markdown::File.read_all("posts/")
   Render.render(posts, require_date: true)
 
   Render.render_rss(
@@ -38,8 +39,12 @@ def create_tasks
   )
 
   # Render pages
-  pages = Markdown::File.read_all("pages")
+  pages = Markdown::File.read_all("pages/")
   Render.render(pages, require_date: false)
+
+  # Render images
+  images = Image.read_all("posts/") + Image.read_all("pages/")
+  Image.render(images)
 end
 
 def run(options, arguments)
