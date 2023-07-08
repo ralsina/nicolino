@@ -18,6 +18,7 @@
 * Implement init command (with data via rucksack?)
 * Implement something like nikola's continuous import (different binary?)
 
+* ~~Add a lightbox~~
 * ~~Image copy/resize via pixie~~
 * ~~HTML manipulation using kostya/lexbor~~ In place, can be used more.
 * ~~live-reload via LiveReload.cr and server in auto mode~~
