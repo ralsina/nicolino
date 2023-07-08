@@ -12,6 +12,9 @@
 * Use croupier's k/v store to avoid reading parsing post data
   all the time
 * Use nanobowers/cronic to parse dates
+* Parse and support shortcodes like nikola/hugo
+* Cleanup dependency handling (make posts calculate theirs)
+* Plugins using duktape?
 
 * ~~live-reload via LiveReload.cr and server in auto mode~~
 * ~~Implement index page generation~~ (at least ONE index page)
