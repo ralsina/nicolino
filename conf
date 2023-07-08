@@ -1,3 +1,6 @@
 title: "Nicolino Test Blog"
 description: "This is the demo site for Nicolino"
 canonical_url: https://example.com
+footer: "Default Nicolino Theme"
+options:
+  pretty_html: false
