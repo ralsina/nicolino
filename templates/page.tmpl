@@ -14,8 +14,10 @@
     />
 
     <!-- Lightbox -->
-    <link rel="stylesheet" href="/simplelightbox/simple-lightbox.min.css" />
-    <script src="/simplelightbox/simple-lightbox.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.css"
+    />
 
     <!-- Custom style-->
     <link rel="stylesheet" href="/css/custom.css" />
@@ -44,9 +46,12 @@
     <!-- /Footer -->
 
     <!-- Theme switcher -->
-    <script src="js/theme-switcher.js"></script>
+    <script src="/js/theme-switcher.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.js"></script>
     <script>
-      var lightbox = new SimpleLightbox(".gallery a");
+      new VenoBox({
+        selector: ".venobox",
+      });
     </script>
   </body>
 </html>
