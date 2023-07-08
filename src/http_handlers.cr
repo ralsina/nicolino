@@ -35,8 +35,10 @@ module Handler
     end
   end
 
+
   alias HTMLFilterProc = Proc(Lexbor::Parser, Nil)
 
+  # A HTMLFilter that uses Lexbor to modify the HTML
   class HTMLFilter < Filter
     def initialize(htmlproc : HTMLFilterProc, @context : HTTP::Server::Context)
       @io = @context.as(HTTP::Server::Context).response.output
@@ -49,6 +51,7 @@ module Handler
   end
 
   # A handler that injects a script tag for livereload
+  # using a HTMLFilter
   class LiveReloadHandler
     include HTTP::Handler
 
@@ -59,8 +62,6 @@ module Handler
             s = doc.create_node(:script)
             s["src"] = "http://localhost:35729/livereload.js"
             doc.head!.append_child(s)
-            # data = String.new(slice) + %(<script src="http://localhost:35729/livereload.js"></script>)
-            # data.to_slice
           }, context)
       end
       call_next(context)
