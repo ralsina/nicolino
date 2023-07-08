@@ -3,9 +3,13 @@ module Config
 
   struct Options
     property? pretty_html = false
+    property image_large = 4096
+    property image_thumb = 1024
 
     def initialize(options = Hash(YAML::Any, YAML::Any).new)
       @pretty_html = options["pretty_html"].as_bool if options.has_key? "pretty_html"
+      @image_large = options["image_large"].as_i if options.has_key? "image_large"
+      @image_thumb = options["image_thumb"].as_i if options.has_key? "image_thumb"
     end
   end
 
