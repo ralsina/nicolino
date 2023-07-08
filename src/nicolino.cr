@@ -2,10 +2,10 @@
 
 require "./assets"
 require "./config"
+require "./http_handlers"
 require "./markdown"
 require "./render"
 require "./template"
-require "./http_handlers"
 require "croupier"
 require "live_reload"
 require "yaml"
