@@ -6,7 +6,6 @@
 * Support tags
 * Teasers
 * Add text/teaser to the RSS feed
-* HTML manipulation using kostya/lexbor
 * TUI using homonoidian/termbox2.cr
 * Minifier via html-minifier
 * Use croupier's k/v store to avoid reading parsing post data
@@ -15,10 +14,11 @@
 * Parse and support shortcodes like nikola/hugo
 * Cleanup dependency handling (make posts calculate theirs)
 * Plugins using duktape?
-* Implement new_post/new_page command
+* Implement `new_post` `new_page` commands
 * Implement init command (with data via rucksack?)
 * Implement something like nikola's continuous import (different binary?)
 
+* ~~HTML manipulation using kostya/lexbor~~ In place, can be used more.
 * ~~live-reload via LiveReload.cr and server in auto mode~~
 * ~~Implement index page generation~~ (at least ONE index page)
 * ~~Write real templates (used picocss)~~
