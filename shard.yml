@@ -28,3 +28,5 @@ dependencies:
     github: bcardiff/live_reload.cr
   lexbor:
     github: kostya/lexbor
+  pixie:
+    github: watzon/pixie
