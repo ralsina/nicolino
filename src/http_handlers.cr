@@ -50,6 +50,19 @@ module Handler
     end
   end
 
+  # A handler that redirects to index.html if the path
+  # is a directory
+  class IndexHandler
+    include HTTP::Handler
+
+    def call(context) : Nil
+      if context.request.path.ends_with?("/")
+        context.request.path = context.request.path + "index.html"
+      end
+      call_next(context)
+    end
+  end
+
   # A handler that injects a script tag for livereload
   # using a HTMLFilter
   class LiveReloadHandler

@@ -70,7 +70,7 @@ def auto(options, arguments)
     Log.info { "Running in auto mode, press Ctrl+C to stop" }
     # Launch HTTP server
     spawn do
-      serve(options, arguments)
+      serve(options, arguments, live_reload: true)
     end
 
     # Launch LiveReload server
@@ -110,9 +110,16 @@ def auto(options, arguments)
   0
 end
 
-def serve(options, arguments)
-  server = HTTP::Server.new([Handler::LiveReloadHandler.new,
-                             HTTP::StaticFileHandler.new("output")])
+def serve(options, arguments, live_reload = false)
+  handlers = [
+    Handler::LiveReloadHandler.new,
+    Handler::IndexHandler.new,
+    HTTP::StaticFileHandler.new("output"),
+  ]
+
+  handlers.delete_at(0) if !live_reload
+
+  server = HTTP::Server.new handlers
   address = server.bind_tcp 8080
   Log.info { "Server listening on http://#{address}" }
   server.listen
