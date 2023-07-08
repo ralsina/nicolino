@@ -1,6 +1,7 @@
-require "markd"
+require "./discount"
 
 module Markdown
+
   # A class representing a Markdown file
   class File
     @metadata = Hash(String, String).new
@@ -28,10 +29,22 @@ module Markdown
       @link = @source.split("/", 2)[1][0..-4] + ".html"
     end
 
+    # Compile the markdown into HTML using Discount
+    def compile(markdown : String) : String
+      doc = Discount.mkd_string(markdown.to_unsafe, markdown.size, 0)
+      Discount.mkd_compile(doc, 0)
+      html = Pointer(Pointer(LibC::Char)).malloc 1
+      size = Discount.mkd_document(doc, html)
+      slice = Slice.new(html.value, size)
+      result = String.new(slice)
+      Discount.mkd_cleanup(doc)
+      result
+    end
+
     def html
       # TODO: do not instantiate a whole new Markd.Renderer
       # for each file (needs subclassing Markd.Renderer)
-      @html = Markd.to_html(@text)
+      @html = compile(@text)
     end
 
     def date
