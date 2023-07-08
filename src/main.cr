@@ -124,6 +124,7 @@ cli = Commander::Command.new do |cmd|
 
   cmd.commands.add do |command|
     command.use = "serve"
+    command.short = "Serve the site over HTTP"
     command.long = "Serve the site over HTTP"
     command.run do |options, arguments|
       LogFormat.setup(options.@bool["quiet"], options.@int["verbosity"])
