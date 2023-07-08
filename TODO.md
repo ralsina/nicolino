@@ -14,7 +14,6 @@
 * Use nanobowers/cronic to parse dates
 
 * ~~live-reload via LiveReload.cr and server in auto mode~~
-  (needs adding the script to the page transparently)
 * ~~Implement index page generation~~ (at least ONE index page)
 * ~~Write real templates (used picocss)~~
 * ~~Add server mode~~
