@@ -65,7 +65,8 @@ module Markdown
       }
     end
 
-    # Parse all markdown posts in a path and build Markdown objects out of them
+    # Parse all markdown posts in a path and build Markdown::File
+    # objects out of them
     def self.read_all(path)
       Log.info { "Reading Markdown from #{path}" }
       posts = [] of File
