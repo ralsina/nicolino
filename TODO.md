@@ -17,6 +17,7 @@
 * Implement `new_post` `new_page` commands
 * Implement init command (with data via rucksack?)
 * Implement something like nikola's continuous import (different binary?)
+* Reorganize theme so it's self contained
 
 * ~~Add a lightbox~~
 * ~~Image copy/resize via pixie~~
