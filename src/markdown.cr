@@ -4,33 +4,34 @@ module Markdown
   # A class representing a Markdown file
   class File
     @metadata = Hash(String, String).new
-    @text : String
-    @link : String
+    @text : String = ""
+    @link : String = ""
     @html : String = ""
-    @title : String
-    @source : String
+    @title : String = ""
+    @source : String = ""
     @rendered : String = ""
     @date : Time | Nil
 
     # Initialize the post with proper data
     def initialize(path)
       # TODO: lazy load data
-      contents = ::File.read(path)
+      @source = path
+      load
+    end
+
+    def load
+      Log.info { "<< #{@source}" }
+      contents = ::File.read(@source)
       _, metadata, @text = contents.split("---\n", 3)
-      # TODO normalize metadata key case
       @metadata = YAML.parse(metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
       @title = @metadata["title"].to_s
-      @link = path.split("/", 2)[1][0..-4] + ".html"
-      @source = path
+      @link = @source.split("/", 2)[1][0..-4] + ".html"
     end
 
     def html
       # TODO: do not instantiate a whole new Markd.Renderer
       # for each file (needs subclassing Markd.Renderer)
-      if @html == ""
-        @html = Markd.to_html(@text)
-      end
-      @html
+      @html = Markd.to_html(@text)
     end
 
     def date
@@ -73,7 +74,6 @@ module Markdown
       Log.info { "Reading Markdown from #{path}" }
       posts = [] of File
       Dir.glob("#{path}/**/*.md").each do |p|
-        Log.debug { "<< #{p}" }
         posts << File.new(p)
       end
       posts

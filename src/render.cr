@@ -18,6 +18,7 @@ module Render
         output: output,
         inputs: ["conf", post.@source, "kv://#{post.template}", "kv://templates/page.tmpl"],
         proc: Croupier::TaskProc.new {
+          post.load # Need to refresh post contents
           Log.info { ">> #{output}" }
           apply_template(post.rendered, "templates/page.tmpl")
         }
