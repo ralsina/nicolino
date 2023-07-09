@@ -22,6 +22,10 @@ module Markdown
       load
     end
 
+    def to_s(io)
+      io << "Post(#{@source})"
+    end
+
     def load
       Log.info { "<< #{@source}" }
       contents = ::File.read(@source)
@@ -149,7 +153,6 @@ module Markdown
       }
     )
   end
-
 
   # Parse all markdown posts in a path and build Markdown::File
   # objects out of them

@@ -7,6 +7,7 @@ require "./http_handlers"
 require "./image"
 require "./markdown"
 require "./render"
+require "./tags"
 require "./template"
 require "croupier"
 require "live_reload"
@@ -38,6 +39,10 @@ def create_tasks
     posts[..10],
     "output/posts/index.html"
   )
+
+  # Render tags
+  tags = Tag.read_all(posts)
+  Tag.render(tags)
 
   # Render pages
   pages = Markdown.read_all("pages/")

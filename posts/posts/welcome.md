@@ -2,6 +2,7 @@
 title: "Hi there, Welcome to Nicolino!"
 date: 2013-02-01
 toc: true
+tags: ["tag1", "tag2"]
 ---
 
 
