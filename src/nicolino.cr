@@ -35,7 +35,7 @@ def create_tasks
 
   Render.render_index(
     posts[..10],
-    "output/index.html"
+    "output/posts/index.html"
   )
 
   # Render pages

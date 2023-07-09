@@ -29,7 +29,7 @@ choice dependencies.
 # What's good about it?
 
 =It *is* fast=
-    While benchamrks probably mean nothing since Nicolino is quite incomplete
+    While benchmarks probably mean nothing since Nicolino is quite incomplete
     it *does* run [this benchmark](https://www.zachleat.com/web/build-benchmark/)
     significantly faster than Hugo, which is widely considered the fastest
     static site generator around.
@@ -55,14 +55,17 @@ choice dependencies.
 
 # Features (So far)
 
-* Pages compiled from markdown
-* Blog posts compiled from markdown
-* RSS feed of latest posts
-* Index page of latest posts
-* Images are resized and thumbnailed
-* PicoCSS based theme
+* Pages compiled from markdown (like this one)
+* Blog posts compiled from markdown, with index page (see [/posts](/posts))
+* RSS feed of latest posts (see [/feed.xml](/feed.xml))
+* Images are resized and thumbnailed (see [nicolino.png](/nicolino.png) and [nicolino.thumb.png](/nicolino.thumb.png))
 * VenoBox based lightbox for images (click on Nicolino above)
+* PicoCSS based theme
 * Markdown compiled using [Discount](http://www.pell.portland.or.us/~orc/Code/discount/)
+* `serve` mode, so you can see what the site looks like
+* `auto` mode, which rebuilds while you edit and automatically reloads
+  the pages in the browser
+* Incremental builds, so it only rebuilds what's needed
 
 # Why the name?
 

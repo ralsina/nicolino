@@ -1,5 +1,4 @@
 require "http/server"
-require "lexbor"
 
 module Handler
   alias FilterProc = Proc(Bytes, Bytes)

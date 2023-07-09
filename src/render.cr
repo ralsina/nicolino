@@ -1,3 +1,4 @@
+require "lexbor"
 require "RSS"
 
 module Render

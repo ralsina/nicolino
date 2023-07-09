@@ -1,3 +1,4 @@
+require "./html_filters"
 require "cr-discount"
 
 module Markdown
@@ -36,7 +37,7 @@ module Markdown
       slice = Slice.new(html.value, size)
       @html = String.new(slice)
       Discount.mkd_cleanup(doc)
-      @html
+      HtmlFilters.downgrade_headers(@html)
     end
 
     def date

@@ -18,14 +18,14 @@
 * Implement init command (with data via rucksack?)
 * Implement something like nikola's continuous import (different binary?)
 * Reorganize theme so it's self contained
-* Downgrade H1 to H3 in post content
 * Detect new posts/pages and handle that in auto mode
 * Decide what to do on output conflicts (like a page and posts index)
 * Check code block styling
-* Check out other markdown implementations (md4c, hoedown, msweet.org/mmd)
+* Check out other markdown implementations (md4c, hoedown, michaelrsweet/mmd)
 * Think how to do translations
 * Think how to do TOC in markdown
 
+* ~~Downgrade H1 to H3 in post content~~
 * ~~Add a lightbox~~
 * ~~Image copy/resize via pixie~~
 * ~~HTML manipulation using kostya/lexbor~~ In place, can be used more.
