@@ -72,6 +72,7 @@ choice dependencies.
         def foo():
             print("bar")
     ```
+* Optional table of contents in posts/pages
 
 # Why the name?
 

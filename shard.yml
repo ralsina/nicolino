@@ -30,3 +30,4 @@ dependencies:
     github: watzon/pixie
   cr-discount:
     github: ralsina/cr-discount
+    branch: main
