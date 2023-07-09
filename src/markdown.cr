@@ -15,11 +15,18 @@ module Markdown
     @rendered : String = ""
     @date : Time | Nil
 
+    # Register all Files by @source
+    @@posts = Hash(String, File).new
+    def self.posts
+      @@posts
+    end
+
     # Initialize the post with proper data
     def initialize(path)
       # TODO: lazy load data
       @source = path
       load
+      @@posts[@source] = self
     end
 
     def to_s(io)
