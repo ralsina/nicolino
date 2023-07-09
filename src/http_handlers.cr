@@ -42,7 +42,7 @@ module Handler
       @proc = FilterProc.new { |slice|
         parser = Lexbor::Parser.new(slice)
         htmlproc.call(parser)
-        parser.to_pretty_html.to_slice
+        parser.to_html.to_slice
       }
     end
   end

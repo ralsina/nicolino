@@ -23,8 +23,8 @@
 * Check out other markdown implementations (md4c, hoedown, michaelrsweet/mmd)
 * Think how to do translations
 * Think how to do TOC in markdown
-* Figure out why code blocks work on serve and not on auto (?!!?)
 
+* ~~Figure out why code blocks work on serve and not on auto (?!!?)~~
 * ~~Check code block styling~~
 * ~~Downgrade H1 to H3 in post content~~
 * ~~Add a lightbox~~
