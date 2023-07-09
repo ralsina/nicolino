@@ -18,10 +18,12 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.css"
     />
+    <script src="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.js"></script>
     <!-- highlightks -->
     <link
+      id="hljscss"
       rel="stylesheet"
-      href="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/default.min.css"
+      href="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/night-owl.min.css"
     />
     <script src="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/highlight.min.js"></script>
     <!-- Custom style-->
@@ -32,7 +34,15 @@
     <header class="container">
       <hgroup>
         <h1>{{ title }}</h1>
-        <h2><input type="checkbox" id="switch_theme" name="switch" role="switch"> » {{ description }}</h2>
+        <h2>
+          <input
+            type="checkbox"
+            id="switch_theme"
+            name="switch"
+            role="switch"
+          />
+          » {{ description }}
+        </h2>
       </hgroup>
     </header>
     <!-- /Header -->
@@ -52,7 +62,6 @@
 
     <!-- Theme switcher -->
     <script src="/js/theme-switcher.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.js"></script>
     <script>
       new VenoBox({
         selector: "div.lightbox div a, div.lightbox p a",
@@ -61,13 +70,7 @@
         share: true,
         maxWidth: "80%",
       });
-    </script>
-    <script>
-      document.addEventListener("DOMContentLoaded", (event) => {
-        document.querySelectorAll("pre code").forEach((block) => {
-          hljs.highlightElement(block);
-        });
-      });
+      hljs.highlightAll();
     </script>
   </body>
 </html>
