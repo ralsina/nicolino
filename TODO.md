@@ -21,11 +21,11 @@
 * Decide what to do on output conflicts (like a page and posts index)
 * Check out other markdown implementations (md4c, hoedown, michaelrsweet/mmd)
 * Think how to do translations
-* Make theme selection persistent
 * Image gallery index
 * Breadcrumbs
 * Sitemap
 
+* ~~Make theme selection persistent~~
 * ~~Apply theme selection to code blocks~~
 * ~~Image gallery~~
 * ~~Think how to do TOC in markdown~~
