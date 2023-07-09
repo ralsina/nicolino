@@ -56,9 +56,9 @@ choice dependencies.
 # Features (So far)
 
 * Pages compiled from markdown (like this one)
-* Blog posts compiled from markdown, with index page (see [/posts](/posts))
-* RSS feed of latest posts (see [/feed.xml](/feed.xml))
-* Images are resized and thumbnailed (see [nicolino.png](/nicolino.png) and [nicolino.thumb.png](/nicolino.thumb.png))
+* Blog posts compiled from markdown, with index page (see [/posts](/posts) )
+* RSS feed of latest posts (see [/feed.xml](/feed.xml) )
+* Images are resized and thumbnailed (see [nicolino.png](/nicolino.png) and [nicolino.thumb.png](/nicolino.thumb.png) )
 * VenoBox based lightbox for images (click on Nicolino above)
 * PicoCSS based theme
 * Markdown compiled using [Discount](http://www.pell.portland.or.us/~orc/Code/discount/)
@@ -66,14 +66,15 @@ choice dependencies.
 * `auto` mode, which rebuilds while you edit and automatically reloads
   the pages in the browser
 * Incremental builds, so it only rebuilds what's needed
-* Image galleries (see [Fancy Turning](/galleries/fancy-turning))
+* Image galleries (see [Fancy Turning](/galleries/fancy-turning) )
+* Optional table of contents in posts/pages
 * code blocks with syntax highlighting
 
-    ```python
-        def foo():
-            print("bar")
-    ```
-* Optional table of contents in posts/pages
+```python
+def foo():
+    print("bar")
+```
+
 
 # Why the name?
 

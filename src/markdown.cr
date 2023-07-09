@@ -47,7 +47,6 @@ module Markdown
       end
       Discount.mkd_cleanup(doc)
       HtmlFilters.downgrade_headers(@html)
-      HtmlFilters.extract_body(@html)
     end
 
     def date
