@@ -25,23 +25,23 @@ def create_tasks
   Assets.render
 
   # Render posts and RSS feed
-  posts = Markdown::File.read_all("posts/")
-  Render.render(posts, require_date: true)
+  posts = Markdown.read_all("posts/")
+  Markdown.render(posts, require_date: true)
 
-  Render.render_rss(
+  Markdown.render_rss(
     posts[..10],
     Config.config["title"].to_s,
     "output/rss.xml"
   )
 
-  Render.render_index(
+  Markdown.render_index(
     posts[..10],
     "output/posts/index.html"
   )
 
   # Render pages
-  pages = Markdown::File.read_all("pages/")
-  Render.render(pages, require_date: false)
+  pages = Markdown.read_all("pages/")
+  Markdown.render(pages, require_date: false)
 
   # Render images from posts and pages
   images = Image.read_all("posts/") + Image.read_all("pages/")

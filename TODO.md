@@ -24,6 +24,8 @@
 * Image gallery index
 * Breadcrumbs
 * Sitemap
+* Try to be close to hugo's input layout if possible
+* Draft / future / expired
 
 * ~~Make theme selection persistent~~
 * ~~Apply theme selection to code blocks~~
