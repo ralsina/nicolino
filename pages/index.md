@@ -6,7 +6,6 @@ title: Hi there, Welcome to Nicolino!
 > [![The Real Nicolino](nicolino.thumb.png)](nicolino.png)
 
 # So, what is this?
-
 Nicolino is a simple, fast and lightweight static site generator written in Crystal.
 
 Yes, yes, I know, all the static site generators are simple, fast and lightweight,

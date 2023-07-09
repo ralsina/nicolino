@@ -55,9 +55,12 @@ module Handler
 
     def call(context) : Nil
       if context.request.path.ends_with?("/")
-        context.request.path = context.request.path + "index.html"
+        # Redirect to whatever/index.html
+        context.response.status_code = 302
+        context.response.headers["Location"] = context.request.path + "index.html"
+      else
+        call_next(context)
       end
-      call_next(context)
     end
   end
 
