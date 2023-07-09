@@ -23,6 +23,8 @@
 * Think how to do translations
 * Make theme selection persistent
 * Image gallery index
+* Breadcrumbs
+* Sitemap
 
 * ~~Apply theme selection to code blocks~~
 * ~~Image gallery~~
