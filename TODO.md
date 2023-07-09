@@ -20,11 +20,12 @@
 * Reorganize theme so it's self contained
 * Detect new posts/pages and handle that in auto mode
 * Decide what to do on output conflicts (like a page and posts index)
-* Check code block styling
 * Check out other markdown implementations (md4c, hoedown, michaelrsweet/mmd)
 * Think how to do translations
 * Think how to do TOC in markdown
+* Figure out why code blocks work on serve and not on auto (?!!?)
 
+* ~~Check code block styling~~
 * ~~Downgrade H1 to H3 in post content~~
 * ~~Add a lightbox~~
 * ~~Image copy/resize via pixie~~
