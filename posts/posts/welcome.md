@@ -1,9 +1,9 @@
 ---
 title: "Hi there, Welcome to Nicolino!"
 date: 2013-02-01
+toc: true
 ---
 
-[TOC]
 
 # Foo
 
