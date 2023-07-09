@@ -92,7 +92,12 @@ def auto(options, arguments)
       proc: Croupier::TaskProc.new {
         Croupier::TaskManager.modified.each do |path|
           next if path.lchop? "kv://"
-          path = path.lchop "output/"
+          path = path.lchop "output"
+          # FIXME: This reload for / is not working
+          if path.ends_with? "index.html"
+            Log.info { "LiveReload: #{path[..-11]}" }
+            live_reload.send_reload(path: path[..-11], liveCSS: false)
+          end
           Log.info { "LiveReload: #{path}" }
           live_reload.send_reload(path: path, liveCSS: path.ends_with?(".css"))
         end

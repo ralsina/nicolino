@@ -28,3 +28,5 @@ dependencies:
     github: kostya/lexbor
   pixie:
     github: watzon/pixie
+  cr-discount:
+    github: ralsina/cr-discount

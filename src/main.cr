@@ -1,7 +1,6 @@
 require "./nicolino"
 require "commander"
 require "colorize"
-require "./discount"
 
 struct LogFormat < Log::StaticFormatter
   @@colors = {

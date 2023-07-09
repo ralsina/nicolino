@@ -1,7 +1,6 @@
-require "./discount"
+require "cr-discount"
 
 module Markdown
-
   # A class representing a Markdown file
   class File
     @metadata = Hash(String, String).new
@@ -26,17 +25,18 @@ module Markdown
       _, metadata, @text = contents.split("---\n", 3)
       @metadata = YAML.parse(metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
       @title = @metadata["title"].to_s
-      @link = @source.split("/", 2)[1][0..-4] + ".html"
+      @link = "/" + @source.split("/", 2)[1][0..-4] + ".html"
     end
 
     def html
-      doc = Discount.mkd_string(@text.to_unsafe, @text.bytesize, 0)
-      Discount.mkd_compile(doc, 0)
+      doc = Discount.mkd_string(@text.to_unsafe, @text.bytesize, Discount::FLAGS)
+      Discount.mkd_compile(doc, Discount::FLAGS)
       html = Pointer(Pointer(LibC::Char)).malloc 1
       size = Discount.mkd_document(doc, html)
       slice = Slice.new(html.value, size)
       @html = String.new(slice)
       Discount.mkd_cleanup(doc)
+      @html
     end
 
     def date

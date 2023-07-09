@@ -3,6 +3,8 @@ title: "Hi there, Welcome to Nicolino!"
 date: 2013-02-01
 ---
 
+[TOC]
+
 # Foo
 
 If you want a real featureful static site generator, you may want to check Nicolino's

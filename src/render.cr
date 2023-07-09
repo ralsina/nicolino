@@ -13,7 +13,7 @@ module Render
         next
       end
 
-      output = "output/#{post.@link}"
+      output = "output#{post.@link}"
       Croupier::Task.new(
         output: output,
         inputs: ["conf", post.@source, "kv://#{post.template}", "kv://templates/page.tmpl"],
