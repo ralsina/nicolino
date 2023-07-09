@@ -30,8 +30,8 @@ module Markdown
     end
 
     def html
-      doc = Discount.mkd_string(@text.to_unsafe, @text.bytesize, Discount::FLAGS)
-      Discount.mkd_compile(doc, Discount::FLAGS)
+      doc = Discount.mkd_string(@text.to_unsafe, @text.bytesize,  Discount::MKD_FENCEDCODE)
+      Discount.mkd_compile(doc, Discount::MKD_FENCEDCODE)
       html = Pointer(Pointer(LibC::Char)).malloc 1
       size = Discount.mkd_document(doc, html)
       slice = Slice.new(html.value, size)
