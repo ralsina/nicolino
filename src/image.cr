@@ -27,9 +27,12 @@ module Image
     # Images are copied 2x:
     # image.jpg => image.jpg       (size is options.image_large)
     # image.jpg => image.thumb.jpg (size is options.image_thumb)
-    def render
+    #
+    # prefix affects destination path:
+    # foo/bar/bat.jpg => output/#{prefix}/bar/bat.jpg
+    def render(prefix = "")
       src = @path.to_s
-      dest = Path.new(["output/"] + @path.parts[1..])
+      dest = Path.new(["output/", prefix] + @path.parts[1..])
       Croupier::Task.new(
         output: dest.to_s,
         inputs: ["conf", src],
@@ -76,13 +79,13 @@ module Image
     Log.info { "Reading Images from #{path}" }
     images = [] of Image
     Dir.glob("#{path}/**/*.{jpg,jpeg,png}").each do |p|
-      Log.debug { "<< #{p}" }
+      Log.info { "<< #{p}" }
       images << Image.new(p)
     end
     images
   end
 
-  def self.render(images)
-    images.each(&.render)
+  def self.render(images, prefix = "")
+    images.each(&.render(prefix))
   end
 end

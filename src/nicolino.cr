@@ -2,6 +2,7 @@
 
 require "./assets"
 require "./config"
+require "./gallery"
 require "./http_handlers"
 require "./image"
 require "./markdown"
@@ -42,9 +43,17 @@ def create_tasks
   pages = Markdown::File.read_all("pages/")
   Render.render(pages, require_date: false)
 
-  # Render images
+  # Render images from posts and pages
   images = Image.read_all("posts/") + Image.read_all("pages/")
   Image.render(images)
+
+  # Render images from galleries
+  images = Image.read_all("galleries/")
+  Image.render(images, "galleries")
+
+  # Render galleries
+  galleries = Gallery.read_all("galleries/")
+  Gallery.render(galleries, "galleries")
 end
 
 def run(options, arguments)

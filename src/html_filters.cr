@@ -17,4 +17,9 @@ module HtmlFilters
     end
     doc.to_html
   end
+
+  def self.extract_body(html)
+    doc = Lexbor::Parser.new(html)
+    doc.nodes(:body).first.inner_html
+  end
 end

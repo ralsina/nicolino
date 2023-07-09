@@ -1,4 +1,6 @@
-# Specimens of Fancy Turning (1869)
+---
+title: Specimens of Fancy Turning (1869)
+---
 
 These awesome public domain images are from a book by
 Edward J. Woolsey (1803-1872) and were created using

@@ -2,6 +2,8 @@ require "./html_filters"
 require "cr-discount"
 
 module Markdown
+  alias ValueType = Hash(String, String | Time | Nil | Array(String))
+
   # A class representing a Markdown file
   class File
     @metadata = Hash(String, String).new
@@ -31,7 +33,7 @@ module Markdown
 
     def html
       flags = Discount::MKD_FENCEDCODE | Discount::MKD_TOC
-      doc = Discount.mkd_string(@text.to_unsafe, @text.bytesize,  flags)
+      doc = Discount.mkd_string(@text.to_unsafe, @text.bytesize, flags)
       Discount.mkd_compile(doc, flags)
       html = Pointer(Pointer(LibC::Char)).malloc 1
       size = Discount.mkd_document(doc, html)
@@ -45,6 +47,7 @@ module Markdown
       end
       Discount.mkd_cleanup(doc)
       HtmlFilters.downgrade_headers(@html)
+      HtmlFilters.extract_body(@html)
     end
 
     def date
@@ -63,22 +66,22 @@ module Markdown
 
     # Render the markdown HTML into the right template for the fragment
     def rendered
-      Templates::Env.get_template(template).render(
-        @metadata.merge({"link" => @link, "text" => html}))
+      context = @metadata.merge(value)
+      Templates::Env.get_template(template).render(context)
     end
 
     # Return a value Crinja can use in templates
     # FIXME: can Crinja handle the object directly
     # if it uses properties?
-    def value
-      {
-        "title"    => @title,
-        "link"     => @link,
-        "date"     => date,
-        "html"     => html,
-        "source"   => @source,
-        "rendered" => rendered,
-      }
+    def value : ValueType
+      v = ValueType.new
+      v.merge({
+        "title"  => @title,
+        "link"   => @link,
+        "date"   => date,
+        "html"   => html,
+        "source" => @source,
+      })
     end
 
     # Parse all markdown posts in a path and build Markdown::File

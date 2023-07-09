@@ -66,6 +66,7 @@ choice dependencies.
 * `auto` mode, which rebuilds while you edit and automatically reloads
   the pages in the browser
 * Incremental builds, so it only rebuilds what's needed
+* Image galleries (see [Fancy Turning](/galleries/fancy-turning))
 * code blocks with syntax highlighting
 
     ```python

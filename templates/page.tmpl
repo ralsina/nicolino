@@ -55,8 +55,11 @@
     <script src="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.js"></script>
     <script>
       new VenoBox({
-        selector: "div.lightbox p a",
+        selector: "div.lightbox div a, div.lightbox p a",
         spinner: "fold",
+        numeration: true,
+        share: true,
+        maxWidth: "80%",
       });
     </script>
     <script>

@@ -2,7 +2,6 @@
 
 ## Things that could be done
 
-* Image gallery
 * Support tags
 * Teasers
 * Add text/teaser to the RSS feed
@@ -24,7 +23,9 @@
 * Think how to do translations
 * Make theme selection persistent
 * Apply theme selection to code blocks
+* Image gallery index
 
+* ~~Image gallery~~
 * ~~Think how to do TOC in markdown~~
 * ~~Figure out why code blocks work on serve and not on auto (?!!?)~~
 * ~~Check code block styling~~
