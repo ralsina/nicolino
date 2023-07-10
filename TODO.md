@@ -10,7 +10,7 @@
 * Use croupier's k/v store to avoid reading parsing post data
   all the time
 * Use nanobowers/cronic to parse dates
-* Parse and support shortcodes like nikola/hugo
+* Parse and support shortcodes like nikola/hugo (Ragmaanir/syntaks ?)
 * Cleanup dependency handling (make posts calculate theirs)
 * Plugins using duktape?
 * Implement `new_post` `new_page` commands
