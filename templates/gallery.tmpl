@@ -14,7 +14,7 @@ date: {{date}}
     <div>
     <a href="{{image}}" data-gall="gallery"><img src="{{image | replace( ".", ".thumb.")}}"></a>
     </div>
-    {% if loop.index % 5 == 0 %}
+    {% if (loop.index % 5 == 0) or (loop.index == image_list | length) %}
         </div>
     {% endif %}
 {% endfor %}
