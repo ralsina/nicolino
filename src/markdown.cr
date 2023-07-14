@@ -43,21 +43,8 @@ module Markdown
     end
 
     def html
-      flags = Discount::MKD_FENCEDCODE | Discount::MKD_TOC
-      doc = Discount.mkd_string(@text.to_unsafe, @text.bytesize, flags)
-      Discount.mkd_compile(doc, flags)
-      html = Pointer(Pointer(LibC::Char)).malloc 1
-      size = Discount.mkd_document(doc, html)
-      slice = Slice.new(html.value, size)
-      @html = String.new(slice)
-      if @metadata.fetch("toc", nil)
-        toc = Pointer(Pointer(LibC::Char)).malloc 1
-        toc_size = Discount.mkd_toc(doc, toc)
-        toc_s = String.new(Slice.new(toc.value, toc_size))
-        @html = toc_s + @html
-      end
-      Discount.mkd_cleanup(doc)
-      HtmlFilters.downgrade_headers(@html)
+      @html = Discount.compile(@text, @metadata.fetch("toc", nil).as(Bool))
+      @html = HtmlFilters.downgrade_headers(@html)
     end
 
     def date
