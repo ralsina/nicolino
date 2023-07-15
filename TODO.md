@@ -7,10 +7,9 @@
 * Add text/teaser to the RSS feed
 * TUI using homonoidian/termbox2.cr
 * Minifier via html-minifier
-* Use croupier's k/v store to avoid reading parsing post data
+* Use croupier's k/v store to avoid reading/parsing post data
   all the time
 * Use nanobowers/cronic to parse dates
-* Parse and support shortcodes like nikola/hugo (Ragmaanir/syntaks ?)
 * Plugins using duktape?
 * Implement `new_post` `new_page` commands
 * Implement init command (with data via rucksack?)
@@ -18,7 +17,6 @@
 * Reorganize theme so it's self contained
 * Detect new posts/pages and handle that in auto mode
 * Decide what to do on output conflicts (like a page and posts index)
-* Check out other markdown implementations (md4c, hoedown, michaelrsweet/mmd)
 * Think how to do translations
 * Image gallery index
 * Breadcrumbs
@@ -28,6 +26,7 @@
 * Parse templats to find dependencies and load recursively
   (currently include doesn't work)
 
+* ~~Parse and support shortcodes like nikola/hugo~~
 * ~~Cleanup dependency handling (make posts calculate theirs)~~
 * ~~Make theme selection persistent~~
 * ~~Apply theme selection to code blocks~~
@@ -70,3 +69,8 @@
   a POC is in the [ecr-templates branch](https://github.com/ralsina/nicolino/tree/ecr-templates)
   but some testing indicates the performance gains are
   marginal.
+
+* Check out other markdown implementations (md4c, hoedown, michaelrsweet/mmd)
+
+  Discount seems to do pretty much everything I want, it's performant
+  and it has a nice, tiny binding I wrote. So, LGTM.
