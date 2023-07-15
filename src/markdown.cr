@@ -75,7 +75,8 @@ module Markdown
     def replace_shortcodes
       @shortcodes.errors.each do |e|
         # TODO: show actual error
-        Log.error { "Shortcode error: #{e}" }
+        Log.error { "In #{@source}:" }
+        Log.error { Shortcodes.nice_error(e, @text) }
       end
       text = @text
       # Starting at the end of text, go backwards
