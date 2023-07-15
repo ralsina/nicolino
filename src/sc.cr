@@ -11,21 +11,34 @@ module Sc
     # Starting at the end of text, go backwards
     # replacing each shortcode with its output
     parsed.shortcodes.reverse_each do |sc|
+      # FIXME: context needs stuff
+      context = Crinja::Context.new
       text = text[0, sc.position] +
-             render_sc(sc, Hash(String, String).new) +
+             render_sc(sc, context) +
              text[sc.position + sc.len, text.size]
     end
     text
   end
 
   # Render shortcode using its template
-  def self.render_sc(sc, context)
-    context["data"] = sc.data
-    # TODO: merge args into context
+  def self.render_sc(sc, context : Crinja::Context)
+    context["inner"] = sc.data
+    args = Hash(String | Int32, String).new
+    i = 0
+    sc.args.each_with_index do |a|
+      if a.name == ""
+        args["#{i}"] = a.value
+        i += 1
+      else
+        args[a.name] = a.value
+      end
+    end
+    context["args"] = args
+
     begin
-    template = Templates::Env.get_template("shortcodes/#{sc.name}.tmpl")
+      template = Templates::Env.get_template("shortcodes/#{sc.name}.tmpl")
     rescue ex
-      Log.error {"Can't load shortcode #{sc.name}: #{ex.message}"}
+      Log.error { "Can't load shortcode #{sc.name}: #{ex.message}" }
       return sc.whole
     end
     template.render(context)

@@ -2,9 +2,14 @@
 Title: Shortcodes Test
 ---
 
-This is a shortcode: {{% foo %}}  <---
-This is another shortcode: {{% bar %}} <---
+Using raw is not working for some reason.
 
-This is the raw shortcode that just passes its content:
+```
+{{%raw%}}
+{{% figure foo src="/nicolino.thumb.jpg" link="/nicolino.jpg" alt="Nicolino" caption="The real Nicolino" %}}
+{{%/raw%}}
+```
 
-{{%raw%}}This is inside{{%raw%}}
+This is the figure shortcode doing a figure:
+
+{{% figure foo src="/nicolino.thumb.jpg" link="/nicolino.jpg" alt="Nicolino" caption="The real Nicolino" %}}
