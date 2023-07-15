@@ -1,4 +1,5 @@
 require "./html_filters"
+require "./sc"
 require "cr-discount"
 
 module Markdown
@@ -17,6 +18,7 @@ module Markdown
 
     # Register all Files by @source
     @@posts = Hash(String, File).new
+
     def self.posts
       @@posts
     end
@@ -43,7 +45,8 @@ module Markdown
     end
 
     def html
-      @html = Discount.compile(@text, @metadata.fetch("toc", nil).as(Bool))
+      @html = Discount.compile(@text, @metadata.fetch("toc", nil) != nil)
+      @html = Sc.replace(html) # FIXME: it may need to go before compilation
       @html = HtmlFilters.downgrade_headers(@html)
     end
 
