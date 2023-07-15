@@ -46,7 +46,7 @@ module Markdown
 
     def html
       @html = Discount.compile(@text, @metadata.fetch("toc", nil) != nil)
-      @html = Sc.replace(html) # FIXME: it may need to go before compilation
+      @html = Sc.replace(@html) # FIXME: it may need to go before compilation
       @html = HtmlFilters.downgrade_headers(@html)
     end
 
