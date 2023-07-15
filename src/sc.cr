@@ -20,8 +20,15 @@ module Sc
 
   # Render shortcode using its template
   def self.render_sc(sc, context)
-    # FIXME: dummy
-    "[#{sc.name}]"
+    context["data"] = sc.data
+    # TODO: merge args into context
+    begin
+    template = Templates::Env.get_template("shortcodes/#{sc.name}.tmpl")
+    rescue ex
+      Log.error {"Can't load shortcode #{sc.name}: #{ex.message}"}
+      return sc.whole
+    end
+    template.render(context)
   end
 
   # Load shortcodes from shortcodes/ and put them in the k/v store
