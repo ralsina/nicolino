@@ -1,5 +1,7 @@
 require "./html_filters"
+require "./sc"
 require "cr-discount"
+require "shortcodes"
 
 module Markdown
   alias ValueType = Hash(String, String | Time | Nil | Array(String))
@@ -14,9 +16,11 @@ module Markdown
     @source : String = ""
     @rendered : String = ""
     @date : Time | Nil
+    @shortcodes = Shortcodes::Result.new
 
     # Register all Files by @source
     @@posts = Hash(String, File).new
+
     def self.posts
       @@posts
     end
@@ -40,10 +44,11 @@ module Markdown
       @metadata = YAML.parse(metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
       @title = @metadata["title"].to_s
       @link = "/" + @source.split("/", 2)[1][0..-4] + ".html"
+      @shortcodes = Shortcodes.parse(@text)
     end
 
     def html
-      @html = Discount.compile(@text, @metadata.fetch("toc", nil).as(Bool))
+      @html = Discount.compile(replace_shortcodes, @metadata.fetch("toc", nil) != nil)
       @html = HtmlFilters.downgrade_headers(@html)
     end
 
@@ -67,6 +72,25 @@ module Markdown
       Templates::Env.get_template(template).render(context)
     end
 
+    def replace_shortcodes
+      @shortcodes.errors.each do |e|
+        # TODO: show actual error
+        Log.error { "In #{@source}:" }
+        Log.error { Shortcodes.nice_error(e, @text) }
+      end
+      text = @text
+      # Starting at the end of text, go backwards
+      # replacing each shortcode with its output
+      @shortcodes.shortcodes.reverse_each do |sc|
+        # FIXME: context needs stuff
+        context = Crinja::Context.new
+        text = text[0, sc.position] +
+               Sc.render_sc(sc, context) +
+               text[sc.position + sc.len, text.size]
+      end
+      text
+    end
+
     # Return a value Crinja can use in templates
     # FIXME: can Crinja handle the object directly
     # if it uses properties?
@@ -79,6 +103,16 @@ module Markdown
         "html"   => html,
         "source" => @source,
       })
+    end
+
+    # List of all files and kv store items this post uses
+    # TODO: recursive template dependencies
+    def dependencies : Array(String)
+      result = ["conf", "kv://templates/page.tmpl"]
+      result << self.@source
+      result << "kv://#{template}"
+      result += self.@shortcodes.shortcodes.map { |sc| "kv://shortcodes/#{sc.name}.tmpl" }
+      result
     end
   end
 
@@ -97,7 +131,7 @@ module Markdown
       output = "output#{post.@link}"
       Croupier::Task.new(
         output: output,
-        inputs: ["conf", post.@source, "kv://#{post.template}", "kv://templates/page.tmpl"],
+        inputs: post.dependencies,
         proc: Croupier::TaskProc.new {
           post.load # Need to refresh post contents
           Log.info { ">> #{output}" }

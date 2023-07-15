@@ -14,8 +14,8 @@ module Templates
   Env = Crinja.new
   Env.loader = StoreLoader.new
 
+  # Load templates from templates/ and put them in the k/v store
   def self.load_templates
-    # Load templates from templates/ and put them in the k/v store
     Dir.glob("templates/*.tmpl").each do |template|
       Croupier::Task.new(
         inputs: [template],

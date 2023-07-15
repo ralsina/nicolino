@@ -11,7 +11,6 @@
   all the time
 * Use nanobowers/cronic to parse dates
 * Parse and support shortcodes like nikola/hugo (Ragmaanir/syntaks ?)
-* Cleanup dependency handling (make posts calculate theirs)
 * Plugins using duktape?
 * Implement `new_post` `new_page` commands
 * Implement init command (with data via rucksack?)
@@ -26,7 +25,10 @@
 * Sitemap
 * Try to be close to hugo's input layout if possible
 * Draft / future / expired
+* Parse templats to find dependencies and load recursively
+  (currently include doesn't work)
 
+* ~~Cleanup dependency handling (make posts calculate theirs)~~
 * ~~Make theme selection persistent~~
 * ~~Apply theme selection to code blocks~~
 * ~~Image gallery~~
