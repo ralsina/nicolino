@@ -7,6 +7,7 @@ require "./http_handlers"
 require "./image"
 require "./markdown"
 require "./render"
+require "./sc"
 require "./tags"
 require "./template"
 require "croupier"
@@ -21,6 +22,9 @@ def create_tasks
 
   # Load templates to k/v store
   Templates.load_templates
+
+  # Load shortcodes to k/v store
+  Sc.load_shortcodes
 
   # Copy assets/ to output/
   Assets.render

@@ -26,6 +26,8 @@
 * Sitemap
 * Try to be close to hugo's input layout if possible
 * Draft / future / expired
+* Parse templats to find dependencies and load recursively
+  (currently include doesn't work)
 
 * ~~Make theme selection persistent~~
 * ~~Apply theme selection to code blocks~~
