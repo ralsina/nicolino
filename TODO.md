@@ -2,6 +2,7 @@
 
 ## Things that could be done
 
+* Support arbitrary command pipelines
 * Support tags
 * Teasers
 * Add text/teaser to the RSS feed
