@@ -2,7 +2,7 @@
 
 ## Things that could be done
 
-* Support tags (started)
+* Sort post lists by date
 * Find a way to separate toc from summary
 * Support arbitrary command pipelines
 * TUI using homonoidian/termbox2.cr
@@ -26,6 +26,7 @@
 * Parse templats to find dependencies and load recursively
   (currently include doesn't work)
 
+* ~~Support tags~~
 * ~~Teasers~~
 * ~~Add text/teaser to the RSS feed~~
 * ~~Fixed RSS generating wrong description in items~~

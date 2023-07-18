@@ -95,13 +95,13 @@ module Markdown
     end
 
     def summary
-       return @metadata["summary"] if @metadata.has_key?("summary")
-       # Split HTML in the comment
-       if @html.includes?("<!--more-->")
+      return @metadata["summary"] if @metadata.has_key?("summary")
+      # Split HTML in the comment
+      if @html.includes?("<!--more-->")
         @html.split("<!--more-->")[0]
-       else
+      else
         @html
-       end
+      end
     end
 
     # Return a value Crinja can use in templates
@@ -110,11 +110,11 @@ module Markdown
     def value : ValueType
       v = ValueType.new
       v.merge({
-        "title"  => @title,
-        "link"   => @link,
-        "date"   => date,
-        "html"   => html,
-        "source" => @source,
+        "title"   => @title,
+        "link"    => @link,
+        "date"    => date,
+        "html"    => html,
+        "source"  => @source,
         "summary" => summary,
       })
     end
@@ -156,20 +156,23 @@ module Markdown
   end
 
   # Create an index page out of a list of posts, save in output
-  def self.render_index(posts, output)
+  def self.render_index(posts, output, title = nil, extra_inputs = [] of String)
     inputs = [
       "conf",
       "kv://templates/index.tmpl",
       "kv://templates/page.tmpl",
-    ] + posts.map(&.@source) + posts.map(&.template)
+    ] + posts.map(&.@source) + posts.map(&.template) + extra_inputs
     inputs = inputs.uniq
     Croupier::Task.new(
       output: output,
       inputs: inputs,
       proc: Croupier::TaskProc.new {
         Log.info { ">> #{output}" }
-        content = Templates::Env.get_template("templates/index.tmpl").render({"posts" => posts.map(&.value)})
-        Render.apply_template(content, "templates/page.tmpl")
+        content = Templates::Env.get_template("templates/index.tmpl").render(
+          {
+            "posts" => posts.map(&.value),
+          })
+        Render.apply_template(content, "templates/page.tmpl", title)
       }
     )
   end
