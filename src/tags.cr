@@ -18,6 +18,14 @@ module Tag
     tags
   end
 
-  def self.render(tags)
+  def self.render(tags : Hash(String, Tag))
+    tags.map { |name, tag|
+      "output/tags/#{name}/index.html"
+      Markdown.render_index(
+        tag.@posts[..10].map {|p| Markdown::File.posts[p]},
+        "output/tags/#{name}/index.html",
+        "Posts tagged '#{name}'"
+      )
+    }
   end
 end

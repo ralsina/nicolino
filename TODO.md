@@ -2,6 +2,7 @@
 
 ## Things that could be done
 
+* Sort post lists by date
 * Support tags (started)
 * Find a way to separate toc from summary
 * Support arbitrary command pipelines
