@@ -2,10 +2,9 @@
 
 ## Things that could be done
 
+* Support tags (started)
+* Find a way to separate toc from summary
 * Support arbitrary command pipelines
-* Support tags
-* Teasers
-* Add text/teaser to the RSS feed
 * TUI using homonoidian/termbox2.cr
 * Minifier via html-minifier
 * Use croupier's k/v store to avoid reading/parsing post data
@@ -27,6 +26,9 @@
 * Parse templats to find dependencies and load recursively
   (currently include doesn't work)
 
+* ~~Teasers~~
+* ~~Add text/teaser to the RSS feed~~
+* ~~Fixed RSS generating wrong description in items~~
 * ~~Parse and support shortcodes like nikola/hugo~~
 * ~~Cleanup dependency handling (make posts calculate theirs)~~
 * ~~Make theme selection persistent~~
