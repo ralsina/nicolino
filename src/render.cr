@@ -1,7 +1,6 @@
 # Helpers to render files/templates
 
 require "lexbor"
-require "RSS"
 
 module Render
   # Generates pretty HTML properly templated

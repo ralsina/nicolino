@@ -1,6 +1,7 @@
 require "./html_filters"
 require "./sc"
 require "cr-discount"
+require "RSS"
 require "shortcodes"
 
 module Markdown
@@ -48,7 +49,9 @@ module Markdown
     end
 
     def html
-      @html = Discount.compile(replace_shortcodes, @metadata.fetch("toc", nil) != nil)
+      @html = Discount.compile(
+        replace_shortcodes,
+        @metadata.fetch("toc", nil) != nil)
       @html = HtmlFilters.downgrade_headers(@html)
     end
 
@@ -91,6 +94,16 @@ module Markdown
       text
     end
 
+    def summary
+       return @metadata["summary"] if @metadata.has_key?("summary")
+       # Split HTML in the comment
+       if @html.includes?("<!--more-->")
+        @html.split("<!--more-->")[0]
+       else
+        @html
+       end
+    end
+
     # Return a value Crinja can use in templates
     # FIXME: can Crinja handle the object directly
     # if it uses properties?
@@ -102,6 +115,7 @@ module Markdown
         "date"   => date,
         "html"   => html,
         "source" => @source,
+        "summary" => summary,
       })
     end
 
@@ -173,8 +187,9 @@ module Markdown
         posts.each do |post|
           feed.item(
             title: post.@title,
+            description: post.summary,
             link: post.@link,
-            pubDate: post.date.to_s
+            pubDate: post.date.to_s,
           )
         end
         feed.xml indent: true

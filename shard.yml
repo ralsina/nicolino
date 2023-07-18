@@ -14,9 +14,10 @@ license: MIT
 
 dependencies:
   crinja:
-   github: straight-shoota/crinja
+    github: straight-shoota/crinja
   RSS:
     github: ralsina/RSS.cr
+    branch: master
   croupier:
     github: ralsina/croupier
     branch: main

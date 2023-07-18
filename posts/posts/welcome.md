@@ -5,6 +5,8 @@ toc: true
 tags: ["tag1", "tag2"]
 ---
 
+This post is just a placeholder for now.
+<!--more-->
 
 # Foo
 
