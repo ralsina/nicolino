@@ -22,7 +22,7 @@ module Tag
     tags.map { |name, tag|
       "output/tags/#{name}/index.html"
       Markdown.render_index(
-        tag.@posts[..10].map {|p| Markdown::File.posts[p]},
+        tag.@posts[..10].map { |p| Markdown::File.posts[p] },
         "output/tags/#{name}/index.html",
         "Posts tagged '#{name}'"
       )
