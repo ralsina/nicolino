@@ -32,6 +32,7 @@ def create_tasks
   # Render posts and RSS feed
   posts = Markdown.read_all("posts/")
   Markdown.render(posts, require_date: true)
+  posts.sort!
 
   Markdown.render_rss(
     posts[..10],

@@ -21,8 +21,10 @@ module Tag
   def self.render(tags : Hash(String, Tag))
     tags.map { |name, tag|
       "output/tags/#{name}/index.html"
+      posts = tag.@posts.map { |p| Markdown::File.posts[p] }
+      posts.sort!
       Markdown.render_index(
-        tag.@posts[..10].map { |p| Markdown::File.posts[p] },
+        posts[..10],
         "output/tags/#{name}/index.html",
         "Posts tagged '#{name}'"
       )
