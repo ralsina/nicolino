@@ -69,7 +69,7 @@ module Markdown
       t = @metadata.fetch("date", nil)
       if t != nil
         # TODO, un-hardcode UTC
-        @date=Time.parse(t.to_s, "%Y-%m-%d %H:%M:%S", Time::Location::UTC)
+        @date = Time.parse(t.to_s, "%Y-%m-%d %H:%M:%S", Time::Location::UTC)
       end
       @date
     end
