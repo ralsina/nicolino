@@ -2,7 +2,7 @@
 
 ## Things that could be done
 
-* Find a way to separate toc from summary
+* Generalize tags/index into taxonomies
 * Support arbitrary command pipelines
 * TUI using homonoidian/termbox2.cr
 * Minifier via html-minifier
@@ -25,6 +25,7 @@
 * Parse templats to find dependencies and load recursively
   (currently include doesn't work)
 
+* ~~Find a way to separate toc from summary~~
 * ~~Sort post lists by date~~
 * ~~Support tags~~
 * ~~Teasers~~

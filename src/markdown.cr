@@ -9,15 +9,16 @@ module Markdown
 
   # A class representing a Markdown file
   class File
-    @metadata = Hash(String, String).new
-    @text : String = ""
-    @link : String = ""
-    @html : String = ""
-    @title : String = ""
-    @source : String = ""
-    @rendered : String = ""
     @date : Time | Nil
+    @html : String = ""
+    @link : String = ""
+    @metadata = Hash(String, String).new
+    @rendered : String = ""
     @shortcodes = Shortcodes::Result.new
+    @source : String = ""
+    @text : String = ""
+    @title : String = ""
+    @toc : String = ""
 
     # Register all Files by @source
     @@posts = Hash(String, File).new
@@ -58,7 +59,7 @@ module Markdown
     end
 
     def html
-      @html = Discount.compile(
+      @html, @toc = Discount.compile(
         replace_shortcodes,
         @metadata.fetch("toc", nil) != nil)
       @html = HtmlFilters.downgrade_headers(@html)
@@ -126,6 +127,7 @@ module Markdown
         "html"    => html,
         "source"  => @source,
         "summary" => summary,
+        "toc"     => @toc,
       })
     end
 
