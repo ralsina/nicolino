@@ -34,6 +34,15 @@ module Markdown
       @@posts[@source] = self
     end
 
+    def <=>(other : File)
+      # The natural sort order is date descending
+      if self.@date.nil? || other.@date.nil?
+        self.@title <=> other.@title
+      else
+        -1 * (self.@date.as(Time) <=> other.@date.as(Time))
+      end
+    end
+
     def to_s(io)
       io << "Post(#{@source})"
     end
@@ -56,12 +65,13 @@ module Markdown
     end
 
     def date
+      return @date if @date != nil
       t = @metadata.fetch("date", nil)
       if t != nil
         # TODO, un-hardcode UTC
-        return Time.parse(t.to_s, "%Y-%m-%d %H:%M:%S", Time::Location::UTC)
+        @date=Time.parse(t.to_s, "%Y-%m-%d %H:%M:%S", Time::Location::UTC)
       end
-      nil
+      @date
     end
 
     # Path for the `Templates::Template` this post should be rendered with
