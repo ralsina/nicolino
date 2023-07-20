@@ -15,10 +15,12 @@
 * Detect new posts/pages and handle that in auto mode
 * Decide what to do on output conflicts (like a page and posts index)
 * Think how to do translations
-* Image gallery index
+* Image gallery index / Generic folder index
 * Sitemap
 * Try to be close to hugo's input layout if possible
 * Draft / future / expired
+* Link checker (for internal links)
+* Link fixer
 
 * ~~Breadcrumbs~~
 * ~~Parse templates to find dependencies and load recursively~~
