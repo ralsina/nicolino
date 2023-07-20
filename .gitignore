@@ -6,3 +6,4 @@
 /shard.lock
 /output/
 .croupier
+.kvstore

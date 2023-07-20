@@ -36,7 +36,6 @@ module Gallery
     Dir.glob("#{path}/**/index.md").each do |p|
       image_list = Dir.glob(
         Path[p].parent.to_s + "/*.{jpg,png}").map(&.split("/")[-1])
-      Log.info { "<< #{p}" }
       galleries << Gallery.new(p, image_list)
     end
     galleries
