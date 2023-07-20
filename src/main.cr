@@ -108,6 +108,7 @@ cli = Commander::Command.new do |cmd|
       exit(run(options, arguments))
     rescue ex
       Log.error { ex.message }
+      raise ex
       exit(1)
     end
   end

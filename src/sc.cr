@@ -29,6 +29,7 @@ module Sc
   # Load shortcodes from shortcodes/ and put them in the k/v store
   # TODO refactor duplication from Templates.load_templates
   def self.load_shortcodes
+    Log.info { "Scanning shortcodes" }
     Dir.glob("shortcodes/*.tmpl").each do |template|
       Croupier::Task.new(
         inputs: [template],
