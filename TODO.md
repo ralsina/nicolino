@@ -2,6 +2,7 @@
 
 ## Things that could be done
 
+* Fix bug that broke incremental rendering for HTML
 * Generalize tags/index into taxonomies
 * Support arbitrary command pipelines
 * TUI using homonoidian/termbox2.cr
