@@ -19,8 +19,8 @@
 * Sitemap
 * Try to be close to hugo's input layout if possible
 * Draft / future / expired
-* Breadcrumbs
 
+* ~~Breadcrumbs~~
 * ~~Parse templates to find dependencies and load recursively~~
 * ~~Fix bug that broke incremental rendering for HTML.~~
   ~~Templates in k/v store are always stale.~~
