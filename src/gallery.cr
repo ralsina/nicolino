@@ -23,10 +23,17 @@ module Gallery
       @metadata["template"] = "templates/gallery.tmpl"
     end
 
-    def value : Markdown::ValueType
-      v = super
-      v["image_list"] = @image_list
-      v
+    # Breadcrumbs is Galleries / this gallery
+    # FIXME should be the path
+    def breadcrumbs
+      [{name: "Galleries", link: "/galleries"}, {name: @title}]
+    end
+
+    def value
+      {
+        "image_list"  => @image_list,
+        "breadcrumbs" => breadcrumbs,
+      }.merge(super)
     end
   end
 
@@ -55,7 +62,8 @@ module Gallery
         proc: Croupier::TaskProc.new {
           post.load # Need to refresh post contents
           Log.info { ">> #{output}" }
-          Render.apply_template(post.rendered, "templates/page.tmpl")
+          Render.apply_template("templates/page.tmpl",
+            {"content" => post.rendered})
         }
       )
     end

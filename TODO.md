@@ -6,8 +6,6 @@
 * Support arbitrary command pipelines
 * TUI using homonoidian/termbox2.cr
 * Minifier via html-minifier
-* Use croupier's k/v store to avoid reading/parsing post data
-  all the time
 * Use nanobowers/cronic to parse dates
 * Plugins using duktape?
 * Implement `new_post` `new_page` commands
@@ -18,10 +16,10 @@
 * Decide what to do on output conflicts (like a page and posts index)
 * Think how to do translations
 * Image gallery index
-* Breadcrumbs
 * Sitemap
 * Try to be close to hugo's input layout if possible
 * Draft / future / expired
+* Breadcrumbs
 
 * ~~Parse templates to find dependencies and load recursively~~
 * ~~Fix bug that broke incremental rendering for HTML.~~

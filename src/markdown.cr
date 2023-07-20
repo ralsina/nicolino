@@ -5,8 +5,6 @@ require "RSS"
 require "shortcodes"
 
 module Markdown
-  alias ValueType = Hash(String, String | Time | Nil | Array(String))
-
   # A class representing a Markdown file
   class File
     @date : Time | Nil
@@ -115,24 +113,32 @@ module Markdown
       end
     end
 
+    # What to show as breadcrumbs for this post
+    def breadcrumbs
+      # This is hard to guess, but ...
+      # For pages, it can follow the path.
+      # For things inside posts/ it can just be empty
+      return [{name: "Posts", link: "/posts"}, {name: @title}] if date
+      [] of String
+    end
+
     # Return a value Crinja can use in templates
     # FIXME: can Crinja handle the object directly
     # if it uses properties?
-    def value : ValueType
-      v = ValueType.new
-      v.merge({
-        "title"   => @title,
-        "link"    => @link,
-        "date"    => date,
-        "html"    => html,
-        "source"  => @source,
-        "summary" => summary,
-        "toc"     => @toc,
-      })
+    def value
+      {
+        "title"       => @title,
+        "link"        => @link,
+        "date"        => date,
+        "html"        => html,
+        "source"      => @source,
+        "summary"     => summary,
+        "toc"         => @toc,
+        "breadcrumbs" => breadcrumbs,
+      }
     end
 
     # List of all files and kv store items this post uses
-    # TODO: recursive template dependencies
     def dependencies : Array(String)
       result = ["conf", "kv://templates/page.tmpl"]
       result << self.@source
@@ -161,7 +167,8 @@ module Markdown
         proc: Croupier::TaskProc.new {
           post.load # Need to refresh post contents
           Log.info { ">> #{output}" }
-          Render.apply_template(post.rendered, "templates/page.tmpl")
+          Render.apply_template("templates/page.tmpl",
+            {"content" => post.rendered})
         }
       )
     end
@@ -184,7 +191,8 @@ module Markdown
           {
             "posts" => posts.map(&.value),
           })
-        Render.apply_template(content, "templates/page.tmpl", title)
+        Render.apply_template("templates/page.tmpl",
+          {"content" => content, "title" => title})
       }
     )
   end
