@@ -67,6 +67,7 @@ def create_tasks
 end
 
 def run(options, arguments)
+  Croupier::TaskManager.use_persistent_store(".kvstore")
   create_tasks
   Croupier::TaskManager.fast_mode = options.bool.fetch("fastmode", false)
 

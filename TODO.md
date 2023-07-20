@@ -2,8 +2,6 @@
 
 ## Things that could be done
 
-* Fix bug that broke incremental rendering for HTML.
-  Templates in k/v store are always stale.
 * Generalize tags/index into taxonomies
 * Support arbitrary command pipelines
 * TUI using homonoidian/termbox2.cr
@@ -27,6 +25,8 @@
 * Parse templats to find dependencies and load recursively
   (currently include doesn't work)
 
+* ~~Fix bug that broke incremental rendering for HTML.~~
+  ~~Templates in k/v store are always stale.~~
 * ~~Find a way to separate toc from summary~~
 * ~~Sort post lists by date~~
 * ~~Support tags~~
