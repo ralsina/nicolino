@@ -40,6 +40,7 @@ module Templates
       Croupier::Task.new(
         inputs: [template] + get_deps(template),
         output: "kv://#{template}",
+        mergeable: false,
         proc: Croupier::TaskProc.new {
           Log.info { "<< #{template}" }
           # Yes, we re-read it when get_deps already did it.

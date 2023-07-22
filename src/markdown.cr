@@ -164,6 +164,7 @@ module Markdown
       Croupier::Task.new(
         output: output,
         inputs: post.dependencies,
+        mergeable: false,
         proc: Croupier::TaskProc.new {
           post.load # Need to refresh post contents
           Log.info { ">> #{output}" }
@@ -185,6 +186,7 @@ module Markdown
     Croupier::Task.new(
       output: output,
       inputs: inputs,
+      mergeable: false,
       proc: Croupier::TaskProc.new {
         Log.info { ">> #{output}" }
         content = Templates::Env.get_template("templates/index.tmpl").render(
@@ -204,6 +206,7 @@ module Markdown
     Croupier::Task.new(
       output: output,
       inputs: inputs,
+      mergeable: false,
       proc: Croupier::TaskProc.new {
         Log.info { ">> #{output}" }
         feed = RSS.new title: title

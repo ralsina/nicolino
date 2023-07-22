@@ -7,6 +7,7 @@ module Assets
       Croupier::Task.new(
         output: dest.to_s,
         inputs: [src],
+        mergeable: false,
         proc: Croupier::TaskProc.new {
           Log.info { ">> #{dest}" }
           Dir.mkdir_p(dest.parent)

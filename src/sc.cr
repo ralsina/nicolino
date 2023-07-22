@@ -34,6 +34,7 @@ module Sc
       Croupier::Task.new(
         inputs: [template],
         output: "kv://#{template}",
+        mergeable: false,
         proc: Croupier::TaskProc.new {
           Log.info { "<< #{template}" }
           File.read(template)

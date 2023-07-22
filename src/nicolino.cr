@@ -109,6 +109,7 @@ def auto(options, arguments)
     Croupier::Task.new(
       id: "LiveReload",
       inputs: Croupier::TaskManager.tasks.keys,
+      mergeable: false,
       proc: Croupier::TaskProc.new {
         Croupier::TaskManager.modified.each do |path|
           next if path.lchop? "kv://"

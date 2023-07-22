@@ -59,6 +59,7 @@ module Gallery
           "kv://#{post.template}",
           "kv://templates/page.tmpl",
         ] + post.@image_list,
+        mergeable: false,
         proc: Croupier::TaskProc.new {
           post.load # Need to refresh post contents
           Log.info { ">> #{output}" }

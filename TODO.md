@@ -13,7 +13,6 @@
 * Implement something like nikola's continuous import (different binary?)
 * Reorganize theme so it's self contained
 * Detect new posts/pages and handle that in auto mode
-* Decide what to do on output conflicts (like a page and posts index)
 * Think how to do translations
 * Image gallery index / Generic folder index
 * Sitemap
@@ -21,6 +20,7 @@
 * Draft / future / expired
 * Link checker (for internal links)
 * Link fixer
+* Decide what to do on output conflicts (like a page and posts index)
 
 * ~~Breadcrumbs~~
 * ~~Parse templates to find dependencies and load recursively~~

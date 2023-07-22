@@ -37,6 +37,7 @@ module Image
         output: dest.to_s,
         inputs: ["conf", src],
         no_save: true,
+        mergeable: false,
         proc: Croupier::TaskProc.new {
           Log.info { ">> #{dest}" }
           Dir.mkdir_p(dest.parent)
@@ -55,6 +56,7 @@ module Image
         output: dest.to_s,
         inputs: ["conf", src],
         no_save: true,
+        mergeable: false,
         proc: Croupier::TaskProc.new {
           ext = dest.extension
           thumb_name = dest.stem + ".thumb" + ext
