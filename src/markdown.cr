@@ -61,6 +61,7 @@ module Markdown
         replace_shortcodes,
         @metadata.fetch("toc", nil) != nil)
       @html = HtmlFilters.downgrade_headers(@html)
+      @html = HtmlFilters.make_links_absolute(@html, @link)
     end
 
     def date
@@ -162,6 +163,7 @@ module Markdown
 
       output = "output#{post.@link}"
       Croupier::Task.new(
+        id: "markdown",
         output: output,
         inputs: post.dependencies,
         mergeable: false,
@@ -184,6 +186,7 @@ module Markdown
     ] + posts.map(&.@source) + posts.map(&.template) + extra_inputs
     inputs = inputs.uniq
     Croupier::Task.new(
+      id: "index",
       output: output,
       inputs: inputs,
       mergeable: false,
@@ -204,6 +207,7 @@ module Markdown
     inputs = ["conf"] + posts.map { |post| post.@source }
 
     Croupier::Task.new(
+      id: "rss",
       output: output,
       inputs: inputs,
       mergeable: false,

@@ -19,8 +19,8 @@
 * Try to be close to hugo's input layout if possible
 * Draft / future / expired
 * Link checker (for internal links)
-* Link fixer
 
+* ~~Link fixer~~
 * ~~Decide what to do on output conflicts (like a page and~~
   ~~posts index)~~
 * ~~Breadcrumbs~~

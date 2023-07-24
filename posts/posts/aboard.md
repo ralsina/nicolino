@@ -6,3 +6,5 @@ summary: This is foo
 ---
 
 # Foo
+
+[welcome](welcome.html)

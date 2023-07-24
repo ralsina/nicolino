@@ -38,6 +38,7 @@ module Templates
     Log.info { "Scanning Templates" }
     Dir.glob("templates/*.tmpl").each do |template|
       Croupier::Task.new(
+        id: "template",
         inputs: [template] + get_deps(template),
         output: "kv://#{template}",
         mergeable: false,
