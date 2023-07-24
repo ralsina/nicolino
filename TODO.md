@@ -2,7 +2,6 @@
 
 ## Things that could be done
 
-* Generalize tags/index into taxonomies
 * Support arbitrary command pipelines
 * TUI using homonoidian/termbox2.cr
 * Minifier via html-minifier
@@ -20,6 +19,7 @@
 * Draft / future / expired
 * Link checker (for internal links)
 
+* ~~Generalize tags/index into taxonomies~~
 * ~~Link fixer~~
 * ~~Decide what to do on output conflicts (like a page and~~
   ~~posts index)~~

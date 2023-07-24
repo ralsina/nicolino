@@ -152,7 +152,6 @@ module Markdown
   # Render given posts using given template
   #
   # posts is an Array of `Markdown::File`
-  # config is a Hash used for template context
   # if require_date is true, posts *must* have a date
   def self.render(posts, require_date = true)
     posts.each do |post|
@@ -203,7 +202,7 @@ module Markdown
   end
 
   # Create a RSS file out of posts with title, save in output
-  def self.render_rss(posts, title, output)
+  def self.render_rss(posts, output, title)
     inputs = ["conf"] + posts.map { |post| post.@source }
 
     Croupier::Task.new(

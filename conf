@@ -2,6 +2,11 @@ title: "Nicolino Test Blog"
 description: "This is the demo site for Nicolino"
 canonical_url: https://example.com
 footer: "Default Nicolino Theme"
+taxonomies:
+  tags:
+    title: "Tags"
+    term_title: "Posts tagged {{term.name}}"
+    output: "tags/"
 options:
   pretty_html: false
   image_large: 1080
