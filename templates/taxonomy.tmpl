@@ -1,0 +1,5 @@
+<ul>
+{% for term in taxonomy.terms %}
+<li> <a href="{{term.name}}/index.html">{{term.name}}</a>
+{% endfor %}
+</ul>

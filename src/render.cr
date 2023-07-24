@@ -8,6 +8,7 @@ module Render
     # Add all config keys to context without clobbering
     Config.config.keys.each { |k|
       next if k == "options"
+      next if k == "taxonomies"
       next if context.has_key? k
       context[k.as_s] = Config.config[k].as_s
     }

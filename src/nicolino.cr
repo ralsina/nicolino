@@ -8,7 +8,7 @@ require "./image"
 require "./markdown"
 require "./render"
 require "./sc"
-require "./tags"
+require "./taxonomies"
 require "./template"
 require "croupier"
 require "live_reload"
@@ -34,10 +34,21 @@ def create_tasks
   Markdown.render(posts, require_date: true)
   posts.sort!
 
+  Config.config["taxonomies"].as_h.each do |k, v|
+    Log.info { "Scanning taxonomy: #{k}" }
+    Taxonomies::Taxonomy.new(
+      k.as_s,
+      v["title"].as_s,
+      v["term_title"].as_s,
+      "output/#{v["output"].as_s}",
+      posts
+    ).render
+  end
+
   Markdown.render_rss(
     posts[..10],
+    "output/rss.xml",
     Config.config["title"].to_s,
-    "output/rss.xml"
   )
 
   Markdown.render_index(
@@ -45,9 +56,9 @@ def create_tasks
     "output/posts/index.html"
   )
 
-  # Render tags
-  tags = Tag.read_all(posts)
-  Tag.render(tags)
+  # # Render tags
+  # tags = Tag.read_all(posts)
+  # Tag.render(tags)
 
   # Render pages
   pages = Markdown.read_all("pages/")
