@@ -20,8 +20,9 @@
 * Draft / future / expired
 * Link checker (for internal links)
 * Link fixer
-* Decide what to do on output conflicts (like a page and posts index)
 
+* ~~Decide what to do on output conflicts (like a page and~~
+  ~~posts index)~~
 * ~~Breadcrumbs~~
 * ~~Parse templates to find dependencies and load recursively~~
 * ~~Fix bug that broke incremental rendering for HTML.~~
