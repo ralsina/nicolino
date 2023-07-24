@@ -34,6 +34,7 @@ module Image
       src = @path.to_s
       dest = Path.new(["output/", prefix] + @path.parts[1..])
       Croupier::Task.new(
+        id: "image",
         output: dest.to_s,
         inputs: ["conf", src],
         no_save: true,
@@ -51,9 +52,10 @@ module Image
           nil
         }
       )
-
+      thumb_dest = Path[dest.parent, dest.stem + ".thumb" + dest.extension]
       Croupier::Task.new(
-        output: dest.to_s,
+        id: "thumb",
+        output: thumb_dest.to_s,
         inputs: ["conf", src],
         no_save: true,
         mergeable: false,

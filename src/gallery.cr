@@ -52,6 +52,7 @@ module Gallery
     galleries.each do |post|
       output = "output/#{prefix}#{post.@link}" # FIXME paths will be wrong
       Croupier::Task.new(
+        id: "gallery",
         output: output,
         inputs: [
           "conf",

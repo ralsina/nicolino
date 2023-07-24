@@ -17,4 +17,21 @@ module HtmlFilters
     end
     doc.to_html
   end
+
+  # Make all relative links absolute to the site root
+  # base is where the file containing the URIs is located
+  # relative to the site root
+  def self.make_links_absolute(html, base)
+    base_uri = URI.parse(base)
+    doc = Lexbor::Parser.new(html)
+    doc.nodes("a").each do |node|
+      next unless node.has_key? "href"
+      node["href"] = base_uri.resolve(node["href"]).to_s
+    end
+    doc.nodes("img").each do |node|
+      next unless node.has_key? "src"
+      node["src"] = base_uri.resolve(node["src"]).to_s
+    end
+    doc.to_html
+  end
 end

@@ -5,6 +5,7 @@ module Assets
       next if File.directory?(src)
       dest = Path.new(["output"] + Path[src].parts[1..])
       Croupier::Task.new(
+        id: "assets",
         output: dest.to_s,
         inputs: [src],
         mergeable: false,

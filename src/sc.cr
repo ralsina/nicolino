@@ -32,6 +32,7 @@ module Sc
     Log.info { "Scanning shortcodes" }
     Dir.glob("shortcodes/*.tmpl").each do |template|
       Croupier::Task.new(
+        id: "shortcode",
         inputs: [template],
         output: "kv://#{template}",
         mergeable: false,
