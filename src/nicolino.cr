@@ -8,6 +8,7 @@ require "./image"
 require "./markdown"
 require "./render"
 require "./sc"
+require "./sitemap"
 require "./taxonomies"
 require "./template"
 require "croupier"
@@ -75,6 +76,9 @@ def create_tasks
   # Render galleries
   galleries = Gallery.read_all("galleries/")
   Gallery.render(galleries, "galleries")
+
+  # Render sitemap
+  Sitemap.render
 end
 
 def run(options, arguments)
