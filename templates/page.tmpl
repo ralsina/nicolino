@@ -25,6 +25,8 @@
       rel="stylesheet"
       href="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/night-owl.min.css"
     />
+    <script src="https://unpkg.com/hyperscript.org@0.9.9"></script>
+    <script src="https://cdn.jsdelivr.net/npm/minisearch@6.1.0/dist/umd/index.min.js"></script>
     <script src="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/highlight.min.js"></script>
     <!-- Custom style-->
     <link rel="stylesheet" href="/css/custom.css" />
@@ -36,11 +38,53 @@
         <h1>{{ title }}</h1>
         <h2>
           <input
+            type="text"
+            id="search"
+            placeholder="🔎"
+            style="width: 2em"
+            _="
+              init
+                set :documents to []
+                make a MiniSearch from { fields: ['title', 'text'] } called :miniSearch
+              on focus
+                if no :documents
+                  fetch /search.json as json put the result into :documents
+                  call :miniSearch.addAll(:documents)
+                end
+                transition my *width to 15em
+              on blur
+                transition my *width to 2em
+                hide #search_results
+              on input
+                set :results to []
+                call :miniSearch.search(my value) put the result into :results
+                show #search_results
+                set #search_results.innerHTML to '<ul>'
+                repeat for r in :results
+                  repeat for d in :documents
+                    if d.id is r.id then append `<li><a href='${d.url}'>${d.title}</a><br>` to #search_results.innerHTML
+                  end
+                end
+            "
+          />
+          <input
             type="checkbox"
             id="switch_theme"
             name="switch"
             role="switch"
+            value="1"
+            _="
+              on change
+                set html to closest <html/>
+              if html.getAttribute('data-theme') == 'light'
+                html.setAttribute('data-theme', 'dark') then
+                set #hljscss.href to 'https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/a11y-dark.min.css'
+              else
+                html.setAttribute('data-theme', 'light') then
+                set #hljscss.href to 'https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/a11y-light.min.css'
+            "
           />
+          <div id="search_results"></div>
           » {{ description }}
         </h2>
       </hgroup>
@@ -61,7 +105,7 @@
     <!-- /Footer -->
 
     <!-- Theme switcher -->
-    <script src="/js/theme-switcher.js"></script>
+    <!-- <script src="/js/theme-switcher.js"></script> -->
     <script>
       new VenoBox({
         selector: "div.lightbox div a, div.lightbox p a",
