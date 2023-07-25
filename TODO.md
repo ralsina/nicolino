@@ -14,12 +14,12 @@
 * Detect new posts/pages and handle that in auto mode
 * Think how to do translations
 * Image gallery index / Generic folder index
-* Sitemap
 * Try to be close to hugo's input layout if possible
 * Draft / future / expired
 * Link checker (for internal links)
 * Automatically show taxonomies in post headings
 
+* ~~Sitemap~~
 * ~~Generalize tags/index into taxonomies~~
 * ~~Link fixer~~
 * ~~Decide what to do on output conflicts (like a page and~~
