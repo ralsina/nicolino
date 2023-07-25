@@ -108,7 +108,7 @@ cli = Commander::Command.new do |cmd|
       exit(run(options, arguments))
     rescue ex
       Log.error { ex.message }
-      raise ex
+      Log.debug { ex.backtrace.join("\n") }
       exit(1)
     end
   end

@@ -78,9 +78,13 @@ def create_tasks
 end
 
 def run(options, arguments)
-  Croupier::TaskManager.use_persistent_store(".kvstore")
-  create_tasks
-  Croupier::TaskManager.fast_mode = options.bool.fetch("fastmode", false)
+  # When doing auto() this is called twice, no need to scan tasks
+  # twice
+  if Croupier::TaskManager.tasks.empty?
+    Croupier::TaskManager.use_persistent_store(".kvstore")
+    create_tasks
+    Croupier::TaskManager.fast_mode = options.bool.fetch("fastmode", false)
+  end
 
   arguments = Croupier::TaskManager.tasks.keys if arguments.empty?
   # Run tasks for real
@@ -139,6 +143,7 @@ def auto(options, arguments)
     Croupier::TaskManager.auto_run(arguments) # FIXME: check options
   rescue ex
     Log.error { ex }
+    Log.debug { ex.backtrace.join("\n") }
     return 1
   end
   loop do
