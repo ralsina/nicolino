@@ -2,11 +2,12 @@
 
 ## Things that could be done
 
+* Support arbitrary compilers defined in config somehow
 * Support arbitrary command pipelines
 * TUI using homonoidian/termbox2.cr
 * Minifier via html-minifier
 * Use nanobowers/cronic to parse dates
-* Plugins using duktape?
+* Plugins using veelenga/lua.cr?
 * Implement `new_post` `new_page` commands
 * Implement init command (with data via rucksack?)
 * Implement something like nikola's continuous import (different binary?)
