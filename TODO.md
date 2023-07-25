@@ -18,6 +18,7 @@
 * Try to be close to hugo's input layout if possible
 * Draft / future / expired
 * Link checker (for internal links)
+* Automatically show taxonomies in post headings
 
 * ~~Generalize tags/index into taxonomies~~
 * ~~Link fixer~~
