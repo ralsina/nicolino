@@ -86,8 +86,6 @@ module Markdown
     end
 
     def replace_shortcodes
-      p! @shortcodes.shortcodes.size
-      p! @shortcodes.shortcodes.map(&.@whole)
       @shortcodes.errors.each do |e|
         # TODO: show actual error
         Log.error { "In #{@source}:" }

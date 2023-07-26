@@ -9,7 +9,7 @@ module Sc
     else
       context["inner"] = sc.data
     end
-      args = Hash(String | Int32, String).new
+    args = Hash(String | Int32, String).new
     i = 0
     sc.args.each do |a|
       if a.name == ""
