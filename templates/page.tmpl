@@ -1,48 +1,36 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{{ title }}</title>
-    <meta name="description" content="{{ description }}" />
-    <link rel="shortcut icon" href="/favicon.ico" />
-    <link rel="canonical" href="{{ canonical_url }}" />
 
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"
-    />
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title }}</title>
+  <meta name="description" content="{{ description }}" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="canonical" href="{{ canonical_url }}" />
 
-    <!-- Lightbox -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.css"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.js"></script>
-    <!-- highlightks -->
-    <link
-      id="hljscss"
-      rel="stylesheet"
-      href="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/night-owl.min.css"
-    />
-    <script src="https://unpkg.com/hyperscript.org@0.9.9"></script>
-    <script src="https://cdn.jsdelivr.net/npm/minisearch@6.1.0/dist/umd/index.min.js"></script>
-    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/highlight.min.js"></script>
-    <!-- Custom style-->
-    <link rel="stylesheet" href="/css/custom.css" />
-  </head>
-  <body>
-    <!-- Header -->
-    <header class="container">
-      <hgroup>
-        <h1>{{ title }}</h1>
-        <h2>
-          <input
-            type="search"
-            id="search"
-            placeholder="🔎"
-            style="width: 2em"
-            _="
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
+
+  <!-- Lightbox -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.js"></script>
+  <!-- highlightks -->
+  <link id="hljscss" rel="stylesheet"
+    href="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/night-owl.min.css" />
+  <script src="https://unpkg.com/hyperscript.org@0.9.9"></script>
+  <script src="https://cdn.jsdelivr.net/npm/minisearch@6.1.0/dist/umd/index.min.js"></script>
+  <script src="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/highlight.min.js"></script>
+  <!-- Custom style-->
+  <link rel="stylesheet" href="/css/custom.css" />
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="container">
+    <hgroup>
+      <h1>{{ title }}</h1>
+      <h2>
+        <input type="search" id="search" placeholder="🔎" style="width: 2em" _="
               init
                 set :documents to []
                 make a MiniSearch from {
@@ -70,15 +58,8 @@
                     if d.id is r.id then append `<li><a href='${d.url}'>${d.title}</a><br>` to #search_results.innerHTML
                   end
                 end
-            "
-          />
-          <input
-            type="checkbox"
-            id="switch_theme"
-            name="switch"
-            role="switch"
-            value="1"
-            _="
+            " />
+        <input type="checkbox" id="switch_theme" name="switch" role="switch" value="1" _="
               on change
                 get the closest <html/>
                 if its @data-theme is 'light'
@@ -87,39 +68,39 @@
                 else
                   set its @data-theme to 'light'
                   set #hljscss.href to 'https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/a11y-light.min.css'
-            "
-          />
-          <div id="search_results"></div>
-          » {{ description }}
-        </h2>
-      </hgroup>
-    </header>
-    <!-- /Header -->
+            " />
+        <div id="search_results"></div>
+        » {{ description }}
+      </h2>
+    </hgroup>
+  </header>
+  <!-- /Header -->
 
-    <!-- Main -->
-    <main class="container">
-      {{ content }}
-    </main>
-    <!-- /Main -->
+  <!-- Main -->
+  <main class="container">
+    {{ content }}
+  </main>
+  <!-- /Main -->
 
-    <!-- Footer -->
-    <footer class="container">
-      <small>{{ footer }}</small> 👈 👉
-      <small>Built with <a href="https://picocss.com">Pico</a></small>
-    </footer>
-    <!-- /Footer -->
+  <!-- Footer -->
+  <footer class="container">
+    <small>{{ footer }}</small> 👈 👉
+    <small>Built with <a href="https://picocss.com">Pico</a></small>
+  </footer>
+  <!-- /Footer -->
 
-    <!-- Theme switcher -->
-    <!-- <script src="/js/theme-switcher.js"></script> -->
-    <script>
-      new VenoBox({
-        selector: "div.lightbox div a, div.lightbox p a",
-        spinner: "fold",
-        numeration: true,
-        share: true,
-        maxWidth: "80%",
-      });
-      hljs.highlightAll();
-    </script>
-  </body>
+  <!-- Theme switcher -->
+  <!-- <script src="/js/theme-switcher.js"></script> -->
+  <script>
+    new VenoBox({
+      selector: "div.lightbox div a, div.lightbox p a",
+      spinner: "fold",
+      numeration: true,
+      share: true,
+      maxWidth: "80%",
+    });
+    hljs.highlightAll();
+  </script>
+</body>
+
 </html>

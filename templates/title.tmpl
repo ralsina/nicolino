@@ -1,19 +1,19 @@
 <H2>
-{% if breadcrumbs|length > 0 %}
-<nav aria-label="breadcrumb">
-    <ul>
-        {% for item in breadcrumbs %}
-        <li>
-        {% if item.link is defined %}
-        <a href="{{ item.link }}">{{ item.name }}</a>
-        {% else %}
-        <small>{{ item.name }}</small>
-        {% endif %}
-        </li>
-        {% endfor %}
-    </ul>
-</nav>
-{% else %}
-<h2><a href="{{link}}">{{title}}</a></h2>
-{% endif %}
+    {% if breadcrumbs|length > 0 %}
+    <nav aria-label="breadcrumb">
+        <ul>
+            {% for item in breadcrumbs %}
+            <li>
+                {% if item.link is defined %}
+                <a href="{{ item.link }}">{{ item.name }}</a>
+                {% else %}
+                <small>{{ item.name }}</small>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </nav>
+    {% else %}
+    <h2><a href="{{link}}">{{title}}</a></h2>
+    {% endif %}
 </H2>
