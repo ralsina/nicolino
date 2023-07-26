@@ -65,7 +65,7 @@ module Gallery
           post.load # Need to refresh post contents
           Log.info { ">> #{output}" }
           Render.apply_template("templates/page.tmpl",
-            {"content" => post.rendered})
+            {"content" => post.rendered, "title" => post.@title})
         }
       )
     end
