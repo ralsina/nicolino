@@ -8,6 +8,7 @@ require "./image"
 require "./markdown"
 require "./render"
 require "./sc"
+require "./search"
 require "./sitemap"
 require "./taxonomies"
 require "./template"
@@ -49,12 +50,13 @@ def create_tasks
   Markdown.render_rss(
     posts[..10],
     "output/rss.xml",
-    Config.config["title"].to_s,
+    Config.config["site_title"].to_s,
   )
 
   Markdown.render_index(
     posts[..10],
-    "output/posts/index.html"
+    "output/posts/index.html",
+    title: "Latest posts"
   )
 
   # # Render tags
@@ -79,6 +81,9 @@ def create_tasks
 
   # Render sitemap
   Sitemap.render
+
+  # Render search data
+  Search.render
 end
 
 def run(options, arguments)

@@ -1,8 +1,8 @@
 {% for post in posts %}
 <section>
-<h2><a href="{{post.link}}">{{post.title}}</a></h2>
-date: {{post.date}}
-<hr>
-{{post.summary}}
+    <h2><a href="{{post.link}}">{{post.title}}</a></h2>
+    date: {{post.date}}
+    <hr>
+    {{post.summary}}
 </section>
 {% endfor %}

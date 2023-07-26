@@ -52,10 +52,13 @@ Nicolino does *not* support nested shortcodes. That's why I can use
 
 Shortcodes can start with `{{%` and end with `%}}` or start with `{{<` and end with `>}}`
 
-The difference is that when the shortcode has "inner" content, those called with a `%` will be parsed as markdown before being passed to the template, while those called with a `<` will be passed to the template as-is.
+The difference is that when the shortcode has "inner" content,
+those called with a `%` will be parsed as markdown before being passed
+to the template, while those called with a `<` will be passed
+to the template as-is.
 
-Usually this will make no difference at all because the markdown
-parser used in Nicolino is different from Hugo's.
+**Usually this will make no difference at all because the markdown
+parser used in Nicolino is different from Hugo's.**
 
 If you really want the details: some Markdown parsers will refuse
 to parse markdown inside HTML tags. So, if you have this shortcode,
@@ -66,7 +69,8 @@ called `heading`:
 ```
 
 Then, if you really want to use Markdown in the content, you have
-to call the shortcode using `{{%` because if you uyse `{{<`
+to call the shortcode using `{{%` because if you use `{{<`
 any markdown inside will be ignored.
 
-**Again:** This will probably not matter for you using Nicolino. Feel free to use markdown everywhere.
+**Again:** This will probably not matter for you using Nicolino.
+Feel free to use markdown everywhere.

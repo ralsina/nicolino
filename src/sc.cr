@@ -4,7 +4,11 @@ include Shortcodes
 module Sc
   # Render shortcode using its template
   def self.render_sc(sc, context : Crinja::Context)
-    context["inner"] = sc.data
+    if sc.markdown?
+      context["inner"] = Discount.compile(sc.data)[0]
+    else
+      context["inner"] = sc.data
+    end
     args = Hash(String | Int32, String).new
     i = 0
     sc.args.each do |a|
