@@ -38,14 +38,19 @@
         <h1>{{ title }}</h1>
         <h2>
           <input
-            type="text"
+            type="search"
             id="search"
             placeholder="🔎"
             style="width: 2em"
             _="
               init
                 set :documents to []
-                make a MiniSearch from { fields: ['title', 'text'] } called :miniSearch
+                make a MiniSearch from {
+                  fields: ['title', 'text'],
+                  searchOptions: {
+                    boost: { title: 2 },
+                    fuzzy: 0.2
+                  }} called :miniSearch
               on focus
                 if no :documents
                   fetch /search.json as json put the result into :documents
@@ -75,13 +80,13 @@
             value="1"
             _="
               on change
-                set html to closest <html/>
-              if html.getAttribute('data-theme') == 'light'
-                html.setAttribute('data-theme', 'dark') then
-                set #hljscss.href to 'https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/a11y-dark.min.css'
-              else
-                html.setAttribute('data-theme', 'light') then
-                set #hljscss.href to 'https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/a11y-light.min.css'
+                get the closest <html/>
+                if its @data-theme is 'light'
+                  set its @data-theme to 'dark'
+                  set #hljscss.href to 'https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/a11y-dark.min.css'
+                else
+                  set its @data-theme to 'light'
+                  set #hljscss.href to 'https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/a11y-light.min.css'
             "
           />
           <div id="search_results"></div>

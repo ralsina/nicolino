@@ -20,6 +20,7 @@
 * Draft / future / expired
 * Link checker (for internal links)
 * Automatically show taxonomies in post headings
+* Make sure all things have proper titles
 
 * ~~Search using lucaong/minisearch?~~
 * ~~Sitemap~~
