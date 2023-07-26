@@ -9,6 +9,7 @@ module Render
     Config.config.keys.each { |k|
       next if k == "options"
       next if k == "taxonomies"
+      next if k == "features"
       next if context.has_key? k
       context[k.as_s] = Config.config[k].as_s
     }

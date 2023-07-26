@@ -2,6 +2,15 @@ site_title: "Nicolino Test Blog"
 description: "This is the demo site for Nicolino"
 canonical_url: https://example.com
 footer: "Default Nicolino Theme"
+features:
+  - assets
+  - posts
+  - pages
+  - taxonomies
+  - images
+  - galleries
+  - sitemap
+  - search
 taxonomies:
   tags:
     title: "Tags"

@@ -4,7 +4,6 @@
 
 * Fix bug in auto where changes are only triggering once
 * Support arbitrary compilers defined in config somehow
-* Enable/disable features from config
 * Support arbitrary command pipelines
 * TUI using homonoidian/termbox2.cr
 * Minifier via html-minifier
@@ -21,6 +20,7 @@
 * Draft / future / expired
 * Link checker (for internal links)
 * Automatically show taxonomies in post headings
+* ~~Enable/disable features from config~~
 * ~~Make sure all things have proper titles~~
 * ~~Search using lucaong/minisearch?~~
 * ~~Sitemap~~

@@ -21,6 +21,8 @@ VERSION = "0.1.0"
 def create_tasks
   # Load config file
   Config.config
+  # FIXME configure a default feature set
+  features = Set.new(Config.config["features"].as_a)
 
   # Load templates to k/v store
   Templates.load_templates
@@ -29,60 +31,69 @@ def create_tasks
   Sc.load_shortcodes
 
   # Copy assets/ to output/
-  Assets.render
-
-  # Render posts and RSS feed
-  posts = Markdown.read_all("posts/")
-  Markdown.render(posts, require_date: true)
-  posts.sort!
-
-  Config.config["taxonomies"].as_h.each do |k, v|
-    Log.info { "Scanning taxonomy: #{k}" }
-    Taxonomies::Taxonomy.new(
-      k.as_s,
-      v["title"].as_s,
-      v["term_title"].as_s,
-      "output/#{v["output"].as_s}",
-      posts
-    ).render
+  if features.includes? "assets"
+    Assets.render
   end
 
-  Markdown.render_rss(
-    posts[..10],
-    "output/rss.xml",
-    Config.config["site_title"].to_s,
-  )
+  # Render posts and RSS feed
+  if features.includes? "posts"
+    posts = Markdown.read_all("posts/")
+    Markdown.render(posts, require_date: true)
+    posts.sort!
 
-  Markdown.render_index(
-    posts[..10],
-    "output/posts/index.html",
-    title: "Latest posts"
-  )
+    Config.config["taxonomies"].as_h.each do |k, v|
+      Log.info { "Scanning taxonomy: #{k}" }
+      Taxonomies::Taxonomy.new(
+        k.as_s,
+        v["title"].as_s,
+        v["term_title"].as_s,
+        "output/#{v["output"].as_s}",
+        posts
+      ).render
+    end
 
-  # # Render tags
-  # tags = Tag.read_all(posts)
-  # Tag.render(tags)
+    Markdown.render_rss(
+      posts[..10],
+      "output/rss.xml",
+      Config.config["site_title"].to_s,
+    )
+
+    Markdown.render_index(
+      posts[..10],
+      "output/posts/index.html",
+      title: "Latest posts"
+    )
+  end
 
   # Render pages
-  pages = Markdown.read_all("pages/")
-  Markdown.render(pages, require_date: false)
+  if features.includes? "pages"
+    pages = Markdown.read_all("pages/")
+    Markdown.render(pages, require_date: false)
+  end
 
   # Render images from posts and pages
-  images = Image.read_all("posts/") + Image.read_all("pages/")
-  Image.render(images)
+  if features.includes? "images"
+    images = Image.read_all("posts/") + Image.read_all("pages/")
+    Image.render(images)
+  end
 
   # Render images from galleries
-  images = Image.read_all("galleries/")
-  Image.render(images, "galleries")
+  if features.includes? "galleries"
+    images = Image.read_all("galleries/")
+    Image.render(images, "galleries")
 
-  # Render galleries
-  galleries = Gallery.read_all("galleries/")
-  Gallery.render(galleries, "galleries")
+    # Render galleries
+    galleries = Gallery.read_all("galleries/")
+    Gallery.render(galleries, "galleries")
+  end
 
   # Render sitemap
-  Sitemap.render
+  if features.includes? "sitemap"
+    Sitemap.render
+  end
 
   # Render search data
+  return unless features.includes? "search"
   Search.render
 end
 
