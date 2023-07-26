@@ -1,5 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" _="
+init
+  if cookies['isLight'] is 'true'
+    set my @data-theme to 'light'
+  else
+    set my @data-theme to 'dark'
+">
 
 <head>
   <meta charset="utf-8" />
@@ -60,14 +66,23 @@
                 end
             " />
         <input type="checkbox" id="switch_theme" name="switch" role="switch" value="1" _="
-              on change
+              def setTheme()
                 get the closest <html/>
-                if its @data-theme is 'light'
-                  set its @data-theme to 'dark'
-                  set #hljscss.href to 'https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/a11y-dark.min.css'
-                else
+                if cookies['isLight'] is 'true'
                   set its @data-theme to 'light'
                   set #hljscss.href to 'https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/a11y-light.min.css'
+                  set cookies['isLight'] to true
+                  set my @checked to false
+                else
+                  set its @data-theme to 'dark'
+                  set #hljscss.href to 'https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/a11y-dark.min.css'
+                  set cookies['isLight'] to false
+                  set my @checked to true
+              end
+              init setTheme() end
+              on change
+                set cookies['isLight'] to (cookies['isLight'] is not 'true')
+                setTheme()
             " />
         <div id="search_results"></div>
         » {{ description }}
