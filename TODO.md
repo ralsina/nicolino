@@ -2,6 +2,7 @@
 
 ## Things that could be done
 
+* Fix bug in auto where changes are only triggering once
 * Support arbitrary compilers defined in config somehow
 * Enable/disable features from config
 * Support arbitrary command pipelines
