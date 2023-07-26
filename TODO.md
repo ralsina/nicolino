@@ -3,6 +3,7 @@
 ## Things that could be done
 
 * Fix bug in auto where changes are only triggering once
+* Detect new posts/pages and handle that in auto mode
 * Support arbitrary compilers defined in config somehow
 * Support arbitrary command pipelines
 * TUI using homonoidian/termbox2.cr
@@ -13,7 +14,6 @@
 * Implement init command (with data via rucksack?)
 * Implement something like nikola's continuous import (different binary?)
 * Reorganize theme so it's self contained
-* Detect new posts/pages and handle that in auto mode
 * Think how to do translations
 * Image gallery index / Generic folder index
 * Try to be close to hugo's input layout if possible
