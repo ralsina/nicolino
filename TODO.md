@@ -2,11 +2,13 @@
 
 ## Things that could be done
 
+* Enable/disable features from config
+* Support arbitrary compilers defined in config somehow
 * Support arbitrary command pipelines
 * TUI using homonoidian/termbox2.cr
 * Minifier via html-minifier
 * Use nanobowers/cronic to parse dates
-* Plugins using duktape?
+* Plugins using veelenga/lua.cr?
 * Implement `new_post` `new_page` commands
 * Implement init command (with data via rucksack?)
 * Implement something like nikola's continuous import (different binary?)
@@ -19,6 +21,7 @@
 * Link checker (for internal links)
 * Automatically show taxonomies in post headings
 
+* ~~Search using lucaong/minisearch?~~
 * ~~Sitemap~~
 * ~~Generalize tags/index into taxonomies~~
 * ~~Link fixer~~

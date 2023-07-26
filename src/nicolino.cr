@@ -8,6 +8,7 @@ require "./image"
 require "./markdown"
 require "./render"
 require "./sc"
+require "./search"
 require "./sitemap"
 require "./taxonomies"
 require "./template"
@@ -79,6 +80,9 @@ def create_tasks
 
   # Render sitemap
   Sitemap.render
+
+  # Render search data
+  Search.render
 end
 
 def run(options, arguments)
