@@ -2,7 +2,6 @@
 
 ## Things that could be done
 
-* Fix bug in auto where changes are only triggering once
 * Detect new posts/pages and handle that in auto mode
 * Support arbitrary compilers defined in config somehow
 * Support arbitrary command pipelines
@@ -20,6 +19,7 @@
 * Draft / future / expired
 * Link checker (for internal links)
 * Automatically show taxonomies in post headings
+* ~~Fix bug in auto where changes are only triggering once~~
 * ~~Enable/disable features from config~~
 * ~~Make sure all things have proper titles~~
 * ~~Search using lucaong/minisearch?~~

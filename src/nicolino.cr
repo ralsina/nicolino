@@ -146,11 +146,17 @@ def auto(options, arguments)
       inputs: Croupier::TaskManager.tasks.keys,
       mergeable: false,
       proc: Croupier::TaskProc.new {
+        modified = Set(String).new
         Croupier::TaskManager.modified.each do |path|
           next if path.lchop? "kv://"
-          path = path.lchop "output"
-          Log.info { "LiveReload: #{path}" }
-          live_reload.send_reload(path: path, liveCSS: path.ends_with?(".css"))
+          Croupier::TaskManager.depends_on(path).each do |p|
+            p = p.lchop "output"
+            modified << p
+          end
+        end
+        modified.each do |p|
+          Log.info { "LiveReload: #{p}" }
+          live_reload.send_reload(path: p, liveCSS: p.ends_with?(".css"))
         end
       }
     )
