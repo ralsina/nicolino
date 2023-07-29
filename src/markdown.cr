@@ -232,7 +232,12 @@ module Markdown
     Log.info { "Reading Markdown from #{path}" }
     posts = [] of File
     Dir.glob("#{path}/**/*.md").each do |p|
-      posts << File.new(p)
+      begin
+        posts << File.new(p)
+      rescue ex
+        Log.error { "Error parsing #{p}: #{ex.message}" }
+        Log.debug { ex }
+      end
     end
     posts
   end

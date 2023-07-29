@@ -129,8 +129,9 @@ def auto(options, arguments)
   begin
     Log.info { "Running in auto mode, press Ctrl+C to stop" }
     # Launch HTTP server
+    server = make_server(options, arguments, live_reload: true)
     spawn do
-      serve(options, arguments, live_reload: true)
+      server.listen
     end
 
     # Launch LiveReload server
@@ -146,6 +147,7 @@ def auto(options, arguments)
     watcher.watch("posts", LibInotify::IN_CREATE)
     watcher.watch("pages", LibInotify::IN_CREATE)
     watcher.on_event do |_|
+      server.close
       live_reload.http_server.close
       Process.exec(Process.executable_path.as(String), ["auto"] + ARGV)
     end
@@ -188,7 +190,7 @@ def auto(options, arguments)
   0
 end
 
-def serve(options, arguments, live_reload = false)
+def make_server(options, arguments, live_reload = false)
   handlers = [
     Handler::LiveReloadHandler.new,
     Handler::IndexHandler.new,
@@ -200,5 +202,9 @@ def serve(options, arguments, live_reload = false)
   server = HTTP::Server.new handlers
   address = server.bind_tcp 8080
   Log.info { "Server listening on http://#{address}" }
-  server.listen
+  server
+end
+
+def serve(options, arguments, live_reload = false)
+  make_server(options, arguments, live_reload).listen
 end

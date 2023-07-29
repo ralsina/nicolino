@@ -2,7 +2,7 @@
 
 ## Things that could be done
 
-* Make auto mode more resilient to bad inputs
+* Better document parsing errors
 * Support arbitrary compilers defined in config somehow
 * Support arbitrary command pipelines
 * TUI using homonoidian/termbox2.cr
@@ -19,6 +19,7 @@
 * Draft / future / expired
 * Link checker (for internal links)
 * Automatically show taxonomies in post headings
+* ~~Make auto mode more resilient to bad inputs~~
 * ~~Detect new posts/pages and handle that in auto mode~~
 * ~~Fix bug in auto where changes are only triggering once~~
 * ~~Enable/disable features from config~~
