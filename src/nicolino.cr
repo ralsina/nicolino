@@ -140,6 +140,16 @@ def auto(options, arguments)
       live_reload.listen
     end
 
+    # Setup a watcher for posts/pages and trigger respawn if files
+    # are added
+    watcher = Inotify::Watcher.new
+    watcher.watch("posts", LibInotify::IN_CREATE)
+    watcher.watch("pages", LibInotify::IN_CREATE)
+    watcher.on_event do |_|
+      live_reload.http_server.close
+      Process.exec(Process.executable_path.as(String), ["auto"] + ARGV)
+    end
+
     # Create task that will be triggered in rebuilds
     Croupier::Task.new(
       id: "LiveReload",
