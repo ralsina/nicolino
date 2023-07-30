@@ -1,38 +1,70 @@
+require "totem"
+
 module Config
-  @@config = {} of YAML::Any => YAML::Any
+  @@config = Totem.new
+
+  struct Taxonomy
+    include JSON::Serializable
+
+    property title : String
+    property term_title : String
+    property output : String
+  end
+
+  alias Taxonomies = Hash(String, Taxonomy)
 
   struct Options
+    include JSON::Serializable
     property? pretty_html = false
     property image_large = 4096
     property image_thumb = 1024
-
-    def initialize(options = Hash(YAML::Any, YAML::Any).new)
-      @pretty_html = options["pretty_html"].as_bool if options.has_key? "pretty_html"
-      @image_large = options["image_large"].as_i if options.has_key? "image_large"
-      @image_thumb = options["image_thumb"].as_i if options.has_key? "image_thumb"
-    end
+    property formats = {} of String => String
   end
 
   @@options : Options | Nil = nil
+  @@taxonomies = Taxonomies.new
+
+  def self.get(key)
+    self.config.get(key)
+  end
 
   def self.config
-    if @@config.empty?
+    if @@config.@config_paths.empty?
       Log.info { "Loading configuration" }
-      @@config = File.open("conf") do |file|
-        YAML.parse(file).as_h
-      end
+      @@config = Totem.from_file "conf.yml"
+      @@config.set_default("features",
+        ["assets",
+         "posts",
+         "pages",
+         "taxonomies",
+         "images",
+         "galleries",
+         "sitemap",
+         "search"])
+      @@config.set_default("taxonomies", {
+        "tags" => {
+          "title"      => "Tags",
+          "term_title" => "Posts tagged {{term.name}}",
+          "output"     => "tags/",
+        },
+      })
     end
     @@config
   end
 
+  def self.taxonomies : Taxonomies
+    if @@taxonomies.empty?
+      @@taxonomies = Taxonomies.new
+      config.get("taxonomies").as_h.keys.each do |k|
+        @@taxonomies[k] = @@config.mapping(Taxonomy, "taxonomies.#{k}")
+      end
+    end
+    @@taxonomies
+  end
+
   def self.options : Options
     if @@options.nil?
-      raw_options = @@config.fetch("options", nil)
-      if raw_options
-        @@options = Options.new raw_options.as_h
-      else
-        @@options = Options.new
-      end
+      @@options = @@config.mapping(Options, "options")
     end
     @@options.as(Options)
   end

@@ -5,7 +5,7 @@ module Pandoc
     def html
       # FIXME: Figure out how to extract TOC
       ext = Path[@source].extension
-      format = Config.config["formats"].as_h[ext].to_s
+      format = Config.options.formats[ext]
       @html, @toc = Pandoc.compile(
         replace_shortcodes,
         @metadata.fetch("toc", nil) != nil,
@@ -20,7 +20,7 @@ module Pandoc
   def self.read_all(path)
     Log.info { "Reading pandoc files from #{path}" }
     posts = [] of File
-    Config.config["formats"].as_h.keys.each do |ext|
+    Config.options.formats.keys.each do |ext|
       Dir.glob("#{path}/**/*#{ext}").each do |p|
         begin
           posts << File.new(p)

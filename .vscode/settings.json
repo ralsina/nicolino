@@ -1,5 +1,11 @@
 {
     "files.associations": {
         "*.tmpl": "jinja-html"
+    },
+    "yaml.schemaStore.enable": true,
+    "yaml.schemas": {
+        ".vscode/.empty_schema.json": [
+            "conf.yml"
+        ]
     }
 }

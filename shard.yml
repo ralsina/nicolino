@@ -35,3 +35,5 @@ dependencies:
   shortcodes:
     github: ralsina/shortcodes
     branch: main
+  totem:
+    github: icyleaf/totem

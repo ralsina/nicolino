@@ -6,13 +6,8 @@ module Render
   # Generates pretty HTML properly templated
   def self.apply_template(template, context)
     # Add all config keys to context without clobbering
-    Config.config.keys.each { |k|
-      next if k == "options"
-      next if k == "taxonomies"
-      next if k == "features"
-      next if k == "formats"
-      next if context.has_key? k
-      context[k.as_s] = Config.config[k].as_s
+    Config.get("site").as_h.map { |k, v|
+      context["site_#{k}"] = v.as_s
     }
     output = Templates::Env.get_template(template).render(context)
     output = Lexbor::Parser.new(output).to_pretty_html \
