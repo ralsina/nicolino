@@ -13,7 +13,6 @@
 * Support arbitrary command pipelines
 * TUI using homonoidian/termbox2.cr
 * Minifier via html-minifier
-* Use nanobowers/cronic to parse dates
 * Plugins using veelenga/lua.cr?
 * Implement `new_post` `new_page` commands
 * Implement init command (with data via rucksack?)
@@ -25,6 +24,7 @@
 * Draft / future / expired
 * Link checker (for internal links)
 
+* ~~Use nanobowers/cronic to parse dates~~
 * ~~Automatically show taxonomies in post headings~~
 * ~~Use a real config library~~
 * ~~Implement `clean`~~

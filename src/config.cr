@@ -19,6 +19,7 @@ module Config
     property image_large = 4096
     property image_thumb = 1024
     property formats = {} of String => String
+    property date_output_format = "%Y-%m-%d %H:%M"
   end
 
   @@options : Options | Nil = nil

@@ -13,6 +13,7 @@ options:
   pretty_html: true
   image_large: 1080
   image_thumb: 600
+  date_output_format: "%Y-%m-%d %H:%M"
   # What extensions you want associated with what pandoc format.
   # For more details: https://pandoc.org/MANUAL.html#option--from
   formats:
