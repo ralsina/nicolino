@@ -16,11 +16,11 @@ site:
 #   - sitemap
 #   - search
 # How to classify posts/pages
-# taxonomies:
-#   tags:
-#     title: "Tags"
-#     term_title: "Posts tagged {{term.name}}"
-#     output: "tags/"
+taxonomies:
+  tags:
+    title: "🏷Tags"
+    term_title: "Posts tagged {{term.name}}"
+    output: "tags/"
 # Some options affecting output
 options:
   pretty_html: false

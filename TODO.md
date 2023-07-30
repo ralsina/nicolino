@@ -20,8 +20,8 @@
 * Try to be close to hugo's input layout if possible
 * Draft / future / expired
 * Link checker (for internal links)
-* Automatically show taxonomies in post headings
 
+* ~~Automatically show taxonomies in post headings~~
 * ~~Use a real config library~~
 * ~~Implement `clean`~~
 * ~~Support arbitrary compilers defined in config somehow (start with pandoc)~~

@@ -12,4 +12,18 @@
     {% else %}
     <h2><a href="{{link}}">{{title}}</a></h2>
     {% endif %}
+    {% if taxonomies %}
+    <nav>
+        <ul>
+            {% for k,v in taxonomies %}
+            <li>
+                {{k | link }} :
+                {% for term in v %}
+                {{term | link}}
+                {% endfor%}
+            </li>
+            {% endfor %}
+        </ul>
+    </nav>
+    {% endif %}
 </H2>

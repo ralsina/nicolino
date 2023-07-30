@@ -35,12 +35,13 @@ module Markdown
     end
 
     def taxonomies
+      result = Hash({name: String, link: String}, Array({name: String, link: String})).new
       Taxonomies::All.each do |taxo|
         next unless taxo.@posts.includes? self
-        taxo.@terms.values.each do |_|
-          # p! "#{self} in #{taxo.@name}::#{term.@name}"
-        end
+        result[taxo.link] = taxo.@terms.values.select \
+           { |t| t.@posts.includes? self }.map(&.link)
       end
+      result
     end
 
     def <=>(other : File)

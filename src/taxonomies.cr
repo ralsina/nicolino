@@ -2,14 +2,22 @@ module Taxonomies
   class Term
     @name : String
     @posts : Array(Markdown::File) = Array(Markdown::File).new
+    @taxonomy : Taxonomy
 
-    def initialize(@name : String)
+    def initialize(@name, @taxonomy)
     end
 
     def value
       {
         "name"  => @name,
         "posts" => @posts.map(&.value),
+      }
+    end
+
+    def link
+      {
+        name: @name,
+        link: "#{@taxonomy.@path}/#{@name}/index.html".lchop("output"),
       }
     end
   end
@@ -35,7 +43,7 @@ module Taxonomies
         post_terms.each do |term|
           term = term.strip
           if !@terms.has_key?(term)
-            @terms[term] = Term.new(term)
+            @terms[term] = Term.new(term, self)
           end
           @terms[term].@posts << post
         end
@@ -48,6 +56,10 @@ module Taxonomies
         "name"  => @name,
         "terms" => @terms.values.map(&.value),
       }
+    end
+
+    def link
+      {name: @title, link: "#{@path}/index.html".lchop("output")}
     end
 
     def render
