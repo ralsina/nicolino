@@ -2,6 +2,7 @@
 
 ## Things that could be done
 
+* Un-ad-hoc path handlings (lchop output and such)
 * Un-hardcode a bunch of things
 * Figure out per-command flags or migrate off commander
 * Do not *always* parse shortcode replacements as markdown (for pandoc)
