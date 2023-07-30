@@ -83,7 +83,12 @@ module Markdown
       return @date if !@date.nil?
       t = @metadata.fetch("date", nil)
       if t != nil
-        @date = Cronic.parse(t.to_s)
+        begin
+          @date = Cronic.parse(t.to_s)
+        rescue ex
+          Log.error { "Error parsing date for: #{@source}" }
+          @date = nil
+        end
       end
       @date
     end
