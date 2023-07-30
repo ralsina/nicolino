@@ -41,15 +41,17 @@ def create_tasks
     Markdown.render(posts, require_date: true)
     posts.sort!
 
-    Config.taxonomies.map do |k, v|
-      Log.info { "Scanning taxonomy: #{k}" }
-      Taxonomies::Taxonomy.new(
-        k,
-        v.title,
-        v.term_title,
-        "output/#{v.output}",
-        posts
-      ).render
+    if features.includes? "taxonomies"
+      Config.taxonomies.map do |k, v|
+        Log.info { "Scanning taxonomy: #{k}" }
+        Taxonomies::Taxonomy.new(
+          k,
+          v.title,
+          v.term_title,
+          "output/#{v.output}",
+          posts
+        ).render
+      end
     end
 
     Markdown.render_rss(
