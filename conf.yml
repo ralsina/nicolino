@@ -10,7 +10,7 @@ site:
   footer: "Default Nicolino Theme"
 # Some options affecting output
 options:
-  pretty_html: false
+  pretty_html: true
   image_large: 1080
   image_thumb: 600
   # What extensions you want associated with what pandoc format.

@@ -2,6 +2,8 @@
 
 ## Things that could be done
 
+* Add noindex meta tag to "index" pages, and remove
+  them from sitemap
 * Add RSS link elements where appropriate
 * Un-ad-hoc path handlings (lchop output and such)
 * Un-hardcode a bunch of things
