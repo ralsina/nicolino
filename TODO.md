@@ -2,6 +2,8 @@
 
 ## Things that could be done
 
+* Figure out per-command flags or migrate off commander
+* Use a real config library
 * Do not *always* parse shortcode replacements as markdown (for pandoc)
 * Better document parsing errors
 * Support arbitrary command pipelines
@@ -19,6 +21,8 @@
 * Draft / future / expired
 * Link checker (for internal links)
 * Automatically show taxonomies in post headings
+
+* ~~Implement `clean`~~
 * ~~Support arbitrary compilers defined in config somehow (start with pandoc)~~
 * ~~Make auto mode more resilient to bad inputs~~
 * ~~Detect new posts/pages and handle that in auto mode~~

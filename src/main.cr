@@ -132,6 +132,16 @@ cli = Commander::Command.new do |cmd|
       serve(options, arguments)
     end
   end
+
+  cmd.commands.add do |command|
+    command.use = "clean"
+    command.short = "Clean unknown files"
+    command.long = "Remove unknown files from output/"
+    command.run do |options, arguments|
+      LogFormat.setup(options.@bool["quiet"], options.@int["verbosity"])
+      clean(options, arguments)
+    end
+  end
 end
 
 Commander.run(cli, ARGV)
