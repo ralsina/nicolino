@@ -2,6 +2,7 @@
 
 ## Things that could be done
 
+* Un-hardcode a bunch of things
 * Figure out per-command flags or migrate off commander
 * Use a real config library
 * Do not *always* parse shortcode replacements as markdown (for pandoc)
