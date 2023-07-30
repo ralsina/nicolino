@@ -37,10 +37,16 @@ module Taxonomies
       @posts : Array(Markdown::File)
     )
       @posts.each do |post|
-        post_terms = post.@metadata.fetch("#{@name}", nil)
+        post_terms = post.@metadata.fetch(@name, nil)
         next if post_terms.nil?
-        post_terms = YAML.parse(post_terms).as_a.map(&.to_s)
-        post_terms.each do |term|
+        begin
+          post_terms = YAML.parse(post_terms).as_a.map(&.to_s)
+        rescue ex
+          # Alternative form tags: foo, bar
+          post_terms = post.@metadata[@name] \
+            .split(",").map(&.to_s.strip)
+        end
+        post_terms.as(Array(String)).each do |term|
           term = term.strip
           if !@terms.has_key?(term)
             @terms[term] = Term.new(term, self)
