@@ -2,6 +2,7 @@
 
 ## Things that could be done
 
+* Do not *always* parse shortcode replacements as markdown (for pandoc)
 * Better document parsing errors
 * Support arbitrary command pipelines
 * TUI using homonoidian/termbox2.cr
