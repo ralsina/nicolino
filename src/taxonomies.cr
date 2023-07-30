@@ -64,7 +64,7 @@ module Taxonomies
 
     def render
       # Render taxonomy index
-      output = "#{@path}/index.html"
+      output = Path["#{@path}/index.html"].normalize.to_s
       rendered = Templates::Env.get_template("templates/taxonomy.tmpl").render({"taxonomy" => value})
 
       Croupier::Task.new(
@@ -84,7 +84,7 @@ module Taxonomies
         term.@posts.sort!
         Markdown.render_index(
           term.@posts[..10],
-          "#{@path}/#{term.@name}/index.html",
+          Path["#{@path}/#{term.@name}/index.html"].normalize.to_s,
           Crinja.render(@term_title, {"term" => term.value}),
         )
         # Render term RSS for each term

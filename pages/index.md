@@ -56,15 +56,17 @@ choice dependencies.
 # Features (So far)
 
 * Pages compiled from markdown (like this one)
+* Many other input formats via [pandoc](https://pandoc.org/)
 * Blog posts compiled from markdown, with index page (see [/posts](/posts) )
 * RSS feed of latest posts (see [/feed.xml](/feed.xml) )
+* Taxonomies (like tags, author, etc.) with their own indexes and feeds
 * Images are resized and thumbnailed (see [nicolino.png](/nicolino.png) and [nicolino.thumb.png](/nicolino.thumb.png) )
 * VenoBox based lightbox for images (click on Nicolino above)
-* PicoCSS based theme
-* Markdown compiled using [Discount](http://www.pell.portland.or.us/~orc/Code/discount/)
+* PicoCSS based theme (needs work, of course)
 * `serve` mode, so you can see what the site looks like
 * `auto` mode, which rebuilds while you edit and automatically reloads
   the pages in the browser
+* [Shortcodes](/shortcodes.html) somewhat compatible with Nikola and Hugo
 * Incremental builds, so it only rebuilds what's needed
 * Image galleries (see [Fancy Turning](/galleries/fancy-turning) )
 * Optional table of contents in posts/pages
