@@ -23,7 +23,7 @@ module Sitemap
         Log.info { ">> #{output}" }
         File.open(output, "w") do |io|
           io << HEADER
-          base = URI.parse(Config.config["canonical_url"].to_s)
+          base = URI.parse(Config.get("site.url").as_s)
           inputs.each do |input|
             next unless input =~ /\.html$/
             modtime = File.info(input).modification_time

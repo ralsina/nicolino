@@ -21,9 +21,7 @@ VERSION = "0.1.0"
 
 def create_tasks
   # Load config file
-  Config.config
-  # FIXME configure a default feature set
-  features = Set.new(Config.config["features"].as_a)
+  features = Set.new(Config.get("features").as_a)
 
   # Load templates to k/v store
   Templates.load_templates
@@ -43,13 +41,13 @@ def create_tasks
     Markdown.render(posts, require_date: true)
     posts.sort!
 
-    Config.config["taxonomies"].as_h.each do |k, v|
+    Config.taxonomies.map do |k, v|
       Log.info { "Scanning taxonomy: #{k}" }
       Taxonomies::Taxonomy.new(
-        k.as_s,
-        v["title"].as_s,
-        v["term_title"].as_s,
-        "output/#{v["output"].as_s}",
+        k,
+        v.title,
+        v.term_title,
+        "output/#{v.output}",
         posts
       ).render
     end
@@ -57,7 +55,7 @@ def create_tasks
     Markdown.render_rss(
       posts[..10],
       "output/rss.xml",
-      Config.config["site_title"].to_s,
+      Config.get("site.title").as_s,
     )
 
     Markdown.render_index(
@@ -216,7 +214,7 @@ def clean(options, arguments)
   create_tasks
   existing = Set.new(Dir.glob("output/**/*"))
   targets = Set.new(Croupier::TaskManager.tasks.keys)
-  targets = targets.map {|p| Path[p].normalize.to_s}
+  targets = targets.map { |p| Path[p].normalize.to_s }
   to_clean = existing - targets
   # Only delete files
   to_clean.each do |p|
