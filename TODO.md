@@ -2,6 +2,7 @@
 
 ## Things that could be done
 
+* Figure out the equivalent of Nikola's `link://` schema
 * Port thumbnail shortcode from Nikola
 * Add slugification where needed
 * Add noindex meta tag to "index" pages, and remove
