@@ -6,6 +6,7 @@ require "./gallery"
 require "./http_handlers"
 require "./image"
 require "./markdown"
+require "./pandoc"
 require "./render"
 require "./sc"
 require "./search"
@@ -38,6 +39,7 @@ def create_tasks
   # Render posts and RSS feed
   if features.includes? "posts"
     posts = Markdown.read_all("posts/")
+    posts += Pandoc.read_all("posts/")
     Markdown.render(posts, require_date: true)
     posts.sort!
 
@@ -68,6 +70,7 @@ def create_tasks
   # Render pages
   if features.includes? "pages"
     pages = Markdown.read_all("pages/")
+    pages += Pandoc.read_all("pages/")
     Markdown.render(pages, require_date: false)
   end
 

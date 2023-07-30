@@ -3,7 +3,6 @@
 ## Things that could be done
 
 * Better document parsing errors
-* Support arbitrary compilers defined in config somehow
 * Support arbitrary command pipelines
 * TUI using homonoidian/termbox2.cr
 * Minifier via html-minifier
@@ -19,6 +18,7 @@
 * Draft / future / expired
 * Link checker (for internal links)
 * Automatically show taxonomies in post headings
+* ~~Support arbitrary compilers defined in config somehow (start with pandoc)~~
 * ~~Make auto mode more resilient to bad inputs~~
 * ~~Detect new posts/pages and handle that in auto mode~~
 * ~~Fix bug in auto where changes are only triggering once~~
