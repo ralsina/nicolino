@@ -43,7 +43,7 @@ module Config
          "search"])
       @@config.set_default("taxonomies", {
         "tags" => {
-          "title"      => "Tags",
+          "title"      => "🏷Tags",
           "term_title" => "Posts tagged {{term.name}}",
           "output"     => "tags/",
         },
