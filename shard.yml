@@ -37,3 +37,5 @@ dependencies:
     branch: main
   totem:
     github: icyleaf/totem
+  cronic:
+    github: nanobowers/cronic

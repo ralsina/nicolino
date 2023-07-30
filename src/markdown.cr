@@ -2,8 +2,11 @@ require "./html_filters"
 require "./sc"
 require "./taxonomies"
 require "cr-discount"
+require "cronic"
 require "RSS"
 require "shortcodes"
+
+include Cronic
 
 module Markdown
   # A class representing a Markdown file
@@ -76,12 +79,11 @@ module Markdown
       @html = HtmlFilters.make_links_absolute(@html, @link)
     end
 
-    def date
-      return @date if @date != nil
+    def date : Time | Nil
+      return @date if !@date.nil?
       t = @metadata.fetch("date", nil)
       if t != nil
-        # TODO, un-hardcode UTC
-        @date = Time.parse(t.to_s, "%Y-%m-%d %H:%M:%S", Time::Location::UTC)
+        @date = Cronic.parse(t.to_s)
       end
       @date
     end
@@ -141,7 +143,7 @@ module Markdown
     def value
       {
         "breadcrumbs" => breadcrumbs,
-        "date"        => date,
+        "date"        => date.nil? ? "" : date.as(Time).to_s(Config.options.date_output_format),
         "html"        => html,
         "link"        => @link,
         "source"      => @source,
