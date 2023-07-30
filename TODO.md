@@ -2,6 +2,7 @@
 
 ## Things that could be done
 
+* Add RSS link elements where appropriate
 * Un-ad-hoc path handlings (lchop output and such)
 * Un-hardcode a bunch of things
 * Figure out per-command flags or migrate off commander
