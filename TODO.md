@@ -2,6 +2,9 @@
 
 ## Things that could be done
 
+* Add slug-for-url support?
+* Fix bug of multiple `output/tags/index.html` when importing
+  large site.
 * Figure out the equivalent of Nikola's `link://` schema
 * Port thumbnail shortcode from Nikola
 * Add slugification where needed
