@@ -4,11 +4,7 @@
         <ul>
             {% for item in breadcrumbs %}
             <li>
-                {% if item.link is defined %}
-                <a href="{{ item.link }}">{{ item.name }}</a>
-                {% else %}
-                <small>{{ item.name }}</small>
-                {% endif %}
+                {{ item | link }}
             </li>
             {% endfor %}
         </ul>

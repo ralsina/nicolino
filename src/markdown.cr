@@ -1,5 +1,6 @@
 require "./html_filters"
 require "./sc"
+require "./taxonomies"
 require "cr-discount"
 require "RSS"
 require "shortcodes"
@@ -31,6 +32,15 @@ module Markdown
       @source = path
       load
       @@posts[@source] = self
+    end
+
+    def taxonomies
+      Taxonomies::All.each do |taxo|
+        next unless taxo.@posts.includes? self
+        taxo.@terms.values.each do |_|
+          # p! "#{self} in #{taxo.@name}::#{term.@name}"
+        end
+      end
     end
 
     def <=>(other : File)
@@ -82,8 +92,7 @@ module Markdown
 
     # Render the markdown HTML into the right template for the fragment
     def rendered
-      context = @metadata.merge(value)
-      Templates::Env.get_template(template).render(context)
+      Templates::Env.get_template(template).render(value)
     end
 
     def replace_shortcodes
@@ -121,6 +130,7 @@ module Markdown
       # For pages, it can follow the path.
       # For things inside posts/ it can just be empty
       return [{name: "Posts", link: "/posts"}, {name: @title}] if date
+      # FIXME this should be the path to the page
       [] of String
     end
 
@@ -129,14 +139,16 @@ module Markdown
     # if it uses properties?
     def value
       {
-        "title"       => @title,
-        "link"        => @link,
+        "breadcrumbs" => breadcrumbs,
         "date"        => date,
         "html"        => html,
+        "link"        => @link,
         "source"      => @source,
         "summary"     => summary,
+        "taxonomies"  => taxonomies,
+        "title"       => @title,
         "toc"         => @toc,
-        "breadcrumbs" => breadcrumbs,
+        "metadata"    => @metadata,
       }
     end
 

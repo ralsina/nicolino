@@ -30,9 +30,6 @@ module Templates
     end
   end
 
-  Env = Crinja.new
-  Env.loader = StoreLoader.new
-
   # Load templates from templates/ and put them in the k/v store
   def self.load_templates
     Log.info { "Scanning Templates" }
@@ -49,5 +46,14 @@ module Templates
           File.read(template)
         })
     end
+  end
+
+  Env = Crinja.new
+  Env.loader = StoreLoader.new
+
+  # Convenience filters
+  Env.filters["link"] = Crinja.filter() do
+    return Crinja::Value.new(%(<a href="#{target["link"]}">#{target["name"]}</a>)) unless target["link"].empty?
+    return target["name"]
   end
 end

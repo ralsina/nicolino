@@ -40,6 +40,7 @@ module Taxonomies
           @terms[term].@posts << post
         end
       end
+      All << self
     end
 
     def value
@@ -83,4 +84,6 @@ module Taxonomies
       end
     end
   end
+
+  All = Array(Taxonomy).new
 end
