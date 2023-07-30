@@ -52,7 +52,8 @@ module Markdown
       _, metadata, @text = contents.split("---\n", 3)
       @metadata = YAML.parse(metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
       @title = @metadata["title"].to_s
-      @link = "/" + @source.split("/", 2)[1][0..-4] + ".html"
+      link = Path.new ["/", @source.split("/")[1..]]
+      @link = link.to_s.rchop(link.extension) + ".html"
       @shortcodes = Shortcodes.parse(@text)
     end
 
