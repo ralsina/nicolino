@@ -2,6 +2,7 @@
 
 ## Things that could be done
 
+* Need better date parser, like dateparser from Python
 * Add slug-for-url support?
 * Figure out the equivalent of Nikola's `link://` schema
 * Port thumbnail shortcode from Nikola
