@@ -10,7 +10,7 @@ module HTML
     end
   end
 
-  # Parse all pandoc posts in a path and build Pandoc::File
+  # Parse all HTML posts in a path and build HTML::File
   # objects out of them
   def self.read_all(path)
     Log.info { "Reading HTML files from #{path}" }
