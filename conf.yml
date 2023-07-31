@@ -18,6 +18,8 @@ options:
   # For more details: https://pandoc.org/MANUAL.html#option--from
   formats:
     .rst: rst
+    .txt: rst
+    .html: html
 # Features you want to enable are listed here
 # features:
 #   - assets
