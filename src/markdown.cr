@@ -86,7 +86,7 @@ module Markdown
         begin
           @date = Cronic.parse(t.to_s)
         rescue ex
-          Log.error { "Error parsing date for: #{@source}" }
+          Log.error { "Error parsing date for #{@source}, #{t}" }
           @date = nil
         end
       end
