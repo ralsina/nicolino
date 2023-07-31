@@ -15,10 +15,10 @@ module Pandoc
     end
 
     # Use a memoized compile method because pandoc is so slow
-    @Cache_compile = {} of {String, Bool, String} => Array(String)
+    @cache_compile = {} of {String, Bool, String} => Array(String)
 
     def compile(input, toc = false, format = "rst")
-      @Cache_compile[{input, toc, format}] ||= _compile(input, toc, format)
+      @cache_compile[{input, toc, format}] ||= _compile(input, toc, format)
     end
 
     def _compile(input, toc = false, format = "rst")
