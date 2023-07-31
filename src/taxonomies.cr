@@ -40,11 +40,11 @@ module Taxonomies
         post_terms = post.@metadata.fetch(@name, nil)
         next if post_terms.nil?
         begin
-          post_terms = YAML.parse(post_terms).as_a.map(&.to_s)
+          post_terms = YAML.parse(post_terms).as_a.map(&.to_s).reject(&.empty?)
         rescue ex
           # Alternative form tags: foo, bar
           post_terms = post.@metadata[@name] \
-            .split(",").map(&.to_s.strip)
+            .split(",").map(&.to_s.strip).reject(&.empty?)
         end
         post_terms.as(Array(String)).each do |term|
           term = term.strip

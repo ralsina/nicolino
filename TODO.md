@@ -3,8 +3,6 @@
 ## Things that could be done
 
 * Add slug-for-url support?
-* Fix bug of multiple `output/tags/index.html` when importing
-  large site.
 * Figure out the equivalent of Nikola's `link://` schema
 * Port thumbnail shortcode from Nikola
 * Add slugification where needed
@@ -30,6 +28,8 @@
 * Draft / future / expired
 * Link checker (for internal links)
 
+* ~~Fix bug of multiple `output/tags/index.html` when importing~~
+  ~~large site.~~
 * ~~Use nanobowers/cronic to parse dates~~
 * ~~Automatically show taxonomies in post headings~~
 * ~~Use a real config library~~
