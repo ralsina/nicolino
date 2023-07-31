@@ -40,7 +40,7 @@ module Image
         no_save: true,
         mergeable: false,
         proc: Croupier::TaskProc.new {
-          Log.info { ">> #{dest}" }
+          Log.info { "👉 #{dest}" }
           Dir.mkdir_p(dest.parent)
           img = Pixie::Image.new(src)
           w, h = new_size(img.width, img.height, Config.options.image_large)
@@ -63,7 +63,7 @@ module Image
           ext = dest.extension
           thumb_name = dest.stem + ".thumb" + ext
           dest = Path[dest.parent, thumb_name]
-          Log.info { ">> #{dest}" }
+          Log.info { "👉 #{dest}" }
           Dir.mkdir_p(dest.parent)
           img = Pixie::Image.new(src)
           w, h = new_size(img.width, img.height, Config.options.image_thumb)
@@ -83,7 +83,7 @@ module Image
     Log.info { "Reading Images from #{path}" }
     images = [] of Image
     Dir.glob("#{path}/**/*.{jpg,jpeg,png}").each do |p|
-      Log.info { "<< #{p}" }
+      Log.info { "👈 #{p}" }
       images << Image.new(p)
     end
     images

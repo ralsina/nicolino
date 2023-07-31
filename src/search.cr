@@ -31,7 +31,7 @@ module Search
       mergeable: false,
       no_save: true,
       proc: Croupier::TaskProc.new {
-        Log.info { ">> #{output}" }
+        Log.info { "👉 #{output}" }
         File.open(output, "w") do |io|
           data = Array(Hash(String, String | Int32)).new
           inputs.each_with_index do |input, i|

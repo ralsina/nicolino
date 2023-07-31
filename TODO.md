@@ -29,6 +29,7 @@
 * Draft / future / expired
 * Link checker (for internal links)
 
+* ~~HTML "compiler"~~
 * ~~Fix bug of multiple `output/tags/index.html` when importing~~
   ~~large site.~~
 * ~~Use nanobowers/cronic to parse dates~~

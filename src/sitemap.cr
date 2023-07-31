@@ -20,7 +20,7 @@ module Sitemap
       mergeable: false,
       no_save: true,
       proc: Croupier::TaskProc.new {
-        Log.info { ">> #{output}" }
+        Log.info { "👉 #{output}" }
         File.open(output, "w") do |io|
           io << HEADER
           base = URI.parse(Config.get("site.url").as_s)

@@ -37,6 +37,7 @@ module Config
         ["assets",
          "posts",
          "pages",
+         "pandoc",
          "taxonomies",
          "images",
          "galleries",

@@ -63,7 +63,7 @@ module Gallery
         mergeable: false,
         proc: Croupier::TaskProc.new {
           post.load # Need to refresh post contents
-          Log.info { ">> #{output}" }
+          Log.info { "👉 #{output}" }
           Render.apply_template("templates/page.tmpl",
             {"content" => post.rendered, "title" => post.@title})
         }

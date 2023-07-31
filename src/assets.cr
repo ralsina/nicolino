@@ -10,7 +10,7 @@ module Assets
         inputs: [src],
         mergeable: false,
         proc: Croupier::TaskProc.new {
-          Log.info { ">> #{dest}" }
+          Log.info { "👉 #{dest}" }
           Dir.mkdir_p(dest.parent)
           File.copy(src, dest)
         },

@@ -19,12 +19,12 @@ options:
   formats:
     .rst: rst
     .txt: rst
-    .html: html
 # Features you want to enable are listed here
 # features:
 #   - assets
 #   - posts
 #   - pages
+#   - pandoc
 #   - taxonomies
 #   - images
 #   - galleries

@@ -41,7 +41,7 @@ module Sc
         output: "kv://#{template}",
         mergeable: false,
         proc: Croupier::TaskProc.new {
-          Log.info { "<< #{template}" }
+          Log.info { "👈 #{template}" }
           File.read(template)
         })
     end

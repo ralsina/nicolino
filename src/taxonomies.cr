@@ -79,7 +79,7 @@ module Taxonomies
         inputs: @posts.flat_map(&.dependencies) + ["kv://templates/taxonomy.tmpl"],
         mergeable: false,
         proc: Croupier::TaskProc.new {
-          Log.info { ">> #{output}" }
+          Log.info { "👉 #{output}" }
           Render.apply_template("templates/page.tmpl",
             {"content" => rendered})
         }

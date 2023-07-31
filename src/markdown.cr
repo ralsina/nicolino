@@ -61,7 +61,7 @@ module Markdown
     end
 
     def load
-      Log.info { "<< #{@source}" }
+      Log.info { "👈 #{@source}" }
       contents = ::File.read(@source)
       _, metadata, @text = contents.split("---\n", 3)
       @metadata = YAML.parse(metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
@@ -189,7 +189,7 @@ module Markdown
         mergeable: false,
         proc: Croupier::TaskProc.new {
           post.load # Need to refresh post contents
-          Log.info { ">> #{output}" }
+          Log.info { "👉 #{output}" }
           Render.apply_template("templates/page.tmpl",
             {"content" => post.rendered, "title" => post.@title})
         }
@@ -211,7 +211,7 @@ module Markdown
       inputs: inputs,
       mergeable: false,
       proc: Croupier::TaskProc.new {
-        Log.info { ">> #{output}" }
+        Log.info { "👉 #{output}" }
         content = Templates::Env.get_template("templates/index.tmpl").render(
           {
             "posts" => posts.map(&.value),
@@ -232,7 +232,7 @@ module Markdown
       inputs: inputs,
       mergeable: false,
       proc: Croupier::TaskProc.new {
-        Log.info { ">> #{output}" }
+        Log.info { "👉 #{output}" }
         feed = RSS.new title: title
         posts.each do |post|
           feed.item(
