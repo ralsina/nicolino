@@ -6,12 +6,29 @@ module Pandoc
       # FIXME: Figure out how to extract TOC
       ext = Path[@source].extension
       format = Config.options.formats[ext]
-      @html, @toc = Pandoc.compile(
+      @html, @toc = compile(
         replace_shortcodes,
         @metadata.fetch("toc", nil) != nil,
         format: format)
       @html = HtmlFilters.downgrade_headers(@html)
       @html = HtmlFilters.make_links_absolute(@html, @link)
+    end
+
+    # Use a memoized compile method because pandoc is so slow
+    @Cache_compile = {} of {String, Bool, String} => Array(String)
+
+    def compile(input, toc = false, format = "rst")
+      @Cache_compile[{input, toc, format}] ||= _compile(input, toc, format)
+    end
+
+    def _compile(input, toc = false, format = "rst")
+      input = IO::Memory.new(input)
+      output = IO::Memory.new
+      Process.run("pandoc",
+        args: ["-f", format, "-t", "html"],
+        input: input,
+        output: output)
+      [output.to_s, ""]
     end
   end
 
@@ -31,15 +48,5 @@ module Pandoc
       end
     end
     posts
-  end
-
-  def self.compile(input, toc = false, format = "rst")
-    input = IO::Memory.new(input)
-    output = IO::Memory.new
-    Process.run("pandoc",
-      args: ["-f", format, "-t", "html"],
-      input: input,
-      output: output)
-    [output.to_s, ""]
   end
 end
