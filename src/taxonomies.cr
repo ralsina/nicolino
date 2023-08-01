@@ -1,4 +1,10 @@
+require "./utils"
+
 module Taxonomies
+  include Utils
+
+  # A Taxonomy Term, which is one of the classifications
+  # within a taxonomy
   class Term
     @name : String
     @posts : Array(Markdown::File) = Array(Markdown::File).new
@@ -17,7 +23,7 @@ module Taxonomies
     def link
       {
         name: @name,
-        link: Path["#{@taxonomy.@path}/#{@name}/index.html".lchop("output")].normalize.to_s,
+        link: Path["#{@taxonomy.@path}/#{Utils.slugify(@name)}/index.html".lchop("output")].normalize.to_s,
       }
     end
   end
@@ -90,13 +96,13 @@ module Taxonomies
         term.@posts.sort!
         Markdown.render_index(
           term.@posts[..10],
-          Path["#{@path}/#{term.@name}/index.html"].normalize.to_s,
+          Path["#{@path}/#{Utils.slugify(term.@name)}/index.html"].normalize.to_s,
           Crinja.render(@term_title, {"term" => term.value}),
         )
         # Render term RSS for each term
         Markdown.render_rss(
           term.@posts[..10],
-          "#{@path}/#{term.@name}/index.rss",
+          Path["#{@path}/#{Utils.slugify(term.@name)}/index.rss"].normalize.to_s,
           Crinja.render(@term_title, {"term" => term.value}),
         )
       end
