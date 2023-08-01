@@ -12,7 +12,7 @@ module Sitemap
   def self.render
     # TODO: support robot exclusion
     # TODO: support alternates for locations
-    inputs = Croupier::TaskManager.tasks.keys
+    inputs = Croupier::TaskManager.tasks.keys.select(&.ends_with?(".html"))
     Croupier::Task.new(
       id: "sitemap",
       output: output = "output/sitemap.xml",
@@ -25,7 +25,6 @@ module Sitemap
           io << HEADER
           base = URI.parse(Config.get("site.url").as_s)
           inputs.each do |input|
-            next unless input =~ /\.html$/
             modtime = File.info(input).modification_time
             input = input.sub(/^output\//, "")
             io << %(<url>
