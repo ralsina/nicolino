@@ -12,6 +12,7 @@ require "./markdown"
 #   with its contents and a nice display of the
 #   images below it.
 module Gallery
+  # An image gallery
   class Gallery < Markdown::File
     def initialize(path, @image_list : Array(String))
       super(path)

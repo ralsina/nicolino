@@ -1,4 +1,5 @@
 module Search
+  # Patch Lexbor::Node to report if the node is "displayable"
   struct Lexbor::Node
     def displayble?
       visible? && !object? && !is_tag_noindex?

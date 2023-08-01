@@ -1,6 +1,7 @@
 require "./markdown"
 
 module HTML
+  # Posts written directly in HTML
   class File < Markdown::File
     def html
       # FIXME: Implement TOC using lexbor

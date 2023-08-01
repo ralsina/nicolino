@@ -1,6 +1,7 @@
 require "./markdown"
 
 module Pandoc
+  # A file written in markdown
   class File < Markdown::File
     def html
       # FIXME: Figure out how to extract TOC

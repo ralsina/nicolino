@@ -16,6 +16,7 @@ module Templates
     deps
   end
 
+  # A Crinja Loader that is aware of the k/v store
   class StoreLoader < Crinja::Loader
     def get_source(env : Crinja, template : String) : {String, String?}
       source = Croupier::TaskManager.get("#{template}")

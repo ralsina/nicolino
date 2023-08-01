@@ -3,6 +3,7 @@ require "totem"
 module Config
   @@config = Totem.new
 
+  # Taxonomy description in config
   struct Taxonomy
     include JSON::Serializable
 
@@ -13,6 +14,7 @@ module Config
 
   alias Taxonomies = Hash(String, Taxonomy)
 
+  # Options for Nicolino output
   struct Options
     include JSON::Serializable
     property? pretty_html = false

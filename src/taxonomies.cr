@@ -28,6 +28,7 @@ module Taxonomies
     end
   end
 
+  # A Taxonomy, which means "a way to classify posts"
   class Taxonomy
     # Initialize the taxonomy out of descriptive data
     # and a list of posts to be classified

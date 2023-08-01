@@ -2,6 +2,7 @@ require "./nicolino"
 require "commander"
 require "colorize"
 
+# Log wrapper
 struct LogFormat < Log::StaticFormatter
   @@colors = {
     "FATAL" => :red,

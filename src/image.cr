@@ -1,6 +1,7 @@
 require "pixie"
 
 module Image
+  # An image to be processed
   struct Image
     property path : Path
 
