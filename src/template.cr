@@ -5,10 +5,10 @@ module Templates
 
   def self.get_deps(template)
     source = File.read(template)
-    if Croupier::TaskManager.get("#{template}") == source
+    if Croupier::TaskManager.get(template) == source
       Log.debug { "Template #{template} unchanged" }
     else
-      Croupier::TaskManager.set("#{template}", source)
+      Croupier::TaskManager.set(template, source)
     end
     deps = [] of String
     # FIXME should really traverse the node tree
@@ -47,7 +47,7 @@ module Templates
         proc: Croupier::TaskProc.new {
           Log.info { "👈 #{template}" }
           # Yes, we re-read it when get_deps already did it.
-          # This is important for auto mode, tho.
+          # In auto mode the content may have changed though.
           File.read(template)
         })
     end
