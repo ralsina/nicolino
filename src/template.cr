@@ -5,7 +5,11 @@ module Templates
 
   def self.get_deps(template)
     source = File.read(template)
-    Croupier::TaskManager.set("#{template}", source)
+    if Croupier::TaskManager.get("#{template}") == source
+      Log.debug { "Template #{template} unchanged" }
+    else
+      Croupier::TaskManager.set("#{template}", source)
+    end
     deps = [] of String
     # FIXME should really traverse the node tree
     Crinja::Template.new(source).nodes.@children \

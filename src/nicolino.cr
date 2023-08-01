@@ -114,7 +114,7 @@ def run(options, arguments)
 
   arguments = Croupier::TaskManager.tasks.keys if arguments.empty?
   # Run tasks for real
-  Log.info { "Running tasks..." }
+  Log.info { "Running tasks... #{arguments}" }
   Croupier::TaskManager.run_tasks(
     targets: arguments,
     parallel: options.bool.fetch("parallel", false),
