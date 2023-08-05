@@ -80,6 +80,10 @@ module Markdown
       @title[Locale.language]
     end
 
+    def output
+      @output[Locale.language]
+    end
+
     def <=>(other : File)
       # The natural sort order is date descending
       if self.@date.nil? || other.@date.nil?
@@ -98,12 +102,10 @@ module Markdown
       lang = Locale.language
       Log.info { "👈 #{source}" }
       contents = ::File.read(source)
-      _, metadata, @text[lang] = contents.split("---\n", 3)
-      @metadata[lang] = YAML.parse(metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
-      @title[lang] = @metadata[lang]["title"].to_s
-      # FIXME calculate link with language
-      link = Path.new ["/", source.split("/")[1..]]
-      @link[lang] = link.to_s.rchop(link.extension) + ".html"
+      _, raw_metadata, @text[lang] = contents.split("---\n", 3)
+      @metadata[lang] = YAML.parse(raw_metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
+      @title[lang] = metadata["title"].to_s
+      @link[lang] = (Path.new ["/", output.split("/")[1..]]).to_s
       @shortcodes[lang] = Shortcodes.parse(@text[lang])
     end
 
@@ -113,7 +115,6 @@ module Markdown
         replace_shortcodes,
         metadata.fetch("toc", nil) != nil)
       @html[lang] = HtmlFilters.downgrade_headers(@html[lang])
-      # FIXME: use localized link
       @html[lang] = HtmlFilters.make_links_absolute(@html[lang], link)
     end
 
