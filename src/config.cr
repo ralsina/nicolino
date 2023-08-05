@@ -27,7 +27,7 @@ module Config
     property language = "en"
   end
 
-  @@options : Options | Nil = nil
+  @@options = Hash(String, Options).new
   @@taxonomies = Taxonomies.new
 
   def self.get(key)
@@ -70,11 +70,15 @@ module Config
     @@taxonomies
   end
 
-  def self.options : Options
-    if @@options.nil?
-      @@options = @@config.mapping(Options, "options")
+  # Return options per language
+  def self.options(language = nil) : Options
+    lang = language || Locale.language
+    if @@options.fetch(lang, nil).nil?
+      @@config.set_default("languages.#{lang}.options", @@config.get("options"))
+      @@options[lang] = @@config.mapping(Options, "languages.#{lang}.options")
     end
-    @@options.as(Options)
+
+    @@options[lang].as(Options)
   end
 
   def self.languages

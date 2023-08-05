@@ -22,6 +22,7 @@ module Markdown
     @text = Hash(String, String).new
     @title = Hash(String, String).new
     @toc = Hash(String, String).new
+    @output = Hash(String, String).new
 
     # Register all Files by @source
     @@posts = Hash(String, File).new
@@ -35,6 +36,12 @@ module Markdown
       # TODO: lazy load data
       @sources = sources
       @base = base
+      @sources.map { |k, _|
+        p = Path[base]
+        p = Path[p.parts[1..]] # Remove the leading "posts/"
+        p = Path[Config.options(k).output] / p
+        @output[k] = p.to_s.rchop(p.extension) + ".html"
+      }
       load
       @@posts[base.to_s] = self
     end
@@ -264,7 +271,7 @@ module Markdown
 
   # Create a RSS file out of posts with title, save in output
   def self.render_rss(posts, output, title)
-    inputs = ["conf"] + posts.map { |post| post.source }
+    inputs = ["conf"] + posts.map(&.source)
 
     Croupier::Task.new(
       id: "rss",
