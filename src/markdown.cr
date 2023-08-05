@@ -198,7 +198,7 @@ module Markdown
   end
 
   # Create an index page out of a list of posts, save in output
-  def self.render_index(posts, output, title = nil, extra_inputs = [] of String)
+  def self.render_index(posts, output, title = nil, extra_inputs = [] of String, extra_feed = nil)
     inputs = [
       "conf",
       "kv://templates/index.tmpl",
@@ -218,9 +218,10 @@ module Markdown
           })
         Render.apply_template("templates/page.tmpl",
           {
-            "content" => content,
-            "title"   => title,
-            "noindex" => true,
+            "content"    => content,
+            "title"      => title,
+            "noindex"    => true,
+            "extra_feed" => extra_feed,
           })
       }
     )

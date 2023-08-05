@@ -9,7 +9,10 @@
   <meta name="description" content="{{ site_description }}" />
   <link rel="shortcut icon" href="/favicon.ico" />
   <link rel="canonical" href="{{ canonical_url }}" />
-
+  <link rel="alternate" type="application/rss+xml" href="/rss.xml" title="RSS Feed" />
+  {% if extra_feed %}
+  <link rel="alternate" type="application/rss+xml" href="{{ extra_feed.link }}" title="{{ extra_feed.title }}" />
+  {% endif %}
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
 
   <!-- Lightbox -->

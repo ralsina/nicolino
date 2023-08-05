@@ -93,18 +93,24 @@ module Taxonomies
       )
 
       @terms.values.each do |term|
-        # Render term index for each term
         term.@posts.sort!
-        Markdown.render_index(
-          term.@posts[..10],
-          Path["#{@path}/#{Utils.slugify(term.@name)}/index.html"].normalize.to_s,
-          Crinja.render(@term_title, {"term" => term.value}),
-        )
+        feed_path = Path["#{@path}/#{Utils.slugify(term.@name)}/index.rss"].normalize.to_s
+        title = Crinja.render(@term_title, {
+          "term" => term.value,
+        })
         # Render term RSS for each term
         Markdown.render_rss(
           term.@posts[..10],
-          Path["#{@path}/#{Utils.slugify(term.@name)}/index.rss"].normalize.to_s,
-          Crinja.render(@term_title, {"term" => term.value}),
+          feed_path,
+          title,
+        )
+
+        # Render term index for each term
+        Markdown.render_index(
+          term.@posts[..10],
+          Path["#{@path}/#{Utils.slugify(term.@name)}/index.html"].normalize.to_s,
+          title,
+          extra_feed: {link: Utils.path_to_link(feed_path), title: "#{title} RSS"},
         )
       end
     end

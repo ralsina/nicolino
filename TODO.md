@@ -2,11 +2,11 @@
 
 ## Things that could be done
 
+* Add RSS link elements where appropriate
 * Need better date parser, like dateparser from Python
 * Add slug-for-url support?
 * Figure out the equivalent of Nikola's `link://` schema
 * Port thumbnail shortcode from Nikola
-* Add RSS link elements where appropriate
 * Un-hardcode a bunch of things
 * Figure out per-command flags or migrate off commander
 * Do not *always* parse shortcode replacements as markdown (for pandoc)
