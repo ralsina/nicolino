@@ -9,6 +9,10 @@ module Sitemap
 
   FOOTER = "</urlset>"
 
+  def self.noindex?(path)
+    File.read(path).includes? %(<meta name="robots" content="noindex">)
+  end
+
   def self.render
     # TODO: support robot exclusion
     # TODO: support alternates for locations
@@ -25,6 +29,7 @@ module Sitemap
           io << HEADER
           base = URI.parse(Config.get("site.url").as_s)
           inputs.each do |input|
+            next if noindex? input
             modtime = File.info(input).modification_time
             input = input.sub(/^output\//, "")
             io << %(<url>

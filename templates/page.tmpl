@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  {% if noindex %}<meta name="robots" content="noindex" />{% endif %}
   <title>{{ title }}</title>
   <meta name="description" content="{{ site_description }}" />
   <link rel="shortcut icon" href="/favicon.ico" />

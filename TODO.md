@@ -6,8 +6,6 @@
 * Add slug-for-url support?
 * Figure out the equivalent of Nikola's `link://` schema
 * Port thumbnail shortcode from Nikola
-* Add noindex meta tag to "index" pages, and remove
-  them from sitemap
 * Add RSS link elements where appropriate
 * Un-ad-hoc path handlings (lchop output and such)
 * Un-hardcode a bunch of things
@@ -28,6 +26,8 @@
 * Draft / future / expired
 * Link checker (for internal links)
 
+* ~~Add noindex meta tag to "index" pages, and remove~~
+  ~~them from sitemap~~
 * ~~Add slugification where needed~~
 * ~~HTML "compiler"~~
 * ~~Fix bug of multiple `output/tags/index.html` when importing~~

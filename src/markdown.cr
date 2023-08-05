@@ -217,7 +217,11 @@ module Markdown
             "posts" => posts.map(&.value),
           })
         Render.apply_template("templates/page.tmpl",
-          {"content" => content, "title" => title})
+          {
+            "content" => content,
+            "title"   => title,
+            "noindex" => true,
+          })
       }
     )
   end
