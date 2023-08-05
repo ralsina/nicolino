@@ -7,7 +7,6 @@
 * Figure out the equivalent of Nikola's `link://` schema
 * Port thumbnail shortcode from Nikola
 * Add RSS link elements where appropriate
-* Un-ad-hoc path handlings (lchop output and such)
 * Un-hardcode a bunch of things
 * Figure out per-command flags or migrate off commander
 * Do not *always* parse shortcode replacements as markdown (for pandoc)
@@ -26,6 +25,7 @@
 * Draft / future / expired
 * Link checker (for internal links)
 
+* ~~Un-ad-hoc path handlings (lchop output and such)~~
 * ~~Add noindex meta tag to "index" pages, and remove~~
   ~~them from sitemap~~
 * ~~Add slugification where needed~~

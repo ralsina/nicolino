@@ -23,7 +23,7 @@ module Taxonomies
     def link
       {
         name: @name,
-        link: Path["#{@taxonomy.@path}/#{Utils.slugify(@name)}/index.html".lchop("output")].normalize.to_s,
+        link: Utils.path_to_link "#{@taxonomy.@path}/#{Utils.slugify(@name)}/index.html",
       }
     end
   end
@@ -72,7 +72,7 @@ module Taxonomies
     end
 
     def link
-      {name: @title, link: Path["#{@path}/index.html".lchop("output")].normalize.to_s}
+      {name: @title, link: Utils.path_to_link "#{@path}/index.html"}
     end
 
     def render
