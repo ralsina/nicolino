@@ -14,10 +14,11 @@ module Markdown
     @date : Time | Nil
     @html : String = ""
     @link : String = ""
+    @base : Path = Path.new
     @metadata = Hash(String, String).new
     @rendered : String = ""
     @shortcodes = Shortcodes::Result.new
-    @source : String = ""
+    @sources = Hash(String, String).new
     @text : String = ""
     @title : String = ""
     @toc : String = ""
@@ -30,11 +31,12 @@ module Markdown
     end
 
     # Initialize the post with proper data
-    def initialize(path)
+    def initialize(sources, base)
       # TODO: lazy load data
-      @source = path
+      @sources = sources
+      @base = base
       load
-      @@posts[@source] = self
+      @@posts[base.to_s] = self
     end
 
     def taxonomies
@@ -47,6 +49,11 @@ module Markdown
       result
     end
 
+    def source
+      pp! @sources, Locale.language
+      @sources[Locale.language]
+    end
+
     def <=>(other : File)
       # The natural sort order is date descending
       if self.@date.nil? || other.@date.nil?
@@ -57,16 +64,17 @@ module Markdown
     end
 
     def to_s(io)
-      io << "Post(#{@source})"
+      io << "Post(#{@base})"
     end
 
     def load
-      Log.info { "👈 #{@source}" }
-      contents = ::File.read(@source)
+      Log.info { "👈 #{source}" }
+      contents = ::File.read(source)
       _, metadata, @text = contents.split("---\n", 3)
       @metadata = YAML.parse(metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
       @title = @metadata["title"].to_s
-      link = Path.new ["/", @source.split("/")[1..]]
+      # FIXME calculate link with language
+      link = Path.new ["/", source.split("/")[1..]]
       @link = link.to_s.rchop(link.extension) + ".html"
       @shortcodes = Shortcodes.parse(@text)
     end
@@ -86,7 +94,7 @@ module Markdown
         begin
           @date = Cronic.parse(t.to_s)
         rescue ex
-          Log.error { "Error parsing date for #{@source}, #{t}" }
+          Log.error { "Error parsing date for #{source}, #{t}" }
           @date = nil
         end
       end
@@ -106,7 +114,7 @@ module Markdown
     def replace_shortcodes
       @shortcodes.errors.each do |e|
         # TODO: show actual error
-        Log.error { "In #{@source}:" }
+        Log.error { "In #{source}:" }
         Log.error { Shortcodes.nice_error(e, @text) }
       end
       text = @text
@@ -151,7 +159,7 @@ module Markdown
         "date"        => date.nil? ? "" : date.as(Time).to_s(Config.options.date_output_format),
         "html"        => html,
         "link"        => @link,
-        "source"      => @source,
+        "source"      => source,
         "summary"     => summary,
         "taxonomies"  => taxonomies,
         "title"       => @title,
@@ -163,7 +171,7 @@ module Markdown
     # List of all files and kv store items this post uses
     def dependencies : Array(String)
       result = ["conf", "kv://templates/page.tmpl"]
-      result << self.@source
+      result << self.source
       result << "kv://#{template}"
       result += self.@shortcodes.shortcodes.map { |sc| "kv://shortcodes/#{sc.name}.tmpl" }
       result
@@ -177,7 +185,7 @@ module Markdown
   def self.render(posts, require_date = true)
     posts.each do |post|
       if require_date && post.date == nil
-        Log.info { "Error: #{post.@source} has no date" }
+        Log.info { "Error: #{post.source} has no date" }
         next
       end
 
@@ -203,7 +211,7 @@ module Markdown
       "conf",
       "kv://templates/index.tmpl",
       "kv://templates/page.tmpl",
-    ] + posts.map(&.@source) + posts.map(&.template) + extra_inputs
+    ] + posts.map(&.source) + posts.map(&.template) + extra_inputs
     inputs = inputs.uniq
     Croupier::Task.new(
       id: "index",
@@ -229,7 +237,7 @@ module Markdown
 
   # Create a RSS file out of posts with title, save in output
   def self.render_rss(posts, output, title)
-    inputs = ["conf"] + posts.map { |post| post.@source }
+    inputs = ["conf"] + posts.map { |post| post.source }
 
     Croupier::Task.new(
       id: "rss",
@@ -257,13 +265,38 @@ module Markdown
   def self.read_all(path)
     Log.info { "Reading Markdown from #{path}" }
     posts = [] of File
+    bases = Set(Path).new
+
+    # Find base files for posts
     Dir.glob("#{path}/**/*.md").each do |p|
-      begin
-        posts << File.new(p)
-      rescue ex
-        Log.error { "Error parsing #{p}: #{ex.message}" }
-        Log.debug { ex }
+      base = Path[p]
+      dirname = base.dirname
+      stem = Path[base.stem]
+      stem_ext = stem.extension
+      if !stem_ext.empty? && Config.languages.keys.includes? stem_ext[1..]
+        stem = stem.stem
       end
+      bases << Path[dirname] / stem
+    end
+
+    # Now for each base file find sources for all languages
+    #
+    # If there is a localized file for that language, use it
+    # If not, use the file for the first language that has a file
+    bases.each do |base|
+      sources = Hash(String, String).new
+      possible_sources = (["#{base}.md"] +
+                          Config.languages.keys.map { |l| "#{base}.#{l}.md" }) \
+        .select { |p| ::File.exists? p }
+      Config.languages.keys.each do |lang|
+        lang_base = "#{base}.#{lang}.md"
+        if possible_sources.includes? lang_base
+          sources[lang] = lang_base
+        else
+          sources[lang] = possible_sources[0]
+        end
+      end
+      posts << File.new(sources, base)
     end
     posts
   end

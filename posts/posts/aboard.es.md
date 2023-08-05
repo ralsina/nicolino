@@ -1,10 +1,10 @@
 ---
-title: This is bar
+title: Esto es bar
 date: 2013-04-01 0:0:0
 tags: ["tag1", "tag3"]
-summary: This is foo
+summary: Esto es foo
 ---
 
 # Foo
 
-[welcome](welcome.html)
+[Bienvenido](welcome.html)

@@ -5,7 +5,7 @@ module Pandoc
   class File < Markdown::File
     def html
       # FIXME: Figure out how to extract TOC
-      ext = Path[@source].extension
+      ext = Path[source].extension
       format = Config.options.formats[ext]
       @html, @toc = compile(
         replace_shortcodes,
@@ -41,7 +41,7 @@ module Pandoc
     Config.options.formats.keys.each do |ext|
       Dir.glob("#{path}/**/*#{ext}").each do |p|
         begin
-          posts << File.new(p)
+          posts << File.new({"en" => p}, Path[p])
         rescue ex
           Log.error { "Error parsing #{p}: #{ex.message}" }
           Log.debug { ex }

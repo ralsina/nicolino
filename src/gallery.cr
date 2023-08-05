@@ -14,8 +14,8 @@ require "./markdown"
 module Gallery
   # An image gallery
   class Gallery < Markdown::File
-    def initialize(path, @image_list : Array(String))
-      super(path)
+    def initialize(sources, base, @image_list : Array(String))
+      super(sources, base)
     end
 
     def load
@@ -44,7 +44,8 @@ module Gallery
     Dir.glob("#{path}/**/index.md").each do |p|
       image_list = Dir.glob(
         Path[p].parent.to_s + "/*.{jpg,png}").map(&.split("/")[-1])
-      galleries << Gallery.new(p, image_list)
+      # FIXME: do properly
+      galleries << Gallery.new({"en" => p}, Path[p], image_list)
     end
     galleries
   end
@@ -57,7 +58,7 @@ module Gallery
         output: output,
         inputs: [
           "conf",
-          post.@source,
+          post.source,
           "kv://#{post.template}",
           "kv://templates/page.tmpl",
         ] + post.@image_list,

@@ -22,6 +22,9 @@ module Config
     property image_thumb = 1024
     property formats = {} of String => String
     property date_output_format = "%Y-%m-%d %H:%M"
+    property output = "output"
+    property locale = "en_US.UTF-8"
+    property language = "en"
   end
 
   @@options : Options | Nil = nil
@@ -72,5 +75,9 @@ module Config
       @@options = @@config.mapping(Options, "options")
     end
     @@options.as(Options)
+  end
+
+  def self.languages
+    config.get("languages").as_h
   end
 end

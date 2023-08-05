@@ -18,7 +18,8 @@ module HTML
     posts = [] of File
     Dir.glob("#{path}/**/*.html").each do |p|
       begin
-        posts << File.new(p)
+        # FIXME: do properly
+        posts << File.new({"en" => p}, Path[p])
       rescue ex
         Log.error { "Error parsing #{p}: #{ex.message}" }
         Log.debug { ex }
