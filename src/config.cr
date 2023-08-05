@@ -52,6 +52,7 @@ module Config
           "output"     => "tags/",
         },
       })
+      @@config.set_default("languages", {"en" => Hash(String, String).new})
     end
     @@config
   end

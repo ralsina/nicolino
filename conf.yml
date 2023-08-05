@@ -19,6 +19,17 @@ options:
   formats:
     .rst: rst
     .txt: rst
+  # Options for languages if you have more than one.
+  languages:
+    - en:
+    - es:
+      title: "Blog de Prueba de Nicolino"
+      description: "Este es el sitio de demostración de Nicolino"
+      footer: "Tema por defecto de Nicolino"
+      url: "https://example.com/es"
+      subDir: "es"
+      locale: "es_ES.UTF-8"
+
 # Features you want to enable are listed here
 # features:
 #   - assets
