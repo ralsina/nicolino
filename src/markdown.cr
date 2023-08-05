@@ -33,7 +33,6 @@ module Markdown
 
     # Initialize the post with proper data
     def initialize(sources, base)
-      # TODO: lazy load data
       @sources = sources
       @base = base
       @sources.map { |k, _|
@@ -42,10 +41,13 @@ module Markdown
         p = Path[Config.options(k).output] / p
         @output[k] = p.to_s.rchop(p.extension) + ".html"
       }
-      load
       @@posts[base.to_s] = self
+      Config.languages.keys.each do |lang|
+        load lang
+      end
     end
 
+    # FIXME: Consider languages here
     def taxonomies
       result = Hash({name: String, link: String}, Array({name: String, link: String})).new
       Taxonomies::All.each do |taxo|
@@ -56,32 +58,36 @@ module Markdown
       result
     end
 
-    def source
-      @sources[Locale.language]
+    def source(lang = nil)
+      @sources[lang || Locale.language]
     end
 
-    def text
-      @text[Locale.language]
+    def text(lang = nil)
+      @text[lang || Locale.language]
     end
 
-    def metadata
-      @metadata[Locale.language]
+    def metadata(lang = nil)
+      @metadata[lang || Locale.language]
     end
 
-    def link
-      @link[Locale.language]
+    def link(lang = nil)
+      @link[lang || Locale.language]
     end
 
-    def html
-      @html[Locale.language]
+    def toc(lang = nil)
+      @toc[lang || Locale.language]
     end
 
-    def title
-      @title[Locale.language]
+    def title(lang = nil)
+      @title[lang || Locale.language]
     end
 
-    def output
-      @output[Locale.language]
+    def output(lang = nil)
+      @output[lang || Locale.language]
+    end
+
+    def shortcodes(lang = nil)
+      @shortcodes[lang || Locale.language]
     end
 
     def <=>(other : File)
@@ -98,8 +104,8 @@ module Markdown
     end
 
     # Load the post from disk (for current language only)
-    def load
-      lang = Locale.language
+    def load(language = nil)
+      lang = language || Locale.language
       Log.info { "👈 #{source}" }
       contents = ::File.read(source)
       _, raw_metadata, @text[lang] = contents.split("---\n", 3)
@@ -109,8 +115,8 @@ module Markdown
       @shortcodes[lang] = Shortcodes.parse(@text[lang])
     end
 
-    def html
-      lang = Locale.language
+    def html(lang = nil)
+      lang ||= Locale.language
       @html[lang], @toc[lang] = Discount.compile(
         replace_shortcodes,
         metadata.fetch("toc", nil) != nil)
@@ -120,7 +126,7 @@ module Markdown
 
     def date : Time | Nil
       return @date if !@date.nil?
-      t = @metadata.fetch("date", nil)
+      t = metadata.fetch("date", nil)
       if t != nil
         begin
           @date = Cronic.parse(t.to_s)
@@ -134,12 +140,12 @@ module Markdown
 
     # Path for the `Templates::Template` this post should be rendered with
     def template
-      @metadata.fetch("template", "templates/post.tmpl").to_s
+      metadata.fetch("template", "templates/post.tmpl").to_s
     end
 
     # Render the markdown HTML into the right template for the fragment
-    def rendered
-      Templates::Env.get_template(template).render(value)
+    def rendered(lang = nil)
+      Templates::Env.get_template(template).render(value lang)
     end
 
     def replace_shortcodes
@@ -161,17 +167,19 @@ module Markdown
       _text
     end
 
-    def summary
-      return metadata["summary"] if metadata.has_key?("summary")
+    def summary(lang = nil)
+      lang ||= Locale.language
+      return metadata(lang)["summary"] if metadata(lang).has_key?("summary")
       # Split HTML in the comment
-      if html.includes?("<!--more-->")
-        html.split("<!--more-->")[0]
+      if html(lang).includes?("<!--more-->")
+        html(lang).split("<!--more-->")[0]
       else
-        html
+        html(lang)
       end
     end
 
     # What to show as breadcrumbs for this post
+    # FIXME: localize
     def breadcrumbs
       # This is hard to guess, but ...
       # For pages, it can follow the path.
@@ -184,23 +192,20 @@ module Markdown
     # Return a value Crinja can use in templates
     # FIXME: can Crinja handle the object directly
     # if it uses properties?
-    def value
+    def value(lang = nil)
+      lang = lang || Locale.language
       {
         "breadcrumbs" => breadcrumbs,
-        "date"        => date.nil? ? "" : date.as(Time).to_s(Config.options.date_output_format),
-        "html"        => html,
-        "link"        => @link,
-        "source"      => source,
-        "summary"     => summary,
+        "date"        => date.nil? ? "" : date.as(Time).to_s(Config.options(lang).date_output_format),
+        "html"        => html(lang),
+        "link"        => link(lang),
+        "source"      => source(lang),
+        "summary"     => summary(lang),
         "taxonomies"  => taxonomies,
-        "title"       => @title,
-        "toc"         => @toc,
-        "metadata"    => @metadata,
+        "title"       => title(lang),
+        "toc"         => toc(lang),
+        "metadata"    => metadata(lang),
       }
-    end
-
-    def shortcodes
-      @shortcodes[Locale.language]
     end
 
     # List of all files and kv store items this post uses
@@ -218,25 +223,27 @@ module Markdown
   # posts is an Array of `Markdown::File`
   # if require_date is true, posts *must* have a date
   def self.render(posts, require_date = true)
-    posts.each do |post|
-      if require_date && post.date == nil
-        Log.info { "Error: #{post.source} has no date" }
-        next
-      end
+    Config.languages.keys.each do |lang|
+      Log.info { "📖 Language #{lang}" }
+      posts.each do |post|
+        if require_date && post.date == nil
+          Log.info { "Error: #{post.source lang} has no date" }
+          next
+        end
 
-      output = "output#{post.@link}"
-      Croupier::Task.new(
-        id: "markdown",
-        output: output,
-        inputs: post.dependencies,
-        mergeable: false,
-        proc: Croupier::TaskProc.new {
-          post.load # Need to refresh post contents
-          Log.info { "👉 #{output}" }
-          Render.apply_template("templates/page.tmpl",
-            {"content" => post.rendered, "title" => post.@title})
-        }
-      )
+        Croupier::Task.new(
+          id: "markdown",
+          output: post.output(lang),
+          inputs: post.dependencies,
+          mergeable: false,
+          proc: Croupier::TaskProc.new {
+            post.load lang # Need to refresh post contents
+            Log.info { "👉 #{post.output lang}" }
+            Render.apply_template("templates/page.tmpl",
+              {"content" => post.rendered(lang), "title" => post.title(lang)})
+          }
+        )
+      end
     end
   end
 
