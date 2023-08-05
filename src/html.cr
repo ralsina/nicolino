@@ -4,10 +4,11 @@ module HTML
   # Posts written directly in HTML
   class File < Markdown::File
     def html
+      lang = Locale.language
       # FIXME: Implement TOC using lexbor
-      @html = replace_shortcodes
-      @html = HtmlFilters.downgrade_headers(@html)
-      @html = HtmlFilters.make_links_absolute(@html, @link)
+      @html[lang] = replace_shortcodes
+      @html[lang] = HtmlFilters.downgrade_headers(html)
+      @html[lang] = HtmlFilters.make_links_absolute(html, link)
     end
   end
 

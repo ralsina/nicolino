@@ -12,16 +12,16 @@ module Markdown
   # A class representing a Markdown file
   class File
     @date : Time | Nil
-    @html : String = ""
-    @link : String = ""
-    @base : Path = Path.new
-    @metadata = Hash(String, String).new
-    @rendered : String = ""
-    @shortcodes = Shortcodes::Result.new
+    @html = Hash(String, String).new
+    @link = Hash(String, String).new
+    @base = Path.new
+    @metadata = Hash(String, Hash(String, String)).new
+    @rendered = Hash(String, String).new
+    @shortcodes = Hash(String, Shortcodes::Result).new
     @sources = Hash(String, String).new
-    @text : String = ""
-    @title : String = ""
-    @toc : String = ""
+    @text = Hash(String, String).new
+    @title = Hash(String, String).new
+    @toc = Hash(String, String).new
 
     # Register all Files by @source
     @@posts = Hash(String, File).new
@@ -50,14 +50,33 @@ module Markdown
     end
 
     def source
-      pp! @sources, Locale.language
       @sources[Locale.language]
+    end
+
+    def text
+      @text[Locale.language]
+    end
+
+    def metadata
+      @metadata[Locale.language]
+    end
+
+    def link
+      @link[Locale.language]
+    end
+
+    def html
+      @html[Locale.language]
+    end
+
+    def title
+      @title[Locale.language]
     end
 
     def <=>(other : File)
       # The natural sort order is date descending
       if self.@date.nil? || other.@date.nil?
-        self.@title <=> other.@title
+        self.title <=> other.title
       else
         -1 * (self.@date.as(Time) <=> other.@date.as(Time))
       end
@@ -67,24 +86,28 @@ module Markdown
       io << "Post(#{@base})"
     end
 
+    # Load the post from disk (for current language only)
     def load
+      lang = Locale.language
       Log.info { "👈 #{source}" }
       contents = ::File.read(source)
-      _, metadata, @text = contents.split("---\n", 3)
-      @metadata = YAML.parse(metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
-      @title = @metadata["title"].to_s
+      _, metadata, @text[lang] = contents.split("---\n", 3)
+      @metadata[lang] = YAML.parse(metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
+      @title[lang] = @metadata[lang]["title"].to_s
       # FIXME calculate link with language
       link = Path.new ["/", source.split("/")[1..]]
-      @link = link.to_s.rchop(link.extension) + ".html"
-      @shortcodes = Shortcodes.parse(@text)
+      @link[lang] = link.to_s.rchop(link.extension) + ".html"
+      @shortcodes[lang] = Shortcodes.parse(@text[lang])
     end
 
     def html
-      @html, @toc = Discount.compile(
+      lang = Locale.language
+      @html[lang], @toc[lang] = Discount.compile(
         replace_shortcodes,
-        @metadata.fetch("toc", nil) != nil)
-      @html = HtmlFilters.downgrade_headers(@html)
-      @html = HtmlFilters.make_links_absolute(@html, @link)
+        metadata.fetch("toc", nil) != nil)
+      @html[lang] = HtmlFilters.downgrade_headers(@html[lang])
+      # FIXME: use localized link
+      @html[lang] = HtmlFilters.make_links_absolute(@html[lang], link)
     end
 
     def date : Time | Nil
@@ -112,31 +135,31 @@ module Markdown
     end
 
     def replace_shortcodes
-      @shortcodes.errors.each do |e|
+      shortcodes.errors.each do |e|
         # TODO: show actual error
         Log.error { "In #{source}:" }
-        Log.error { Shortcodes.nice_error(e, @text) }
+        Log.error { Shortcodes.nice_error(e, text) }
       end
-      text = @text
+      _text = text
       # Starting at the end of text, go backwards
       # replacing each shortcode with its output
-      @shortcodes.shortcodes.reverse_each do |sc|
+      shortcodes.shortcodes.reverse_each do |sc|
         # FIXME: context needs stuff
         context = Crinja::Context.new
-        text = text[0, sc.position] +
-               Sc.render_sc(sc, context) +
-               text[sc.position + sc.len, text.size]
+        _text = _text[0, sc.position] +
+                Sc.render_sc(sc, context) +
+                _text[sc.position + sc.len, _text.size]
       end
-      text
+      _text
     end
 
     def summary
-      return @metadata["summary"] if @metadata.has_key?("summary")
+      return metadata["summary"] if metadata.has_key?("summary")
       # Split HTML in the comment
-      if @html.includes?("<!--more-->")
-        @html.split("<!--more-->")[0]
+      if html.includes?("<!--more-->")
+        html.split("<!--more-->")[0]
       else
-        @html
+        html
       end
     end
 
@@ -168,12 +191,16 @@ module Markdown
       }
     end
 
+    def shortcodes
+      @shortcodes[Locale.language]
+    end
+
     # List of all files and kv store items this post uses
     def dependencies : Array(String)
       result = ["conf", "kv://templates/page.tmpl"]
-      result << self.source
+      result << source
       result << "kv://#{template}"
-      result += self.@shortcodes.shortcodes.map { |sc| "kv://shortcodes/#{sc.name}.tmpl" }
+      result += shortcodes.shortcodes.map { |sc| "kv://shortcodes/#{sc.name}.tmpl" }
       result
     end
   end
@@ -249,9 +276,9 @@ module Markdown
         feed = RSS.new title: title
         posts.each do |post|
           feed.item(
-            title: post.@title,
+            title: post.title,
             description: post.summary,
-            link: post.@link,
+            link: post.link,
             pubDate: post.date.to_s,
           )
         end

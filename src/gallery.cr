@@ -21,7 +21,9 @@ module Gallery
     def load
       super
       # FIXME: do conditionally
-      @metadata["template"] = "templates/gallery.tmpl"
+      Config.languages.keys.each do |lang|
+        @metadata[lang]["template"] = "templates/gallery.tmpl"
+      end
     end
 
     # Breadcrumbs is Galleries / this gallery

@@ -4,15 +4,16 @@ module Pandoc
   # A file written in markdown
   class File < Markdown::File
     def html
+      lang = Locale.language
       # FIXME: Figure out how to extract TOC
       ext = Path[source].extension
       format = Config.options.formats[ext]
-      @html, @toc = compile(
+      @html[lang], @toc[lang] = compile(
         replace_shortcodes,
-        @metadata.fetch("toc", nil) != nil,
+        metadata.fetch("toc", nil) != nil,
         format: format)
-      @html = HtmlFilters.downgrade_headers(@html)
-      @html = HtmlFilters.make_links_absolute(@html, @link)
+      @html[lang] = HtmlFilters.downgrade_headers(html)
+      @html[lang] = HtmlFilters.make_links_absolute(html, link)
     end
 
     # Use a memoized compile method because pandoc is so slow
