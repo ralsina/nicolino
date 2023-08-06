@@ -47,7 +47,6 @@ module Markdown
       end
     end
 
-    # FIXME: Consider languages here
     def taxonomies
       result = Hash({name: String, link: String}, Array({name: String, link: String})).new
       Taxonomies::All.each do |taxo|

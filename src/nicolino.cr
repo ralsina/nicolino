@@ -52,7 +52,7 @@ def create_tasks
           k,
           v.title,
           v.term_title,
-          "output/#{v.output}",
+          v.output,
           posts
         ).render
       end

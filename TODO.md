@@ -22,6 +22,7 @@
 * Try to be close to hugo's input layout if possible
 * Draft / future / expired
 * Link checker (for internal links)
+* Taxonomies have no titles
 
 * ~~Think how to do translations~~
 * ~~Add RSS link elements where appropriate~~
