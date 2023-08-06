@@ -18,60 +18,62 @@ module Gallery
       super(sources, base)
     end
 
-    def load
-      super
-      # FIXME: do conditionally
-      Config.languages.keys.each do |lang|
-        @metadata[lang]["template"] = "templates/gallery.tmpl"
-      end
+    def load(lang=nil)
+      lang ||= Locale.language
+      super(lang)
+      @metadata[lang]["template"] = "templates/gallery.tmpl"
     end
 
     # Breadcrumbs is Galleries / this gallery
     # FIXME should be the path
-    def breadcrumbs
-      [{name: "Galleries", link: "/galleries"}, {name: @title}]
+    def breadcrumbs(lang=nil)
+      lang ||= Locale.language
+      [{name: "Galleries", link: "/galleries"}, {name: title(lang)}]
     end
 
-    def value
+    def value(lang=nil)
+      lang ||= Locale.language
       {
         "image_list"  => @image_list,
-        "breadcrumbs" => breadcrumbs,
-      }.merge(super)
+        "breadcrumbs" => breadcrumbs(lang),
+      }.merge(super(lang))
     end
   end
 
   def self.read_all(path)
     Log.info { "Reading galleries from #{path}" }
     galleries = [] of Gallery
-    Dir.glob("#{path}/**/index.md").each do |p|
+    Utils.find_all(path, "md").map do |base, sources|
       image_list = Dir.glob(
-        Path[p].parent.to_s + "/*.{jpg,png}").map(&.split("/")[-1])
-      # FIXME: do properly
-      galleries << Gallery.new({"en" => p}, Path[p], image_list)
+        Path[base].parent.to_s + "/*.{jpg,png}").map(&.split("/")[-1])
+      galleries << Gallery.new(sources, base, image_list)
     end
     galleries
   end
 
   def self.render(galleries : Array(Gallery), prefix = "")
     galleries.each do |post|
-      output = "output/#{prefix}#{post.@link}" # FIXME paths will be wrong
-      Croupier::Task.new(
-        id: "gallery",
-        output: output,
-        inputs: [
+      Config.languages.keys.each do |lang|
+        p! "kv://#{post.template(lang)}"
+        Log.info { "📖 Language #{lang}" }
+        Croupier::Task.new(
+          id: "gallery",
+          output: post.output(lang), # This is producing es/foo instead of es/galleries/foo
+          inputs: [
           "conf",
-          post.source,
-          "kv://#{post.template}",
+          post.source(lang),
+          "kv://#{post.template(lang)}",
           "kv://templates/page.tmpl",
         ] + post.@image_list,
-        mergeable: false,
-        proc: Croupier::TaskProc.new {
-          post.load # Need to refresh post contents
-          Log.info { "👉 #{output}" }
-          Render.apply_template("templates/page.tmpl",
-            {"content" => post.rendered, "title" => post.@title})
-        }
-      )
+          mergeable: false,
+          proc: Croupier::TaskProc.new {
+            post.load(lang) # Need to refresh post contents
+            Log.info { "👉 #{post.output(lang)}" }
+            Render.apply_template("templates/page.tmpl",
+              {"content" => post.rendered(lang), "title" => post.title(lang)})
+          }
+        )
+      end
     end
   end
 end

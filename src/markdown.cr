@@ -118,8 +118,8 @@ module Markdown
     def html(lang = nil)
       lang ||= Locale.language
       @html[lang], @toc[lang] = Discount.compile(
-        replace_shortcodes,
-        metadata.fetch("toc", nil) != nil)
+        replace_shortcodes(lang),
+        metadata(lang).fetch("toc", nil) != nil)
       @html[lang] = HtmlFilters.downgrade_headers(@html[lang])
       @html[lang] = HtmlFilters.make_links_absolute(@html[lang], link)
     end
@@ -139,25 +139,28 @@ module Markdown
     end
 
     # Path for the `Templates::Template` this post should be rendered with
-    def template
-      metadata.fetch("template", "templates/post.tmpl").to_s
+    def template(lang = nil)
+      lang ||= Locale.language
+      metadata(lang).fetch("template", "templates/post.tmpl").to_s
     end
 
     # Render the markdown HTML into the right template for the fragment
     def rendered(lang = nil)
-      Templates::Env.get_template(template).render(value lang)
+      lang ||= Locale.language
+      Templates::Env.get_template(template(lang)).render(value(lang))
     end
 
-    def replace_shortcodes
-      shortcodes.errors.each do |e|
+    def replace_shortcodes(lang)
+      lang ||= Locale.language
+      shortcodes(lang).errors.each do |e|
         # TODO: show actual error
-        Log.error { "In #{source}:" }
-        Log.error { Shortcodes.nice_error(e, text) }
+        Log.error { "In #{source(lang)}:" }
+        Log.error { Shortcodes.nice_error(e, text(lang)) }
       end
-      _text = text
+      _text = text(lang)
       # Starting at the end of text, go backwards
       # replacing each shortcode with its output
-      shortcodes.shortcodes.reverse_each do |sc|
+      shortcodes(lang).shortcodes.reverse_each do |sc|
         # FIXME: context needs stuff
         context = Crinja::Context.new
         _text = _text[0, sc.position] +
@@ -190,8 +193,6 @@ module Markdown
     end
 
     # Return a value Crinja can use in templates
-    # FIXME: can Crinja handle the object directly
-    # if it uses properties?
     def value(lang = nil)
       lang = lang || Locale.language
       {
@@ -307,37 +308,8 @@ module Markdown
   def self.read_all(path)
     Log.info { "Reading Markdown from #{path}" }
     posts = [] of File
-    bases = Set(Path).new
-
-    # Find base files for posts
-    Dir.glob("#{path}/**/*.md").each do |p|
-      base = Path[p]
-      dirname = base.dirname
-      stem = Path[base.stem]
-      stem_ext = stem.extension
-      if !stem_ext.empty? && Config.languages.keys.includes? stem_ext[1..]
-        stem = stem.stem
-      end
-      bases << Path[dirname] / stem
-    end
-
-    # Now for each base file find sources for all languages
-    #
-    # If there is a localized file for that language, use it
-    # If not, use the file for the first language that has a file
-    bases.each do |base|
-      sources = Hash(String, String).new
-      possible_sources = (["#{base}.md"] +
-                          Config.languages.keys.map { |l| "#{base}.#{l}.md" }) \
-        .select { |p| ::File.exists? p }
-      Config.languages.keys.each do |lang|
-        lang_base = "#{base}.#{lang}.md"
-        if possible_sources.includes? lang_base
-          sources[lang] = lang_base
-        else
-          sources[lang] = possible_sources[0]
-        end
-      end
+    all_sources = Utils.find_all(path, "md")
+    all_sources.map do |base, sources|
       posts << File.new(sources, base)
     end
     posts
