@@ -2,7 +2,6 @@
 
 ## Things that could be done
 
-* Think how to do translations
 * Un-hardcode a bunch of things
 * Figure out per-command flags or migrate off commander
 * Image gallery index / Generic folder index
@@ -24,6 +23,7 @@
 * Draft / future / expired
 * Link checker (for internal links)
 
+* ~~Think how to do translations~~
 * ~~Add RSS link elements where appropriate~~
 * ~~Un-ad-hoc path handlings (lchop output and such)~~
 * ~~Add noindex meta tag to "index" pages, and remove~~
