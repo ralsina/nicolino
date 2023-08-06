@@ -3,16 +3,17 @@ require "./markdown"
 module Pandoc
   # A file written in markdown
   class File < Markdown::File
-    def html
+    def html(lang = nil)
+      lang ||= Locale.language
       # FIXME: Figure out how to extract TOC
-      ext = Path[@source].extension
+      ext = Path[source].extension
       format = Config.options.formats[ext]
-      @html, @toc = compile(
-        replace_shortcodes,
-        @metadata.fetch("toc", nil) != nil,
+      @html[lang], @toc[lang] = compile(
+        replace_shortcodes(lang),
+        metadata(lang).fetch("toc", nil) != nil,
         format: format)
-      @html = HtmlFilters.downgrade_headers(@html)
-      @html = HtmlFilters.make_links_absolute(@html, @link)
+      @html[lang] = HtmlFilters.downgrade_headers(html(lang))
+      @html[lang] = HtmlFilters.make_links_absolute(html(lang), link)
     end
 
     # Use a memoized compile method because pandoc is so slow
@@ -39,11 +40,12 @@ module Pandoc
     Log.info { "Reading pandoc files from #{path}" }
     posts = [] of File
     Config.options.formats.keys.each do |ext|
-      Dir.glob("#{path}/**/*#{ext}").each do |p|
+      all_sources = Utils.find_all(path, ext[1..])
+      all_sources.map do |base, sources|
         begin
-          posts << File.new(p)
+          posts << File.new(sources, base)
         rescue ex
-          Log.error { "Error parsing #{p}: #{ex.message}" }
+          Log.error { "Error parsing #{base}: #{ex.message}" }
           Log.debug { ex }
         end
       end

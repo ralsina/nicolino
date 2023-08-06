@@ -14,61 +14,71 @@ require "./markdown"
 module Gallery
   # An image gallery
   class Gallery < Markdown::File
-    def initialize(path, @image_list : Array(String))
-      super(path)
+    def initialize(sources, base, @image_list : Array(String))
+      super(sources, base)
+      @sources.map { |k, _|
+        # Preserve the "galleries/" prefix
+        p = Path[base]
+        p = Path[Config.options(k).output] / p
+        @output[k] = p.to_s.rchop(p.extension) + ".html"
+      }
     end
 
-    def load
-      super
-      # FIXME: do conditionally
-      @metadata["template"] = "templates/gallery.tmpl"
+    def load(lang = nil)
+      lang ||= Locale.language
+      super(lang)
+      @metadata[lang]["template"] = "templates/gallery.tmpl"
     end
 
     # Breadcrumbs is Galleries / this gallery
     # FIXME should be the path
-    def breadcrumbs
-      [{name: "Galleries", link: "/galleries"}, {name: @title}]
+    def breadcrumbs(lang = nil)
+      lang ||= Locale.language
+      gal_path = Utils.path_to_link(Path[Config.options(lang).output]/Path[@base].parts[0])
+      [{name: "Galleries", link: gal_path}, {name: title(lang)}]
     end
 
-    def value
-      {
+    def value(lang = nil)
+      lang ||= Locale.language
+      super(lang).merge({
         "image_list"  => @image_list,
-        "breadcrumbs" => breadcrumbs,
-      }.merge(super)
+        "breadcrumbs" => breadcrumbs(lang),
+      })
     end
   end
 
   def self.read_all(path)
     Log.info { "Reading galleries from #{path}" }
     galleries = [] of Gallery
-    Dir.glob("#{path}/**/index.md").each do |p|
+    Utils.find_all(path, "md").map do |base, sources|
       image_list = Dir.glob(
-        Path[p].parent.to_s + "/*.{jpg,png}").map(&.split("/")[-1])
-      galleries << Gallery.new(p, image_list)
+        Path[base].parent.to_s + "/*.{jpg,png}").map(&.split("/")[-1])
+      galleries << Gallery.new(sources, base, image_list)
     end
     galleries
   end
 
   def self.render(galleries : Array(Gallery), prefix = "")
     galleries.each do |post|
-      output = "output/#{prefix}#{post.@link}" # FIXME paths will be wrong
-      Croupier::Task.new(
-        id: "gallery",
-        output: output,
-        inputs: [
-          "conf",
-          post.@source,
-          "kv://#{post.template}",
-          "kv://templates/page.tmpl",
-        ] + post.@image_list,
-        mergeable: false,
-        proc: Croupier::TaskProc.new {
-          post.load # Need to refresh post contents
-          Log.info { "👉 #{output}" }
-          Render.apply_template("templates/page.tmpl",
-            {"content" => post.rendered, "title" => post.@title})
-        }
-      )
+      Config.languages.keys.each do |lang|
+        Croupier::Task.new(
+          id: "gallery",
+          output: post.output(lang),
+          inputs: [
+            "conf",
+            post.source(lang),
+            "kv://#{post.template(lang)}",
+            "kv://templates/page.tmpl",
+          ] + post.@image_list,
+          mergeable: false,
+          proc: Croupier::TaskProc.new {
+            post.load(lang) # Need to refresh post contents
+            Log.info { "👉 #{post.output(lang)}" }
+            Render.apply_template("templates/page.tmpl",
+              {"content" => post.rendered(lang), "title" => post.title(lang)})
+          }
+        )
+      end
     end
   end
 end

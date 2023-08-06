@@ -2,13 +2,13 @@
 
 ## Things that could be done
 
-* Add RSS link elements where appropriate
+* Un-hardcode a bunch of things
+* Figure out per-command flags or migrate off commander
+* Image gallery index / Generic folder index
 * Need better date parser, like dateparser from Python
 * Add slug-for-url support?
 * Figure out the equivalent of Nikola's `link://` schema
 * Port thumbnail shortcode from Nikola
-* Un-hardcode a bunch of things
-* Figure out per-command flags or migrate off commander
 * Do not *always* parse shortcode replacements as markdown (for pandoc)
 * Better document parsing errors
 * Support arbitrary command pipelines
@@ -19,12 +19,15 @@
 * Implement init command (with data via rucksack?)
 * Implement something like nikola's continuous import (different binary?)
 * Reorganize theme so it's self contained
-* Think how to do translations
-* Image gallery index / Generic folder index
 * Try to be close to hugo's input layout if possible
 * Draft / future / expired
 * Link checker (for internal links)
+* Taxonomies have no titles
+* Usage of link without lang in File::html() call to make_links_absolute
+  is probably wrong
 
+* ~~Think how to do translations~~
+* ~~Add RSS link elements where appropriate~~
 * ~~Un-ad-hoc path handlings (lchop output and such)~~
 * ~~Add noindex meta tag to "index" pages, and remove~~
   ~~them from sitemap~~

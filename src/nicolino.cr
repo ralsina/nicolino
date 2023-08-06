@@ -6,6 +6,7 @@ require "./gallery"
 require "./html"
 require "./http_handlers"
 require "./image"
+require "./locale"
 require "./markdown"
 require "./pandoc"
 require "./render"
@@ -37,6 +38,7 @@ def create_tasks
 
   # Render posts and RSS feed
   if features.includes? "posts"
+    # FIXME: use a compiler registry or something
     posts = Markdown.read_all("posts/")
     posts += HTML.read_all("posts/")
     posts += Pandoc.read_all("posts/") if features.includes? "pandoc"
@@ -50,7 +52,7 @@ def create_tasks
           k,
           v.title,
           v.term_title,
-          "output/#{v.output}",
+          v.output,
           posts
         ).render
       end

@@ -7,9 +7,9 @@ module Config
   struct Taxonomy
     include JSON::Serializable
 
-    property title : String
-    property term_title : String
-    property output : String
+    property title : Hash(String, String)
+    property term_title : Hash(String, String)
+    property output : Hash(String, String)
   end
 
   alias Taxonomies = Hash(String, Taxonomy)
@@ -22,9 +22,12 @@ module Config
     property image_thumb = 1024
     property formats = {} of String => String
     property date_output_format = "%Y-%m-%d %H:%M"
+    property output = "output"
+    property locale = "en_US.UTF-8"
+    property language = "en"
   end
 
-  @@options : Options | Nil = nil
+  @@options = Hash(String, Options).new
   @@taxonomies = Taxonomies.new
 
   def self.get(key)
@@ -52,6 +55,7 @@ module Config
           "output"     => "tags/",
         },
       })
+      @@config.set_default("languages", {"en" => Hash(String, String).new})
     end
     @@config
   end
@@ -59,17 +63,48 @@ module Config
   def self.taxonomies : Taxonomies
     if @@taxonomies.empty?
       @@taxonomies = Taxonomies.new
+
+      Config.languages.keys.each do |lang|
+        @@config.set_default("languages.#{lang}.taxonomies", @@config.get("taxonomies"))
+      end
+
+      # This is the master taxonomy list
       config.get("taxonomies").as_h.keys.each do |k|
-        @@taxonomies[k] = @@config.mapping(Taxonomy, "taxonomies.#{k}")
+        # For each, collect the taxonomy in all languages
+        # This is a pain to do but keeps the config file nicer
+        title = Config.languages.keys.map do |lang|
+          [lang, config.get("languages.#{lang}.taxonomies.#{k}.title").as_s]
+        end.to_h
+        term_title = Config.languages.keys.map do |lang|
+          [lang, config.get("languages.#{lang}.taxonomies.#{k}.term_title").as_s]
+        end.to_h
+        output = Config.languages.keys.map do |lang|
+          [lang, config.get("languages.#{lang}.taxonomies.#{k}.output").as_s]
+        end.to_h
+
+        @@config.set("_taxonomies.#{k}", {
+          "title"      => title,
+          "term_title" => term_title,
+          "output"     => output,
+        })
+        @@taxonomies[k] = @@config.mapping(Taxonomy, "_taxonomies.#{k}")
       end
     end
     @@taxonomies
   end
 
-  def self.options : Options
-    if @@options.nil?
-      @@options = @@config.mapping(Options, "options")
+  # Return options per language
+  def self.options(lang = nil) : Options
+    lang ||= Locale.language
+    if @@options.fetch(lang, nil).nil?
+      @@config.set_default("languages.#{lang}.options", @@config.get("options"))
+      @@options[lang] = @@config.mapping(Options, "languages.#{lang}.options")
     end
-    @@options.as(Options)
+
+    @@options[lang].as(Options)
+  end
+
+  def self.languages
+    config.get("languages").as_h
   end
 end
