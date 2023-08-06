@@ -23,6 +23,8 @@
 * Draft / future / expired
 * Link checker (for internal links)
 * Taxonomies have no titles
+* Usage of link without lang in File::html() call to make_links_absolute
+  is probably wrong
 
 * ~~Think how to do translations~~
 * ~~Add RSS link elements where appropriate~~
