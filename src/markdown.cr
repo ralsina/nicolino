@@ -182,12 +182,14 @@ module Markdown
     end
 
     # What to show as breadcrumbs for this post
-    # FIXME: localize
-    def breadcrumbs
-      # This is hard to guess, but ...
-      # For pages, it can follow the path.
-      # For things inside posts/ it can just be empty
-      return [{name: "Posts", link: "/posts"}, {name: @title}] if date
+    def breadcrumbs(lang = nil)
+      lang ||= Locale.language
+      # For blog posts, breadcrumb goes to the index
+      # FIXME un-hardcode the posts/ path
+      return [{name: "Posts",
+               link: Utils.path_to_link(Path[Config.options(lang).output] /
+                                        "posts/index.html")},
+              {name: @title}] if date
       # FIXME this should be the path to the page
       [] of String
     end
@@ -196,7 +198,7 @@ module Markdown
     def value(lang = nil)
       lang = lang || Locale.language
       {
-        "breadcrumbs" => breadcrumbs,
+        "breadcrumbs" => breadcrumbs(lang),
         "date"        => date.nil? ? "" : date.as(Time).to_s(Config.options(lang).date_output_format),
         "html"        => html(lang),
         "link"        => link(lang),

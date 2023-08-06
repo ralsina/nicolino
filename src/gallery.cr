@@ -34,15 +34,17 @@ module Gallery
     # FIXME should be the path
     def breadcrumbs(lang = nil)
       lang ||= Locale.language
-      [{name: "Galleries", link: "/galleries"}, {name: title(lang)}]
+      gal_path = Utils.path_to_link(Path[Config.options(lang).output]/Path[@base].parts[0])
+      p! gal_path
+      [{name: "Galleries", link: gal_path}, {name: title(lang)}]
     end
 
     def value(lang = nil)
       lang ||= Locale.language
-      {
+      super(lang).merge({
         "image_list"  => @image_list,
         "breadcrumbs" => breadcrumbs(lang),
-      }.merge(super(lang))
+      })
     end
   end
 
