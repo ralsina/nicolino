@@ -35,7 +35,6 @@ module Gallery
     def breadcrumbs(lang = nil)
       lang ||= Locale.language
       gal_path = Utils.path_to_link(Path[Config.options(lang).output]/Path[@base].parts[0])
-      p! gal_path
       [{name: "Galleries", link: gal_path}, {name: title(lang)}]
     end
 
@@ -62,7 +61,6 @@ module Gallery
   def self.render(galleries : Array(Gallery), prefix = "")
     galleries.each do |post|
       Config.languages.keys.each do |lang|
-        Log.info { "📖 Language #{lang}" }
         Croupier::Task.new(
           id: "gallery",
           output: post.output(lang),

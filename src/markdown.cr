@@ -104,13 +104,13 @@ module Markdown
     end
 
     # Load the post from disk (for current language only)
-    def load(language = nil)
-      lang = language || Locale.language
-      Log.info { "👈 #{source}" }
-      contents = ::File.read(source)
+    def load(lang = nil)
+      lang ||= Locale.language
+      Log.info { "👈 #{source(lang)}" }
+      contents = ::File.read(source(lang))
       _, raw_metadata, @text[lang] = contents.split("---\n", 3)
       @metadata[lang] = YAML.parse(raw_metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
-      @title[lang] = metadata["title"].to_s
+      @title[lang] = metadata(lang)["title"].to_s
       @link[lang] = (Path.new ["/", output.split("/")[1..]]).to_s
       @shortcodes[lang] = Shortcodes.parse(@text[lang])
     end
@@ -189,7 +189,7 @@ module Markdown
       return [{name: "Posts",
                link: Utils.path_to_link(Path[Config.options(lang).output] /
                                         "posts/index.html")},
-              {name: @title}] if date
+              {name: title(lang)}] if date
       # FIXME this should be the path to the page
       [] of String
     end
@@ -227,7 +227,6 @@ module Markdown
   # if require_date is true, posts *must* have a date
   def self.render(posts, require_date = true)
     Config.languages.keys.each do |lang|
-      Log.info { "📖 Language #{lang}" }
       posts.each do |post|
         if require_date && post.date == nil
           Log.info { "Error: #{post.source lang} has no date" }
