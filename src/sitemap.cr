@@ -19,7 +19,7 @@ module Sitemap
     inputs = Croupier::TaskManager.tasks.keys.select(&.ends_with?(".html"))
     Croupier::Task.new(
       id: "sitemap",
-      output: output = "output/sitemap.xml",
+      output: output = (Path[Config.options.output] / "sitemap.xml").to_s,
       inputs: inputs,
       mergeable: false,
       no_save: true,

@@ -60,13 +60,14 @@ def create_tasks
 
     Markdown.render_rss(
       posts[..10],
-      "output/rss.xml",
+      Path[Config.options.output] / "rss.xml",
       Config.get("site.title").as_s,
     )
 
+    # FIXME: path is arbitrary
     Markdown.render_index(
       posts[..10],
-      "output/posts/index.html",
+      Path[Config.options.output] / "posts/index.html",
       title: "Latest posts"
     )
   end
@@ -218,7 +219,7 @@ end
 
 def clean(options, arguments)
   create_tasks
-  existing = Set.new(Dir.glob("output/**/*"))
+  existing = Set.new(Dir.glob(Path[Config.options.output] / "**/*"))
   targets = Set.new(Croupier::TaskManager.tasks.keys)
   targets = targets.map { |p| Path[p].normalize.to_s }
   to_clean = existing - targets

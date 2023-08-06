@@ -33,7 +33,7 @@ module Image
     # foo/bar/bat.jpg => output/#{prefix}/bar/bat.jpg
     def render(prefix = "")
       src = @path.to_s
-      dest = Path.new(["output/", prefix] + @path.parts[1..])
+      dest = Path[Config.options.output] / prefix / Path[@path.parts[1..]]
       Croupier::Task.new(
         id: "image",
         output: dest.to_s,

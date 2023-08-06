@@ -3,7 +3,7 @@ module Utils
     string.downcase.strip.gsub(' ', '-').gsub(/[^\w]/, '-').gsub(/-+/, '-')
   end
 
-  # Convert path to link
+  # Convert path to link, optionally changing extension
   #
   # >> path_to_link("output/foo/../bar") # => "/bar"
   def self.path_to_link(path, extension = nil)

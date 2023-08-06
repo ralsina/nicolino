@@ -3,6 +3,10 @@
 ## Things that could be done
 
 * Un-hardcode a bunch of things
+  * ~~output/~~
+  * posts
+  * pages
+  * output/posts/index.html
 * Figure out per-command flags or migrate off commander
 * Image gallery index / Generic folder index
 * Need better date parser, like dateparser from Python

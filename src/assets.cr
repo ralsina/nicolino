@@ -3,7 +3,7 @@ module Assets
   def self.render
     Dir.glob("assets/**/*").each do |src|
       next if File.directory?(src)
-      dest = Path.new(["output"] + Path[src].parts[1..])
+      dest = Path[Config.options.output] / Path[Path[src].parts[1..]]
       Croupier::Task.new(
         id: "assets",
         output: dest.to_s,

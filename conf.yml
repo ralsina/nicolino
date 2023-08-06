@@ -42,14 +42,14 @@ languages:
         term_title: "Posts etiquetados {{term.name}}"
         output: "tags/"
 
-# Features you want to enable are listed here
-features:
-  - assets
-  - posts
-  - pages
-  - pandoc
-  - taxonomies
-  - images
-  - galleries
-  - sitemap
-  - search
+# # Features you want to enable are listed here
+# features:
+#   - assets
+#   - posts
+#   - pages
+#   - pandoc
+#   - taxonomies
+#   - images
+#   - galleries
+#   - sitemap
+#   - search

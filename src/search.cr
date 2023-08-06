@@ -27,7 +27,7 @@ module Search
     inputs = Croupier::TaskManager.tasks.keys.select(&.to_s.ends_with?(".html"))
     Croupier::Task.new(
       id: "search",
-      output: output = "output/search.json",
+      output: output = (Path[Config.options.output] / "search.json").to_s,
       inputs: inputs,
       mergeable: false,
       no_save: true,

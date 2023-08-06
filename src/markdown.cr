@@ -258,7 +258,7 @@ module Markdown
     inputs = inputs.uniq
     Croupier::Task.new(
       id: "index",
-      output: output,
+      output: output.to_s,
       inputs: inputs,
       mergeable: false,
       proc: Croupier::TaskProc.new {
@@ -284,7 +284,7 @@ module Markdown
 
     Croupier::Task.new(
       id: "rss",
-      output: output,
+      output: output.to_s,
       inputs: inputs,
       mergeable: false,
       proc: Croupier::TaskProc.new {
