@@ -16,9 +16,15 @@ module Gallery
   class Gallery < Markdown::File
     def initialize(sources, base, @image_list : Array(String))
       super(sources, base)
+      @sources.map { |k, _|
+        # Preserve the "galleries/" prefix
+        p = Path[base]
+        p = Path[Config.options(k).output] / p
+        @output[k] = p.to_s.rchop(p.extension) + ".html"
+      }
     end
 
-    def load(lang=nil)
+    def load(lang = nil)
       lang ||= Locale.language
       super(lang)
       @metadata[lang]["template"] = "templates/gallery.tmpl"
@@ -26,12 +32,12 @@ module Gallery
 
     # Breadcrumbs is Galleries / this gallery
     # FIXME should be the path
-    def breadcrumbs(lang=nil)
+    def breadcrumbs(lang = nil)
       lang ||= Locale.language
       [{name: "Galleries", link: "/galleries"}, {name: title(lang)}]
     end
 
-    def value(lang=nil)
+    def value(lang = nil)
       lang ||= Locale.language
       {
         "image_list"  => @image_list,
@@ -54,17 +60,16 @@ module Gallery
   def self.render(galleries : Array(Gallery), prefix = "")
     galleries.each do |post|
       Config.languages.keys.each do |lang|
-        p! "kv://#{post.template(lang)}"
         Log.info { "📖 Language #{lang}" }
         Croupier::Task.new(
           id: "gallery",
-          output: post.output(lang), # This is producing es/foo instead of es/galleries/foo
+          output: post.output(lang),
           inputs: [
-          "conf",
-          post.source(lang),
-          "kv://#{post.template(lang)}",
-          "kv://templates/page.tmpl",
-        ] + post.@image_list,
+            "conf",
+            post.source(lang),
+            "kv://#{post.template(lang)}",
+            "kv://templates/page.tmpl",
+          ] + post.@image_list,
           mergeable: false,
           proc: Croupier::TaskProc.new {
             post.load(lang) # Need to refresh post contents
