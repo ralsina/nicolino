@@ -1,6 +1,7 @@
 require "./nicolino"
 require "commander"
 require "colorize"
+require "rucksack"
 
 # Log wrapper
 struct LogFormat < Log::StaticFormatter
@@ -141,6 +142,31 @@ cli = Commander::Command.new do |cmd|
     command.run do |options, arguments|
       LogFormat.setup(options.@bool["quiet"], options.@int["verbosity"])
       clean(options, arguments)
+    end
+  end
+
+  cmd.commands.add do |command|
+    command.use = "init"
+    command.short = "Create a new site"
+    command.long = "Create a new site"
+    command.run do |options, arguments|
+      LogFormat.setup(options.@bool["quiet"], options.@int["verbosity"])
+      {% for name in %(conf.yml
+          templates/title.tmpl
+          templates/gallery.tmpl
+          templates/taxonomy.tmpl
+          templates/index.tmpl
+          templates/post.tmpl
+          templates/page.tmpl
+          shortcodes/raw.tmpl
+          shortcodes/figure.tmpl
+          assets/css/custom.css
+          assets/favicon.ico).lines.map(&.strip) %}
+        FileUtils.mkdir_p(File.dirname({{name}}))
+        File.open({{name}}, "w") { |f|
+          rucksack({{name}}).read(f)
+        }
+      {% end %}
     end
   end
 end
