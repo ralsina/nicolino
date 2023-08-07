@@ -2,6 +2,8 @@
 
 ## Things that could be done
 
+* Add pages to taxonomies besides posts
+* Implement "Archive" of all content
 * Un-hardcode a bunch of things
   * ~~output/~~
   * posts
