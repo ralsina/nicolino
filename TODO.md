@@ -20,7 +20,6 @@
 * Minifier via html-minifier
 * Plugins using veelenga/lua.cr?
 * Implement `new_post` `new_page` commands
-* Implement init command (with data via rucksack?)
 * Implement something like nikola's continuous import (different binary?)
 * Reorganize theme so it's self contained
 * Try to be close to hugo's input layout if possible
@@ -30,6 +29,7 @@
 * Usage of link without lang in File::html() call to make_links_absolute
   is probably wrong
 
+* ~~Implement init command (with data via rucksack?)~~
 * ~~Think how to do translations~~
 * ~~Add RSS link elements where appropriate~~
 * ~~Un-ad-hoc path handlings (lchop output and such)~~

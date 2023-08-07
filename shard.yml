@@ -39,3 +39,5 @@ dependencies:
     github: icyleaf/totem
   cronic:
     github: nanobowers/cronic
+  rucksack:
+    github: busyloop/rucksack

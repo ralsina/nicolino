@@ -7,3 +7,5 @@
 /output/
 .croupier
 .kvstore
+.rucksack
+.rucksack.toc
