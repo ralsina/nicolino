@@ -39,5 +39,3 @@ dependencies:
     github: icyleaf/totem
   cronic:
     github: nanobowers/cronic
-  docspec:
-    github: skippi/docspec
