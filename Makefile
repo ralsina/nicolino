@@ -6,5 +6,6 @@ bin:
 	cat .rucksack >> bin/nicolino
 release:
 	shards build --release
-	cat .rucksack >> bin/nic
+	strip bin/nicolino
+	cat .rucksack >> bin/nicolino
 .PHONY: clean all test bin

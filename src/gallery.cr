@@ -60,16 +60,17 @@ module Gallery
 
   def self.render(galleries : Array(Gallery), prefix = "")
     galleries.each do |post|
+      basedir = File.dirname(post.source)
       Config.languages.keys.each do |lang|
         Croupier::Task.new(
           id: "gallery",
           output: post.output(lang),
           inputs: [
-            "conf",
+            "conf.yml",
             post.source(lang),
             "kv://#{post.template(lang)}",
             "kv://templates/page.tmpl",
-          ] + post.@image_list,
+          ] + post.@image_list.map { |i| "#{basedir}/#{i}" },
           mergeable: false,
           proc: Croupier::TaskProc.new {
             post.load(lang) # Need to refresh post contents

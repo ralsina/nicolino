@@ -9,12 +9,12 @@ module Assets
         output: dest.to_s,
         inputs: [src],
         mergeable: false,
+        no_save: true,
         proc: Croupier::TaskProc.new {
           Log.info { "👉 #{dest}" }
           Dir.mkdir_p(dest.parent)
           File.copy(src, dest)
         },
-        no_save: true,
       )
     end
   end

@@ -212,7 +212,7 @@ module Markdown
 
     # List of all files and kv store items this post uses
     def dependencies : Array(String)
-      result = ["conf", "kv://templates/page.tmpl"]
+      result = ["conf.yml", "kv://templates/page.tmpl"]
       result << source
       result << "kv://#{template}"
       result += shortcodes.shortcodes.map { |sc| "kv://shortcodes/#{sc.name}.tmpl" }
@@ -251,7 +251,7 @@ module Markdown
   # Create an index page out of a list of posts, save in output
   def self.render_index(posts, output, title = nil, extra_inputs = [] of String, extra_feed = nil)
     inputs = [
-      "conf",
+      "conf.yml",
       "kv://templates/index.tmpl",
       "kv://templates/page.tmpl",
     ] + posts.map(&.source) + posts.map(&.template) + extra_inputs
@@ -280,7 +280,7 @@ module Markdown
 
   # Create a RSS file out of posts with title, save in output
   def self.render_rss(posts, output, title)
-    inputs = ["conf"] + posts.map(&.source)
+    inputs = ["conf.yml"] + posts.map(&.source)
 
     Croupier::Task.new(
       id: "rss",
