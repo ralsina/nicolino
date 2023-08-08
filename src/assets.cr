@@ -15,7 +15,6 @@ module Assets
           Dir.mkdir_p(dest.parent)
           File.copy(src, dest)
         },
-        no_save: true,
       )
     end
   end
