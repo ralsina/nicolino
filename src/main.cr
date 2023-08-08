@@ -149,7 +149,7 @@ cli = Commander::Command.new do |cmd|
     command.use = "init"
     command.short = "Create a new site"
     command.long = "Create a new site"
-    command.run do |options, arguments|
+    command.run do |options, _|
       LogFormat.setup(options.@bool["quiet"], options.@int["verbosity"])
       {% for name in %(conf.yml
           templates/title.tmpl
@@ -163,10 +163,14 @@ cli = Commander::Command.new do |cmd|
           assets/css/custom.css
           assets/favicon.ico).lines.map(&.strip) %}
         FileUtils.mkdir_p(File.dirname({{name}}))
+        Log.info { "👉 Creating #{{{name}}}" }
         File.open({{name}}, "w") { |f|
           rucksack({{name}}).read(f)
         }
       {% end %}
+      FileUtils.mkdir_p("posts")
+      FileUtils.mkdir_p("pages")
+      Log.info { "✔️ Done, start writing things in posts and pages!" }
     end
   end
 end
