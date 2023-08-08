@@ -37,7 +37,7 @@ module Image
       Croupier::Task.new(
         id: "image",
         output: dest.to_s,
-        inputs: ["conf", src],
+        inputs: ["conf.yml", src],
         no_save: true,
         mergeable: false,
         proc: Croupier::TaskProc.new {
@@ -57,7 +57,7 @@ module Image
       Croupier::Task.new(
         id: "thumb",
         output: thumb_dest.to_s,
-        inputs: ["conf", src],
+        inputs: ["conf.yml", src],
         no_save: true,
         mergeable: false,
         proc: Croupier::TaskProc.new {

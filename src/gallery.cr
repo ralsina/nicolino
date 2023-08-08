@@ -65,7 +65,7 @@ module Gallery
           id: "gallery",
           output: post.output(lang),
           inputs: [
-            "conf",
+            "conf.yml",
             post.source(lang),
             "kv://#{post.template(lang)}",
             "kv://templates/page.tmpl",
