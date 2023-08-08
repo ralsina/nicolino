@@ -61,18 +61,15 @@ module Image
         no_save: true,
         mergeable: false,
         proc: Croupier::TaskProc.new {
-          ext = dest.extension
-          thumb_name = dest.stem + ".thumb" + ext
-          dest = Path[dest.parent, thumb_name]
-          Log.info { "👉 #{dest}" }
-          Dir.mkdir_p(dest.parent)
+          Log.info { "👉 #{thumb_dest}" }
+          Dir.mkdir_p(thumb_dest.parent)
           img = Pixie::Image.new(src)
           w, h = new_size(img.width, img.height, Config.options.image_thumb)
           Log.debug { "Resizing #{src} to #{w}x#{h}" }
           if w != img.width || h != img.height
             img.resize(w, h)
           end
-          img.write(dest.to_s)
+          img.write(thumb_dest.to_s)
           nil
         }
       )

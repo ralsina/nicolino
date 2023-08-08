@@ -149,7 +149,7 @@ cli = Commander::Command.new do |cmd|
     command.use = "init"
     command.short = "Create a new site"
     command.long = "Create a new site"
-    command.run do |options, arguments|
+    command.run do |options, _|
       LogFormat.setup(options.@bool["quiet"], options.@int["verbosity"])
       {% for name in %(conf.yml
           templates/title.tmpl
