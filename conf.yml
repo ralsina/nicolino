@@ -35,22 +35,24 @@ options:
 # Options for languages if you have more than one.
 # Each language key can contain all or part of this config file's structure,
 # which will be overlayed on the default config.
-languages:
-  en:
-  es:
-    site:
-      title: "Blog de Prueba de Nicolino"
-      description: "Este es el sitio de demostración de Nicolino"
-      footer: "Tema por defecto de Nicolino"
-      url: "https://example.com/es"
-    options:
-      output: "output/es"
-      locale: "es_ES.UTF-8"
-    taxonomies:
-      tags:
-        title: "🏷Etiquetas"
-        term_title: "Posts etiquetados {{term.name}}"
-        location: "tags/"
+# For example, these are some overrides that would work for Spanish
+# in a site where the default language is English
+# languages:
+#   en:
+#   es:
+#     site:
+#       title: "Blog de Prueba de Nicolino"
+#       description: "Este es el sitio de demostración de Nicolino"
+#       footer: "Tema por defecto de Nicolino"
+#       url: "https://example.com/es"
+#     options:
+#       output: "output/es"
+#       locale: "es_ES.UTF-8"
+#     taxonomies:
+#       tags:
+#         title: "🏷Etiquetas"
+#         term_title: "Posts etiquetados {{term.name}}"
+#         location: "tags/"
 
 # Taxonomies are ways to classify your content.
 # For example, by tags, or by author.
@@ -64,14 +66,14 @@ taxonomies:
     # Where the files are located in content/ and on output/
     location: "tags/"
 
-# # Features you want to enable are listed here
-# features:
-#   - assets
-#   - posts
-#   - pages
-#   - pandoc
-#   - taxonomies
-#   - images
-#   - galleries
-#   - sitemap
-#   - search
+# Features you want to enable are listed here
+features:
+  - assets
+  - posts
+  - pages
+  - pandoc
+  - taxonomies
+  - images
+  - galleries
+  - sitemap
+  - search
