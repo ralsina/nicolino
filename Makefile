@@ -2,7 +2,7 @@ all: bin
 clean: rm /bin/nicolino
 test: ameba --all --fix
 bin:
-	shards build
+	shards build -d
 	cat .rucksack >> bin/nicolino
 release:
 	shards build --release

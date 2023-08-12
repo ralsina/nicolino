@@ -9,7 +9,7 @@ module Config
 
     property title : Hash(String, String)
     property term_title : Hash(String, String)
-    property output : Hash(String, String)
+    property location : Hash(String, String)
   end
 
   alias Taxonomies = Hash(String, Taxonomy)
@@ -52,7 +52,7 @@ module Config
         "tags" => {
           "title"      => "🏷Tags",
           "term_title" => "Posts tagged {{term.name}}",
-          "output"     => "tags/",
+          "location"     => "tags/",
         },
       })
       @@config.set_default("languages", {"en" => Hash(String, String).new})
@@ -78,14 +78,14 @@ module Config
         term_title = Config.languages.keys.map do |lang|
           [lang, config.get("languages.#{lang}.taxonomies.#{k}.term_title").as_s]
         end.to_h
-        output = Config.languages.keys.map do |lang|
-          [lang, config.get("languages.#{lang}.taxonomies.#{k}.output").as_s]
+        location = Config.languages.keys.map do |lang|
+          [lang, config.get("languages.#{lang}.taxonomies.#{k}.location").as_s]
         end.to_h
 
         @@config.set("_taxonomies.#{k}", {
           "title"      => title,
           "term_title" => term_title,
-          "output"     => output,
+          "location"     => location,
         })
         @@taxonomies[k] = @@config.mapping(Taxonomy, "_taxonomies.#{k}")
       end

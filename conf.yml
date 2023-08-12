@@ -46,7 +46,19 @@ languages:
       tags:
         title: "🏷Etiquetas"
         term_title: "Posts etiquetados {{term.name}}"
-        output: "tags/"
+        location: "tags/"
+
+# Taxonomies are ways to classify your content.
+# For example, by tags, or by author.
+taxonomies:
+  # Classify posts by tags
+  tags:
+    # A generic title for showing the tags
+    title: "🏷Tags"
+    # Title for a list of posts with a specific tag
+    term_title: "Posts tagged {{term.name}}"
+    # Where the files are located in content/ and on output/
+    location: "tags/"
 
 # # Features you want to enable are listed here
 # features:
