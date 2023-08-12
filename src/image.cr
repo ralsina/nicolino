@@ -47,7 +47,7 @@ module Image
           w, h = new_size(img.width, img.height, Config.options.image_large)
           Log.debug { "Resizing #{src} to #{w}x#{h}" }
           if w != img.width || h != img.height
-            img.resize(w, h)
+            img.scale(w, h)
           end
           img.write(dest.to_s)
           nil
@@ -67,7 +67,7 @@ module Image
           w, h = new_size(img.width, img.height, Config.options.image_thumb)
           Log.debug { "Resizing #{src} to #{w}x#{h}" }
           if w != img.width || h != img.height
-            img.resize(w, h)
+            img.scale(w, h)
           end
           img.write(thumb_dest.to_s)
           nil
