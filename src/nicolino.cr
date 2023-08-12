@@ -30,7 +30,6 @@ def create_tasks
   content_post_path = content_path / Config.options.posts
   content_post_output_path = output_path / Config.options.posts
 
-
   # Load templates to k/v store
   Templates.load_templates
 

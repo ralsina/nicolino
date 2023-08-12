@@ -54,7 +54,7 @@ module Config
         "tags" => {
           "title"      => "🏷Tags",
           "term_title" => "Posts tagged {{term.name}}",
-          "location"     => "tags/",
+          "location"   => "tags/",
         },
       })
       @@config.set_default("languages", {"en" => Hash(String, String).new})
@@ -87,7 +87,7 @@ module Config
         @@config.set("_taxonomies.#{k}", {
           "title"      => title,
           "term_title" => term_title,
-          "location"     => location,
+          "location"   => location,
         })
         @@taxonomies[k] = @@config.mapping(Taxonomy, "_taxonomies.#{k}")
       end
