@@ -25,6 +25,12 @@ def create_tasks
   # Load config file
   features = Set.new(Config.get("features").as_a)
 
+  output_path = Path[Config.options.output]
+  content_path = Path[Config.options.content]
+  content_post_path = content_path / Config.options.posts
+  content_post_output_path = output_path / Config.options.posts
+
+
   # Load templates to k/v store
   Templates.load_templates
 
@@ -39,9 +45,9 @@ def create_tasks
   # Render posts and RSS feed
   if features.includes? "posts"
     # FIXME: use a compiler registry or something
-    posts = Markdown.read_all("posts/")
-    posts += HTML.read_all("posts/")
-    posts += Pandoc.read_all("posts/") if features.includes? "pandoc"
+    posts = Markdown.read_all(content_post_path)
+    posts += HTML.read_all(content_post_path)
+    posts += Pandoc.read_all(content_post_path) if features.includes? "pandoc"
     Markdown.render(posts, require_date: true)
     posts.sort!
 
@@ -64,25 +70,24 @@ def create_tasks
       Config.get("site.title").as_s,
     )
 
-    # FIXME: path is arbitrary
     Markdown.render_index(
       posts[..10],
-      Path[Config.options.output] / "posts/index.html",
+      content_post_output_path / "index.html",
       title: "Latest posts"
     )
   end
 
   # Render pages
   if features.includes? "pages"
-    pages = Markdown.read_all("pages/")
-    pages += HTML.read_all("pages/")
-    pages += Pandoc.read_all("pages/") if features.includes? "pandoc"
+    pages = Markdown.read_all(content_path)
+    pages += HTML.read_all(content_path)
+    pages += Pandoc.read_all(content_path) if features.includes? "pandoc"
     Markdown.render(pages, require_date: false)
   end
 
   # Render images from posts and pages
   if features.includes? "images"
-    images = Image.read_all("posts/") + Image.read_all("pages/")
+    images = Image.read_all(content_path)
     Image.render(images)
   end
 

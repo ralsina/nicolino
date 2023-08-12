@@ -22,7 +22,9 @@ module Config
     property image_thumb = 1024
     property formats = {} of String => String
     property date_output_format = "%Y-%m-%d %H:%M"
-    property output = "output"
+    property output = "output/"
+    property content = "content/"
+    property posts = "posts/"
     property locale = "en_US.UTF-8"
     property language = "en"
   end

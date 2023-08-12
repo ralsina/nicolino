@@ -20,6 +20,7 @@ module HTML
     all_sources = Utils.find_all(path, "html")
     all_sources.map do |base, sources|
       begin
+        next if File.posts.keys.includes? base.to_s
         posts << File.new(sources, base)
       rescue ex
         Log.error { "Error parsing #{base}: #{ex.message}" }

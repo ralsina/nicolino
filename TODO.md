@@ -4,11 +4,6 @@
 
 * Add pages to taxonomies besides posts
 * Implement "Archive" of all content
-* Un-hardcode a bunch of things
-  * ~~output/~~
-  * posts
-  * pages
-  * output/posts/index.html
 * Figure out per-command flags or migrate off commander
 * Image gallery index / Generic folder index
 * Need better date parser, like dateparser from Python
@@ -31,6 +26,11 @@
 * Usage of link without lang in File::html() call to make_links_absolute
   is probably wrong
 
+* ~~Un-hardcode a bunch of things~~
+  * ~~output/~~
+  * ~~posts~~
+  * ~~pages~~
+  * ~~output/posts/index.html~~
 * ~~Implement init command (with data via rucksack?)~~
 * ~~Think how to do translations~~
 * ~~Add RSS link elements where appropriate~~

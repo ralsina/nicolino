@@ -1,5 +1,6 @@
 all: bin
-clean: rm /bin/nicolino
+clean: 
+	rm /bin/nicolino shard.lock lib -rf
 test: ameba --all --fix
 bin:
 	shards build -d
