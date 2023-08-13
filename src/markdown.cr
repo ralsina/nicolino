@@ -39,7 +39,7 @@ module Markdown
         p = Path[base]
         p = Path[p.parts[1..]] # Remove the leading "posts/"
         p = Path[Config.options(k).output] / p
-        @output[k] = p.to_s.rchop(p.extension) + ".html"
+        @output[k] = "#{p}.html"
       }
       @@posts[base.to_s] = self
       Config.languages.keys.each do |lang|
@@ -231,7 +231,7 @@ module Markdown
           Log.info { "Error: #{post.source lang} has no date" }
           next
         end
-
+        p! lang, post.@base, post.output(lang)
         Croupier::Task.new(
           id: "markdown",
           output: post.output(lang),
