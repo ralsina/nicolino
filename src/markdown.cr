@@ -231,7 +231,6 @@ module Markdown
           Log.info { "Error: #{post.source lang} has no date" }
           next
         end
-        p! lang, post.@base, post.output(lang)
         Croupier::Task.new(
           id: "markdown",
           output: post.output(lang),
