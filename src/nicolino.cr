@@ -154,8 +154,7 @@ def auto(options, arguments)
     # Setup a watcher for posts/pages and trigger respawn if files
     # are added
     watcher = Inotify::Watcher.new
-    watcher.watch("posts", LibInotify::IN_CREATE)
-    watcher.watch("pages", LibInotify::IN_CREATE)
+    watcher.watch("content", LibInotify::IN_CREATE)
     watcher.on_event do |_|
       server.close
       live_reload.http_server.close
