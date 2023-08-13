@@ -29,6 +29,7 @@ def create_tasks
   content_path = Path[Config.options.content]
   content_post_path = content_path / Config.options.posts
   content_post_output_path = output_path / Config.options.posts
+  galleries_path = content_path / Config.options.galleries
 
   # Load templates to k/v store
   Templates.load_templates
@@ -84,20 +85,16 @@ def create_tasks
     Markdown.render(pages, require_date: false)
   end
 
-  # Render images from posts and pages
+  # Render images from content
   if features.includes? "images"
     images = Image.read_all(content_path)
     Image.render(images)
   end
 
-  # Render images from galleries
   if features.includes? "galleries"
-    images = Image.read_all("galleries/")
-    Image.render(images, "galleries")
-
     # Render galleries
-    galleries = Gallery.read_all("galleries/")
-    Gallery.render(galleries, "galleries")
+    galleries = Gallery.read_all(galleries_path)
+    Gallery.render(galleries, Config.options.galleries)
   end
 
   # Render sitemap

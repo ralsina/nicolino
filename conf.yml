@@ -22,6 +22,8 @@ options:
   content: "content/"
   # Where posts are located within content/
   posts: "posts/"
+  # Where galleries are located within content/
+  galleries: "galleries/"
   # Default localization options.
   # If you want more than one language look at the laguages section
   date_output_format: "%Y-%m-%d %H:%M"

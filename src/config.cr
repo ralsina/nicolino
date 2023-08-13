@@ -25,6 +25,7 @@ module Config
     property output = "output/"
     property content = "content/"
     property posts = "posts/"
+    property galleries = "galleries/"
     property locale = "en_US.UTF-8"
     property language = "en"
   end
