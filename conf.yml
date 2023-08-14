@@ -34,6 +34,15 @@ options:
   formats:
     .rst: rst
     .txt: rst
+  # How verbose should output be by default. 
+  # 0: fatal (same as -q flag)
+  # 1: errors
+  # 2: warnings
+  # 3: info
+  # 4: debug
+  # 5: trace
+  verbosity: 3
+
 # Options for languages if you have more than one.
 # Each language key can contain all or part of this config file's structure,
 # which will be overlayed on the default config.

@@ -28,6 +28,7 @@ module Config
     property galleries = "galleries/"
     property locale = "en_US.UTF-8"
     property language = "en"
+    property verbosity = 3
   end
 
   @@options = Hash(String, Options).new
@@ -39,7 +40,6 @@ module Config
 
   def self.config
     if @@config.@config_paths.empty?
-      Log.info { "Loading configuration" }
       @@config = Totem.from_file "conf.yml"
       @@config.set_default("features",
         ["assets",
