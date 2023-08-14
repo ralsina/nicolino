@@ -2,6 +2,8 @@
 
 ## Things that could be done
 
+* Support fallback templates. So, for example a taxonomy can be custom but
+  fallback to index.tmpl
 * Add pages to taxonomies besides posts
 * Implement "Archive" of all content
 * Figure out per-command flags or migrate off commander
@@ -16,7 +18,6 @@
 * TUI using homonoidian/termbox2.cr
 * Minifier via html-minifier
 * Plugins using veelenga/lua.cr?
-* Implement `new_post` `new_page` commands
 * Implement something like nikola's continuous import (different binary?)
 * Reorganize theme so it's self contained
 * Try to be close to hugo's input layout if possible
@@ -26,6 +27,7 @@
 * Usage of link without lang in File::html() call to make_links_absolute
   is probably wrong
 
+* ~~Implement `new_post` `new_page` commands~~
 * ~~Un-hardcode a bunch of things~~
   * ~~output/~~
   * ~~posts~~

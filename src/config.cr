@@ -100,8 +100,8 @@ module Config
   def self.options(lang = nil) : Options
     lang ||= Locale.language
     if @@options.fetch(lang, nil).nil?
-      @@config.set_default("languages.#{lang}.options", @@config.get("options"))
-      @@options[lang] = @@config.mapping(Options, "languages.#{lang}.options")
+      config.set_default("languages.#{lang}.options", config.get("options"))
+      @@options[lang] = config.mapping(Options, "languages.#{lang}.options")
     end
 
     @@options[lang].as(Options)

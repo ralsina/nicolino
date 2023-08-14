@@ -82,4 +82,16 @@ module Gallery
       end
     end
   end
+
+  # Create a new gallery
+  def self.new_gallery(path)
+    raise "Galleries are folders, not documents" if path.to_s.ends_with? ".md"
+    path = path / "index.md"
+    Log.info { "Creating new gallery #{path}" }
+    raise "#{path} already exists" if ::File.exists? path
+    Dir.mkdir_p(path.dirname)
+    ::File.open(path, "w") do |io|
+      io << Crinja.render(::File.read(Path["models", "page.tmpl"]), {date: "#{Time.local}"})
+    end
+  end
 end

@@ -173,6 +173,15 @@ cli = Commander::Command.new do |cmd|
       Log.info { "✔️ Done, start writing things in posts and pages!" }
     end
   end
+
+  cmd.commands.add do |command|
+    command.use = "new"
+    command.short = "Create new content"
+    command.run do |options, arguments|
+      LogFormat.setup(options.@bool["quiet"], options.@int["verbosity"])
+      new(options, arguments)
+    end
+  end
 end
 
 Commander.run(cli, ARGV)

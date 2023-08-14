@@ -314,4 +314,26 @@ module Markdown
     end
     posts
   end
+
+  # Create a new "page" file
+  def self.new_page(path)
+    path = path / "index.md" unless path.to_s.ends_with? ".md"
+    Log.info { "Creating new page #{path}" }
+    raise "#{path} already exists" if ::File.exists? path
+    Dir.mkdir_p(path.dirname)
+    ::File.open(path, "w") do |io|
+      io << Crinja.render(::File.read(Path["models", "page.tmpl"]), {date: "#{Time.local}"})
+    end
+  end
+
+  # Create a new "post" file
+  def self.new_post(path)
+    path = path / "index.md" unless path.to_s.ends_with? ".md"
+    Log.info { "Creating new post #{path}" }
+    raise "#{path} already exists" if ::File.exists? path
+    Dir.mkdir_p(path.dirname)
+    ::File.open(path, "w") do |io|
+      io << Crinja.render(::File.read(Path["models", "post.tmpl"]), {date: "#{Time.local}"})
+    end
+  end
 end
