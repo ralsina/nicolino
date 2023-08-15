@@ -97,7 +97,10 @@ module Taxonomies
           proc: Croupier::TaskProc.new {
             Log.info { "👉 #{output}" }
             Render.apply_template("templates/page.tmpl",
-              {"content" => rendered})
+              {
+                "content" => rendered,
+                "title"   => @title[lang],
+              })
           }
         )
 

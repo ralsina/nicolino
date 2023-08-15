@@ -24,10 +24,10 @@
 * Reorganize theme so it's self contained
 * Draft / future / expired
 * Link checker (for internal links)
-* Taxonomies have no titles
 * Usage of link without lang in File::html() call to make_links_absolute
   is probably wrong
 
+* ~~Taxonomies have no titles~~
 * ~~Try to be close to hugo's input layout if possible~~
 * ~~Implement `new_post` `new_page` commands~~
 * ~~Un-hardcode a bunch of things~~
