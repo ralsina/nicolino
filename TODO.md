@@ -2,6 +2,7 @@
 
 ## Things that could be done
 
+* Re-check all the auto mode things work after caching was added
 * Add progress bar using mgomes/progress_bar (requires croupier work)
 * Patch served pages to use localhost:port instead of the configured URL
 * Support fallback templates. So, for example a taxonomy can be custom but

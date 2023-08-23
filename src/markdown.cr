@@ -184,7 +184,6 @@ module Markdown
     def breadcrumbs(lang = nil)
       lang ||= Locale.language
       # For blog posts, breadcrumb goes to the index
-      # FIXME un-hardcode the posts/ path
       return [{name: "Posts",
                link: Utils.path_to_link(Path[Config.options(lang).output] /
                                         "posts/index.html")},
@@ -237,6 +236,7 @@ module Markdown
           inputs: post.dependencies,
           mergeable: false,
           proc: Croupier::TaskProc.new {
+            # FIXME: only call load in auto mode, save 10% of markdown benchmark
             post.load lang # Need to refresh post contents
             Log.info { "👉 #{post.output lang}" }
             Render.apply_template("templates/page.tmpl",
