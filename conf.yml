@@ -34,7 +34,7 @@ options:
   formats:
     .rst: rst
     .txt: rst
-  # How verbose should output be by default. 
+  # How verbose should output be by default.
   # 0: fatal (same as -q flag)
   # 1: errors
   # 2: warnings
@@ -79,12 +79,12 @@ taxonomies:
 
 # Features you want to enable are listed here
 features:
-  - assets
+  # - assets
   - posts
   - pages
-  - pandoc
-  - taxonomies
-  - images
-  - galleries
-  - sitemap
-  - search
+  # - pandoc
+  # - taxonomies
+  # - images
+  # - galleries
+  # - sitemap
+  # - search
