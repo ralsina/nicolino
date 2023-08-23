@@ -111,6 +111,8 @@ module Markdown
       @metadata[lang] = YAML.parse(raw_metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
       @title[lang] = metadata(lang)["title"].to_s
       @link[lang] = (Path.new ["/", output.split("/")[1..]]).to_s
+      # Performance Note: usually parse takes ~.1 seconds to
+      # parse 1000 short posts that have no shortcodes.
       @shortcodes[lang] = Shortcodes.parse(@text[lang])
     end
 
@@ -119,8 +121,12 @@ module Markdown
       @html[lang], @toc[lang] = Discount.compile(
         replace_shortcodes(lang),
         metadata(lang).fetch("toc", nil) != nil)
-      @html[lang] = HtmlFilters.downgrade_headers(@html[lang])
-      @html[lang] = HtmlFilters.make_links_absolute(@html[lang], link)
+      # Performance Note: each HtmlFilter takes ~.8 seconds for
+      # 4000 short posts
+      doc = Lexbor::Parser.new(@html[lang])
+      doc = HtmlFilters.downgrade_headers(doc)
+      doc = HtmlFilters.make_links_absolute(doc, link)
+      @html[lang] = doc.to_html
     end
 
     def date : Time | Nil
