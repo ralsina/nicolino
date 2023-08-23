@@ -38,9 +38,9 @@ module Config
     self.config.get(key)
   end
 
-  def self.config
+  def self.config(path = "conf.yml")
     if @@config.@config_paths.empty?
-      @@config = Totem.from_file "conf.yml"
+      @@config = Totem.from_file path
       @@config.set_default("features",
         ["assets",
          "posts",

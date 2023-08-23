@@ -121,8 +121,8 @@ module Markdown
       @html[lang], @toc[lang] = Discount.compile(
         replace_shortcodes(lang),
         metadata(lang).fetch("toc", nil) != nil)
-      # Performance Note: each HtmlFilter takes ~.8 seconds for
-      # 4000 short posts
+      # Performance Note: parsing the HTML takes ~.7 seconds for
+      # 4000 short posts. Calling each filter is much faster.
       doc = Lexbor::Parser.new(@html[lang])
       doc = HtmlFilters.downgrade_headers(doc)
       doc = HtmlFilters.make_links_absolute(doc, link)

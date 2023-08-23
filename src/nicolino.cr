@@ -108,6 +108,7 @@ def create_tasks
 end
 
 def run(options, arguments)
+  load_config(options)
   # When doing auto() this is called twice, no need to scan tasks
   # twice
   if Croupier::TaskManager.tasks.empty?
@@ -132,6 +133,7 @@ end
 
 # Run forever automatically rebuilding the site
 def auto(options, arguments)
+  load_config(options)
   create_tasks
   Croupier::TaskManager.fast_mode = options.bool.fetch("fastmode", false)
 
@@ -214,10 +216,12 @@ def make_server(options, arguments, live_reload = false)
 end
 
 def serve(options, arguments, live_reload = false)
+  load_config(options)
   make_server(options, arguments, live_reload).listen
 end
 
 def clean(options, arguments)
+  load_config(options)
   create_tasks
   existing = Set.new(Dir.glob(Path[Config.options.output] / "**/*"))
   targets = Set.new(Croupier::TaskManager.tasks.keys)
@@ -231,7 +235,12 @@ def clean(options, arguments)
   end
 end
 
+def load_config(options)
+  Config.config(options.string.fetch("config", "conf.yml"))
+end
+
 def new(options, arguments)
+  load_config(options)
   paths = arguments.map { |a| Path[a] }
   paths.each do |p|
     raise "Can't create #{p}, new is used to create data inside #{Config.options.content}" \

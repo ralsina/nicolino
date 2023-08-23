@@ -52,6 +52,15 @@ cli = Commander::Command.new do |cmd|
   end
 
   cmd.flags.add do |flag|
+    flag.name = "config"
+    flag.short = "-c"
+    flag.long = "--config"
+    flag.default = "conf.yml"
+    flag.description = "Specify a config file to use."
+    flag.persistent = true
+  end
+
+  cmd.flags.add do |flag|
     flag.name = "quiet"
     flag.short = "-q"
     flag.long = "--quiet"
@@ -65,7 +74,7 @@ cli = Commander::Command.new do |cmd|
     flag.short = "-v"
     flag.long = "--verbosity"
     flag.description = "Control the logging verbosity, 0 to 5"
-    flag.default = Config.options.verbosity
+    flag.default = 2
     flag.persistent = true
   end
 
