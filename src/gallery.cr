@@ -73,8 +73,8 @@ module Gallery
           ] + post.@image_list.map { |i| "#{basedir}/#{i}" },
           mergeable: false,
           proc: Croupier::TaskProc.new {
-            # FIXME: only refresh in auto mode
-            post.load(lang) # Need to refresh post contents
+            # Need to refresh post contents in auto mode
+            post.load(lang) if Croupier::TaskManager.auto_mode?
             Log.info { "👉 #{post.output(lang)}" }
             Render.apply_template("templates/page.tmpl",
               {"content" => post.rendered(lang), "title" => post.title(lang)})
