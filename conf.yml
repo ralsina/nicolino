@@ -79,12 +79,12 @@ taxonomies:
 
 # Features you want to enable are listed here
 features:
-  # - assets
+  - assets
   - posts
   - pages
-  # - pandoc
-  # - taxonomies
-  # - images
-  # - galleries
-  # - sitemap
-  # - search
+  - pandoc
+  - taxonomies
+  - images
+  - galleries
+  - sitemap
+  - search
