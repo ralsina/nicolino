@@ -6,7 +6,7 @@ bin:
 	shards build -d
 	cat .rucksack >> bin/nicolino
 release:
-	shards build --release -d
+	shards build --release
 	strip bin/nicolino
 	cat .rucksack >> bin/nicolino
 mt:
@@ -14,7 +14,7 @@ mt:
 	strip bin/nicolino
 	cat .rucksack >> bin/nicolino
 mt-release:
-	shards build --release -Dpreview_mt -d
+	shards build --release -Dpreview_mt
 	strip bin/nicolino
 	cat .rucksack >> bin/nicolino
 .PHONY: clean all test bin
