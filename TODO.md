@@ -3,7 +3,6 @@
 ## Things that could be done
 
 * Re-check all the auto mode things work after caching was added
-* Add progress bar using mgomes/progress_bar (requires croupier work)
 * Patch served pages to use localhost:port instead of the configured URL
 * Support fallback templates. So, for example a taxonomy can be custom but
   fallback to index.tmpl
@@ -28,6 +27,7 @@
 * Usage of link without lang in File::html() call to make_links_absolute
   is probably wrong
 
+* ~~Add progress bar using mgomes/progress_bar (requires croupier work)~~
 * ~~Taxonomies have no titles~~
 * ~~Try to be close to hugo's input layout if possible~~
 * ~~Implement `new_post` `new_page` commands~~

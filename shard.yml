@@ -41,3 +41,6 @@ dependencies:
     github: nanobowers/cronic
   rucksack:
     github: busyloop/rucksack
+  progress_bar:
+    github: ralsina/progress_bar
+    branch: master-1
