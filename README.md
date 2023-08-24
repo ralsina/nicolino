@@ -37,13 +37,3 @@ It's pretty fast?
 
 Nothing is planned, this is strictly a make it up as you go operation.
 BUT check out the [TODO list](TODO.md)
-
-## What's NOT planned
-
-It will not be massively flexible. For that you may want to look
-at [Nikola](https://getnikola.com) which can do pretty much
-anything because it had to be able to generate exactly my site
-which has 20 years of weird stuff in it.
-
-This will be a more "convention over configuration" affair. Posts
-go in `posts/`, pages in `pages/`, that sort of thing.
