@@ -1,4 +1,4 @@
-require "pixie"
+require "vips"
 
 module Image
   # An image to be processed
@@ -43,13 +43,12 @@ module Image
         proc: Croupier::TaskProc.new {
           Log.info { "👉 #{dest}" }
           Dir.mkdir_p(dest.parent)
-          img = Pixie::Image.new(src)
-          w, h = new_size(img.width, img.height, Config.options.image_large)
-          Log.debug { "Resizing #{src} to #{w}x#{h}" }
-          if w != img.width || h != img.height
-            img.scale(w, h)
-          end
-          img.write(dest.to_s)
+          # w, h = new_size(img.width, img.height, Config.options.image_large)
+          img = Vips::Image.thumbnail(
+            src,
+            Config.options.image_large,
+            height: Config.options.image_thumb)
+          img.write_to_file(dest.to_s)
           nil
         }
       )
@@ -63,13 +62,11 @@ module Image
         proc: Croupier::TaskProc.new {
           Log.info { "👉 #{thumb_dest}" }
           Dir.mkdir_p(thumb_dest.parent)
-          img = Pixie::Image.new(src)
-          w, h = new_size(img.width, img.height, Config.options.image_thumb)
-          Log.debug { "Resizing #{src} to #{w}x#{h}" }
-          if w != img.width || h != img.height
-            img.scale(w, h)
-          end
-          img.write(thumb_dest.to_s)
+          img = Vips::Image.thumbnail(
+            src,
+            Config.options.image_thumb,
+            height: Config.options.image_thumb)
+          img.write_to_file(thumb_dest.to_s)
           nil
         }
       )
