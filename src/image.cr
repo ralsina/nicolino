@@ -9,22 +9,6 @@ module Image
       @path = Path[path]
     end
 
-    # Calculates the new size of an image, given the original size and the
-    # desired new size. The new size is calculated so that the aspect ratio
-    # is preserved.
-    # If the image is smaller than new_size, then it's kept in the same size.
-    def new_size(w, h, new_size)
-      return [w, h] if w <= new_size && h <= new_size
-      if w > h
-        h = (h * new_size) / w
-        w = new_size
-      else
-        w = (w * new_size) / h
-        h = new_size
-      end
-      return w.to_i, h.to_i
-    end
-
     # Images are copied 2x:
     # image.jpg => image.jpg       (size is options.image_large)
     # image.jpg => image.thumb.jpg (size is options.image_thumb)
@@ -39,37 +23,32 @@ module Image
         output: dest.to_s,
         inputs: ["conf.yml", src],
         no_save: true,
-        mergeable: false,
-        proc: Croupier::TaskProc.new {
-          Log.info { "👉 #{dest}" }
-          Dir.mkdir_p(dest.parent)
-          # w, h = new_size(img.width, img.height, Config.options.image_large)
-          img = Vips::Image.thumbnail(
-            src,
-            Config.options.image_large,
-            height: Config.options.image_thumb)
-          img.write_to_file(dest.to_s)
-          nil
-        }
-      )
+        mergeable: false) do
+        Log.info { "👉 #{dest}" }
+        Dir.mkdir_p(dest.parent)
+        img = Vips::Image.thumbnail(
+          src,
+          Config.options.image_large,
+          height: Config.options.image_thumb)
+        img.write_to_file(dest.to_s)
+        nil
+      end
       thumb_dest = Path[dest.parent, dest.stem + ".thumb" + dest.extension]
       Croupier::Task.new(
         id: "thumb",
         output: thumb_dest.to_s,
         inputs: ["conf.yml", src],
         no_save: true,
-        mergeable: false,
-        proc: Croupier::TaskProc.new {
-          Log.info { "👉 #{thumb_dest}" }
-          Dir.mkdir_p(thumb_dest.parent)
-          img = Vips::Image.thumbnail(
-            src,
-            Config.options.image_thumb,
-            height: Config.options.image_thumb)
-          img.write_to_file(thumb_dest.to_s)
-          nil
-        }
-      )
+        mergeable: false) do
+        Log.info { "👉 #{thumb_dest}" }
+        Dir.mkdir_p(thumb_dest.parent)
+        img = Vips::Image.thumbnail(
+          src,
+          Config.options.image_thumb,
+          height: Config.options.image_thumb)
+        img.write_to_file(thumb_dest.to_s)
+        nil
+      end
     end
   end
 
