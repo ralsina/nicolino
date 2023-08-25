@@ -90,7 +90,7 @@ cli = Commander::Command.new do |cmd|
     flag.short = "-v"
     flag.long = "--verbosity"
     flag.description = "Control the logging verbosity, 0 to 5"
-    flag.default = 2
+    flag.default = 3
     flag.persistent = true
   end
 
