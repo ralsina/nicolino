@@ -2,6 +2,7 @@
 
 ## Things that could be done
 
+* Consider amauryt/cr-mark-gfm instead of discount
 * Re-check all the auto mode things work after caching was added
 * Patch served pages to use localhost:port instead of the configured URL
 * Support fallback templates. So, for example a taxonomy can be custom but
