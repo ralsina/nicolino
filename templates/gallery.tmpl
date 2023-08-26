@@ -6,7 +6,8 @@ date: {{date}}
 </br>
 
 {{html}}
----{{image_list}}---
+{# FIXME: make this a pretty list of links #}
+{{subdir_list}}
 {# Basically: every 5 images, wrap them in a grid div #}
 {% for image in image_list %}
 {% if loop.index % 5 == 1 %}
