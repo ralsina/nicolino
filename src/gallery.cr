@@ -16,6 +16,7 @@ module Gallery
   class Gallery < Markdown::File
     def initialize(sources, base, @image_list : Array(String))
       super(sources, base)
+      Markdown::File.posts[base.to_s] = self
     end
 
     def load(lang = nil)

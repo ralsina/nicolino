@@ -77,7 +77,14 @@ def create_tasks
     )
   end
 
-  # Render pages
+  if features.includes? "galleries"
+    # Render galleries
+    galleries = Gallery.read_all(galleries_path)
+    Gallery.render(galleries, Config.options.galleries)
+  end
+
+  # Render pages last because it's a catchall and will find gallery
+  # posts, blog posts, etc.
   if features.includes? "pages"
     pages = Markdown.read_all(content_path)
     pages += HTML.read_all(content_path)
@@ -89,12 +96,6 @@ def create_tasks
   if features.includes? "images"
     images = Image.read_all(content_path)
     Image.render(images)
-  end
-
-  if features.includes? "galleries"
-    # Render galleries
-    galleries = Gallery.read_all(galleries_path)
-    Gallery.render(galleries, Config.options.galleries)
   end
 
   # Render sitemap
