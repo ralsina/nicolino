@@ -16,7 +16,6 @@
 * Figure out the equivalent of Nikola's `link://` schema
 * Port thumbnail shortcode from Nikola
 * Do not *always* parse shortcode replacements as markdown (for pandoc)
-* Better document parsing errors
 * Support arbitrary command pipelines
 * TUI using homonoidian/termbox2.cr
 * Minifier via html-minifier
@@ -28,6 +27,7 @@
 * Usage of link without lang in File::html() call to make_links_absolute
   is probably wrong
 
+* ~~Better document parsing errors~~
 * ~~Add progress bar using mgomes/progress_bar (requires croupier work)~~
 * ~~Taxonomies have no titles~~
 * ~~Try to be close to hugo's input layout if possible~~

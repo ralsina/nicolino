@@ -103,17 +103,27 @@ module Markdown
     end
 
     # Load the post from disk (for current language only)
-    def load(lang = nil)
+    def load(lang = nil) : Nil
       lang ||= Locale.language
       Log.info { "👈 #{source(lang)}" }
       contents = ::File.read(source(lang))
-      _, raw_metadata, @text[lang] = contents.split("---\n", 3)
-      @metadata[lang] = YAML.parse(raw_metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
-      @title[lang] = metadata(lang)["title"].to_s
-      @link[lang] = (Path.new ["/", output.split("/")[1..]]).to_s
-      # Performance Note: usually parse takes ~.1 seconds to
-      # parse 1000 short posts that have no shortcodes.
-      @shortcodes[lang] = Shortcodes.parse(@text[lang])
+      begin
+        _, raw_metadata, @text[lang] = contents.split("---\n", 3)
+      rescue ex
+        Log.error { "Error reading metadata in #{source(lang)}: #{ex}" }
+        raise ex
+      end
+      begin
+        @metadata[lang] = YAML.parse(raw_metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
+        @title[lang] = metadata(lang)["title"].to_s
+        @link[lang] = (Path.new ["/", output.split("/")[1..]]).to_s
+        # Performance Note: usually parse takes ~.1 seconds to
+        # parse 1000 short posts that have no shortcodes.
+        @shortcodes[lang] = Shortcodes.parse(@text[lang])
+      rescue ex
+        Log.error { "Error parsing metadata in #{source(lang)}: #{ex}" }
+        raise ex
+      end
     end
 
     def html(lang = nil)
