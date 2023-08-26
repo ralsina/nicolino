@@ -16,12 +16,6 @@ module Gallery
   class Gallery < Markdown::File
     def initialize(sources, base, @image_list : Array(String))
       super(sources, base)
-      @sources.map { |k, _|
-        # Preserve the "galleries/" prefix
-        p = Path[base]
-        p = Path[Config.options(k).output] / p
-        @output[k] = p.to_s.rchop(p.extension) + ".html"
-      }
     end
 
     def load(lang = nil)
@@ -59,9 +53,9 @@ module Gallery
   end
 
   def self.render(galleries : Array(Gallery), prefix = "")
-    galleries.each do |post|
-      basedir = File.dirname(post.source)
-      Config.languages.keys.each do |lang|
+    Config.languages.keys.each do |lang|
+      galleries.each do |post|
+        basedir = File.dirname(post.source)
         Croupier::Task.new(
           id: "gallery",
           output: post.output(lang),
@@ -71,15 +65,13 @@ module Gallery
             "kv://#{post.template(lang)}",
             "kv://templates/page.tmpl",
           ] + post.@image_list.map { |i| "#{basedir}/#{i}" },
-          mergeable: false,
-          proc: Croupier::TaskProc.new {
-            # Need to refresh post contents in auto mode
-            post.load(lang) if Croupier::TaskManager.auto_mode?
-            Log.info { "👉 #{post.output(lang)}" }
-            Render.apply_template("templates/page.tmpl",
-              {"content" => post.rendered(lang), "title" => post.title(lang)})
-          }
-        )
+          mergeable: false) do
+          # Need to refresh post contents in auto mode
+          post.load(lang) if Croupier::TaskManager.auto_mode?
+          Log.info { "👉 #{post.output(lang)}" }
+          Render.apply_template("templates/page.tmpl",
+            {"content" => post.rendered(lang), "title" => post.title(lang)})
+        end
       end
     end
   end

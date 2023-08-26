@@ -82,7 +82,7 @@ features:
   - assets
   - posts
   - pages
-    #- pandoc
+  - pandoc
   - taxonomies
   - images
   - galleries

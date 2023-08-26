@@ -146,7 +146,7 @@ module Markdown
     # Path for the `Templates::Template` this post should be rendered with
     def template(lang = nil)
       lang ||= Locale.language
-      metadata(lang).fetch("template", "templates/post.tmpl").to_s
+      @metadata[lang].fetch("template", "templates/post.tmpl").to_s
     end
 
     # Render the markdown HTML into the right template for the fragment
