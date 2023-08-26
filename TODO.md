@@ -15,6 +15,7 @@
 * Add slug-for-url support?
 * Figure out the equivalent of Nikola's `link://` schema
 * Port thumbnail shortcode from Nikola
+* Add a graphviz shortcode
 * Do not *always* parse shortcode replacements as markdown (for pandoc)
 * Support arbitrary command pipelines
 * TUI using homonoidian/termbox2.cr

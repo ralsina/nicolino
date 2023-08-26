@@ -14,7 +14,9 @@ require "./markdown"
 module Gallery
   # An image gallery
   class Gallery < Markdown::File
-    def initialize(sources, base, @image_list : Array(String))
+    def initialize(sources, base,
+                   @image_list : Array(String),
+                   @subdir_list : Array(String))
       super(sources, base)
       Markdown::File.posts[base.to_s] = self
     end
@@ -37,6 +39,7 @@ module Gallery
       lang ||= Locale.language
       super(lang).merge({
         "image_list"  => @image_list,
+        "subdir_list"  => @subdir_list,
         "breadcrumbs" => breadcrumbs(lang),
       })
     end
@@ -45,10 +48,14 @@ module Gallery
   def self.read_all(path)
     Log.info { "Reading galleries from #{path}" }
     galleries = [] of Gallery
+    # FIXME should find all directories, not just md files
     Utils.find_all(path, "md").map do |base, sources|
+      # FIXME should be links not just names
+      subdir_list = Dir.glob(
+        Path[base].parent.to_s + "/*/").map(&.split("/")[-1])
       image_list = Dir.glob(
         Path[base].parent.to_s + "/*.{jpg,png}").map(&.split("/")[-1])
-      galleries << Gallery.new(sources, base, image_list)
+      galleries << Gallery.new(sources, base, image_list, subdir_list)
     end
     galleries
   end
