@@ -21,6 +21,13 @@ module Gallery
       Markdown::File.posts[base.to_s] = self
     end
 
+    def initialize(title : String, base : String,
+                   @image_list : Array(String),
+                   @subdir_list : Array(String))
+      @virtual = true
+      super(title, base)
+    end
+
     def load(lang = nil)
       lang ||= Locale.language
       super(lang)
@@ -39,7 +46,7 @@ module Gallery
       lang ||= Locale.language
       super(lang).merge({
         "image_list"  => @image_list,
-        "subdir_list"  => @subdir_list,
+        "subdir_list" => @subdir_list,
         "breadcrumbs" => breadcrumbs(lang),
       })
     end
@@ -48,7 +55,8 @@ module Gallery
   def self.read_all(path)
     Log.info { "Reading galleries from #{path}" }
     galleries = [] of Gallery
-    # FIXME should find all directories, not just md files
+
+    # First find all galleries that have an index.md
     Utils.find_all(path, "md").map do |base, sources|
       # FIXME should be links not just names
       subdir_list = Dir.glob(
@@ -57,6 +65,23 @@ module Gallery
         Path[base].parent.to_s + "/*.{jpg,png}").map(&.split("/")[-1])
       galleries << Gallery.new(sources, base, image_list, subdir_list)
     end
+
+    # Now the ones that do not have an index.md
+    dirs = [path]
+    Dir.glob(path / "**" / "*/") do |dir|
+      dirs << Path[dir]
+    end
+    dirs.each do |dir|
+      next if File.exists? dir / "index.md"
+      subdir_list = Dir.glob(
+        Path[dir].to_s + "/*/").map(&.split("/")[-1])
+      image_list = Dir.glob(
+        Path[dir].to_s + "/*.{jpg,png}").map(&.split("/")[-1])
+      # FIXME: create a "gallery" with only subdirs
+      galleries << Gallery.new(dir.to_s, dir / "index",
+        image_list, subdir_list)
+    end
+
     galleries
   end
 
@@ -64,15 +89,13 @@ module Gallery
     Config.languages.keys.each do |lang|
       galleries.each do |post|
         basedir = File.dirname(post.source)
+        inputs = post.dependencies
+        inputs += post.@image_list.map { |i| "#{basedir}/#{i}" }
+        pp! inputs
         Croupier::Task.new(
           id: "gallery",
           output: post.output(lang),
-          inputs: [
-            "conf.yml",
-            post.source(lang),
-            "kv://#{post.template(lang)}",
-            "kv://templates/page.tmpl",
-          ] + post.@image_list.map { |i| "#{basedir}/#{i}" },
+          inputs: inputs,
           mergeable: false) do
           # Need to refresh post contents in auto mode
           post.load(lang) if Croupier::TaskManager.auto_mode?

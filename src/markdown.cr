@@ -23,6 +23,7 @@ module Markdown
     @title = Hash(String, String).new
     @toc = Hash(String, String).new
     @output = Hash(String, String).new
+    @virtual = false
 
     # Register all Files by @source
     @@posts = Hash(String, File).new
@@ -31,10 +32,10 @@ module Markdown
       @@posts
     end
 
-    # Initialize the post with proper data
-    def initialize(sources, base)
-      @sources = sources
-      @base = base
+    # Initialize the post with data from one or more files
+    # base is the base path of the post, `whatever/foo.md`
+    # sources is a Hash of language => source file
+    def initialize(@sources : Hash(String, String), @base : Path)
       @sources.map { |k, _|
         p = Path[base]
         p = Path[p.parts[1..]] # Remove the leading "posts/"
@@ -44,6 +45,20 @@ module Markdown
       @@posts[base.to_s] = self
       Config.languages.keys.each do |lang|
         load lang
+      end
+    end
+
+    # Initialize the post from just a title and a path
+    # for "virtual" posts with no file.
+    #
+    # May need to be extended further
+    def initialize(title : String, base : Path)
+      @virtual = true
+      Config.languages.keys.each do |lang|
+        # FIXME: not right for all languages
+        @output[lang] = "#{base}.html"
+        @metadata[lang] = Hash(String, String).new
+        @metadata[lang]["template"] = "templates/post.tmpl"
       end
     end
 
@@ -58,6 +73,7 @@ module Markdown
     end
 
     def source(lang = nil)
+      return "" if @virtual
       @sources[lang || Locale.language]
     end
 
@@ -86,6 +102,7 @@ module Markdown
     end
 
     def shortcodes(lang = nil)
+      return Shortcodes::Result.new if @virtual
       @shortcodes[lang || Locale.language]
     end
 
@@ -104,6 +121,7 @@ module Markdown
 
     # Load the post from disk (for current language only)
     def load(lang = nil) : Nil
+      return if @virtual
       lang ||= Locale.language
       Log.info { "👈 #{source(lang)}" }
       contents = ::File.read(source(lang))
@@ -228,7 +246,7 @@ module Markdown
     # List of all files and kv store items this post uses
     def dependencies : Array(String)
       result = ["conf.yml", "kv://templates/page.tmpl"]
-      result << source
+      result << source unless @virtual
       result << "kv://#{template}"
       result += shortcodes.shortcodes.map { |sc| "kv://shortcodes/#{sc.name}.tmpl" }
       result
