@@ -20,6 +20,7 @@ struct LogFormat < Log::StaticFormatter
   end
 
   def self.setup(quiet : Bool, progress : Bool, verbosity)
+    Colorize.on_tty_only!
     if quiet
       _verbosity = Log::Severity::Fatal
     elsif progress
