@@ -2,7 +2,6 @@
 
 ## Things that could be done
 
-* Add progress bar using mgomes/progress_bar (requires croupier work)
 * Patch served pages to use localhost:port instead of the configured URL
 * Support fallback templates. So, for example a taxonomy can be custom but
   fallback to index.tmpl
