@@ -26,8 +26,11 @@ module Templates
 
     def get_source(env : Crinja, template : String) : {String, String?}
       # No caching in auto mode
-      return {_get_source(env, template), nil} if Croupier::TaskManager.auto_mode?
-      {@cache_sources[template] ||= _get_source(env, template), nil}
+
+      if Croupier::TaskManager.auto_mode?
+        return {_get_source(env, template), nil}
+      end
+      return {@cache_sources[template] ||= _get_source(env, template), nil}
     end
 
     def _get_source(env : Crinja, template : String) : String
