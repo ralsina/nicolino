@@ -121,6 +121,8 @@
   Discount seems to do pretty much everything I want, it's performant
   and it has a nice, tiny binding I wrote. So, LGTM.
 
+  Checked amauryt/cr-cmark-gfm and it's not faster than discount.
+
 * TUI using homonoidian/termbox2.cr
 
   Not really needed. Can't think of a usecase, really.
