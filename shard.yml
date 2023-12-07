@@ -27,8 +27,6 @@ dependencies:
     github: bcardiff/live_reload.cr
   lexbor:
     github: kostya/lexbor
-  pixie:
-    github: watzon/pixie
   cr-discount:
     github: ralsina/cr-discount
     branch: main
@@ -41,3 +39,8 @@ dependencies:
     github: nanobowers/cronic
   rucksack:
     github: busyloop/rucksack
+  progress_bar:
+    github: mgomes/progress_bar
+    branch: master
+  vips:
+    github: naqvis/crystal-vips

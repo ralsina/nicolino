@@ -22,7 +22,15 @@ module Templates
 
   # A Crinja Loader that is aware of the k/v store
   class StoreLoader < Crinja::Loader
+    @cache_sources = {} of String => String
+
     def get_source(env : Crinja, template : String) : {String, String?}
+      # No caching in auto mode
+      return {_get_source(env, template), nil} if Croupier::TaskManager.auto_mode?
+      {@cache_sources[template] ||= _get_source(env, template), nil}
+    end
+
+    def _get_source(env : Crinja, template : String) : String
       source = Croupier::TaskManager.get("#{template}")
       raise "Template #{template} not found" if source.nil?
       # FIXME should really traverse the node tree
@@ -31,7 +39,7 @@ module Templates
           .select { |n| n.@name == "include" }.each { |n|
         Croupier::TaskManager.tasks["kv://#{template}"].inputs << "kv://#{n.@arguments[0].value}"
       }
-      {source, nil}
+      source
     end
   end
 

@@ -38,11 +38,11 @@ module Utils
     all_sources = Hash(Path, Hash(String, String)).new
     bases.each do |base|
       sources = Hash(String, String).new
-      possible_sources = (["#{base}.md"] +
-                          Config.languages.keys.map { |l| "#{base}.#{l}.md" }) \
+      possible_sources = (["#{base}.#{extension}"] +
+                          Config.languages.keys.map { |l| "#{base}.#{l}.#{extension}" }) \
         .select { |p| ::File.exists? p }
       Config.languages.keys.each do |lang|
-        lang_base = "#{base}.#{lang}.md"
+        lang_base = "#{base}.#{lang}.#{extension}"
         if possible_sources.includes? lang_base
           sources[lang] = lang_base
         else

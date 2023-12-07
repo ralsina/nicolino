@@ -1,5 +1,5 @@
 all: bin
-clean: 
+clean:
 	rm /bin/nicolino shard.lock lib -rf
 test: ameba --all --fix
 bin:
@@ -10,7 +10,7 @@ release:
 	strip bin/nicolino
 	cat .rucksack >> bin/nicolino
 mt:
-	shards build -Dpreview_mt
+	shards build -Dpreview_mt -d
 	strip bin/nicolino
 	cat .rucksack >> bin/nicolino
 mt-release:

@@ -103,15 +103,27 @@ module Markdown
     end
 
     # Load the post from disk (for current language only)
-    def load(lang = nil)
+    def load(lang = nil) : Nil
       lang ||= Locale.language
       Log.info { "👈 #{source(lang)}" }
       contents = ::File.read(source(lang))
-      _, raw_metadata, @text[lang] = contents.split("---\n", 3)
-      @metadata[lang] = YAML.parse(raw_metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
-      @title[lang] = metadata(lang)["title"].to_s
-      @link[lang] = (Path.new ["/", output.split("/")[1..]]).to_s
-      @shortcodes[lang] = Shortcodes.parse(@text[lang])
+      begin
+        _, raw_metadata, @text[lang] = contents.split("---\n", 3)
+      rescue ex
+        Log.error { "Error reading metadata in #{source(lang)}: #{ex}" }
+        raise ex
+      end
+      begin
+        @metadata[lang] = YAML.parse(raw_metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
+        @title[lang] = metadata(lang)["title"].to_s
+        @link[lang] = (Path.new ["/", output.split("/")[1..]]).to_s
+        # Performance Note: usually parse takes ~.1 seconds to
+        # parse 1000 short posts that have no shortcodes.
+        @shortcodes[lang] = Shortcodes.parse(@text[lang])
+      rescue ex
+        Log.error { "Error parsing metadata in #{source(lang)}: #{ex}" }
+        raise ex
+      end
     end
 
     def html(lang = nil)
@@ -119,8 +131,12 @@ module Markdown
       @html[lang], @toc[lang] = Discount.compile(
         replace_shortcodes(lang),
         metadata(lang).fetch("toc", nil) != nil)
-      @html[lang] = HtmlFilters.downgrade_headers(@html[lang])
-      @html[lang] = HtmlFilters.make_links_absolute(@html[lang], link)
+      # Performance Note: parsing the HTML takes ~.7 seconds for
+      # 4000 short posts. Calling each filter is much faster.
+      doc = Lexbor::Parser.new(@html[lang])
+      doc = HtmlFilters.downgrade_headers(doc)
+      doc = HtmlFilters.make_links_absolute(doc, link)
+      @html[lang] = doc.to_html
     end
 
     def date : Time | Nil
@@ -140,7 +156,7 @@ module Markdown
     # Path for the `Templates::Template` this post should be rendered with
     def template(lang = nil)
       lang ||= Locale.language
-      metadata(lang).fetch("template", "templates/post.tmpl").to_s
+      @metadata[lang].fetch("template", "templates/post.tmpl").to_s
     end
 
     # Render the markdown HTML into the right template for the fragment
@@ -184,7 +200,6 @@ module Markdown
     def breadcrumbs(lang = nil)
       lang ||= Locale.language
       # For blog posts, breadcrumb goes to the index
-      # FIXME un-hardcode the posts/ path
       return [{name: "Posts",
                link: Utils.path_to_link(Path[Config.options(lang).output] /
                                         "posts/index.html")},
@@ -237,6 +252,7 @@ module Markdown
           inputs: post.dependencies,
           mergeable: false,
           proc: Croupier::TaskProc.new {
+            # FIXME: only call load in auto mode, save 10% of markdown benchmark
             post.load lang # Need to refresh post contents
             Log.info { "👉 #{post.output lang}" }
             Render.apply_template("templates/page.tmpl",

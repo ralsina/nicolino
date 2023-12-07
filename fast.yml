@@ -12,7 +12,7 @@ site:
 options:
   # Format HTML nicely. Makes it larger but easier to read
   # and understand.
-  pretty_html: true
+  pretty_html: false
   # Image sizes for output
   image_large: 1080
   image_thumb: 600
@@ -79,12 +79,12 @@ taxonomies:
 
 # Features you want to enable are listed here
 features:
-  - assets
+  #- assets
   - posts
   - pages
-  - pandoc
-  - taxonomies
-  - images
-  - galleries
-  - sitemap
-  - search
+    #- pandoc
+    #- taxonomies
+    #- images
+    #- galleries
+    #- sitemap
+    #- search

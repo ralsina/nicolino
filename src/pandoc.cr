@@ -48,6 +48,7 @@ module Pandoc
         rescue ex
           Log.error { "Error parsing #{base}: #{ex.message}" }
           Log.debug { ex }
+          raise ex
         end
       end
     end
