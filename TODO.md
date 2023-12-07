@@ -2,30 +2,35 @@
 
 ## Things that could be done
 
-* Patch served pages to use localhost:port instead of the configured URL
+* Link preprocessor
+  * Figure out the equivalent of Nikola's `link://` schema
+  * Patch served pages to use localhost:port instead of the configured URL
+
 * Template rewrite:
   * Support fallback templates. So, for example a taxonomy can be custom but
     fallback to index.tmpl
   * Support multiple template paths
   * Templates created while in auto mode aren't detected
-* Patch served pages to use localhost:port instead of the configured URL
-* Add pages to taxonomies besides posts
-* Implement "Archive" of all content
-* Figure out per-command flags or migrate off commander
-  (at-grandpa/clim looks good)
-* Image gallery index / Generic folder index
-* Need better date parser, like dateparser from Python
-* Add slug-for-url support?
-* Figure out the equivalent of Nikola's `link://` schema
-* Port thumbnail shortcode from Nikola
-* Support arbitrary command pipelines
-* Plugins using veelenga/lua.cr?
-* Implement something like nikola's continuous import (different binary?)
-* Reorganize theme so it's self contained
-* Draft / future / expired
-* Link checker (for internal links)
-* Usage of link without lang in File::html() call to make_links_absolute
-  is probably wrong
+
+* More tasks
+  * Add pages to taxonomies besides posts
+  * Implement "Archive" of all content
+  * Image gallery index / Generic folder index
+  * Link checker (for internal links)
+  * Draft / future / expired
+
+* Code QoL
+  * Figure out per-command flags or migrate off commander
+    (at-grandpa/clim looks good)
+  * Need better date parser, like dateparser from Python
+  * Add slug-for-url support?
+  * Port thumbnail shortcode from Nikola
+  * Support arbitrary command pipelines
+  * Plugins using veelenga/lua.cr?
+  * Implement something like nikola's continuous import (different binary?)
+  * Reorganize theme so it's self contained
+  * Usage of link without lang in File::html() call to make_links_absolute
+    is probably wrong
 
 * ~~Do not *always* parse shortcode replacements as markdown (for pandoc)~~
   {{< >}} shortcodes are not markdown
