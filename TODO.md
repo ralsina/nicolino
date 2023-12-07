@@ -3,10 +3,11 @@
 ## Things that could be done
 
 * Patch served pages to use localhost:port instead of the configured URL
-* Support fallback templates. So, for example a taxonomy can be custom but
-  fallback to index.tmpl
-* Support multiple template paths
-* Templates created while in auto mode aren't detected
+* Template rewrite:
+  * Support fallback templates. So, for example a taxonomy can be custom but
+    fallback to index.tmpl
+  * Support multiple template paths
+  * Templates created while in auto mode aren't detected
 * Patch served pages to use localhost:port instead of the configured URL
 * Add pages to taxonomies besides posts
 * Implement "Archive" of all content
