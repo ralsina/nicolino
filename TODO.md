@@ -17,7 +17,6 @@
 * Port thumbnail shortcode from Nikola
 * Do not *always* parse shortcode replacements as markdown (for pandoc)
 * Support arbitrary command pipelines
-* TUI using homonoidian/termbox2.cr
 * Minifier via html-minifier
 * Plugins using veelenga/lua.cr?
 * Implement something like nikola's continuous import (different binary?)
@@ -121,3 +120,7 @@
 
   Discount seems to do pretty much everything I want, it's performant
   and it has a nice, tiny binding I wrote. So, LGTM.
+
+* TUI using homonoidian/termbox2.cr
+
+  Not really needed. Can't think of a usecase, really.
