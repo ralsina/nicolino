@@ -30,9 +30,7 @@ choice dependencies.
 
 =It *is* fast=
     While benchmarks probably mean nothing since Nicolino is quite incomplete
-    it *does* run [this benchmark](https://www.zachleat.com/web/build-benchmark/)
-    significantly faster than Hugo, which is widely considered the fastest
-    static site generator around.
+    it *does* run [this benchmark](https://www.zachleat.com/web/build-benchmark/) ... ok.
 
     One thing the benchmark doesn't reflect is that Nicolino is
     *much faster than that* in normal use, when it's not doing a
@@ -61,6 +59,7 @@ choice dependencies.
 * RSS feed of latest posts (see [/feed.xml](/feed.xml) )
 * Taxonomies (like tags, author, etc.) with their own indexes and feeds
 * Images are resized and thumbnailed (see [nicolino.png](/nicolino.png) and [nicolino.thumb.png](/nicolino.thumb.png) )
+* Jinja-like [templates](/templates.html)
 * VenoBox based lightbox for images (click on Nicolino above)
 * PicoCSS based theme (needs work, of course)
 * `serve` mode, so you can see what the site looks like
@@ -70,7 +69,7 @@ choice dependencies.
 * Incremental builds, so it only rebuilds what's needed
 * Image galleries (see [Fancy Turning](/galleries/fancy-turning) )
 * Optional table of contents in posts/pages
-* code blocks with syntax highlighting
+* code blocks with syntax highlighting using [HighlightJS](https://highlightjs.org/)
 
 ```python
 def foo():

@@ -32,6 +32,9 @@
   * Usage of link without lang in File::html() call to make_links_absolute
     is probably wrong
 
+* Misc
+  * The markdown compiler doesn't force language-foo class on code blocks
+
 * ~~Do not *always* parse shortcode replacements as markdown (for pandoc)~~
   {{< >}} shortcodes are not markdown
 * ~~Better document parsing errors~~
