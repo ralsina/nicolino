@@ -37,6 +37,10 @@
   * Write folder_index template
   * Support video in galleries (I have `.mov` files there!)
 
+* Bugs
+  * Make galleries without a "index.md" file work properly
+  * Empty gallery index.md causes "Index out of bounds" error
+
 * ~~Image gallery index / Generic folder index~~
 * ~~Validator for posts~~
 * ~~Do not *always* parse shortcode replacements as markdown (for pandoc)~~
