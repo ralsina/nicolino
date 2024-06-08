@@ -34,6 +34,7 @@
 
 * Misc
   * The markdown compiler doesn't force language-foo class on code blocks
+  * Fix search box
 
 * ~~Validator for posts~~
 * ~~Do not *always* parse shortcode replacements as markdown (for pandoc)~~
