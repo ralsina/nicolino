@@ -5,6 +5,7 @@ require "./gallery"
 require "./html"
 require "./http_handlers"
 require "./image"
+require "./folder_indexes"
 require "./locale"
 require "./markdown"
 require "./pandoc"
@@ -103,8 +104,15 @@ def create_tasks
   end
 
   # Render search data
-  return unless features.includes? "search"
-  Search.render
+  if features.includes? "search"
+    Search.render
+  end
+
+  # Make indexes for gallery folders without a index.* file
+  # TODO: enable for other places once we have a way to handle conflicts
+  return unless features.includes? "folder_indexes"
+  indexes = FolderIndexes.read_all(galleries_path)
+  FolderIndexes.render(indexes)
 end
 
 def run(options, arguments)

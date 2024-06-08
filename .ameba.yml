@@ -10,3 +10,9 @@ Documentation/DocumentationAdmonition:
   Excluded:
     - src/**/**
   Enabled: true
+
+# FIXME: Has too many ifs, needs to be implemented as a feature registry
+Metrics/CyclomaticComplexity:
+  Excluded:
+    - src/nicolino.cr
+  Enabled: true

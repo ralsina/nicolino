@@ -15,7 +15,6 @@
 * More tasks
   * Add pages to taxonomies besides posts
   * Implement "Archive" of all content
-  * Image gallery index / Generic folder index
   * Link checker (for internal links)
   * Draft / future / expired
 
@@ -35,7 +34,9 @@
 * Misc
   * The markdown compiler doesn't force language-foo class on code blocks
   * Fix search box
+  * Write folder_index template
 
+* ~~Image gallery index / Generic folder index~~
 * ~~Validator for posts~~
 * ~~Do not *always* parse shortcode replacements as markdown (for pandoc)~~
   {{< >}} shortcodes are not markdown

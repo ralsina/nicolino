@@ -48,6 +48,9 @@ options:
 # which will be overlayed on the default config.
 # For example, these are some overrides that would work for Spanish
 # in a site where the default language is English
+#
+# IMPORTANT: do NOT override the `content` path here.`
+#
 # languages:
 #   en:
 #   es:
@@ -88,3 +91,4 @@ features:
   - galleries
   - sitemap
   - search
+  - folder_indexes

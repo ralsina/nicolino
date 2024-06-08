@@ -192,6 +192,7 @@ cli = Commander::Command.new do |cmd|
           templates/index.tmpl
           templates/post.tmpl
           templates/page.tmpl
+          templates/folder_index.tmpl
           shortcodes/raw.tmpl
           shortcodes/figure.tmpl
           assets/css/custom.css
