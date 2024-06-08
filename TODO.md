@@ -35,6 +35,7 @@
   * The markdown compiler doesn't force language-foo class on code blocks
   * Fix search box
   * Write folder_index template
+  * Support video in galleries (I have `.mov` files there!)
 
 * ~~Image gallery index / Generic folder index~~
 * ~~Validator for posts~~
