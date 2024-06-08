@@ -39,8 +39,9 @@
 
 * Bugs
   * Make galleries without a "index.md" file work properly
-  * Empty gallery index.md causes "Index out of bounds" error
+  * Galleries with empty index.md have no title
 
+* ~~More robust post metadata loading (posts without metadata)~~
 * ~~Image gallery index / Generic folder index~~
 * ~~Validator for posts~~
 * ~~Do not *always* parse shortcode replacements as markdown (for pandoc)~~

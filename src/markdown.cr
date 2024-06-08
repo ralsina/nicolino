@@ -109,14 +109,26 @@ module Markdown
       Log.info { "👈 #{source(lang)}" }
       contents = ::File.read(source(lang))
       begin
-        _, raw_metadata, @text[lang] = contents.split("---\n", 3)
+        fragments = contents.split("---\n", 3)
+        if fragments.size >= 3
+          _, raw_metadata, @text[lang] = fragments
+        else
+          # No metadata
+          raw_metadata = nil
+          @text[lang] = contents
+        end
       rescue ex
         Log.error { "Error reading metadata in #{source(lang)}: #{ex}" }
         raise ex
       end
       begin
-        @metadata[lang] = YAML.parse(raw_metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
-        @title[lang] = metadata(lang)["title"].to_s
+        if raw_metadata.nil?
+          @metadata[lang] = {} of String => String
+          @title[lang] = ""
+        else
+          @metadata[lang] = YAML.parse(raw_metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
+          @title[lang] = metadata(lang)["title"].to_s
+        end
         @link[lang] = (Path.new ["/", output.split("/")[1..]]).to_s
         # Performance Note: usually parse takes ~.1 seconds to
         # parse 1000 short posts that have no shortcodes.
