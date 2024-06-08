@@ -37,6 +37,7 @@ module Markdown
       @base = base
       @sources.map { |k, _|
         p = Path[base]
+        # FIXME: posts/ is configurable
         p = Path[p.parts[1..]] # Remove the leading "posts/"
         p = Path[Config.options(k).output] / p
         @output[k] = "#{p}.html"
@@ -243,7 +244,7 @@ module Markdown
     Config.languages.keys.each do |lang|
       posts.each do |post|
         if require_date && post.date == nil
-          Log.info { "Error: #{post.source lang} has no date" }
+          Log.error { "Error: #{post.source lang} has no date" }
           next
         end
         Croupier::Task.new(
@@ -261,6 +262,22 @@ module Markdown
         )
       end
     end
+  end
+
+  # Similar to self.render but it only validates correctness of posts
+  # without actually generating output
+  def self.validate(posts, require_date = true)
+    error_count = 0
+    Config.languages.keys.each do |lang|
+      posts.each do |post|
+        if require_date && post.date == nil
+          error_count += 1
+          Log.error { "Error: #{post.source lang} has no date" }
+          next
+        end
+      end
+    end
+    error_count
   end
 
   # Create an index page out of a list of posts, save in output

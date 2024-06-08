@@ -216,6 +216,15 @@ cli = Commander::Command.new do |cmd|
       new(options, arguments)
     end
   end
+
+  cmd.commands.add do |command|
+    command.use = "validate"
+    command.short = "Validate existing content"
+    command.run do |options, arguments|
+      LogFormat.setup(options.@bool["quiet"], options.@bool["progress"], options.@int["verbosity"])
+      validate(options, arguments)
+    end
+  end
 end
 
 Commander.run(cli, ARGV)
