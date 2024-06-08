@@ -3,7 +3,7 @@ title: Hi there, Welcome to Nicolino!
 ---
 
 > %lightbox%
-> [![The Real Nicolino](nicolino.thumb.jpg)](nicolino.jpg)
+> [![The Real Nicolino](/nicolino.thumb.jpg)](/nicolino.jpg)
 
 # So, what is this?
 Nicolino is a simple, fast and lightweight static site generator written in Crystal.
