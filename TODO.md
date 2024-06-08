@@ -35,6 +35,7 @@
 * Misc
   * The markdown compiler doesn't force language-foo class on code blocks
 
+* ~~Validator for posts~~
 * ~~Do not *always* parse shortcode replacements as markdown (for pandoc)~~
   {{< >}} shortcodes are not markdown
 * ~~Better document parsing errors~~

@@ -17,4 +17,7 @@ mt-release:
 	shards build -v --release -Dpreview_mt
 	strip bin/nicolino
 	cat .rucksack >> bin/nicolino
-.PHONY: clean all test bin
+lint:
+	bin/ameba --all --fix
+
+.PHONY: clean all test bin lint
