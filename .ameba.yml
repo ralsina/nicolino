@@ -8,5 +8,5 @@ Naming/BlockParameterName:
 
 Documentation/DocumentationAdmonition:
   Excluded:
-    - src/**
+    - src/**/**
   Enabled: true
