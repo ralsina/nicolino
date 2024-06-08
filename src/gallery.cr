@@ -17,6 +17,13 @@ module Gallery
     def initialize(sources, base, @image_list : Array(String))
       super(sources, base)
       Markdown::File.posts[base.to_s] = self
+      # Patch title if it's missing, special case for galleries
+      Config.languages.keys.each do |lang|
+        if @title[lang].empty?
+          # Use folder name
+          @title[lang] = base.parts[-2].capitalize
+        end
+      end
     end
 
     def load(lang = nil)

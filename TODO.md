@@ -37,9 +37,10 @@
   * Write folder_index template
   * Support video in galleries (I have `.mov` files there!)
 
-* Bugs
-  * Make galleries without a "index.md" file work properly
-  * Galleries with empty index.md have no title
+* Galleries
+  * Make galleries without a "index.md" file work properly?
+  * ~~Galleries with empty index.md have no title~~
+  * Crumbs links are garbage
 
 * ~~More robust post metadata loading (posts without metadata)~~
 * ~~Image gallery index / Generic folder index~~
