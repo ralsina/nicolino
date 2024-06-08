@@ -35,12 +35,13 @@ module Markdown
     def initialize(sources, base)
       @sources = sources
       @base = base
-      @sources.map { |k, _|
+      @sources.map { |lang, _|
         p = Path[base]
         # FIXME: posts/ is configurable
-        p = Path[p.parts[1..]] # Remove the leading "posts/"
-        p = Path[Config.options(k).output] / p
-        @output[k] = "#{p}.html"
+        # Remove the leading "posts/"
+        p = Path[p.parts].relative_to Config.options.content
+        p = Path[Config.options(lang).output] / p
+        @output[lang] = "#{p}.html"
       }
       @@posts[base.to_s] = self
       Config.languages.keys.each do |lang|

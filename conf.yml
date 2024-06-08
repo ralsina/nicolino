@@ -51,22 +51,22 @@ options:
 #
 # IMPORTANT: do NOT override the `content` path here.`
 #
-# languages:
-#   en:
-#   es:
-#     site:
-#       title: "Blog de Prueba de Nicolino"
-#       description: "Este es el sitio de demostración de Nicolino"
-#       footer: "Tema por defecto de Nicolino"
-#       url: "https://example.com/es"
-#     options:
-#       output: "output/es"
-#       locale: "es_ES.UTF-8"
-#     taxonomies:
-#       tags:
-#         title: "🏷Etiquetas"
-#         term_title: "Posts etiquetados {{term.name}}"
-#         location: "tags/"
+languages:
+  en:
+  es:
+    site:
+      title: "Blog de Prueba de Nicolino"
+      description: "Este es el sitio de demostración de Nicolino"
+      footer: "Tema por defecto de Nicolino"
+      url: "https://example.com/es"
+    options:
+      output: "output/es"
+      locale: "es_ES.UTF-8"
+    taxonomies:
+      tags:
+        title: "🏷Etiquetas"
+        term_title: "Posts etiquetados {{term.name}}"
+        location: "tags/"
 
 # Taxonomies are ways to classify your content.
 # For example, by tags, or by author.

@@ -42,6 +42,9 @@
   * ~~Galleries with empty index.md have no title~~
   * Crumbs links are garbage
 
+* Bugs:
+  * ~~Respect configurable "content" directory in markdown posts~~
+
 * ~~More robust post metadata loading (posts without metadata)~~
 * ~~Image gallery index / Generic folder index~~
 * ~~Validator for posts~~
