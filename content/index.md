@@ -56,7 +56,7 @@ choice dependencies.
 * Pages compiled from markdown (like this one)
 * Many other input formats via [pandoc](https://pandoc.org/)
 * Blog posts compiled from markdown, with index page (see [/posts](/posts) )
-* RSS feed of latest posts (see [/feed.xml](/feed.xml) )
+* RSS feed of latest posts (see [/rss.xml](/rss.xml) )
 * Taxonomies (like tags, author, etc.) with their own indexes and feeds
 * Images are resized and thumbnailed (see [nicolino.png](/nicolino.png) and [nicolino.thumb.png](/nicolino.thumb.png) )
 * Jinja-like [templates](/templates.html)
