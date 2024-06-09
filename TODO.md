@@ -25,7 +25,7 @@
   * Add slug-for-url support?
   * Port thumbnail shortcode from Nikola
   * Support arbitrary command pipelines
-  * Plugins using veelenga/lua.cr?
+  * Plugins using veelenga/lua.cr? anyolite/mruby? What plugins? Crinja custom filters?
   * Implement something like nikola's continuous import (different binary?)
   * Reorganize theme so it's self contained
   * Usage of link without lang in File::html() call to make_links_absolute
