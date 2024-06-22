@@ -3,7 +3,6 @@
 /bin/
 /.shards/
 *.dwarf
-/shard.lock
 /output/
 .croupier
 .kvstore
