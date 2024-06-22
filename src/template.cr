@@ -1,4 +1,5 @@
 require "crinja"
+require "cr-wren/src/wren.cr"
 
 module Templates
   extend self
@@ -71,5 +72,21 @@ module Templates
   Env.filters["link"] = Crinja.filter() do
     return Crinja::Value.new(%(<a href="#{target["link"]}">#{target["name"]}</a>)) unless target["link"].empty?
     return target["name"]
+  end
+
+  vm = Wren::VM.new "vm"
+  # Filters defined in Wren in template_extensions/filters/*.wren
+  Dir.glob("template_extensions/filters/*.wren").each do |f|
+    filter_name = Path[f].stem
+    if !Env.filters.has_key? filter_name
+      filter_code = File.read(f)
+      vm.interpret filter_name, filter_code
+
+      Env.filters[filter_name] = Crinja.filter() do
+        args = [target.to_s] + arguments.to_h.keys.sort!.map { |k| arguments[k].to_s }
+        r = vm.call(filter_name, "filter", "call", args).to_s
+        Crinja::Value.new(r)
+      end
+    end
   end
 end
