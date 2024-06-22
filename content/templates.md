@@ -3,8 +3,9 @@ Title: How templates Work in Nicolino
 ---
 
 Templates are used to make your content look nice. They are written in
-the "Crinja" template languaje, which is basically the same as the
-popular "Jinja" used by most static site generators.
+the [Crinja template languaje](https://straight-shoota.github.io/crinja/),
+which is basically the same as the popular "Jinja2" used by most static
+site generators.
 
 They can expand `variables` and use `filters` to transform them. They
 can also do some limited logic, like iterate over lists of things or
@@ -31,9 +32,9 @@ date: {{date}}
 
 These variables are available in all templates:
 
-* site_footer (string): The footer of the site, as defined in the config.
-* site_description (string): The description of the site, as defined in the config.
-* canonical_url (string): The canonical URL of the site, as defined in the config.
+* `site_footer` (string): The footer of the site, as defined in the config.
+* `site_description` (string): Th description of the site, as defined in the config.
+* `canonical_url` (string): The canonical URL of the site, as defined in the config.
 
 And everything else you define in your `conf.yml` file under `site`.
 
@@ -48,6 +49,67 @@ site:
   url: "https://example.com"
   footer: "Default Nicolino Theme"
 ```
+
+## Filters
+
+A filter in Jinja is a function that you can use in the templates.
+For example, you could have a filter called `backwards` that takes a string and turns it backwards. So if you had this in your template
+
+```jinja2
+{{ "sarlanga" | backwards }}
+```
+
+Your document would have the "agnalras" string in it.
+
+Our template engine [Crinja](https://straight-shoota.github.io/crinja/)
+supports all the [builtin filters](https://jinja.palletsprojects.com/en/2.9.x/templates/#list-of-builtin-filters) from jinja2.
+
+You can also extend it with your own filters written in [Wren](https://wren.io) by writing a wren function and placing it in `template_extensions/filters/filtername.wren`
+
+This, for example, is an implementation of the `backwards` filter:
+
+```wren
+var filter = Fn.new { |target|
+    var y = ""
+    for (c in (target.count-1)..0) {
+        y = y + target[c]
+    }
+    return y
+}
+```
+
+In your custom filters the first argument is always `target`, the string
+being filtered. If your filter supports more arguments, they will be passed in
+**alphabetical order** and **as strings** (this will probably change later).
+
+For example, consider this `hello` filter:
+
+```wren
+var filter = Fn.new { |target, greeting, is_super|
+  var result = ""
+  // We have to compare to "true" because args are always strings
+  if (is_super=="true") {
+    result = "Super "
+  }
+  return result + greeting + " " + target
+}
+```
+
+If your template contained this:
+
+```jinja2
+{{ "world" | greeting(greeting="Hi", is_super=true) }}
+{{ "mundo" | greeting(greeting="Hola", is_super=false) }}
+```
+
+The output will be
+
+```
+Super Hi world
+Hola mundo
+```
+
+**NOTE:** Filters written in wren are slower than the filters that come with Crinja. On the other hand, you probably won't notice the difference unless you are using a ton of them.
 
 ## Available Templates
 
