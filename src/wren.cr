@@ -16,5 +16,22 @@ module Vm
       end
       raise "Wren Error"
     }
+
+    def _cast_value(v : Crinja::Value)
+      case v
+      when .string?            then v.as_s?
+      when .number?            then v.as_number
+      when .none?, .undefined? then nil
+      when .truthy?            then true
+      else                          false
+      end
+    end
+
+    # Convert Crinja::Arguments into an array of normal basic types
+    def parse_args(arguments : Crinja::Arguments)
+      [arguments.target.to_s] + arguments.to_h.keys.sort!.map { |k|
+        _cast_value(arguments[k])
+      }
+    end
   end
 end

@@ -80,15 +80,14 @@ var filter = Fn.new { |target|
 
 In your custom filters the first argument is always `target`, the string
 being filtered. If your filter supports more arguments, they will be passed in
-**alphabetical order** and **as strings** (this will probably change later).
+**alphabetical order**.
 
 For example, consider this `hello` filter:
 
 ```wren
 var filter = Fn.new { |target, greeting, is_super|
   var result = ""
-  // We have to compare to "true" because args are always strings
-  if (is_super=="true") {
+  if (is_super) {
     result = "Super "
   }
   return result + greeting + " " + target
