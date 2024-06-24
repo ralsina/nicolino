@@ -19,6 +19,8 @@ module Templates
         .select { |node| node.@name == "include" }.each { |node|
       deps << "kv://#{node.@arguments[0].value}"
     }
+    # TODO: traverse tree and find mentions of wren filters,
+    # add as dependencies
     deps
   end
 
