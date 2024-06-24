@@ -44,8 +44,8 @@ dependencies:
     branch: master
   vips:
     github: naqvis/crystal-vips
-  elkjs:
-    github: ralsina/elkjs
+  cr-wren:
+    github: ralsina/cr-wren
     branch: main
 
 development_dependencies:

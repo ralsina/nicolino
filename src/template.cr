@@ -1,7 +1,9 @@
 require "crinja"
+require "./wren.cr"
 
 module Templates
   extend self
+  include Vm
 
   def self.get_deps(template)
     source = File.read(template)
@@ -10,6 +12,8 @@ module Templates
     else
       Croupier::TaskManager.set(template, source)
     end
+
+
     deps = [] of String
     # FIXME should really traverse the node tree
     Crinja::Template.new(source).nodes.@children \
@@ -17,6 +21,9 @@ module Templates
         .select { |n| n.@name == "include" }.each { |n|
       deps << "kv://#{n.@arguments[0].value}"
     }
+    # TODO: traverse tree and find mentions of wren filters,
+    # add as dependencies
+    deps += Dir.glob("template_extensions/**/*.wren")
     deps
   end
 
@@ -48,6 +55,7 @@ module Templates
 
   # Load templates from templates/ and put them in the k/v store
   def self.load_templates
+    self.load_filters
     Log.info { "Scanning Templates" }
     Dir.glob("templates/*.tmpl").each do |template|
       Croupier::Task.new(
@@ -71,5 +79,23 @@ module Templates
   Env.filters["link"] = Crinja.filter() do
     return Crinja::Value.new(%(<a href="#{target["link"]}">#{target["name"]}</a>)) unless target["link"].empty?
     return target["name"]
+  end
+
+  WrenVM = VM.new "vm"
+
+  def self.load_filters
+    # Filters defined in Wren in template_extensions/filters/*.wren
+    Dir.glob("template_extensions/filters/*.wren").each do |f|
+      filter_name = Path[f].stem
+      if !Env.filters.has_key? filter_name
+        filter_code = File.read(f)
+        WrenVM.interpret filter_name, filter_code
+
+        Env.filters[filter_name] = Crinja.filter() do
+          r = WrenVM.call(filter_name, "filter", "call", WrenVM.parse_args(arguments)).to_s
+          Crinja::Value.new(r)
+        end
+      end
+    end
   end
 end
