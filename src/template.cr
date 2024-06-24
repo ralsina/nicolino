@@ -87,8 +87,7 @@ module Templates
         WrenVM.interpret filter_name, filter_code
 
         Env.filters[filter_name] = Crinja.filter() do
-          args = [target.to_s] + arguments.to_h.keys.sort!.map { |k| arguments[k].to_s }
-          r = WrenVM.call(filter_name, "filter", "call", args).to_s
+          r = WrenVM.call(filter_name, "filter", "call", WrenVM.parse_args(arguments)).to_s
           Crinja::Value.new(r)
         end
       end
