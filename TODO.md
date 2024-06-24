@@ -37,7 +37,6 @@
   * Add slug-for-url support?
   * Port thumbnail shortcode from Nikola
   * Support arbitrary command pipelines
-  * Plugins using veelenga/lua.cr? anyolite/mruby? What plugins? Crinja custom filters?
   * Implement something like nikola's continuous import (different binary?)
   * Reorganize theme so it's self contained
   * Add custom filters using wren (see <https://forum.crystal-lang.org/t/cr-wren-a-binding-to-the-wren-language/6951/3>)

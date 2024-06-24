@@ -1,8 +1,9 @@
 require "crinja"
-require "cr-wren/src/wren.cr"
+require "./wren.cr"
 
 module Templates
   extend self
+  include Vm
 
   def self.get_deps(template)
     source = File.read(template)
@@ -50,6 +51,7 @@ module Templates
   # Load templates from templates/ and put them in the k/v store
   def self.load_templates
     Log.debug { "Scanning Templates" }
+    self.load_filters
     Dir.glob("templates/*.tmpl").each do |template|
       Croupier::Task.new(
         id: "template",
@@ -74,18 +76,21 @@ module Templates
     return target["name"]
   end
 
-  vm = Wren::VM.new "vm"
-  # Filters defined in Wren in template_extensions/filters/*.wren
-  Dir.glob("template_extensions/filters/*.wren").each do |f|
-    filter_name = Path[f].stem
-    if !Env.filters.has_key? filter_name
-      filter_code = File.read(f)
-      vm.interpret filter_name, filter_code
+  WrenVM = VM.new "vm"
 
-      Env.filters[filter_name] = Crinja.filter() do
-        args = [target.to_s] + arguments.to_h.keys.sort!.map { |k| arguments[k].to_s }
-        r = vm.call(filter_name, "filter", "call", args).to_s
-        Crinja::Value.new(r)
+  def self.load_filters
+    # Filters defined in Wren in template_extensions/filters/*.wren
+    Dir.glob("template_extensions/filters/*.wren").each do |f|
+      filter_name = Path[f].stem
+      if !Env.filters.has_key? filter_name
+        filter_code = File.read(f)
+        WrenVM.interpret filter_name, filter_code
+
+        Env.filters[filter_name] = Crinja.filter() do
+          args = [target.to_s] + arguments.to_h.keys.sort!.map { |k| arguments[k].to_s }
+          r = WrenVM.call(filter_name, "filter", "call", args).to_s
+          Crinja::Value.new(r)
+        end
       end
     end
   end
