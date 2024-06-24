@@ -7,7 +7,8 @@
   `ERROR: Error running task for LiveReload: Task`
   `LiveReload:: failed: Invalid path: kv://templates/page.tmpl`
 
-  That is fixed in
+  That is fixed in main but need to confirm auto mode works
+  correctly when updating templates
 
 ## Things that could be done
 
