@@ -12,15 +12,18 @@ module Templates
     else
       Croupier::TaskManager.set(template, source)
     end
+
+
     deps = [] of String
     # FIXME should really traverse the node tree
-    nodes = Crinja::Template.new(source).nodes.@children
-    nodes.select(Crinja::AST::TagNode) \
+    Crinja::Template.new(source).nodes.@children \
+      .select(Crinja::AST::TagNode) \
         .select { |n| n.@name == "include" }.each { |n|
       deps << "kv://#{n.@arguments[0].value}"
     }
     # TODO: traverse tree and find mentions of wren filters,
     # add as dependencies
+    deps += Dir.glob("template_extensions/**/*.wren")
     deps
   end
 
