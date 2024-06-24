@@ -40,6 +40,7 @@ def auto(options, arguments)
         Croupier::TaskManager.modified.each do |path|
           next if path.lchop? "kv://"
           Croupier::TaskManager.depends_on(path).each do |p|
+            next unless p.lchop? "output/"
             modified << Utils.path_to_link(p)
           end
         end

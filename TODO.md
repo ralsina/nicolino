@@ -1,5 +1,14 @@
 # TODO
 
+## Bugs
+
+* If a template is modified, auto mode goes nuts, prints
+
+  `ERROR: Error running task for LiveReload: Task`
+  `LiveReload:: failed: Invalid path: kv://templates/page.tmpl`
+
+  That is fixed in
+
 ## Things that could be done
 
 * Link preprocessor

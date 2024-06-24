@@ -44,9 +44,6 @@ dependencies:
     branch: master
   vips:
     github: naqvis/crystal-vips
-  elkjs:
-    github: ralsina/elkjs
-    branch: main
 
 development_dependencies:
   ameba:
