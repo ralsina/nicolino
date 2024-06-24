@@ -19,5 +19,10 @@ mt-release:
 	cat .rucksack >> bin/nicolino
 lint:
 	bin/ameba --all --fix
+static:
+	# Sadly doesn't work because there is no static libdiscount in alpine
+	docker build . -t nicolino-builder
+	docker run -ti -v .:/src -w /src crystal shards build --static
+
 
 .PHONY: clean all test bin lint
