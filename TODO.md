@@ -2,13 +2,7 @@
 
 ## Bugs
 
-* If a template is modified, auto mode goes nuts, prints
-
-  `ERROR: Error running task for LiveReload: Task`
-  `LiveReload:: failed: Invalid path: kv://templates/page.tmpl`
-
-  That is fixed in main but need to confirm auto mode works
-  correctly when updating templates
+* Auto mode only detects template changes ONCE (changes in posts are OK)
 
 ## Things that could be done
 
