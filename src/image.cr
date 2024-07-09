@@ -56,7 +56,7 @@ module Image
   def self.read_all(path)
     Log.info { "Reading Images from #{path}" }
     images = [] of Image
-    Dir.glob("#{path}/**/*.{jpg,jpeg,png}").each do |p|
+    Dir.glob("#{path}/**/*.{jpg,jpeg,png,webp}").each do |p|
       Log.info { "👈 #{p}" }
       images << Image.new(p)
     end
