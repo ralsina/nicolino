@@ -44,6 +44,8 @@ dependencies:
     branch: master
   vips:
     github: naqvis/crystal-vips
+  oplog:
+    github: ralsina/oplog
 
 development_dependencies:
   ameba:

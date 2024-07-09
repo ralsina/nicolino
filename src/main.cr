@@ -1,59 +1,9 @@
 require "./nicolino"
 require "colorize"
 require "commander"
+require "oplog"
 require "progress_bar"
 require "rucksack"
-
-# Log wrapper
-struct LogFormat < Log::StaticFormatter
-  @@colors = {
-    "FATAL" => :red,
-    "ERROR" => :red,
-    "WARN"  => :yellow,
-    "INFO"  => :green,
-    "DEBUG" => :blue,
-    "TRACE" => :light_blue,
-  }
-
-  def run
-    string "[#{Time.local}] #{@entry.severity.label}: #{@entry.message}".colorize(@@colors[@entry.severity.label])
-  end
-
-  def self.setup(quiet : Bool, progress : Bool, verbosity)
-    Colorize.on_tty_only!
-    if quiet
-      _verbosity = Log::Severity::Fatal
-    elsif progress
-      _verbosity = Log::Severity::Error
-      theme = Progress::Theme.new(
-        complete: "-",
-        incomplete: "•".colorize(:blue).to_s,
-        progress_head: "C".colorize(:yellow).to_s,
-        alt_progress_head: "c".colorize(:yellow).to_s
-      )
-      bar = Progress::Bar.new(theme: theme)
-      done = 0
-      Croupier::TaskManager.progress_callback = ->(_id : String) {
-        done += 1
-        new_tick = ((done*100)/Croupier::TaskManager.tasks.size).to_i
-        bar.tick(new_tick - bar.current)
-      }
-    else
-      _verbosity = [
-        Log::Severity::Fatal,
-        Log::Severity::Error,
-        Log::Severity::Warn,
-        Log::Severity::Info,
-        Log::Severity::Debug,
-        Log::Severity::Trace,
-      ][[verbosity, 5].min]
-    end
-    Log.setup(
-      _verbosity,
-      Log::IOBackend.new(io: STDERR, formatter: LogFormat)
-    )
-  end
-end
 
 cli = Commander::Command.new do |cmd|
   cmd.use = "nicolino"
@@ -90,8 +40,8 @@ cli = Commander::Command.new do |cmd|
     flag.name = "verbosity"
     flag.short = "-v"
     flag.long = "--verbosity"
-    flag.description = "Control the logging verbosity, 0 to 5"
-    flag.default = 3
+    flag.description = "Control the logging verbosity, 0 to 6"
+    flag.default = 4
     flag.persistent = true
   end
 
@@ -140,7 +90,7 @@ cli = Commander::Command.new do |cmd|
 
   cmd.run do |options, arguments|
     begin
-      LogFormat.setup(options.@bool["quiet"], options.@bool["progress"], options.@int["verbosity"])
+      Oplog.setup(options.@bool["quiet"] ? 0 : options.@int["verbosity"])
       exit(run(options, arguments))
     rescue ex
       Log.error { ex.message }
@@ -154,7 +104,7 @@ cli = Commander::Command.new do |cmd|
     command.short = "Run in auto mode"
     command.long = "Run in auto mode, monitoring files for changes"
     command.run do |options, arguments|
-      LogFormat.setup(options.@bool["quiet"], options.@bool["progress"], options.@int["verbosity"])
+      Oplog.setup(options.@bool["quiet"] ? 0 : options.@int["verbosity"])
       auto(options, arguments)
     end
   end
@@ -164,7 +114,7 @@ cli = Commander::Command.new do |cmd|
     command.short = "Serve the site over HTTP"
     command.long = "Serve the site over HTTP"
     command.run do |options, arguments|
-      LogFormat.setup(options.@bool["quiet"], options.@bool["progress"], options.@int["verbosity"])
+      Oplog.setup(options.@bool["quiet"] ? 0 : options.@int["verbosity"])
       serve(options, arguments)
     end
   end
@@ -174,7 +124,7 @@ cli = Commander::Command.new do |cmd|
     command.short = "Clean unknown files"
     command.long = "Remove unknown files from output"
     command.run do |options, arguments|
-      LogFormat.setup(options.@bool["quiet"], options.@bool["progress"], options.@int["verbosity"])
+      Oplog.setup(options.@bool["quiet"] ? 0 : options.@int["verbosity"])
       clean(options, arguments)
     end
   end
@@ -184,7 +134,7 @@ cli = Commander::Command.new do |cmd|
     command.short = "Create a new site"
     command.long = "Create a new site"
     command.run do |options, _|
-      LogFormat.setup(options.@bool["quiet"], options.@bool["progress"], options.@int["verbosity"])
+      Oplog.setup(options.@bool["quiet"] ? 0 : options.@int["verbosity"])
       {% for name in %(conf.yml
           templates/title.tmpl
           templates/gallery.tmpl
@@ -213,7 +163,7 @@ cli = Commander::Command.new do |cmd|
     command.use = "new"
     command.short = "Create new content"
     command.run do |options, arguments|
-      LogFormat.setup(options.@bool["quiet"], options.@bool["progress"], options.@int["verbosity"])
+      Oplog.setup(options.@bool["quiet"] ? 0 : options.@int["verbosity"])
       new(options, arguments)
     end
   end
@@ -222,7 +172,7 @@ cli = Commander::Command.new do |cmd|
     command.use = "validate"
     command.short = "Validate existing content"
     command.run do |options, arguments|
-      LogFormat.setup(options.@bool["quiet"], options.@bool["progress"], options.@int["verbosity"])
+      Oplog.setup(options.@bool["quiet"] ? 0 : options.@int["verbosity"])
       validate(options, arguments)
     end
   end
