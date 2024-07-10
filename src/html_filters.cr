@@ -24,15 +24,24 @@ module HtmlFilters
   # Make all relative links absolute to the site root
   # base is where the file containing the URIs is located
   # relative to the site root
-  def self.make_links_absolute(doc, base)
+  def self.make_links_relative(doc, base)
     base_uri = URI.parse(base)
     doc.nodes("a").each do |node|
       next unless node.has_key? "href"
-      node["href"] = base_uri.resolve(node["href"]).to_s
+      node["href"] = base_uri.relativize(node["href"]).to_s
+    end
+    doc.nodes("link").each do |node|
+      next unless node.has_key? "href"
+      p! base, base_uri.relativize(node["href"]).to_s
+      node["href"] = base_uri.relativize(node["href"]).to_s
     end
     doc.nodes("img").each do |node|
       next unless node.has_key? "src"
-      node["src"] = base_uri.resolve(node["src"]).to_s
+      node["src"] = base_uri.relativize(node["src"]).to_s
+    end
+    doc.nodes("script").each do |node|
+      next unless node.has_key? "src"
+      node["src"] = base_uri.relativize(node["src"]).to_s
     end
     doc
   end

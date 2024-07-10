@@ -13,7 +13,7 @@ module Pandoc
         metadata(lang).fetch("toc", nil) != nil,
         format: format)
       @html[lang] = HtmlFilters.downgrade_headers(html(lang))
-      @html[lang] = HtmlFilters.make_links_absolute(html(lang), link)
+      @html[lang] = HtmlFilters.make_links_relative(html(lang), link)
     end
 
     # Use a memoized compile method because pandoc is so slow

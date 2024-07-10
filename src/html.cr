@@ -8,7 +8,7 @@ module HTML
       # FIXME: Implement TOC using lexbor
       @html[lang] = replace_shortcodes(lang)
       @html[lang] = HtmlFilters.downgrade_headers(html(lang))
-      @html[lang] = HtmlFilters.make_links_absolute(html(lang), link)
+      @html[lang] = HtmlFilters.make_links_relative(html(lang), link)
     end
   end
 

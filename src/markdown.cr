@@ -156,7 +156,7 @@ module Markdown
       # 4000 short posts. Calling each filter is much faster.
       doc = Lexbor::Parser.new(@html[lang])
       doc = HtmlFilters.downgrade_headers(doc)
-      doc = HtmlFilters.make_links_absolute(doc, link)
+      doc = HtmlFilters.make_links_relative(doc, link)
       @html[lang] = doc.to_html
     end
 

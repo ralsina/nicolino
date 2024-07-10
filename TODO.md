@@ -9,6 +9,8 @@
 * Link preprocessor
   * Figure out the equivalent of Nikola's `link://` schema
   * Patch served pages to use localhost:port instead of the configured URL
+  * Currently it only patches links in the Markdown, it should
+    also patch other links in the HTML output (like `custom.css`)
 
 * Template rewrite:
   * Support fallback templates. So, for example a taxonomy can be custom but
@@ -32,8 +34,6 @@
   * Plugins using veelenga/lua.cr? anyolite/mruby? What plugins? Crinja custom filters?
   * Implement something like nikola's continuous import (different binary?)
   * Reorganize theme so it's self contained
-  * Usage of link without lang in File::html() call to make_links_absolute
-    is probably wrong
 
 * Misc
   * The markdown compiler doesn't force language-foo class on code blocks
