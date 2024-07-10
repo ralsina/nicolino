@@ -144,7 +144,14 @@ module Markdown
       lang ||= Locale.language
       @html[lang], @toc[lang] = Discount.compile(
         replace_shortcodes(lang),
-        metadata(lang).fetch("toc", nil) != nil)
+        metadata(lang).fetch("toc", nil) != nil,
+        flags = LibDiscount::MKD_FENCEDCODE |
+                LibDiscount::MKD_TOC |
+                LibDiscount::MKD_AUTOLINK |
+                LibDiscount::MKD_SAFELINK |
+                LibDiscount::MKD_NOPANTS |
+                LibDiscount::MKD_GITHUBTAGS
+      )
       # Performance Note: parsing the HTML takes ~.7 seconds for
       # 4000 short posts. Calling each filter is much faster.
       doc = Lexbor::Parser.new(@html[lang])
