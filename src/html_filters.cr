@@ -9,6 +9,9 @@ module HtmlFilters
       headers.each do |node|
         downgraded = doc.create_node("h#{i + n}")
         downgraded.inner_html = node.inner_html
+        if node.attributes.has_key? "class"
+          downgraded["class"] = node.attributes["class"]
+        end
         node.insert_before(downgraded)
       end
       headers.each do |node|
