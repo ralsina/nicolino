@@ -9,8 +9,8 @@
 * Link preprocessor
   * Figure out the equivalent of Nikola's `link://` schema
   * Patch served pages to use localhost:port instead of the configured URL
-  * Currently it only patches links in the Markdown, it should
-    also patch other links in the HTML output (like `custom.css`)
+  * ~~Currently it only patches links in the Markdown, it should
+    also patch other links in the HTML output (like `custom.css`)~~
 
 * Template rewrite:
   * Support fallback templates. So, for example a taxonomy can be custom but

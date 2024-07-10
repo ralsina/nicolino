@@ -96,11 +96,14 @@ module Taxonomies
           mergeable: false,
           proc: Croupier::TaskProc.new {
             Log.info { "👉 #{output}" }
-            Render.apply_template("templates/page.tmpl",
+            html = Render.apply_template("templates/page.tmpl",
               {
                 "content" => rendered,
                 "title"   => @title[lang],
               })
+            doc = Lexbor::Parser.new(html)
+            doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))
+            doc.to_html
           }
         )
 

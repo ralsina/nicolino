@@ -145,18 +145,17 @@ module Markdown
       @html[lang], @toc[lang] = Discount.compile(
         replace_shortcodes(lang),
         metadata(lang).fetch("toc", nil) != nil,
-        flags = LibDiscount::MKD_FENCEDCODE |
-                LibDiscount::MKD_TOC |
-                LibDiscount::MKD_AUTOLINK |
-                LibDiscount::MKD_SAFELINK |
-                LibDiscount::MKD_NOPANTS |
-                LibDiscount::MKD_GITHUBTAGS
+        flags: LibDiscount::MKD_FENCEDCODE |
+               LibDiscount::MKD_TOC |
+               LibDiscount::MKD_AUTOLINK |
+               LibDiscount::MKD_SAFELINK |
+               LibDiscount::MKD_NOPANTS |
+               LibDiscount::MKD_GITHUBTAGS
       )
       # Performance Note: parsing the HTML takes ~.7 seconds for
       # 4000 short posts. Calling each filter is much faster.
       doc = Lexbor::Parser.new(@html[lang])
       doc = HtmlFilters.downgrade_headers(doc)
-      doc = HtmlFilters.make_links_relative(doc, link)
       @html[lang] = doc.to_html
     end
 
@@ -276,8 +275,11 @@ module Markdown
             # FIXME: only call load in auto mode, save 10% of markdown benchmark
             post.load lang # Need to refresh post contents
             Log.info { "👉 #{post.output lang}" }
-            Render.apply_template("templates/page.tmpl",
+            html = Render.apply_template("templates/page.tmpl",
               {"content" => post.rendered(lang), "title" => post.title(lang)})
+            doc = Lexbor::Parser.new(html)
+            doc = HtmlFilters.make_links_relative(doc, post.link(lang))
+            doc.to_html
           }
         )
       end
@@ -319,13 +321,16 @@ module Markdown
           {
             "posts" => posts.map(&.value),
           })
-        Render.apply_template("templates/page.tmpl",
+        html = Render.apply_template("templates/page.tmpl",
           {
             "content"    => content,
             "title"      => title,
             "noindex"    => true,
             "extra_feed" => extra_feed,
           })
+        doc = Lexbor::Parser.new(html)
+        doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))
+        doc.to_html
       }
     )
   end

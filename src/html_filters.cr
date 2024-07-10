@@ -32,7 +32,6 @@ module HtmlFilters
     end
     doc.nodes("link").each do |node|
       next unless node.has_key? "href"
-      p! base, base_uri.relativize(node["href"]).to_s
       node["href"] = base_uri.relativize(node["href"]).to_s
     end
     doc.nodes("img").each do |node|

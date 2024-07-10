@@ -37,16 +37,20 @@ module FolderIndexes
       out_path = Path.new(Config.options(lang).output)
       indexes.each do |index|
         inputs = ["kv://templates/folder_index.tmpl"] + index.@contents
+        output = (out_path / index.@output).to_s
         Croupier::Task.new(
           id: "folder_index",
-          output: (out_path / index.@output).to_s,
+          output: output,
           # FIXME: find correct way to use contents of folder as dependencies
           inputs: inputs,
           mergeable: false,
           proc: Croupier::TaskProc.new {
             Log.info { "👉 #{index.@output}" }
-            Render.apply_template("templates/page.tmpl",
+            html = Render.apply_template("templates/page.tmpl",
               {"content" => index.rendered, "title" => index.@path.basename})
+            doc = Lexbor::Parser.new(html)
+            doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))
+            doc.to_html
           }
         )
       end
