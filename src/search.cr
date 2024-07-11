@@ -1,17 +1,10 @@
 module Search
-  # Patch Lexbor::Node to report if the node is "displayable"
-  struct Lexbor::Node
-    def displayble?
-      visible? && !object? && !is_tag_noindex?
-    end
-  end
-
   # Read an input file and extract the relevant stuff
   def self.extract_item(input : String, url : String, i : Int32)
     parser = Lexbor::Parser.new(File.read(input))
     return nil if parser.nodes("main").to_a.empty?
     text = parser.nodes(:_text) \
-      .select(&.parents.all?(&.displayble?)) \
+      .select(&.parents.all? { |n| n.visible? && !n.object? && !n.is_tag_noindex? }) \
         .select(&.parents.any? { |n| n.tag_name == "main" }) \
           .map(&.tag_text).reject(&.blank?) \
             .map(&.strip.gsub(/\s{2,}/, " ")).join(" ")
