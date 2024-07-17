@@ -31,6 +31,7 @@ module HtmlFilters
       node["href"] = base_uri.relativize(node["href"]).to_s
     end
     doc.nodes("link").each do |node|
+      next if node.fetch("rel", nil) == "canonical"
       next unless node.has_key? "href"
       node["href"] = base_uri.relativize(node["href"]).to_s
     end
