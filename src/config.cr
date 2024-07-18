@@ -17,7 +17,6 @@ module Config
   # Options for Nicolino output
   struct Options
     include JSON::Serializable
-    property? pretty_html = false
     property image_large = 4096
     property image_thumb = 1024
     property formats = {} of String => String

@@ -9,9 +9,6 @@ module Render
     Config.get("site").as_h.map { |k, v|
       context["site_#{k}"] = v.as_s
     }
-    output = Templates::Env.get_template(template).render(context)
-    output = Lexbor::Parser.new(output).to_pretty_html \
-      if Config.options.pretty_html?
-    output
+    Templates::Env.get_template(template).render(context)
   end
 end
