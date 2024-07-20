@@ -4,9 +4,9 @@
 # Some site options. These are available in templates
 # as site_name (ex: site_title)
 site:
-  title: "Nicolino Test Blog"
-  description: "This is the demo site for Nicolino"
-  url: "https://example.com"
+  title: "Nicolino"
+  description: "Nicolino: a static site generator"
+  url: "https://nicolino.ralsina.me"
   footer: "Default Nicolino Theme"
 # Some options affecting output
 options:
@@ -51,22 +51,8 @@ options:
 #
 # IMPORTANT: do NOT override the `content` path here.`
 #
-languages:
-  en:
-  es:
-    site:
-      title: "Blog de Prueba de Nicolino"
-      description: "Este es el sitio de demostración de Nicolino"
-      footer: "Tema por defecto de Nicolino"
-      url: "https://example.com/es"
-    options:
-      output: "output/es"
-      locale: "es_ES.UTF-8"
-    taxonomies:
-      tags:
-        title: "🏷Etiquetas"
-        term_title: "Posts etiquetados {{term.name}}"
-        location: "tags/"
+# languages:
+#   en:
 
 # Taxonomies are ways to classify your content.
 # For example, by tags, or by author.

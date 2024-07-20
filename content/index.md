@@ -49,7 +49,7 @@ choice dependencies.
     the config is a single YAML file, and so on.
 
 =It *is* lightweight=
-    I intend to keep it below 2000 lines of code. It currently has around 1200.
+    I intend to keep it below 2000 lines of code. It currently has around 1700.
 
 # Features (So far)
 
