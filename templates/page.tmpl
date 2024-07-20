@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 
 <html lang="en" data-theme="dark">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  {% if noindex %}<meta name="robots" content="noindex" />{% endif %}
-  <title>{{ site_title }}</title>
+  {% if noindex %}
+  <meta name="robots" content="noindex" />{% endif %}
+  <title>{{ site_title }}: {{ title }}</title>
   <meta name="description" content="{{ site_description }}" />
   <link rel="shortcut icon" href="/favicon.ico" />
   <link rel="canonical" href="{{ canonical_url }}" />
@@ -13,14 +15,14 @@
   {% if extra_feed %}
   <link rel="alternate" type="application/rss+xml" href="{{ extra_feed.link }}" title="{{ extra_feed.title }}" />
   {% endif %}
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
-  />
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.colors.min.css"
-  />
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap"
+    rel="stylesheet">
+  <!-- Pico CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.colors.min.css" />
   <!-- Lightbox -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.js"></script>
@@ -37,10 +39,16 @@
 <body>
   <!-- Header -->
   <header class="container">
-    <hgroup>
-      <h1>{{ site_title }}</h1>
-      <h2>
-        <input type="search" id="search" placeholder="🔎" style="width: 2em" _="
+    <nav>
+      <ul>
+        <li>
+          <h1>{{ site_title }}</h1>
+          <p>» {{ site_description }}</p>
+        </li>
+      </ul>
+      <ul>
+        <li>
+          <input type="search" id="search" style="width: 2em" _="
               init
                 set :documents to []
                 make a MiniSearch from {
@@ -69,7 +77,9 @@
                   end
                 end
             " />
-        <input type="checkbox" id="switch_theme" name="switch" role="switch" value="1" _="
+        </li>
+        <li>
+          <input type="checkbox" id="switch_theme" name="switch" role="switch" value="1" _="
               def setTheme()
                 get the closest <html/>
                 if cookies['isLight'] is 'true'
@@ -88,11 +98,11 @@
                 set cookies['isLight'] to (cookies['isLight'] is not 'true')
                 setTheme()
             " />
-        <div id="search_results"></div>
-        » {{ site_description }}
-      </h2>
-    </hgroup>
+        </li>
+      </ul>
+    </nav>
   </header>
+  <div id="search_results"></div>
   <!-- /Header -->
 
   <!-- Main -->

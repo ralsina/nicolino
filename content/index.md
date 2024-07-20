@@ -6,25 +6,24 @@ title: Hi there, Welcome to Nicolino!
 > [![The Real Nicolino](/nicolino.thumb.jpg)](/nicolino.jpg)
 
 # So, what is this?
-Nicolino is a simple, fast and lightweight static site generator written in Crystal.
-
-Yes, yes, I know, all the static site generators are simple, fast and lightweight,
-but Nicolino is different, it's written in Crystal! 😅
+Nicolino is a simple, fast and lightweight static site generator written in [Crystal](https://crystal-lang.org). Yes, yes, I know,
+all the static site generators are simple, fast and lightweight.
 
 # Should You use it?
 
-Oh Jesus, no. It's not even finished. It's not even close to finished. It's
-barely started. It's not even a toy. It's a toy for a toy. It does work, but
-it changes too much and too often to be usable.
+Oh Jesus, probably not? It *is* good enough that *I* am using it
+for new sites, but it's probably not good enough for a regular
+user.
+
 # Why?
 
 I have written [a large, very flexible, static site generator in Python](https://getnikola.com),
-and I wanted to see what would happen if I made very different decisions when
-writing the same sort of software.
+and I wanted to see what would happen if I made very different
+decisions when writing the same sort of software.
 
-So, instead of leveraging the huge Python ecosystem of libraries, I wrote
-the core of Nicolino from scratch, using only the standard library and a few
-choice dependencies.
+So, instead of leveraging the huge Python ecosystem of libraries,
+I wrote the core of Nicolino from scratch, using only the standard
+library and a few choice dependencies.
 
 # What's good about it?
 

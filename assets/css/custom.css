@@ -7,15 +7,8 @@ div.lightbox {
   width: 100%;
   text-align: center;
 }
-html,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: pt serif, Georgia, times new roman, serif;
-  margin-block-end: 0.9em;
+html * {
+  font-family: Quicksand, sans-serif;
 }
 
 header.container, main.container {
@@ -24,4 +17,8 @@ header.container, main.container {
 
 figure {
   text-align: center;
+}
+
+code, code>* {
+  font-family: monospace !important;
 }

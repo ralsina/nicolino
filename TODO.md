@@ -7,6 +7,7 @@
 ## Things that could be done
 
 * Link preprocessor
+
   * Figure out the equivalent of Nikola's `link://` schema
   * Patch served pages to use localhost:port instead of the configured URL
   * ~~Currently it only patches links in the Markdown, it should
@@ -34,6 +35,7 @@
   * Plugins using veelenga/lua.cr? anyolite/mruby? What plugins? Crinja custom filters?
   * Implement something like nikola's continuous import (different binary?)
   * Reorganize theme so it's self contained
+  * Add custom filters using wren (see <https://forum.crystal-lang.org/t/cr-wren-a-binding-to-the-wren-language/6951/3>)
 
 * Misc
   * The markdown compiler doesn't force language-foo class on code blocks
