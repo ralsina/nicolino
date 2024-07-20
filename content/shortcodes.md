@@ -1,6 +1,9 @@
 ---
 Title: Shortcodes
+toc: true
 ---
+
+# What are Shortcodes?
 
 A shortcode is a small template you can embed in your posts to
 provide functionality markdown lacks. They are defined in Jinja
@@ -69,9 +72,9 @@ those called with a `%` will be parsed as markdown before being passed
 to the template, while those called with a `<` will be passed
 to the template as-is.
 
-## Included Shortcodes
+# Included Shortcodes
 
-### Raw
+## Raw
 
 Used when you want to show content that looks like shortcodes.
 Probably only ever used in this very documentation. Example
@@ -84,7 +87,7 @@ This is passed as-is
 {{< /raw >}}
 ```
 
-### Figure
+## Figure
 
 Support for the `<figure>` tag. Example
 
@@ -99,7 +102,7 @@ Support for the `<figure>` tag. Example
 {{< /raw >}}
 ```
 
-### Tag
+## Tag
 
 Used to wrap markdown with any required tag. Example
 
