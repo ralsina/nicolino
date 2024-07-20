@@ -10,12 +10,22 @@ For example, Markdown doesn't have support for the `<figure>` tag,
 so you can use this shortcode to embed a figure:
 
 ```
-{{% raw %}}
-{{% figure foo src="/nicolino.thumb.jpg" link="/nicolino.jpg" alt="Nicolino" caption="The real Nicolino" %}}
-{{% /raw %}}
+{{< raw >}}
+{{% figure foo
+    src="/nicolino.thumb.jpg"
+    link="/nicolino.jpg"
+    alt="Nicolino"
+    caption="The real Nicolino"
+%}}
+{{< /raw >}}
 ```
 
-{{% figure foo src="/nicolino.thumb.jpg" link="/nicolino.jpg" alt="Nicolino" caption="The real Nicolino" %}}
+{{% figure foo
+    src="/nicolino.thumb.jpg"
+    link="/nicolino.jpg"
+    alt="Nicolino"
+    caption="The real Nicolino"
+%}}
 
 The definition is just a template which can use the arguments
 you pass:
@@ -33,11 +43,11 @@ opening and closing tags. For example, there is `raw` which just
 passes whatever is inside as-is:
 
 ```markdown
-{{% raw %}}
-{{% raw %}}
+{{< raw >}}
+{{< raw >}}
 This is called "inner"
-{{% /raw %}}
-{{% /raw %}}
+{{< /raw >}}
+{{< /raw >}}
 ```
 
 In those shortcodes, you can access that content as `inner`.
@@ -56,21 +66,3 @@ The difference is that when the shortcode has "inner" content,
 those called with a `%` will be parsed as markdown before being passed
 to the template, while those called with a `<` will be passed
 to the template as-is.
-
-**Usually this will make no difference at all because the markdown
-parser used in Nicolino is different from Hugo's.**
-
-If you really want the details: some Markdown parsers will refuse
-to parse markdown inside HTML tags. So, if you have this shortcode,
-called `heading`:
-
-```jinja
-<h1>{{inner}}</h1>
-```
-
-Then, if you really want to use Markdown in the content, you have
-to call the shortcode using `{{%` because if you use `{{<`
-any markdown inside will be ignored.
-
-**Again:** This will probably not matter for you using Nicolino.
-Feel free to use markdown everywhere.

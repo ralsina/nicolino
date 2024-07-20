@@ -21,3 +21,7 @@ h6 {
 header.container, main.container {
   padding: 0;
 }
+
+figure {
+  text-align: center;
+}

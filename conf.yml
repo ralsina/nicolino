@@ -14,8 +14,8 @@ options:
   # and understand.
   pretty_html: true
   # Image sizes for output
-  image_large: 1280
-  image_thumb: 180
+  image_large: 1920
+  image_thumb: 640
   # Where to write the output
   output: "output/"
   # Where the content is located
