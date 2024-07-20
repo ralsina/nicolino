@@ -28,20 +28,20 @@ module HtmlFilters
     base_uri = URI.parse(base)
     doc.nodes("a").each do |node|
       next unless node.has_key? "href"
-      node["href"] = base_uri.relativize(node["href"]).to_s
+      node["href"] = base_uri.relativize(base_uri.resolve(node["href"])).to_s
     end
     doc.nodes("link").each do |node|
       next if node.fetch("rel", nil) == "canonical"
       next unless node.has_key? "href"
-      node["href"] = base_uri.relativize(node["href"]).to_s
+      node["href"] = base_uri.relativize(base_uri.resolve(node["href"])).to_s
     end
     doc.nodes("img").each do |node|
       next unless node.has_key? "src"
-      node["src"] = base_uri.relativize(node["src"]).to_s
+      node["src"] = base_uri.relativize(base_uri.resolve(node["src"])).to_s
     end
     doc.nodes("script").each do |node|
       next unless node.has_key? "src"
-      node["src"] = base_uri.relativize(node["src"]).to_s
+      node["src"] = base_uri.relativize(base_uri.resolve(node["src"])).to_s
     end
     doc
   end
