@@ -3,11 +3,8 @@ include Shortcodes
 
 module Sc
   # Render shortcode using its template
-  def self.render_sc(sc, context : Crinja::Context)
+  def self.render_sc(sc, context : Crinja::Context) : String
     if sc.markdown?
-      # TODO: To support nested shortcodes, need to
-      # replace shortcodes in here with their
-      # rendered output
       context["inner"] = Discount.compile(sc.data)[0]
     else
       context["inner"] = sc.data

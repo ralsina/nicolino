@@ -183,24 +183,34 @@ module Markdown
       Templates::Env.get_template(template(lang)).render(value(lang))
     end
 
-    def replace_shortcodes(lang)
-      lang ||= Locale.language
-      shortcodes(lang).errors.each do |e|
+    def _replace_shortcodes(text : String) : String
+      sc_list = Shortcodes.parse(text)
+      sc_list.errors.each do |e|
         # TODO: show actual error
-        Log.error { "In #{source(lang)}:" }
-        Log.error { Shortcodes.nice_error(e, text(lang)) }
+        Log.error { Shortcodes.nice_error(e, text) }
       end
-      _text = text(lang)
       # Starting at the end of text, go backwards
       # replacing each shortcode with its output
-      shortcodes(lang).shortcodes.reverse_each do |sc|
-        # FIXME: context needs stuff
-        context = Crinja::Context.new
-        _text = _text[0, sc.position] +
-                Sc.render_sc(sc, context) +
-                _text[sc.position + sc.len, _text.size]
+
+      # FIXME: context needs stuff
+      context = Crinja::Context.new
+      sc_list.shortcodes.reverse_each do |sc|
+        if sc.markdown? # Recurse for nested shortcodes
+          # If there are nested shortcodes, handle them
+          sc.data = _replace_shortcodes(sc.data) unless Shortcodes.parse(sc.data).shortcodes.empty?
+        end
+        middle = Sc.render_sc(sc, context)
+
+        text = text[0, sc.position] +
+               middle +
+               text[sc.position + sc.len..]
       end
-      _text
+      text
+    end
+
+    def replace_shortcodes(lang)
+      lang ||= Locale.language
+      _replace_shortcodes(text(lang))
     end
 
     def summary(lang = nil)

@@ -72,9 +72,9 @@ A shortcode can be `inline` so it doesn't require a separate template file. For 
 
 ```markdown
 {{< raw >}}
-{{% foo.inline "this will be in title case" %}}{{ args.0 | title}}{{% /foo.inline %}}
+{{< foo.inline "this will be in title case" >}}{{ args.0 | title}}{{< /foo.inline >}}
 {{< /raw >}}
-{{% foo.inline "this will be in title case" %}}{{ args.0 | title}}{{% /foo.inline %}}
+{{< foo.inline "this will be in title case" >}}{{ args.0 | title}}{{< /foo.inline >}}
 ```
 
 Inline shortcodes can be handy for one-off cases when you *need* some templating logic
@@ -88,6 +88,28 @@ The difference is that when the shortcode has "inner" content,
 those called with a `%` will be parsed as markdown before being passed
 to the template, while those called with a `<` will be passed
 to the template as-is (thus: verbatim).
+
+## Nested Shortcodes
+
+Nicolino supports nesting shortcodes as long as the outer shortcode is not verbatim.
+For example, you can nest two `tag` shortcodes:
+
+```markdown
+{{< raw >}}
+{{% tag div class="outer" %}}
+{{< tag div class="inner" >}}
+This is inside two divs
+{{< /tag >}}
+{{% /tag %}}
+{{< /raw >}}
+
+{{% tag div class="outer" %}}
+{{< tag div class="inner" >}}
+This is inside two divs
+{{< /tag >}}
+{{% /tag %}}
+```
+
 
 # Included Shortcodes
 
@@ -127,11 +149,11 @@ Used to wrap markdown with any required tag. Example
 ```markdown
 {{< raw >}}
 {{% tag div class="pico-background-orange-350" %}}
-This has an orange background.
+This has an **orange** background.
 {{% /tag %}}
 {{< /raw >}}
 ```
 
 {{% tag div class="pico-background-orange-350" %}}
-This has an orange background.
+This has an *orange* background.
 {{% /tag %}}
