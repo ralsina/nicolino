@@ -3,6 +3,8 @@
 ## Bugs
 
 * Auto mode only detects template changes ONCE (changes in posts are OK)
+* TOC is always shown?
+* Shortcodes are parsed a bazillion times
 
 ## Things that could be done
 

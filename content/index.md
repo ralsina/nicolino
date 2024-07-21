@@ -1,9 +1,14 @@
 ---
 title: Hi there, Welcome to Nicolino!
+toc: false
 ---
 
-> %lightbox%
-> [![The Real Nicolino](/nicolino.thumb.jpg)](/nicolino.jpg)
+{{% figure foo
+    src="/nicolino.thumb.jpg"
+    link="/nicolino.jpg"
+    alt="Nicolino"
+    caption="The real Nicolino"
+%}}
 
 # So, what is this?
 Nicolino is a simple, fast and lightweight static site generator written in [Crystal](https://crystal-lang.org). Yes, yes, I know,

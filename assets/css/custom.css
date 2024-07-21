@@ -18,6 +18,9 @@ header.container, main.container {
 figure {
   text-align: center;
 }
+figure > a > img {
+  border-radius: .5em;
+}
 
 code, code>* {
   font-family: monospace !important;
