@@ -1,0 +1,81 @@
+version: 2.0
+shards:
+  RSS:
+    git: https://github.com/ralsina/rss.cr.git
+    version: 0.1.1+git.commit.6f74fb4f3d312babe4f9cebec4a97cf4330023a5
+
+  ameba:
+    git: https://github.com/crystal-ameba/ameba.git
+    version: 1.6.1
+
+  commander:
+    git: https://github.com/mrrooijen/commander.git
+    version: 0.4.0
+
+  cr-discount:
+    git: https://github.com/ralsina/cr-discount.git
+    version: 0.1.0+git.commit.aa000c050edd2dc46eb9f588454028e669cd08ba
+
+  crinja:
+    git: https://github.com/straight-shoota/crinja.git
+    version: 0.8.1
+
+  cronic:
+    git: https://github.com/nanobowers/cronic.git
+    version: 0.1.0+git.commit.a35d80aa61180e6e4d50f36b38c4e3c0ddbfd297
+
+  croupier:
+    git: https://github.com/ralsina/croupier.git
+    version: 0.5.1+git.commit.79fa534996a98addfe6b857e9e61e6e45d6ca228
+
+  crystalline:
+    git: https://github.com/jtomschroeder/crystalline.git
+    version: 0.1.0+git.commit.e614f1c8b0a321fa74237db3c45bbb36aa3898e2
+
+  inotify:
+    git: https://github.com/petoem/inotify.cr.git
+    version: 1.0.3
+
+  kiwi:
+    git: https://github.com/ralsina/kiwi.git
+    version: 0.1.0+git.commit.65059b87771238593a28b2b8b9fdf77d8e2b9e89
+
+  lexbor:
+    git: https://github.com/kostya/lexbor.git
+    version: 3.2.0
+
+  live_reload:
+    git: https://github.com/bcardiff/live_reload.cr.git
+    version: 0.1.0
+
+  number_parser:
+    git: https://github.com/mhib/number_parser.git
+    version: 0.1.0
+
+  oplog:
+    git: https://github.com/ralsina/oplog.git
+    version: 0.1.0+git.commit.6419ac30e4a8cfc7beb57b2b01d9d6f5efc7b389
+
+  popcorn:
+    git: https://github.com/icyleaf/popcorn.git
+    version: 0.3.0
+
+  progress_bar:
+    git: https://github.com/mgomes/progress_bar.git
+    version: 1.0.1+git.commit.d8d741d42f55f91b9c51f8551bf32abfc56e0ec1
+
+  rucksack:
+    git: https://github.com/busyloop/rucksack.git
+    version: 2.0.0
+
+  shortcodes:
+    git: https://github.com/ralsina/shortcodes.git
+    version: 0.1.0+git.commit.92b7f30ee62fbdb7682049e12681207d6ea44c70
+
+  totem:
+    git: https://github.com/icyleaf/totem.git
+    version: 0.7.0
+
+  vips:
+    git: https://github.com/naqvis/crystal-vips.git
+    version: 0.1.6
