@@ -6,6 +6,7 @@
 
 ## Things that could be done
 
+* Switch from rucksack to baked-file-system (more reliable)
 * Link preprocessor
 
   * Figure out the equivalent of Nikola's `link://` schema
