@@ -87,10 +87,12 @@ I had written [Nikola](https://getnikola.com) in Python. As a toy I
 wrote [Nicoletta](https://github.com/ralsina/nicoletta) which is sort
 of the minimal viable static site generator. I ported it to Crystal.
 
-So, I had Nikola, Nicoletta, and I needed a name for the Crystal version.
+So, I had Nikola, Nicoletta, and I needed a name for the fast, small but
+not too small Crystal project I was starting.
 
-And you know who was deceptively fast? Nicolino Locche. So, Nicolino it is.
+And you know who was deceptively fast and not very large?
+Nicolino Locche. So, Nicolino it is.
 
 Who? [This guy.](https://en.wikipedia.org/wiki/Nicolino_Locche)
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/gDQltEznD9Q" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<iframe width="100%" height="315" src="https://www.youtube.com/embed/gDQltEznD9Q" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
