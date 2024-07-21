@@ -21,19 +21,11 @@ a lot about SSGs, so it's a nice project.
 Probably not? I am an old guy and my energy is limited and I don't
 **need** this, so I will just keep adding stuff while it's fun.
 
-## What's in it
-
-Not much:
-
-* Markdown with normal YAML metadata
-* Pages and Posts (which have dates)
-* RSS feed generation
-* Generates HTML
-* Incremental builds
-
-It's pretty fast?
-
 ## What's planned
 
 Nothing is planned, this is strictly a make it up as you go operation.
 BUT check out the [TODO list](TODO.md)
+
+## More information
+
+You can consider it a "demo" at <https://nicolino.ralsina.me>
