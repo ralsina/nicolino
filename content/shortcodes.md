@@ -130,15 +130,20 @@ Support for the `<figure>` tag. Example
 
 ## Raw
 
-Used when you want to show content that looks like shortcodes.
-Probably only ever used in this very documentation. Example
+Used when you want to show content that looks like shortcodes or to
+avoid processing markdown in a piece of text. Example:
 
 ```markdown
 {{< raw >}}
 {{< raw >}}
-This is passed as-is
+This is **passed** as-is
 {{< /raw >}}
 {{< /raw >}}
+
+{{< raw >}}
+This is **passed** as-is
+{{< /raw >}}
+
 ```
 
 
