@@ -1,10 +1,5 @@
 {% include "templates/title.tmpl" %}
 
-{% if date %}
-date: {{date}}
-{% endif %}
-</br>
-
 {{html}}
 {# Basically: every 5 images, wrap them in a grid div #}
 {% for image in image_list %}
