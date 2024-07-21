@@ -3,7 +3,7 @@ def new(options, arguments)
   paths = arguments.map { |a| Path[a] }
   paths.each do |p|
     raise "Can't create #{p}, new is used to create data inside #{Config.options.content}" \
-      if p.parts[0] != Config.options.content.rstrip("/")
+       if p.parts[0] != Config.options.content.rstrip("/")
 
     # So, we want to create output/whatever/foo
     # What kind of whatever, if any, is it?

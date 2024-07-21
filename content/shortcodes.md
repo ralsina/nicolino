@@ -62,6 +62,18 @@ The template for `raw` is pretty simple:
 {{inner}}
 ```
 
+A shortcode can be `inline` so it doesn't require a separate template file. For example:
+
+```markdown
+{{< raw >}}
+{{% foo.inline "this will be in title case" %}}{{ args.0 | title}}{{% /foo.inline %}}
+{{< /raw >}}
+{{% foo.inline "this will be in title case" %}}{{ args.0 | title}}{{% /foo.inline %}}
+```
+
+Inline shortcodes can be handy for one-off cases when you *need* some templating logic
+but it's all self-contained.
+
 Nicolino does *not* support nested shortcodes. That's why I can use
 `raw` to show shortcodes :-)
 

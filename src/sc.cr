@@ -5,6 +5,9 @@ module Sc
   # Render shortcode using its template
   def self.render_sc(sc, context : Crinja::Context)
     if sc.markdown?
+      # TODO: To support nested shortcodes, need to
+      # replace shortcodes in here with their
+      # rendered output
       context["inner"] = Discount.compile(sc.data)[0]
     else
       context["inner"] = sc.data
@@ -21,13 +24,15 @@ module Sc
     end
     context["args"] = args
 
-    begin
+    if sc.is_inline?
+      Crinja.render(sc.data, context)
+    else
       template = Templates::Env.get_template("shortcodes/#{sc.name}.tmpl")
-    rescue ex
-      Log.error { "Can't load shortcode #{sc.name}: #{ex.message}" }
-      return sc.whole
+      template.render(context)
     end
-    template.render(context)
+  rescue ex
+    Log.error(exception: ex) { "Can't load shortcode #{sc.name}: #{ex.message}" }
+    sc.whole
   end
 
   # Load shortcodes from shortcodes/ and put them in the k/v store

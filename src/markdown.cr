@@ -122,22 +122,20 @@ module Markdown
         Log.error { "Error reading metadata in #{source(lang)}: #{ex}" }
         raise ex
       end
-      begin
-        if raw_metadata.nil?
-          @metadata[lang] = {} of String => String
-          @title[lang] = ""
-        else
-          @metadata[lang] = YAML.parse(raw_metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
-          @title[lang] = metadata(lang)["title"].to_s
-        end
-        @link[lang] = (Path.new ["/", output.split("/")[1..]]).to_s
-        # Performance Note: usually parse takes ~.1 seconds to
-        # parse 1000 short posts that have no shortcodes.
-        @shortcodes[lang] = Shortcodes.parse(@text[lang])
-      rescue ex
-        Log.error { "Error parsing metadata in #{source(lang)}: #{ex}" }
-        raise ex
+      if raw_metadata.nil?
+        @metadata[lang] = {} of String => String
+        @title[lang] = ""
+      else
+        @metadata[lang] = YAML.parse(raw_metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
+        @title[lang] = metadata(lang)["title"].to_s
       end
+      @link[lang] = (Path.new ["/", output.split("/")[1..]]).to_s
+      # Performance Note: usually parse takes ~.1 seconds to
+      # parse 1000 short posts that have no shortcodes.
+      @shortcodes[lang] = Shortcodes.parse(@text[lang])
+    rescue ex
+      Log.error { "Error parsing metadata in #{source(lang)}: #{ex}" }
+      raise ex
     end
 
     def html(lang = nil)
@@ -250,7 +248,7 @@ module Markdown
       result = ["conf.yml", "kv://templates/page.tmpl"]
       result << source
       result << "kv://#{template}"
-      result += shortcodes.shortcodes.map { |sc| "kv://shortcodes/#{sc.name}.tmpl" }
+      result += shortcodes.shortcodes.reject(&.is_inline?).map { |sc| "kv://shortcodes/#{sc.name}.tmpl" }
       result
     end
   end
