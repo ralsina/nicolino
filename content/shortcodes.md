@@ -9,8 +9,10 @@ A shortcode is a small template you can embed in your posts to
 provide functionality markdown lacks. They are defined in Jinja
 templates in the `shortcodes` directory.
 
-For example, Markdown doesn't have support for the `<figure>` tag,
-so you can use this shortcode to embed a figure:
+## Example
+
+Markdown doesn't have support for the `<figure>` tag,
+so you can use the `figure` shortcode to embed a figure:
 
 ```
 {{< raw >}}
@@ -43,7 +45,9 @@ you pass:
 
 Positional arguments (without names) are passed as `args.0`, `args.1`, etc.
 
-Also, you can have "paired" shortcodes, which have content between
+## Paired Shortcodes
+
+Ppaired shortcodes have content between
 opening and closing tags. For example, there is `raw` which just
 passes whatever is inside as-is:
 
@@ -62,6 +66,8 @@ The template for `raw` is pretty simple:
 {{inner}}
 ```
 
+## Inline Shortcodes
+
 A shortcode can be `inline` so it doesn't require a separate template file. For example:
 
 ```markdown
@@ -74,30 +80,16 @@ A shortcode can be `inline` so it doesn't require a separate template file. For 
 Inline shortcodes can be handy for one-off cases when you *need* some templating logic
 but it's all self-contained.
 
-Nicolino does *not* support nested shortcodes. That's why I can use
-`raw` to show shortcodes :-)
+## Verbatim and Markdown Shortcodes
 
 Shortcodes can start with `{{%` and end with `%}}` or start with `{{<` and end with `>}}`
 
 The difference is that when the shortcode has "inner" content,
 those called with a `%` will be parsed as markdown before being passed
 to the template, while those called with a `<` will be passed
-to the template as-is.
+to the template as-is (thus: verbatim).
 
 # Included Shortcodes
-
-## Raw
-
-Used when you want to show content that looks like shortcodes.
-Probably only ever used in this very documentation. Example
-
-```markdown
-{{< raw >}}
-{{< raw >}}
-This is passed as-is
-{{< /raw >}}
-{{< /raw >}}
-```
 
 ## Figure
 
@@ -113,6 +105,20 @@ Support for the `<figure>` tag. Example
 %}}
 {{< /raw >}}
 ```
+
+## Raw
+
+Used when you want to show content that looks like shortcodes.
+Probably only ever used in this very documentation. Example
+
+```markdown
+{{< raw >}}
+{{< raw >}}
+This is passed as-is
+{{< /raw >}}
+{{< /raw >}}
+```
+
 
 ## Tag
 
