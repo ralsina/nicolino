@@ -13,8 +13,8 @@
 
   * Figure out the equivalent of Nikola's `link://` schema
   * Patch served pages to use localhost:port instead of the configured URL
-  * ~~Currently it only patches links in the Markdown, it should
-    also patch other links in the HTML output (like `custom.css`)~~
+  * ✅ Currently it only patches links in the Markdown, it should
+    also patch other links in the HTML output (like `custom.css`)
 
 * Template rewrite:
   * Support fallback templates. So, for example a taxonomy can be custom but
@@ -48,90 +48,90 @@
 
 * Galleries
   * Make galleries without a "index.md" file work properly?
-  * ~~Galleries with empty index.md have no title~~
+  * ✅ Galleries with empty index.md have no title
   * Crumbs links are garbage
 
 * Bugs:
-  * ~~Respect configurable "content" directory in markdown posts~~
+  * ✅ Respect configurable "content" directory in markdown posts
 
-* ~~More robust post metadata loading (posts without metadata)~~
-* ~~Image gallery index / Generic folder index~~
-* ~~Validator for posts~~
-* ~~Do not *always* parse shortcode replacements as markdown (for pandoc)~~
+* ✅ More robust post metadata loading (posts without metadata)
+* ✅ Image gallery index / Generic folder index
+* ✅ Validator for posts
+* ✅ Do not *always* parse shortcode replacements as markdown (for pandoc)
   {{< >}} shortcodes are not markdown
-* ~~Better document parsing errors~~
-* ~~Add progress bar using mgomes/progress_bar (requires croupier work)~~
-* ~~Taxonomies have no titles~~
-* ~~Try to be close to hugo's input layout if possible~~
-* ~~Implement `new_post` `new_page` commands~~
-* ~~Un-hardcode a bunch of things~~
-  * ~~output/~~
-  * ~~posts~~
-  * ~~pages~~
-  * ~~output/posts/index.html~~
-* ~~Implement init command (with data via rucksack?)~~
-* ~~Think how to do translations~~
-* ~~Add RSS link elements where appropriate~~
-* ~~Un-ad-hoc path handlings (lchop output and such)~~
-* ~~Add noindex meta tag to "index" pages, and remove~~
-  ~~them from sitemap~~
-* ~~Add slugification where needed~~
-* ~~HTML "compiler"~~
-* ~~Fix bug of multiple `output/tags/index.html` when importing~~
-  ~~large site.~~
-* ~~Use nanobowers/cronic to parse dates~~
-* ~~Automatically show taxonomies in post headings~~
-* ~~Use a real config library~~
-* ~~Implement `clean`~~
-* ~~Support arbitrary compilers defined in config somehow (start with pandoc)~~
-* ~~Make auto mode more resilient to bad inputs~~
-* ~~Detect new posts/pages and handle that in auto mode~~
-* ~~Fix bug in auto where changes are only triggering once~~
-* ~~Enable/disable features from config~~
-* ~~Make sure all things have proper titles~~
-* ~~Search using lucaong/minisearch?~~
-* ~~Sitemap~~
-* ~~Generalize tags/index into taxonomies~~
-* ~~Link fixer~~
-* ~~Decide what to do on output conflicts (like a page and~~
-  ~~posts index)~~
-* ~~Breadcrumbs~~
-* ~~Parse templates to find dependencies and load recursively~~
-* ~~Fix bug that broke incremental rendering for HTML.~~
-  ~~Templates in k/v store are always stale.~~
-* ~~Find a way to separate toc from summary~~
-* ~~Sort post lists by date~~
-* ~~Support tags~~
-* ~~Teasers~~
-* ~~Add text/teaser to the RSS feed~~
-* ~~Fixed RSS generating wrong description in items~~
-* ~~Parse and support shortcodes like nikola/hugo~~
-* ~~Cleanup dependency handling (make posts calculate theirs)~~
-* ~~Make theme selection persistent~~
-* ~~Apply theme selection to code blocks~~
-* ~~Image gallery~~
-* ~~Think how to do TOC in markdown~~
-* ~~Figure out why code blocks work on serve and not on auto (?!!?)~~
-* ~~Check code block styling~~
-* ~~Downgrade H1 to H3 in post content~~
-* ~~Add a lightbox~~
-* ~~Image copy/resize via pixie~~
-* ~~HTML manipulation using kostya/lexbor~~ In place, can be used more.
-* ~~live-reload via LiveReload.cr and server in auto mode~~
-* ~~Implement index page generation~~ (at least ONE index page)
-* ~~Write real templates (used picocss)~~
-* ~~Add server mode~~
-* ~~Add auto mode~~
-* ~~Try crinja~~
-* ~~CLI arg to only build a specific thing~~
-* ~~Add flag for "run all / keep running / fast mode" and whatever~~
-  ~~other flags Croupier has now.~~
-* ~~Verbosity levels~~
-* ~~Asset copying~~
-* ~~Fix bug where pages are rebuilt uselessly~~
-* ~~Load templates lazy~~
-* ~~Normalize metadata key case~~
-* ~~Real CLI interface~~
+* ✅ Better document parsing errors
+* ✅ Add progress bar using mgomes/progress_bar (requires croupier work)
+* ✅ Taxonomies have no titles
+* ✅ Try to be close to hugo's input layout if possible
+* ✅ Implement `new_post` `new_page` commands
+* ✅ Un-hardcode a bunch of things
+  * ✅ output/
+  * ✅ posts
+  * ✅ pages
+  * ✅ output/posts/index.html
+* ✅ Implement init command (with data via rucksack?)
+* ✅ Think how to do translations
+* ✅ Add RSS link elements where appropriate
+* ✅ Un-ad-hoc path handlings (lchop output and such)
+* ✅ Add noindex meta tag to "index" pages, and remove
+  ✅ them from sitemap
+* ✅ Add slugification where needed
+* ✅ HTML "compiler"
+* ✅ Fix bug of multiple `output/tags/index.html` when importing
+  ✅ large site.
+* ✅ Use nanobowers/cronic to parse dates
+* ✅ Automatically show taxonomies in post headings
+* ✅ Use a real config library
+* ✅ Implement `clean`
+* ✅ Support arbitrary compilers defined in config somehow (start with pandoc)
+* ✅ Make auto mode more resilient to bad inputs
+* ✅ Detect new posts/pages and handle that in auto mode
+* ✅ Fix bug in auto where changes are only triggering once
+* ✅ Enable/disable features from config
+* ✅ Make sure all things have proper titles
+* ✅ Search using lucaong/minisearch?
+* ✅ Sitemap
+* ✅ Generalize tags/index into taxonomies
+* ✅ Link fixer
+* ✅ Decide what to do on output conflicts (like a page and
+  ✅ posts index)
+* ✅ Breadcrumbs
+* ✅ Parse templates to find dependencies and load recursively
+* ✅ Fix bug that broke incremental rendering for HTML.
+  ✅ Templates in k/v store are always stale.
+* ✅ Find a way to separate toc from summary
+* ✅ Sort post lists by date
+* ✅ Support tags
+* ✅ Teasers
+* ✅ Add text/teaser to the RSS feed
+* ✅ Fixed RSS generating wrong description in items
+* ✅ Parse and support shortcodes like nikola/hugo
+* ✅ Cleanup dependency handling (make posts calculate theirs)
+* ✅ Make theme selection persistent
+* ✅ Apply theme selection to code blocks
+* ✅ Image gallery
+* ✅ Think how to do TOC in markdown
+* ✅ Figure out why code blocks work on serve and not on auto (?!!?)
+* ✅ Check code block styling
+* ✅ Downgrade H1 to H3 in post content
+* ✅ Add a lightbox
+* ✅ Image copy/resize via pixie
+* ✅ HTML manipulation using kostya/lexbor.
+* ✅ live-reload via LiveReload.cr and server in auto mode
+* ✅ Implement index page generation (at least ONE index page)
+* ✅ Write real templates (used picocss)
+* ✅ Add server mode
+* ✅ Add auto mode
+* ✅ Try crinja
+* ✅ CLI arg to only build a specific thing
+* ✅ Add flag for "run all / keep running / fast mode" and whatever
+  ✅ other flags Croupier has now.
+* ✅ Verbosity levels
+* ✅ Asset copying
+* ✅ Fix bug where pages are rebuilt uselessly
+* ✅ Load templates lazy
+* ✅ Normalize metadata key case
+* ✅ Real CLI interface
 
 ## Things that are not such a great idea, and why
 
