@@ -1,6 +1,5 @@
 ---
 title: Hi there, Welcome to Nicolino!
-toc: false
 ---
 
 {{% figure foo

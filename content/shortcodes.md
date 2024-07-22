@@ -161,5 +161,5 @@ This has an **orange** background.
 ```
 
 {{% tag div class="pico-background-orange-350" %}}
-This has an *orange* background.
+This has an **orange** background.
 {{% /tag %}}

@@ -3,7 +3,7 @@
 date: {{date}}
 {% endif %}
 </br>
-{% if toc %}
+{% if toc | length > 0 %}
 <details closed>
     <summary class="contents-heading secondary" role="link">Contents</summary>
     {{toc}}

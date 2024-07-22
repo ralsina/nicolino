@@ -17,7 +17,7 @@ module Markdown
     @base = Path.new
     @metadata = Hash(String, Hash(String, String)).new
     @rendered = Hash(String, String).new
-    @shortcodes = Hash(String, Shortcodes::Result).new
+    @shortcodes = Hash(String, Array(Shortcodes::Shortcode)).new
     @sources = Hash(String, String).new
     @text = Hash(String, String).new
     @title = Hash(String, String).new
@@ -132,10 +132,23 @@ module Markdown
       @link[lang] = (Path.new ["/", output.split("/")[1..]]).to_s
       # Performance Note: usually parse takes ~.1 seconds to
       # parse 1000 short posts that have no shortcodes.
-      @shortcodes[lang] = Shortcodes.parse(@text[lang])
+      @shortcodes[lang] = full_shortcodes_list(@text[lang])
     rescue ex
       Log.error { "Error parsing metadata in #{source(lang)}: #{ex}" }
       raise ex
+    end
+
+    # Parse shortcodes in the text recursively
+    def full_shortcodes_list(text)
+      sc_list = Shortcodes.parse(text)
+      final_list = sc_list.shortcodes
+      sc_list.shortcodes.each do |sc|
+        if sc.markdown? # Recurse for nested shortcodes
+          # If there are nested shortcodes, handle them
+          final_list += full_shortcodes_list(sc.data)
+        end
+      end
+      Set.new(final_list).to_a
     end
 
     def html(lang = nil)
@@ -258,7 +271,7 @@ module Markdown
       result = ["conf.yml", "kv://templates/page.tmpl"]
       result << source
       result << "kv://#{template}"
-      result += shortcodes.shortcodes.reject(&.is_inline?).map { |sc| "kv://shortcodes/#{sc.name}.tmpl" }
+      result += shortcodes.reject(&.is_inline?).map { |sc| "kv://shortcodes/#{sc.name}.tmpl" }
       result
     end
   end

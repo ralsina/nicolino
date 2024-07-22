@@ -3,8 +3,9 @@
 ## Bugs
 
 * Auto mode only detects template changes ONCE (changes in posts are OK)
-* TOC is always shown?
+* ✅ TOC is always shown?
 * Shortcodes are parsed a bazillion times
+* ✅ Nested shortcodes are not in dependencies
 
 ## Things that could be done
 
