@@ -6,8 +6,9 @@ toc: true
 # What are Shortcodes?
 
 A shortcode is a small template you can embed in your posts to
-provide functionality markdown lacks. They are defined in Jinja
-templates in the `shortcodes` directory.
+provide functionality markdown lacks. They are defined using
+[Crinja templates](https://straight-shoota.github.io/crinja/)
+in the `shortcodes` directory.
 
 ## Example
 
