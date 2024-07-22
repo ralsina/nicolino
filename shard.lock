@@ -8,6 +8,10 @@ shards:
     git: https://github.com/crystal-ameba/ameba.git
     version: 1.6.1
 
+  baked_file_system:
+    git: https://github.com/schovi/baked_file_system.git
+    version: 0.10.0
+
   commander:
     git: https://github.com/mrrooijen/commander.git
     version: 0.4.0
@@ -63,10 +67,6 @@ shards:
   progress_bar:
     git: https://github.com/mgomes/progress_bar.git
     version: 1.0.1+git.commit.d8d741d42f55f91b9c51f8551bf32abfc56e0ec1
-
-  rucksack:
-    git: https://github.com/busyloop/rucksack.git
-    version: 2.0.0
 
   shortcodes:
     git: https://github.com/ralsina/shortcodes.git

@@ -37,8 +37,8 @@ dependencies:
     github: icyleaf/totem
   cronic:
     github: nanobowers/cronic
-  rucksack:
-    github: busyloop/rucksack
+  baked_file_system:
+    github: schovi/baked_file_system
   progress_bar:
     github: mgomes/progress_bar
     branch: master

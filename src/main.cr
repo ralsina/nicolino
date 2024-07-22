@@ -1,9 +1,45 @@
 require "./nicolino"
+require "baked_file_system"
 require "colorize"
 require "commander"
 require "oplog"
 require "progress_bar"
-require "rucksack"
+
+class Expandable
+  extend BakedFileSystem
+  class_property path : String = ""
+
+  def self.expand
+    @@files.each do |file|
+      path = Path[self.path, file.path[1..]].normalize
+      FileUtils.mkdir_p(File.dirname(path))
+      Log.info { "👉 Creating #{path}" }
+      File.open(path, "w") { |f|
+        f << file.gets_to_end
+      }
+    end
+  end
+end
+
+class TemplateFiles < Expandable
+  @@path = "templates"
+  bake_folder "templates", "."
+end
+
+class ShortcodesFiles < Expandable
+  @@path = "shortcodes"
+  bake_folder "shortcodes", "."
+end
+
+class AssetsFiles < Expandable
+  @@path = "assets"
+  bake_folder "assets", "."
+end
+
+class RootFiles < Expandable
+  @@path = "."
+  bake_folder "defaults", "."
+end
 
 cli = Commander::Command.new do |cmd|
   cmd.use = "nicolino"
@@ -135,24 +171,9 @@ cli = Commander::Command.new do |cmd|
     command.long = "Create a new site"
     command.run do |options, _|
       Oplog.setup(options.@bool["quiet"] ? 0 : options.@int["verbosity"])
-      {% for name in %(conf.yml
-          templates/title.tmpl
-          templates/gallery.tmpl
-          templates/taxonomy.tmpl
-          templates/index.tmpl
-          templates/post.tmpl
-          templates/page.tmpl
-          templates/folder_index.tmpl
-          shortcodes/raw.tmpl
-          shortcodes/figure.tmpl
-          assets/css/custom.css
-          assets/favicon.ico).lines.map(&.strip) %}
-        FileUtils.mkdir_p(File.dirname({{name}}))
-        Log.info { "👉 Creating #{{{name}}}" }
-        File.open({{name}}, "w") { |f|
-          rucksack({{name}}).read(f)
-        }
-      {% end %}
+      [TemplateFiles, ShortcodesFiles, AssetsFiles, RootFiles].each do |klass|
+        klass.expand
+      end
       FileUtils.mkdir_p("posts")
       FileUtils.mkdir_p("pages")
       Log.info { "✔️ Done, start writing things in posts and pages!" }
