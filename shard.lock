@@ -70,7 +70,7 @@ shards:
 
   shortcodes:
     git: https://github.com/ralsina/shortcodes.git
-    version: 0.1.0+git.commit.091449a1db7a4e8f664be2b4d5765fb6244d663f
+    version: 0.1.0+git.commit.74cb7f146b9d67d7ab043a103afd4bb787c016c1
 
   totem:
     git: https://github.com/icyleaf/totem.git

@@ -213,10 +213,14 @@ module Markdown
           sc.data = _replace_shortcodes(sc.data) unless Shortcodes.parse(sc.data).shortcodes.empty?
         end
         middle = Sc.render_sc(sc, context)
-
-        text = text[0, sc.position] +
-               middle +
-               text[sc.position + sc.len..]
+        if sc.position > 0
+          text = text[...sc.position] +
+                 middle +
+                 text[(sc.position + sc.whole.size)..]
+        else
+          text = middle +
+                 text[(sc.position + sc.whole.size)..]
+        end
       end
       text
     end
@@ -254,7 +258,7 @@ module Markdown
       lang = lang || Locale.language
       {
         "breadcrumbs" => breadcrumbs(lang),
-        "date"        => date.nil? ? "" : date.as(Time).to_s(Config.options(lang).date_output_format),
+        "date"        => date.try &.as(Time).to_s(Config.options(lang).date_output_format),
         "html"        => html(lang),
         "link"        => link(lang),
         "source"      => source(lang),
