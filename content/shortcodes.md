@@ -15,9 +15,9 @@ in the `shortcodes` directory.
 Markdown doesn't have support for the `<figure>` tag,
 so you can use the `figure` shortcode to embed a figure:
 
-```
+```markdown
 {{< raw >}}
-{{% figure foo
+{{% figure
     src="/nicolino.thumb.jpg"
     link="/nicolino.jpg"
     alt="Nicolino"
@@ -26,7 +26,7 @@ so you can use the `figure` shortcode to embed a figure:
 {{< /raw >}}
 ```
 
-{{% figure foo
+{{% figure
     src="/nicolino.thumb.jpg"
     link="/nicolino.jpg"
     alt="Nicolino"
