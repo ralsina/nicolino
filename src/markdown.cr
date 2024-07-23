@@ -388,7 +388,7 @@ module Markdown
   # Parse all markdown posts in a path and build Markdown::File
   # objects out of them
   def self.read_all(path)
-    Log.info { "Reading Markdown from #{path}" }
+    Log.debug { "Reading Markdown from #{path}" }
     posts = [] of File
     all_sources = Utils.find_all(path, "md")
     all_sources.map do |base, sources|

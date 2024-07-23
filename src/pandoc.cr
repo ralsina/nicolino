@@ -37,7 +37,7 @@ module Pandoc
   # Parse all pandoc posts in a path and build Pandoc::File
   # objects out of them
   def self.read_all(path)
-    Log.info { "Reading pandoc files from #{path}" }
+    Log.debug { "Reading pandoc files from #{path}" }
     posts = [] of File
     Config.options.formats.keys.each do |ext|
       all_sources = Utils.find_all(path, ext[1..])

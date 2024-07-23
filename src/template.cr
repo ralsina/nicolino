@@ -48,7 +48,7 @@ module Templates
 
   # Load templates from templates/ and put them in the k/v store
   def self.load_templates
-    Log.info { "Scanning Templates" }
+    Log.debug { "Scanning Templates" }
     Dir.glob("templates/*.tmpl").each do |template|
       Croupier::Task.new(
         id: "template",

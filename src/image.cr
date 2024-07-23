@@ -54,7 +54,7 @@ module Image
 
   # Finds all images in a path and build Image objects out of them
   def self.read_all(path)
-    Log.info { "Reading Images from #{path}" }
+    Log.debug { "Reading Images from #{path}" }
     images = [] of Image
     Dir.glob("#{path}/**/*.{jpg,jpeg,png,webp}").each do |file|
       Log.debug { "👈 #{file}" }

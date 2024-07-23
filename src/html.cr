@@ -15,7 +15,7 @@ module HTML
   # Parse all HTML posts in a path and build HTML::File
   # objects out of them
   def self.read_all(path)
-    Log.info { "Reading HTML files from #{path}" }
+    Log.debug { "Reading HTML files from #{path}" }
     posts = [] of File
     all_sources = Utils.find_all(path, "html")
     all_sources.map do |base, sources|

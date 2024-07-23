@@ -53,7 +53,7 @@ def create_tasks # ameba:disable Metrics/CyclomaticComplexity
 
     if features.includes? "taxonomies"
       Config.taxonomies.map do |k, v|
-        Log.info { "Scanning taxonomy: #{k}" }
+        Log.debug { "Scanning taxonomy: #{k}" }
         Taxonomies::Taxonomy.new(
           k,
           v.title,

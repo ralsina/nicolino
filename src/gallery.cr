@@ -50,7 +50,7 @@ module Gallery
   end
 
   def self.read_all(path)
-    Log.info { "Reading galleries from #{path}" }
+    Log.debug { "Reading galleries from #{path}" }
     galleries = [] of Gallery
     Utils.find_all(path, "md").map do |base, sources|
       image_list = Dir.glob(

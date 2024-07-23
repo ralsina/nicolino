@@ -18,7 +18,7 @@ shards:
 
   cr-discount:
     git: https://github.com/ralsina/cr-discount.git
-    version: 0.1.0+git.commit.aa000c050edd2dc46eb9f588454028e669cd08ba
+    version: 0.2.0+git.commit.91ddb70506fa03fd3025b8970f08c9954649d6e2
 
   crinja:
     git: https://github.com/straight-shoota/crinja.git
@@ -30,7 +30,7 @@ shards:
 
   croupier:
     git: https://github.com/ralsina/croupier.git
-    version: 0.5.1+git.commit.79fa534996a98addfe6b857e9e61e6e45d6ca228
+    version: 0.5.1+git.commit.dce28f4b8a94f2e8afbaf56c3ede1f429fac59c0
 
   crystalline:
     git: https://github.com/jtomschroeder/crystalline.git
@@ -62,7 +62,7 @@ shards:
 
   oplog:
     git: https://github.com/ralsina/oplog.git
-    version: 0.1.0+git.commit.6419ac30e4a8cfc7beb57b2b01d9d6f5efc7b389
+    version: 0.1.0
 
   polydocopt:
     git: https://github.com/ralsina/polydocopt.git
@@ -78,7 +78,7 @@ shards:
 
   shortcodes:
     git: https://github.com/ralsina/shortcodes.git
-    version: 0.1.0+git.commit.7d91258693e1c5aed891789277217a9ebac02a9d
+    version: 0.2.0+git.commit.e43eddeb5fe26ad814afecfab09a0052007cc0bb
 
   totem:
     git: https://github.com/icyleaf/totem.git
