@@ -1,45 +1,9 @@
 require "./nicolino"
-require "baked_file_system"
 require "colorize"
 require "commander"
 require "oplog"
 require "progress_bar"
 
-class Expandable
-  extend BakedFileSystem
-  class_property path : String = ""
-
-  def self.expand
-    @@files.each do |file|
-      path = Path[self.path, file.path[1..]].normalize
-      FileUtils.mkdir_p(File.dirname(path))
-      Log.info { "👉 Creating #{path}" }
-      File.open(path, "w") { |f|
-        f << file.gets_to_end
-      }
-    end
-  end
-end
-
-class TemplateFiles < Expandable
-  @@path = "templates"
-  bake_folder "templates", "."
-end
-
-class ShortcodesFiles < Expandable
-  @@path = "shortcodes"
-  bake_folder "shortcodes", "."
-end
-
-class AssetsFiles < Expandable
-  @@path = "assets"
-  bake_folder "assets", "."
-end
-
-class RootFiles < Expandable
-  @@path = "."
-  bake_folder "defaults", "."
-end
 
 cli = Commander::Command.new do |cmd|
   cmd.use = "nicolino"
@@ -131,21 +95,6 @@ cli = Commander::Command.new do |cmd|
     command.run do |options, arguments|
       Oplog.setup(options.@bool["quiet"] ? 0 : options.@int["verbosity"])
       clean(options, arguments)
-    end
-  end
-
-  cmd.commands.add do |command|
-    command.use = "init"
-    command.short = "Create a new site"
-    command.long = "Create a new site"
-    command.run do |options, _|
-      Oplog.setup(options.@bool["quiet"] ? 0 : options.@int["verbosity"])
-      [TemplateFiles, ShortcodesFiles, AssetsFiles, RootFiles].each do |klass|
-        klass.expand
-      end
-      FileUtils.mkdir_p("content/posts")
-      FileUtils.mkdir_p("pages")
-      Log.info { "✔️ Done, start writing things in content!" }
     end
   end
 
