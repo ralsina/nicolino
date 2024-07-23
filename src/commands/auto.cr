@@ -21,7 +21,6 @@ Options:
                     decide rebuilds.
   -v level          Control the verbosity, 0 to 6 [default: 4]
   -q                Don't log anything [default: false]
-
 DOC
 
       def run : Int32
@@ -33,7 +32,7 @@ DOC
         # Now run in auto mode
         Log.info { "Running in auto mode, press Ctrl+C to stop" }
         # Launch HTTP server
-        server = make_server(options, arguments, live_reload: true)
+        server = make_server(live_reload: true)
         spawn do
           server.listen
         end
