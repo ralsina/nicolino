@@ -51,7 +51,7 @@ DOC
         watcher.on_event do |_|
           server.close
           live_reload.http_server.close
-          Process.exec(Process.executable_path.as(String), ["auto"] + ARGV)
+          Process.exec(Process.executable_path.as(String), ARGV)
         end
 
         # Create task that will be triggered in rebuilds
@@ -86,10 +86,10 @@ DOC
           sleep 1
         end
         0
-      rescue ex : Exception
-        Log.error(exception: ex) { "Error running in auto mode: #{ex.message}" }
-        Log.debug { ex.backtrace.join("\n") }
-        1
+        # rescue ex : Exception
+        #   Log.error(exception: ex) { "Error running in auto mode: #{ex.message}" }
+        #   Log.debug { ex.backtrace.join("\n") }
+        #   1
       end
     end
   end
