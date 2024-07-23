@@ -11,7 +11,7 @@ module Nicolino
         # Load config and setup logging
         Config.config(@options.fetch("-c", "conf.yml").as(String))
         verbosity = @options.fetch("-v", 4).to_s.to_i
-        verbosity = 0 if @options["-q"]
+        verbosity = 0 if @options["-q"] == 1
         Oplog.setup(verbosity)
       end
 

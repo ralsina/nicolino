@@ -13,7 +13,9 @@ If you specify one or more TARGETs, only those files will be
 built. If you don't specify any, the whole site will be built.
 
 Usage:
-  nicolino build [TARGET...] [--fast-mode][-n][-p][--progress][-k][-q][-B][-c <file>][-q|-v <level>]
+  nicolino build [TARGET...] [--fast-mode][-n][-p][--progress]
+                             [-k][-q][-B][-c <file>]
+                             [-q|-v <level>]
 
 Options:
   --help            Help for this command.
