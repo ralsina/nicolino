@@ -57,7 +57,7 @@ module Image
     Log.info { "Reading Images from #{path}" }
     images = [] of Image
     Dir.glob("#{path}/**/*.{jpg,jpeg,png,webp}").each do |p|
-      Log.info { "👈 #{p}" }
+      Log.debug { "👈 #{p}" }
       images << Image.new(p)
     end
     images

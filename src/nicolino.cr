@@ -141,7 +141,7 @@ def run(
     dry_run: dry_run,
     run_all: run_all,
   )
-  Log.info { "Done!" }
+  Log.info { "😀 Done!" }
   0
 end
 
