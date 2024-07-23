@@ -21,9 +21,10 @@ being created is inside models/
 Those paths may vary depending on your configuration.
 
 Usage:
-  nicolino new PATH [-q | -v <level>]
+  nicolino new PATH [-c <file>][-q|-v <level>]
 
 Options:
+  -c <file>        Specify a config file to use [default: conf.yml]
   -v level         Control the verbosity, 0 to 6 [default: 4]
   -q               Don't log anything [default: false]
 DOC

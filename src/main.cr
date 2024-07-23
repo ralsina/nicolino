@@ -127,21 +127,11 @@ cli = Commander::Command.new do |cmd|
   cmd.run do |options, arguments|
     begin
       Oplog.setup(options.@bool["quiet"] ? 0 : options.@int["verbosity"])
-      exit(run(options, arguments))
+      # exit(run(options, arguments))
     rescue ex
       Log.error { ex.message }
       Log.debug { ex.backtrace.join("\n") }
       exit(1)
-    end
-  end
-
-  cmd.commands.add do |command|
-    command.use = "auto"
-    command.short = "Run in auto mode"
-    command.long = "Run in auto mode, monitoring files for changes"
-    command.run do |options, arguments|
-      Oplog.setup(options.@bool["quiet"] ? 0 : options.@int["verbosity"])
-      auto(options, arguments)
     end
   end
 
@@ -179,15 +169,6 @@ cli = Commander::Command.new do |cmd|
       Log.info { "✔️ Done, start writing things in content!" }
     end
   end
-
-  # cmd.commands.add do |command|
-  #   command.use = "new"
-  #   command.short = "Create new content"
-  #   command.run do |options, arguments|
-  #     Oplog.setup(options.@bool["quiet"] ? 0 : options.@int["verbosity"])
-  #     new(options, arguments)
-  #   end
-  # end
 
   cmd.commands.add do |command|
     command.use = "validate"

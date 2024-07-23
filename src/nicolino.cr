@@ -115,14 +115,20 @@ def create_tasks
   FolderIndexes.render(indexes)
 end
 
-def run(options, arguments)
-  load_config(options)
+def run(
+  arguments : Array(String),
+  parallel = false,
+  keep_going = false,
+  dry_run = false,
+  run_all = false,
+  fast_mode = false,
+)
   # When doing auto() this is called twice, no need to scan tasks
   # twice
   if Croupier::TaskManager.tasks.empty?
     Croupier::TaskManager.use_persistent_store(".kvstore")
     create_tasks
-    Croupier::TaskManager.fast_mode = options.bool.fetch("fastmode", false)
+    Croupier::TaskManager.fast_mode = fast_mode
   end
 
   arguments = Croupier::TaskManager.tasks.keys if arguments.empty?
@@ -130,15 +136,16 @@ def run(options, arguments)
   Log.info { "Running tasks..." }
   Croupier::TaskManager.run_tasks(
     targets: arguments,
-    parallel: options.bool.fetch("parallel", false),
-    keep_going: options.bool.fetch("keep_going", false),
-    dry_run: options.bool.fetch("dry_run", false),
-    run_all: options.bool.fetch("run_all", false),
+    parallel: parallel,
+    keep_going: keep_going,
+    dry_run: dry_run,
+    run_all: run_all,
   )
   Log.info { "Done!" }
   0
 end
 
+# FIXME REMOVE
 def load_config(options)
-  Config.config(options.string.fetch("config", "conf.yml"))
+  # Config.config(options.string.fetch("config", "conf.yml"))
 end

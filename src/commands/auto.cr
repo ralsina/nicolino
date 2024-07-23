@@ -1,69 +1,100 @@
-# Run forever automatically rebuilding the site
-def auto(options, arguments)
-  load_config(options)
-  create_tasks
-  Croupier::TaskManager.fast_mode = options.bool.fetch("fastmode", false)
+require "./command.cr"
 
-  # Now run in auto mode
-  begin
-    Log.info { "Running in auto mode, press Ctrl+C to stop" }
-    # Launch HTTP server
-    server = make_server(options, arguments, live_reload: true)
-    spawn do
-      server.listen
-    end
+module Nicolino
+  module Commands
+    # Run forever automatically rebuilding the site
+    struct Auto < Command
+      @@name = "auto"
+      @@doc = <<-DOC
+Run forever automatically rebuilding the site
 
-    # Launch LiveReload server
-    live_reload = LiveReload::Server.new
-    Log.info { "LiveReload on http://#{live_reload.address}" }
-    spawn do
-      live_reload.listen
-    end
+This command will run the site in auto mode, monitoring
+files for changes and triggering rebuilds. Also, if you
+have a page open in a browser, it will trigger a reload.
 
-    # Setup a watcher for posts/pages and trigger respawn if files
-    # are added
-    watcher = Inotify::Watcher.new
-    watcher.watch("content", LibInotify::IN_CREATE)
-    watcher.on_event do |_|
-      server.close
-      live_reload.http_server.close
-      Process.exec(Process.executable_path.as(String), ["auto"] + ARGV)
-    end
+Usage:
+  nicolino auto [TARGET...] [--fast-mode][-c <file>][-q|-v <level>]
 
-    # Create task that will be triggered in rebuilds
-    Croupier::Task.new(
-      id: "LiveReload",
-      inputs: Croupier::TaskManager.tasks.keys,
-      mergeable: false,
-      proc: Croupier::TaskProc.new {
-        modified = Set(String).new
-        Croupier::TaskManager.modified.each do |path|
-          next if path.lchop? "kv://"
-          Croupier::TaskManager.depends_on(path).each do |p|
-            next unless p.lchop? "output/"
-            modified << Utils.path_to_link(p)
-          end
+Options:
+  -c <file>         Specify a config file to use [default: conf.yml]
+  --fast-mode       Use file timestamps rather than contents to
+                    decide rebuilds.
+  -v level          Control the verbosity, 0 to 6 [default: 4]
+  -q                Don't log anything [default: false]
+
+DOC
+
+      def run : Int32
+        create_tasks
+        fast_mode = !@options.fetch("--fast-mode", nil).nil?
+        Croupier::TaskManager.fast_mode = fast_mode
+        arguments = @options.fetch("TARGET", [] of String).as(Array(String))
+        pp! arguments
+
+        # Now run in auto mode
+        Log.info { "Running in auto mode, press Ctrl+C to stop" }
+        # Launch HTTP server
+        server = make_server(options, arguments, live_reload: true)
+        spawn do
+          server.listen
         end
-        modified.each do |p|
-          Log.info { "LiveReload: #{p}" }
-          live_reload.send_reload(path: p, liveCSS: p.ends_with?(".css"))
+
+        # Launch LiveReload server
+        live_reload = LiveReload::Server.new
+        Log.info { "LiveReload on http://#{live_reload.address}" }
+        spawn do
+          live_reload.listen
         end
-      }
-    )
 
-    # First do a normal run
-    arguments = Croupier::TaskManager.tasks.keys if arguments.empty?
-    run(options, arguments)
+        # Setup a watcher for posts/pages and trigger respawn if files
+        # are added
+        watcher = Inotify::Watcher.new
+        watcher.watch("content", LibInotify::IN_CREATE)
+        watcher.on_event do |_|
+          server.close
+          live_reload.http_server.close
+          Process.exec(Process.executable_path.as(String), ["auto"] + ARGV)
+        end
 
-    # Then run in auto mode
-    Croupier::TaskManager.auto_run(arguments) # FIXME: check options
-  rescue ex
-    Log.error { ex }
-    Log.debug { ex.backtrace.join("\n") }
-    return 1
+        # Create task that will be triggered in rebuilds
+        Croupier::Task.new(
+          id: "LiveReload",
+          inputs: Croupier::TaskManager.tasks.keys,
+          mergeable: false,
+          proc: Croupier::TaskProc.new {
+            modified = Set(String).new
+            Croupier::TaskManager.modified.each do |path|
+              next if path.lchop? "kv://"
+              Croupier::TaskManager.depends_on(path).each do |p|
+                next unless p.lchop? "output/"
+                modified << Utils.path_to_link(p)
+              end
+            end
+            modified.each do |p|
+              Log.info { "LiveReload: #{p}" }
+              live_reload.send_reload(path: p, liveCSS: p.ends_with?(".css"))
+            end
+          }
+        )
+
+        # First do a normal run
+        arguments = Croupier::TaskManager.tasks.keys if arguments.empty?
+        # TODO: see if any other combination of args is a good idea
+        run(arguments, fast_mode: fast_mode)
+
+        # Then run in auto mode
+        Croupier::TaskManager.auto_run(arguments) # FIXME: check options
+        loop do
+          sleep 1
+        end
+        0
+      rescue ex : Exception
+        Log.error(exception: ex) { "Error running in auto mode: #{ex.message}" }
+        Log.debug { ex.backtrace.join("\n") }
+        1
+      end
+    end
   end
-  loop do
-    sleep 1
-  end
-  0
 end
+
+Nicolino::Commands::Auto.register
