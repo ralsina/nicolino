@@ -144,8 +144,3 @@ def run(
   Log.info { "😀 Done!" }
   0
 end
-
-# FIXME REMOVE
-def load_config(options)
-  # Config.config(options.string.fetch("config", "conf.yml"))
-end
