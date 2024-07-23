@@ -10,7 +10,9 @@ module Nicolino
       def initialize(@options)
         # Load config and setup logging
         Config.config(@options.fetch("-c", "conf.yml").as(String))
-        Oplog.setup(@options.fetch("-v", 4).to_s.to_i) unless ENV.fetch("FAASO_SERVER_SIDE", nil)
+        verbosity = @options.fetch("-v", 4).to_s.to_i
+        verbosity = 0 if @options["-q"]
+        Oplog.setup(verbosity)
       end
 
       def run : Int32

@@ -24,7 +24,7 @@ Options:
   -p --parallel    Run tasks in parallel.
   --fast-mode       Use file timestamps rather than contents to decide rebuilds.
   --progress        Show a progress bar instead of messages
-  -q                Don't log anything [default: false]
+  -q                Don't log anything
   -v level          Control the verbosity, 0 to 6 [default: 4]
 
 DOC

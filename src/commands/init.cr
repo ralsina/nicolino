@@ -17,7 +17,7 @@ Usage:
 Options:
   -c <file>         Specify a config file to use [default: conf.yml]
   -v level          Control the verbosity, 0 to 6 [default: 4]
-  -q                Don't log anything [default: false]
+  -q                Don't log anything
 DOC
 
       def run : Int32

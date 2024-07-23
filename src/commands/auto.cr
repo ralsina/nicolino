@@ -13,14 +13,15 @@ files for changes and triggering rebuilds. Also, if you
 have a page open in a browser, it will trigger a reload.
 
 Usage:
-  nicolino auto [TARGET...] [--fast-mode][-c <file>][-q|-v <level>]
+  nicolino auto [TARGET...] [--fast-mode][-c <file>]
+                [-q|-v <level>]
 
 Options:
   -c <file>         Specify a config file to use [default: conf.yml]
   --fast-mode       Use file timestamps rather than contents to
                     decide rebuilds.
   -v level          Control the verbosity, 0 to 6 [default: 4]
-  -q                Don't log anything [default: false]
+  -q                Don't log anything
 DOC
 
       def run : Int32
