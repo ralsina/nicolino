@@ -174,9 +174,9 @@ cli = Commander::Command.new do |cmd|
       [TemplateFiles, ShortcodesFiles, AssetsFiles, RootFiles].each do |klass|
         klass.expand
       end
-      FileUtils.mkdir_p("posts")
+      FileUtils.mkdir_p("content/posts")
       FileUtils.mkdir_p("pages")
-      Log.info { "✔️ Done, start writing things in posts and pages!" }
+      Log.info { "✔️ Done, start writing things in content!" }
     end
   end
 

@@ -48,7 +48,7 @@ Positional arguments (without names) are passed as `args.0`, `args.1`, etc.
 
 ## Paired Shortcodes
 
-Ppaired shortcodes have content between
+Paired shortcodes have content between
 opening and closing tags. For example, there is `raw` which just
 passes whatever is inside as-is:
 
