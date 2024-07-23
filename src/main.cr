@@ -124,16 +124,16 @@ cli = Commander::Command.new do |cmd|
     flag.persistent = false
   end
 
-  cmd.run do |options, arguments|
-    begin
-      Oplog.setup(options.@bool["quiet"] ? 0 : options.@int["verbosity"])
-      # exit(run(options, arguments))
-    rescue ex
-      Log.error { ex.message }
-      Log.debug { ex.backtrace.join("\n") }
-      exit(1)
-    end
-  end
+  # cmd.run do |options, arguments|
+  #   begin
+  #     Oplog.setup(options.@bool["quiet"] ? 0 : options.@int["verbosity"])
+  #     # exit(run(options, arguments))
+  #   rescue ex
+  #     Log.error { ex.message }
+  #     Log.debug { ex.backtrace.join("\n") }
+  #     exit(1)
+  #   end
+  # end
 
   cmd.commands.add do |command|
     command.use = "serve"

@@ -29,7 +29,6 @@ DOC
         fast_mode = !@options.fetch("--fast-mode", nil).nil?
         Croupier::TaskManager.fast_mode = fast_mode
         arguments = @options.fetch("TARGET", [] of String).as(Array(String))
-        pp! arguments
 
         # Now run in auto mode
         Log.info { "Running in auto mode, press Ctrl+C to stop" }
