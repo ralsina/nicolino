@@ -86,16 +86,6 @@ cli = Commander::Command.new do |cmd|
     flag.default = false
     flag.persistent = false
   end
-
-  cmd.commands.add do |command|
-    command.use = "clean"
-    command.short = "Clean unknown files"
-    command.long = "Remove unknown files from output"
-    command.run do |options, arguments|
-      Oplog.setup(options.@bool["quiet"] ? 0 : options.@int["verbosity"])
-      clean(options, arguments)
-    end
-  end
 end
 
 exit(Polydocopt.main("nicolino", ARGV))
