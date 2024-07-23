@@ -6,6 +6,7 @@
 * ✅ TOC is always shown?
 * Shortcodes are parsed a bazillion times
 * ✅ Nested shortcodes are not in dependencies
+* Lost progressbar in move to oplog!
 
 ## Things that could be done
 
