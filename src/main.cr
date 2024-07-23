@@ -180,14 +180,14 @@ cli = Commander::Command.new do |cmd|
     end
   end
 
-  cmd.commands.add do |command|
-    command.use = "new"
-    command.short = "Create new content"
-    command.run do |options, arguments|
-      Oplog.setup(options.@bool["quiet"] ? 0 : options.@int["verbosity"])
-      new(options, arguments)
-    end
-  end
+  # cmd.commands.add do |command|
+  #   command.use = "new"
+  #   command.short = "Create new content"
+  #   command.run do |options, arguments|
+  #     Oplog.setup(options.@bool["quiet"] ? 0 : options.@int["verbosity"])
+  #     new(options, arguments)
+  #   end
+  # end
 
   cmd.commands.add do |command|
     command.use = "validate"
@@ -199,4 +199,6 @@ cli = Commander::Command.new do |cmd|
   end
 end
 
-Commander.run(cli, ARGV)
+# Commander.run(cli, ARGV)
+
+exit(Polydocopt.main("nicolino", ARGV))
