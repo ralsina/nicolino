@@ -36,6 +36,10 @@ shards:
     git: https://github.com/jtomschroeder/crystalline.git
     version: 0.1.0+git.commit.e614f1c8b0a321fa74237db3c45bbb36aa3898e2
 
+  docopt:
+    git: https://github.com/chenkovsky/docopt.cr.git
+    version: 0.2.0+git.commit.620fce4f334ff15d7321e5ecb6665ad258fe9297
+
   inotify:
     git: https://github.com/petoem/inotify.cr.git
     version: 1.0.3
@@ -59,6 +63,10 @@ shards:
   oplog:
     git: https://github.com/ralsina/oplog.git
     version: 0.1.0+git.commit.6419ac30e4a8cfc7beb57b2b01d9d6f5efc7b389
+
+  polydocopt:
+    git: https://github.com/ralsina/polydocopt.git
+    version: 0.1.0+git.commit.dd5c96707e38681d0f562f27ce413be5ccb88bc9
 
   popcorn:
     git: https://github.com/icyleaf/popcorn.git

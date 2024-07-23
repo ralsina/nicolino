@@ -46,6 +46,8 @@ dependencies:
     github: naqvis/crystal-vips
   oplog:
     github: ralsina/oplog
+  polydocopt:
+    github: ralsina/polydocopt
 
 development_dependencies:
   ameba:

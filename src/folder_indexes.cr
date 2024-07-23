@@ -25,7 +25,7 @@ module FolderIndexes
     candidates = [path] + Dir.glob("#{path}/**/*/")
     candidates.map do |folder|
       if Dir.glob("#{folder}/index.*").empty?
-        Log.info { "👈 #{folder}" }
+        Log.debug { "👈 #{folder}" }
         indexes << FolderIndex.new(Path.new(folder))
       end
     end

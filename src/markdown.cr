@@ -107,7 +107,7 @@ module Markdown
     # Load the post from disk (for current language only)
     def load(lang = nil) : Nil
       lang ||= Locale.language
-      Log.info { "👈 #{source(lang)}" }
+      Log.debug { "👈 #{source(lang)}" }
       contents = ::File.read(source(lang))
       begin
         fragments = contents.split("---\n", 3)

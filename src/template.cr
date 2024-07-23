@@ -56,7 +56,7 @@ module Templates
         output: "kv://#{template}",
         mergeable: false,
         proc: Croupier::TaskProc.new {
-          Log.info { "👈 #{template}" }
+          Log.debug { "👈 #{template}" }
           # Yes, we re-read it when get_deps already did it.
           # In auto mode the content may have changed though.
           File.read(template)
