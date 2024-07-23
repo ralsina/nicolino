@@ -2,6 +2,7 @@ require "./command.cr"
 
 module Nicolino
   module Commands
+    # nicolino validate command
     struct Validate < Command
       @@name = "validate"
       @@doc = <<-DOC

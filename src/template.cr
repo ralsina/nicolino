@@ -14,8 +14,8 @@ module Templates
     # FIXME should really traverse the node tree
     Crinja::Template.new(source).nodes.@children \
       .select(Crinja::AST::TagNode) \
-        .select { |n| n.@name == "include" }.each { |n|
-      deps << "kv://#{n.@arguments[0].value}"
+        .select { |node| node.@name == "include" }.each { |node|
+      deps << "kv://#{node.@arguments[0].value}"
     }
     deps
   end
@@ -39,8 +39,8 @@ module Templates
       # FIXME should really traverse the node tree
       Crinja::Template.new(source).nodes.@children \
         .select(Crinja::AST::TagNode) \
-          .select { |n| n.@name == "include" }.each { |n|
-        Croupier::TaskManager.tasks["kv://#{template}"].inputs << "kv://#{n.@arguments[0].value}"
+          .select { |node| node.@name == "include" }.each { |node|
+        Croupier::TaskManager.tasks["kv://#{template}"].inputs << "kv://#{node.@arguments[0].value}"
       }
       source
     end

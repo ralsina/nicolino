@@ -20,8 +20,8 @@ module Utils
   def self.find_all(path, extension)
     bases = Set(Path).new
     # Find base files for posts
-    Dir.glob("#{path}/**/*.#{extension}").each do |p|
-      base = Path[p]
+    Dir.glob("#{path}/**/*.#{extension}").each do |fname|
+      base = Path[fname]
       dirname = base.dirname
       stem = Path[base.stem]
       stem_ext = stem.extension
@@ -39,8 +39,8 @@ module Utils
     bases.each do |base|
       sources = Hash(String, String).new
       possible_sources = (["#{base}.#{extension}"] +
-                          Config.languages.keys.map { |l| "#{base}.#{l}.#{extension}" }) \
-        .select { |p| ::File.exists? p }
+                          Config.languages.keys.map { |lang| "#{base}.#{lang}.#{extension}" }) \
+        .select { |source| ::File.exists? source }
       Config.languages.keys.each do |lang|
         lang_base = "#{base}.#{lang}.#{extension}"
         if possible_sources.includes? lang_base

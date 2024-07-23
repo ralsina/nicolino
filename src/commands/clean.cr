@@ -2,6 +2,7 @@ require "./command.cr"
 
 module Nicolino
   module Commands
+    # nicolino clean command
     struct Clean < Command
       @@name = "clean"
       @@doc = <<-DOC
@@ -23,13 +24,13 @@ DOC
         create_tasks
         existing = Set.new(Dir.glob(Path[Config.options.output] / "**/*"))
         targets = Set.new(Croupier::TaskManager.tasks.keys)
-        targets = targets.map { |p| Path[p].normalize.to_s }
+        targets = targets.map { |path| Path[path].normalize.to_s }
         to_clean = existing - targets
         # Only delete files
-        to_clean.each do |p|
-          next if File.info(p).directory?
-          Log.warn { "❌ #{p}" }
-          File.delete(p)
+        to_clean.each do |path|
+          next if File.info(path).directory?
+          Log.warn { "❌ #{path}" }
+          File.delete(path)
         end
         0
       end

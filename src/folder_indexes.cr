@@ -7,7 +7,7 @@ module FolderIndexes
     def initialize(path : Path)
       @path = path
       @output = (@path / "index.html").relative_to Config.options.content
-      @contents = Dir.glob("#{@path}/*").select! { |p| File.file? p }
+      @contents = Dir.glob("#{@path}/*").select! { |item| File.file? item }
     end
 
     def rendered

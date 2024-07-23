@@ -3,6 +3,7 @@ require "baked_file_system"
 
 module Nicolino
   module Commands
+    # nicolino init command
     struct Init < Command
       @@name = "init"
       @@doc = <<-DOC
@@ -42,6 +43,7 @@ DOC
     end
   end
 
+  # A self-expanding BakedFileSystem
   class Expandable
     extend BakedFileSystem
     class_property path : String = ""
@@ -51,28 +53,32 @@ DOC
         path = Path[self.path, file.path[1..]].normalize
         FileUtils.mkdir_p(File.dirname(path))
         Log.info { "👉 Creating #{path}" }
-        File.open(path, "w") { |f|
-          f << file.gets_to_end
+        File.open(path, "w") { |outf|
+          outf << file.gets_to_end
         }
       end
     end
   end
 
+  # Files that go in templates/
   class TemplateFiles < Expandable
     @@path = "templates"
     bake_folder "templates", "."
   end
 
+  # Files that go in shortcodes/
   class ShortcodesFiles < Expandable
     @@path = "shortcodes"
     bake_folder "shortcodes", "."
   end
 
+  # Files that go in assets/
   class AssetsFiles < Expandable
     @@path = "assets"
     bake_folder "assets", "."
   end
 
+  # Files that go in the root of the site
   class RootFiles < Expandable
     @@path = "."
     bake_folder "defaults", "."

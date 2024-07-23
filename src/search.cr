@@ -4,8 +4,8 @@ module Search
     parser = Lexbor::Parser.new(File.read(input))
     return nil if parser.nodes("main").to_a.empty?
     text = parser.nodes(:_text) \
-      .select(&.parents.all? { |n| n.visible? && !n.object? && !n.is_tag_noindex? }) \
-        .select(&.parents.any? { |n| n.tag_name == "main" }) \
+      .select(&.parents.all? { |node| node.visible? && !node.object? && !node.is_tag_noindex? }) \
+        .select(&.parents.any? { |node| node.tag_name == "main" }) \
           .map(&.tag_text).reject(&.blank?) \
             .map(&.strip.gsub(/\s{2,}/, " ")).join(" ")
     {

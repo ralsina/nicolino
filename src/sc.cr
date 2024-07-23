@@ -11,12 +11,12 @@ module Sc
     end
     args = Hash(String | Int32, String).new
     i = 0
-    sc.args.each do |a|
-      if a.name == ""
-        args["#{i}"] = a.value
+    sc.args.each do |arg|
+      if arg.name == ""
+        args["#{i}"] = arg.value
         i += 1
       else
-        args[a.name] = a.value
+        args[arg.name] = arg.value
       end
     end
     context["args"] = args

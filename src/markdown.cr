@@ -54,7 +54,7 @@ module Markdown
       Taxonomies::All.each do |taxo|
         next unless taxo.@posts.includes? self
         result[taxo.link] = taxo.@terms.values.select \
-           { |t| t.@posts.includes? self }.map(&.link)
+           { |term| term.@posts.includes? self }.map(&.link)
       end
       result
     end
@@ -142,10 +142,10 @@ module Markdown
     def full_shortcodes_list(text)
       sc_list = Shortcodes.parse(text)
       final_list = sc_list.shortcodes
-      sc_list.shortcodes.each do |sc|
-        if sc.markdown? # Recurse for nested shortcodes
+      sc_list.shortcodes.each do |scode|
+        if scode.markdown? # Recurse for nested shortcodes
           # If there are nested shortcodes, handle them
-          final_list += full_shortcodes_list(sc.data)
+          final_list += full_shortcodes_list(scode.data)
         end
       end
       Set.new(final_list).to_a
@@ -207,19 +207,19 @@ module Markdown
 
       # FIXME: context needs stuff
       context = Crinja::Context.new
-      sc_list.shortcodes.reverse_each do |sc|
-        if sc.markdown? # Recurse for nested shortcodes
+      sc_list.shortcodes.reverse_each do |scode|
+        if scode.markdown? # Recurse for nested shortcodes
           # If there are nested shortcodes, handle them
-          sc.data = _replace_shortcodes(sc.data) unless Shortcodes.parse(sc.data).shortcodes.empty?
+          scode.data = _replace_shortcodes(scode.data) unless Shortcodes.parse(scode.data).shortcodes.empty?
         end
-        middle = Sc.render_sc(sc, context)
-        if sc.position > 0
-          text = text[...sc.position] +
+        middle = Sc.render_sc(scode, context)
+        if scode.position > 0
+          text = text[...scode.position] +
                  middle +
-                 text[(sc.position + sc.whole.size)..]
+                 text[(scode.position + scode.whole.size)..]
         else
           text = middle +
-                 text[(sc.position + sc.whole.size)..]
+                 text[(scode.position + scode.whole.size)..]
         end
       end
       text
@@ -275,7 +275,7 @@ module Markdown
       result = ["conf.yml", "kv://templates/page.tmpl"]
       result << source
       result << "kv://#{template}"
-      result += shortcodes.reject(&.is_inline?).map { |sc| "kv://shortcodes/#{sc.name}.tmpl" }
+      result += shortcodes.reject(&.is_inline?).map { |scode| "kv://shortcodes/#{scode.name}.tmpl" }
       result
     end
   end

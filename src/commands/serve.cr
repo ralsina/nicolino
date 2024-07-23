@@ -2,6 +2,7 @@ require "./command.cr"
 
 module Nicolino
   module Commands
+    # nicolino serve comand
     struct Serve < Command
       @@name = "serve"
       @@doc = <<-DOC

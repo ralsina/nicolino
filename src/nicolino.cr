@@ -21,7 +21,7 @@ require "yaml"
 
 VERSION = "0.1.0"
 
-def create_tasks
+def create_tasks # ameba:disable Metrics/CyclomaticComplexity
   # Load config file
   features = Set.new(Config.get("features").as_a)
 

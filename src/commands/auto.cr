@@ -64,14 +64,14 @@ DOC
             modified = Set(String).new
             Croupier::TaskManager.modified.each do |path|
               next if path.lchop? "kv://"
-              Croupier::TaskManager.depends_on(path).each do |p|
-                next unless p.lchop? "output/"
-                modified << Utils.path_to_link(p)
+              Croupier::TaskManager.depends_on(path).each do |dep|
+                next unless dep.lchop? "output/"
+                modified << Utils.path_to_link(dep)
               end
             end
-            modified.each do |p|
-              Log.info { "LiveReload: #{p}" }
-              live_reload.send_reload(path: p, liveCSS: p.ends_with?(".css"))
+            modified.each do |path|
+              Log.info { "LiveReload: #{path}" }
+              live_reload.send_reload(path: path, liveCSS: path.ends_with?(".css"))
             end
           }
         )
