@@ -48,6 +48,9 @@ dependencies:
     github: ralsina/oplog
   polydocopt:
     github: ralsina/polydocopt
+  cr-wren:
+    github: ralsina/cr-wren
+    branch: main
 
 development_dependencies:
   ameba:

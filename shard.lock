@@ -20,6 +20,10 @@ shards:
     git: https://github.com/ralsina/cr-discount.git
     version: 0.2.0+git.commit.91ddb70506fa03fd3025b8970f08c9954649d6e2
 
+  cr-wren:
+    git: https://github.com/ralsina/cr-wren.git
+    version: 0.1.0+git.commit.8dcd8e7448788feffa79e0f9a4cff3f0a4e4ecc1
+
   crinja:
     git: https://github.com/straight-shoota/crinja.git
     version: 0.8.1
