@@ -2,5 +2,5 @@
 
 set -e
 
-nicolino -B
+nicolino build -B
 rsync -rav output/* ralsina@pinky:/data/websites/nicolino.ralsina.me/

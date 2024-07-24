@@ -6,6 +6,7 @@ module Handler
   # A filtering IO for HTTP server contexts
   # Takes a FilterProc which takes the next handler's
   # output and modifies it
+
   class Filter < IO
     def initialize(
       @proc : FilterProc,
