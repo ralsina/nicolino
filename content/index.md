@@ -61,7 +61,7 @@ library and a few choice dependencies.
 * Blog posts compiled from markdown, with index page (see [/posts](/posts) )
 * RSS feed of latest posts (see [/rss.xml](/rss.xml) )
 * Taxonomies (like tags, author, etc.) with their own indexes and feeds
-* Images are resized and thumbnailed (see [nicolino.png](/nicolino.png) and [nicolino.thumb.png](/nicolino.thumb.png) )
+* Images are resized and thumbnailed (see [nicolino.jpg](/nicolino.jpg) and [nicolino.thumb.jpg](/nicolino.thumb.jpg) )
 * Jinja-like [templates](/templates.html)
 * VenoBox based lightbox for images (click on Nicolino above)
 * PicoCSS based theme (needs work, of course)
