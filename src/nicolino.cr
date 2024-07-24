@@ -121,7 +121,7 @@ def run(
   keep_going = false,
   dry_run = false,
   run_all = false,
-  fast_mode = false,
+  fast_mode = false
 )
   # When doing auto() this is called twice, no need to scan tasks
   # twice

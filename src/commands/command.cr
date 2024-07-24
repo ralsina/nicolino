@@ -2,6 +2,7 @@ require "colorize"
 require "log"
 require "oplog"
 require "polydocopt"
+require "progress_bar"
 
 module Nicolino
   module Commands
@@ -12,6 +13,23 @@ module Nicolino
         Config.config(@options.fetch("-c", "conf.yml").as(String))
         verbosity = @options.fetch("-v", 4).to_s.to_i
         verbosity = 0 if @options["-q"] == 1
+        progress = @options.fetch("--progress", nil)
+        if progress
+          verbosity = 0
+          theme = Progress::Theme.new(
+            complete: "-",
+            incomplete: "•".colorize(:blue).to_s,
+            progress_head: "C".colorize(:yellow).to_s,
+            alt_progress_head: "c".colorize(:yellow).to_s
+          )
+          bar = Progress::Bar.new(theme: theme)
+          done = 0
+          Croupier::TaskManager.progress_callback = ->(_id : String) {
+            done += 1
+            new_tick = ((done*100)/Croupier::TaskManager.tasks.size).to_i
+            bar.tick(new_tick - bar.current)
+          }
+        end
         Oplog.setup(verbosity)
       end
 
