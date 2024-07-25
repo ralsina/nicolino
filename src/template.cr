@@ -66,6 +66,8 @@ module Templates
 
   Env = Crinja.new
   Env.loader = StoreLoader.new
+  # The cache seems to make no difference performance-wise
+  Env.cache = Crinja::TemplateCache::InMemory.new
 
   # Convenience filters
   Env.filters["link"] = Crinja.filter() do
