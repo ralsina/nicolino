@@ -47,6 +47,11 @@ site:
   description: "This is the demo site for Nicolino"
   url: "https://example.com"
   footer: "Default Nicolino Theme"
+  # This is a list of items to show in the navigation bar.
+  # In the default theme they are shown at the right of
+  # the title.
+  nav_items:
+    - "somehtmlhere"
 ```
 
 ## Available Templates

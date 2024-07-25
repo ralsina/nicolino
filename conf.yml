@@ -8,6 +8,9 @@ site:
   description: "Nicolino: a static site generator"
   url: "https://nicolino.ralsina.me"
   footer: "Default Nicolino Theme"
+  # This is a list of items to show in the navigation bar.
+  # In the default theme they are shown at the right of
+  # the title.
   nav_items:
     - "<span role='button' class='outline'><a href='https://github.com/ralsina/nicolino'>GitHub</a></span>"
 # Some options affecting output
