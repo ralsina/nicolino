@@ -1,5 +1,7 @@
 require "./utils"
 
+# FIXME: Get rid of the named tuples
+
 module Taxonomies
   include Utils
 

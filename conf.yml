@@ -8,6 +8,8 @@ site:
   description: "Nicolino: a static site generator"
   url: "https://nicolino.ralsina.me"
   footer: "Default Nicolino Theme"
+  nav_items:
+    - "<span role='button' class='outline'><a href='https://github.com/ralsina/nicolino'>GitHub</a></span>"
 # Some options affecting output
 options:
   # Format HTML nicely. Makes it larger but easier to read

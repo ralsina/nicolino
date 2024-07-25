@@ -99,9 +99,9 @@
                 setTheme()
             " />
         </li>
-        <li>
-	  <a href="https://github.com/ralsina/nicolino">GitHub</a>
-        </li>
+        {% for item in site_nav_items %}
+        <li>{{item}}</li>
+        {% endfor %}
       </ul>
     </nav>
   </header>
