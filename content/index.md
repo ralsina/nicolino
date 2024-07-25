@@ -60,7 +60,7 @@ library and a few choice dependencies.
 * Many other input formats via [pandoc](https://pandoc.org/)
 * Blog posts compiled from markdown, with index page (see [/posts](/posts) )
 * RSS feed of latest posts (see [/rss.xml](/rss.xml) )
-* Taxonomies (like tags, author, etc.) with their own indexes and feeds
+* Taxonomies (like [tags](/tags), author, etc.) with their own indexes and feeds
 * Images are resized and thumbnailed (see [nicolino.jpg](/nicolino.jpg) and [nicolino.thumb.jpg](/nicolino.thumb.jpg) )
 * Jinja-like [templates](/templates.html)
 * VenoBox based lightbox for images (click on Nicolino above)
