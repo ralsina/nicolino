@@ -198,6 +198,7 @@ module Markdown
 
     def _replace_shortcodes(text : String) : String
       sc_list = Shortcodes.parse(text)
+      return text if sc_list.shortcodes.empty?
       sc_list.errors.each do |e|
         # TODO: show actual error
         Log.error { Shortcodes.nice_error(e, text) }
@@ -210,7 +211,7 @@ module Markdown
       sc_list.shortcodes.reverse_each do |scode|
         if scode.markdown? # Recurse for nested shortcodes
           # If there are nested shortcodes, handle them
-          scode.data = _replace_shortcodes(scode.data) unless Shortcodes.parse(scode.data).shortcodes.empty?
+          scode.data = _replace_shortcodes(scode.data)
         end
         middle = Sc.render_sc(scode, context)
         if scode.position > 0
