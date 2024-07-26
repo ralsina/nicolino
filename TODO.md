@@ -31,20 +31,18 @@
   * Draft / future / expired
 
 * Code QoL
-  * Figure out per-command flags or migrate off commander
-    (at-grandpa/clim looks good)
+  * ✅ Figure out per-command flags or migrate off commander
   * Need better date parser, like dateparser from Python
   * Add slug-for-url support?
   * Port thumbnail shortcode from Nikola
   * Support arbitrary command pipelines
-  * Plugins using veelenga/lua.cr? anyolite/mruby? What plugins? Crinja custom filters?
   * Implement something like nikola's continuous import (different binary?)
   * Reorganize theme so it's self contained
   * Add custom filters using wren (see <https://forum.crystal-lang.org/t/cr-wren-a-binding-to-the-wren-language/6951/3>)
 
 * Misc
   * The markdown compiler doesn't force language-foo class on code blocks
-  * Fix search box
+  * ✅ Fix search box
   * Write folder_index template
   * Support video in galleries (I have `.mov` files there!)
 
@@ -60,7 +58,7 @@
 * ✅ Image gallery index / Generic folder index
 * ✅ Validator for posts
 * ✅ Do not *always* parse shortcode replacements as markdown (for pandoc)
-  {{< >}} shortcodes are not markdown
+  ✅ {{< >}} shortcodes are not markdown
 * ✅ Better document parsing errors
 * ✅ Add progress bar using mgomes/progress_bar (requires croupier work)
 * ✅ Taxonomies have no titles
