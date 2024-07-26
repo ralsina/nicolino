@@ -20,14 +20,14 @@ module Nicolino
             complete: "-",
             incomplete: "•".colorize(:blue).to_s,
             progress_head: "C".colorize(:yellow).to_s,
-            alt_progress_head: "c".colorize(:yellow).to_s
+            alt_progress_head: "c".colorize(:yellow).to_s,
           )
           bar = Progress::Bar.new(theme: theme)
           done = 0
           Croupier::TaskManager.progress_callback = ->(_id : String) {
             done += 1
-            new_tick = ((done*100)/Croupier::TaskManager.tasks.size).to_i
-            bar.tick(new_tick - bar.current)
+            step = done * 100.0 / Croupier::TaskManager.tasks.size - bar.current
+            bar.tick(step) if step >= 1
           }
         end
         Oplog.setup(verbosity)
