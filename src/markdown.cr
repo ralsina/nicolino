@@ -298,8 +298,8 @@ module Markdown
           inputs: post.dependencies,
           mergeable: false,
           proc: Croupier::TaskProc.new {
-            # FIXME: only call load in auto mode, save 10% of markdown benchmark
-            post.load lang # Need to refresh post contents
+            # Need to refresh post contents
+            post.load lang if Croupier::TaskManager.auto_mode?
             Log.info { "👉 #{post.output lang}" }
             html = Render.apply_template("templates/page.tmpl",
               {"content" => post.rendered(lang), "title" => post.title(lang)})
