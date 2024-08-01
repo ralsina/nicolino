@@ -8,6 +8,12 @@ site:
   description: "Nicolino: a static site generator"
   url: "https://nicolino.ralsina.me"
   footer: "Default Nicolino Theme"
+  # These are used to generate a base16 dark and light color
+  # scheme in CSS, which can be imported in custom.css
+  # Also, to choose the HighlightJS color schemes for syntax
+  # highlighting.
+  dark_scheme: "unikitty-dark"
+  light_scheme: "unikitty-light"
   # This is a list of items to show in the navigation bar.
   # In the default theme they are shown at the right of
   # the title.
@@ -74,12 +80,13 @@ taxonomies:
 # Features you want to enable are listed here
 features:
   - assets
-  - posts
+  - base16
+  - folder_indexes
+  - galleries
+  - images
   - pages
   - pandoc
-  - taxonomies
-  - images
-  - galleries
-  - sitemap
+  - posts
   - search
-  - folder_indexes
+  - sitemap
+  - taxonomies

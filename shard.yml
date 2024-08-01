@@ -42,6 +42,9 @@ dependencies:
   progress_bar:
     github: mgomes/progress_bar
     branch: master
+  sixteen:
+    github: ralsina/sixteen
+    branch: main
   vips:
     github: naqvis/crystal-vips
   oplog:

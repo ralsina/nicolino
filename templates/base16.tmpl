@@ -1,0 +1,32 @@
+/* These are just a tiny fraction of the pico color variables,
+   will add more as I know what they do and which semantic
+   value from base16 may make sense */
+
+/* Theme: {{dark.scheme_name}} */
+/* Author: {{dark.scheme_author}} */
+
+[data-theme=dark] {
+    --pico-background-color: #{{dark.base00_hex}}; /* Default backround */
+    --pico-color: #{{dark.base05_hex}}; /* Default foreground */
+    --pico-text-selection-color: #{{dark.base02_hex}}; /* Selection background */
+    --pico-primary: #{{dark.base0D_hex}}; /* Headings */
+    --pico-primary-underline: var(--pico-primary);
+    --pico-primary-background: #{{dark.base02_hex}};
+    --pico-primary-hover: #{{dark.base09_hex}}; /* Link URL */
+    --pico-primary-hover-underline: var(--pico-primary-hover);
+}
+
+/* Theme: {{light.scheme_name}} */
+/* Author: {{light.scheme_author}} */
+
+:root:not([data-theme=dark]),
+[data-theme=light] {
+    --pico-background-color: #{{light.base00_hex}}; /* Default backround */
+    --pico-color: #{{light.base05_hex}}; /* Default foreground */
+    --pico-text-selection-color: #{{light.base02_hex}}; /* Selection background */
+    --pico-primary: #{{light.base0D_hex}}; /* Headings */
+    --pico-primary-underline: var(--pico-primary);
+    --pico-primary-background: #{{light.base02_hex}};
+    --pico-primary-hover: #{{light.base09_hex}}; /* Link URL */
+    --pico-primary-hover-underline: var(--pico-primary-hover);
+}

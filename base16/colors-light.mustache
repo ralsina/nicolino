@@ -1,0 +1,15 @@
+/* These are just a tiny fraction of the pico color variables,
+   will add more as I know what they do and which semantic
+   value from base16 may make sense */
+
+:root:not([data-theme=dark]),
+[data-theme=light] {
+    --pico-background-color: #{{base00-hex}}; /* Default backround */
+    --pico-color: #{{base05-hex}}; /* Default foreground */
+    --pico-text-selection-color: #{{base02-hex}}; /* Selection background */
+    --pico-primary: #{{base0D-hex}}; /* Headings */
+    --pico-primary-underline: var(--pico-primary);
+    --pico-primary-background: #{{base02-hex}};
+    --pico-primary-hover: #{{base09-hex}}; /* Link URL */
+    --pico-primary-hover-underline: var(--pico-primary-hover);
+}

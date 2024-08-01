@@ -1,3 +1,4 @@
+@import url("color_scheme.css");
 body {
   max-width: 60em;
   margin: 0 auto;
@@ -22,8 +23,9 @@ figure > a > img {
   border-radius: .5em;
 }
 
-code, code>* {
+code, code>*, pre>code {
   font-family: monospace !important;
+  font-size: 1.1em;
 }
 
 summary.contents-heading {

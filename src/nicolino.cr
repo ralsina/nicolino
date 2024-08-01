@@ -1,5 +1,6 @@
 require "./assets"
 require "./commands/*"
+require "./base16"
 require "./config"
 require "./gallery"
 require "./html"
@@ -40,6 +41,11 @@ def create_tasks # ameba:disable Metrics/CyclomaticComplexity
   # Copy assets/ to output/
   if features.includes? "assets"
     Assets.render
+  end
+
+  # Render custom color scheme
+  if features.includes? "base16"
+    Base16.render_base16
   end
 
   # Render posts and RSS feed

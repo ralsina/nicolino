@@ -10,6 +10,7 @@
 
 ## Things that could be done
 
+* ✅ Base16 support for quick theme personalization
 * ✅ Switch from rucksack to baked-file-system (more reliable)
 * Link preprocessor
 
