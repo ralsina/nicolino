@@ -32,10 +32,6 @@ shards:
     git: https://github.com/ralsina/croupier.git
     version: 0.5.1+git.commit.5477f23608572852ec7f9f1e692497a0e1251ec9
 
-  crustache:
-    git: https://github.com/makenowjust/crustache.git
-    version: 2.4.4
-
   crystalline:
     git: https://github.com/jtomschroeder/crystalline.git
     version: 0.1.0+git.commit.e614f1c8b0a321fa74237db3c45bbb36aa3898e2
@@ -86,7 +82,7 @@ shards:
 
   sixteen:
     git: https://github.com/ralsina/sixteen.git
-    version: 0.1.0+git.commit.f83764cb0de919005ae27f4da39d29e1b2459394
+    version: 0.3.0+git.commit.854ce3e0376c93f129dcb7a4afb4d26c9bc27a4e
 
   totem:
     git: https://github.com/icyleaf/totem.git
