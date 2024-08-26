@@ -3,15 +3,15 @@ clean:
 	rm /bin/nicolino shard.lock lib -rf
 test: ameba --all --fix
 bin:
-	shards build -v -d --error-trace
+	shards build -d --error-trace
 release:
-	shards build -v --release
+	shards build --release
 	strip bin/nicolino
 mt:
-	shards build -v -Dpreview_mt -d
+	shards build -Dpreview_mt -d
 	strip bin/nicolino
 mt-release:
-	shards build -v --release -Dpreview_mt
+	shards build --release -Dpreview_mt
 	strip bin/nicolino
 lint:
 	bin/ameba --all --fix
