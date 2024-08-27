@@ -16,4 +16,8 @@ mt-release:
 lint:
 	bin/ameba --all --fix
 
+changelog:
+	git cliff -o --sort=newest
+
+
 .PHONY: clean all test bin lint
