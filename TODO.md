@@ -3,6 +3,7 @@
 ## Bugs
 
 * Auto mode only detects template changes ONCE (changes in posts are OK)
+* In multithreaded mode sometimes it fails with an error about creating output/
 * ✅ TOC is always shown?
 * ✅ Shortcodes are parsed a bazillion times
 * ✅ Nested shortcodes are not in dependencies
