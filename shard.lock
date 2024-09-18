@@ -9,8 +9,8 @@ shards:
     version: 1.6.1
 
   baked_file_system:
-    git: https://github.com/schovi/baked_file_system.git
-    version: 0.10.0
+    git: https://github.com/ralsina/baked_file_system.git
+    version: 0.10.0+git.commit.beb373124c7a235cfb9cd94e36849d8168eaa04b
 
   commander:
     git: https://github.com/mrrooijen/commander.git
@@ -18,7 +18,7 @@ shards:
 
   cr-discount:
     git: https://github.com/ralsina/cr-discount.git
-    version: 0.2.0+git.commit.1949a03dbf5c7c54c84510901e12904a4fb3cf09
+    version: 0.2.0+git.commit.4e31bb0ab7cdb07514d45769c2e363a4680dca80
 
   crinja:
     git: https://github.com/straight-shoota/crinja.git
@@ -30,7 +30,7 @@ shards:
 
   croupier:
     git: https://github.com/ralsina/croupier.git
-    version: 0.5.1+git.commit.5477f23608572852ec7f9f1e692497a0e1251ec9
+    version: 0.5.1+git.commit.0521b63b01378acc038dc5acd1d46ddf89b43b34
 
   crystalline:
     git: https://github.com/jtomschroeder/crystalline.git
@@ -78,11 +78,11 @@ shards:
 
   shortcodes:
     git: https://github.com/ralsina/shortcodes.git
-    version: 0.2.0+git.commit.4477d106d5e2adf246d137f6090350f40de5de6e
+    version: 0.2.0+git.commit.310c6536ce113d6b6562a49f90d8570bb432098e
 
   sixteen:
     git: https://github.com/ralsina/sixteen.git
-    version: 0.3.0+git.commit.854ce3e0376c93f129dcb7a4afb4d26c9bc27a4e
+    version: 0.3.1+git.commit.ceab99ad73b42dea82fa890c8607111c7d30ee9c
 
   totem:
     git: https://github.com/icyleaf/totem.git
