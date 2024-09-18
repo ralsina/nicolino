@@ -38,7 +38,8 @@ dependencies:
   cronic:
     github: nanobowers/cronic
   baked_file_system:
-    github: schovi/baked_file_system
+    github: ralsina/baked_file_system
+    branch: master
   progress_bar:
     github: mgomes/progress_bar
     branch: master
