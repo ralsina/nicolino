@@ -3,4 +3,4 @@
 set -e
 
 nicolino build -B
-rsync -rav output/* ralsina@pinky:/data/websites/nicolino.ralsina.me/
+rsync -rav output/* ralsina@rocky:/home/ralsina/web/websites/nicolino.ralsina.me/
