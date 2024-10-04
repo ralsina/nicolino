@@ -1,4 +1,4 @@
-require "vips"
+require "./thumb"
 
 module Image
   # An image to be processed
@@ -26,11 +26,7 @@ module Image
         mergeable: false) do
         Log.info { "👉 #{dest}" }
         Dir.mkdir_p(dest.parent)
-        img = Vips::Image.thumbnail(
-          src,
-          Config.options.image_large,
-          height: Config.options.image_thumb)
-        img.write_to_file(dest.to_s)
+        Images.thumb(src, dest.to_s, Config.options.image_large)
         nil
       end
       thumb_dest = Path[dest.parent, dest.stem + ".thumb" + dest.extension]
@@ -42,11 +38,7 @@ module Image
         mergeable: false) do
         Log.info { "👉 #{thumb_dest}" }
         Dir.mkdir_p(thumb_dest.parent)
-        img = Vips::Image.thumbnail(
-          src,
-          Config.options.image_thumb,
-          height: Config.options.image_thumb)
-        img.write_to_file(thumb_dest.to_s)
+        Images.thumb(src, thumb_dest.to_s, Config.options.image_thumb)
         nil
       end
     end

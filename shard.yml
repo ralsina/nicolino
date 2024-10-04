@@ -47,6 +47,8 @@ dependencies:
     branch: main
   vips:
     github: naqvis/crystal-vips
+  imgkit:
+    github: xtokio/imgkit
   oplog:
     github: ralsina/oplog
   polydocopt:

@@ -40,6 +40,10 @@ shards:
     git: https://github.com/chenkovsky/docopt.cr.git
     version: 0.2.0+git.commit.620fce4f334ff15d7321e5ecb6665ad258fe9297
 
+  imgkit:
+    git: https://github.com/xtokio/imgkit.git
+    version: 0.1.0+git.commit.649234449babf2173e046436f78fa128104da475
+
   inotify:
     git: https://github.com/petoem/inotify.cr.git
     version: 1.0.3
