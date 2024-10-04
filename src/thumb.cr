@@ -5,7 +5,8 @@
 {% if flag?(:novips) %}
   require "pluto"
   require "pluto/format/jpeg"
-  require "pluto/format/png"
+  require "pluto/format/stumpy"
+  require "stumpy_png"
 {% else %}
   require "vips"
 {% end %}
@@ -15,18 +16,20 @@ module Images
 
   def thumb(input : String, output : String, size : Int32)
     {% if flag?(:novips) %}
-      image = File.open(input) do |file|
-        if File.extname(input).downcase == "png"
-          Pluto::ImageRGBA.from_png(file)
-        else
+      if File.extname(input).downcase == "png"
+        canvas = StumpyPNG.read(input)
+        image = Pluto::ImageRGBA.from_stumpy(canvas)
+      else
+        image = File.open(input) do |file|
           Pluto::ImageRGBA.from_jpeg(file)
         end
       end
+
       image.bilinear_resize!(size, size)
 
       io = IO::Memory.new
       if File.extname(input).downcase == "png"
-        image.to_png(io)
+        StumpyPNG.write(image.to_stumpy, io)
       else
         image.to_jpeg(io)
       end

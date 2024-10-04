@@ -13,7 +13,7 @@
 
 * Implement version command
 * Use modern tooling
-* Make static build possible
+* ✅ Make static build possible
 * ✅ Base16 support for quick theme personalization
 * ✅ Switch from rucksack to baked-file-system (more reliable)
 * Link preprocessor

@@ -47,6 +47,8 @@ dependencies:
     github: naqvis/crystal-vips
   pluto:
     github: phenopolis/pluto
+  stumpy_png:
+    github: stumpycr/stumpy_png
   oplog:
     github: ralsina/oplog
   polydocopt:

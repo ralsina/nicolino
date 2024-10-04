@@ -81,3 +81,11 @@ tasks:
     always_run: true
     commands: |
       rm -rf shard.lock bin lib
+
+  static:
+    outputs:
+      - bin/hace-{{name}}-linux-amd64
+      - bin/hace-{{name}}-linux-arm64
+    commands: |
+      hace clean
+      ./build_static.sh
