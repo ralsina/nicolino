@@ -30,7 +30,7 @@ shards:
 
   croupier:
     git: https://github.com/ralsina/croupier.git
-    version: 0.5.1+git.commit.0521b63b01378acc038dc5acd1d46ddf89b43b34
+    version: 0.5.4
 
   crystalline:
     git: https://github.com/jtomschroeder/crystalline.git

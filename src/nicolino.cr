@@ -20,7 +20,7 @@ require "croupier"
 require "live_reload"
 require "yaml"
 
-VERSION = "0.1.0"
+VERSION = {{ `shards version #{__DIR__}`.chomp.stringify }}
 
 def create_tasks # ameba:disable Metrics/CyclomaticComplexity
   # Load config file

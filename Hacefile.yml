@@ -1,0 +1,83 @@
+variables:
+  FLAGS: "-d --error-trace -Dpreview_mt"
+  NAME: "nicolino"
+
+tasks:
+  build:
+    default: true
+    dependencies:
+      - src
+      - shard.lock
+      - shard.yml
+      - Hacefile.yml
+    outputs:
+      - bin/{{NAME}}
+    commands: |
+      shards build {{FLAGS}}
+
+  get-deps:
+    dependencies:
+      - shard.yml
+    outputs:
+      - shard.lock
+    commands: |
+      shards install
+
+  build-release:
+    phony: true
+    always_run: true
+    commands: |
+      rm bin/nicolino
+      hace build FLAGS="--release -Dpreview_mt"
+
+  install:
+    phony: true
+    always_run: true
+    dependencies:
+      - bin/hace
+    commands: |
+      rm ${HOME}/.local/bin/{{NAME}}
+      cp bin/hace ${HOME}/.local/bin/{{NAME}}
+
+  lint:
+    dependencies:
+      - src
+      - shard.lock
+      - shard.yml
+    commands: |
+      crystal tool format src/*.cr
+      bin/ameba --fix
+    always_run: true
+    phony: true
+
+  deploy:
+    dependencies:
+      - bin/nicolino
+      - src
+      - shard.lock
+      - shard.yml
+      - content
+    commands: |
+      rm -rf content/bench/
+      rm -rf output/
+      bin/nicolino build -B
+      rsync -rzav --delete output/* ralsina@rocky:/data/stacks/web/websites/nicolino.ralsina.me/
+    outputs:
+      - output/sitemap.xml
+
+  pre-commit:
+    default: true
+    outputs:
+      - .git/hooks/commit-msg
+      - .git/hooks/pre-commit
+    dependencies:
+      - .pre-commit-config.yaml
+    commands: |
+      pre-commit install --hook-type commit-msg
+      pre-commit install
+
+  clean:
+    phony: true
+    always_run: true
+    commands: |
+      rm -rf shard.lock bin lib
