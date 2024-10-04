@@ -3,7 +3,9 @@
 # imgkit based thumbnailer.
 
 {% if flag?(:novips) %}
-  require "imgkit"
+  require "pluto"
+  require "pluto/format/jpeg"
+  require "pluto/format/png"
 {% else %}
   require "vips"
 {% end %}
@@ -13,13 +15,23 @@ module Images
 
   def thumb(input : String, output : String, size : Int32)
     {% if flag?(:novips) %}
-      img = ImgKit::Image.new(input)
-      if img.width > img.height
-        img.resize(width: size)
-      else
-        img.resize(height: size)
+      image = File.open(input) do |file|
+        if File.extname(input).downcase == "png"
+          Pluto::ImageRGBA.from_png(file)
+        else
+          Pluto::ImageRGBA.from_jpeg(file)
+        end
       end
-      img.save(output)
+      image.bilinear_resize!(size, size)
+
+      io = IO::Memory.new
+      if File.extname(input).downcase == "png"
+        image.to_png(io)
+      else
+        image.to_jpeg(io)
+      end
+      io.rewind
+      File.write(output, io)
     {% else %}
       Vips::Image.thumbnail(
         input,

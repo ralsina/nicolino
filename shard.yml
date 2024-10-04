@@ -20,8 +20,6 @@ dependencies:
     branch: master
   croupier:
     github: ralsina/croupier
-  commander:
-    github: mrrooijen/commander
   live_reload:
     github: bcardiff/live_reload.cr
   lexbor:
@@ -47,8 +45,8 @@ dependencies:
     branch: main
   vips:
     github: naqvis/crystal-vips
-  imgkit:
-    github: xtokio/imgkit
+  pluto:
+    github: phenopolis/pluto
   oplog:
     github: ralsina/oplog
   polydocopt:

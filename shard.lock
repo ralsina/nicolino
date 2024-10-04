@@ -12,10 +12,6 @@ shards:
     git: https://github.com/ralsina/baked_file_system.git
     version: 0.10.0+git.commit.beb373124c7a235cfb9cd94e36849d8168eaa04b
 
-  commander:
-    git: https://github.com/mrrooijen/commander.git
-    version: 0.4.0
-
   cr-discount:
     git: https://github.com/ralsina/cr-discount.git
     version: 0.2.0+git.commit.4e31bb0ab7cdb07514d45769c2e363a4680dca80
@@ -39,10 +35,6 @@ shards:
   docopt:
     git: https://github.com/chenkovsky/docopt.cr.git
     version: 0.2.0+git.commit.620fce4f334ff15d7321e5ecb6665ad258fe9297
-
-  imgkit:
-    git: https://github.com/xtokio/imgkit.git
-    version: 0.1.0+git.commit.649234449babf2173e046436f78fa128104da475
 
   inotify:
     git: https://github.com/petoem/inotify.cr.git
@@ -68,6 +60,10 @@ shards:
     git: https://github.com/ralsina/oplog.git
     version: 0.1.0
 
+  pluto:
+    git: https://github.com/phenopolis/pluto.git
+    version: 1.0.1
+
   polydocopt:
     git: https://github.com/ralsina/polydocopt.git
     version: 0.1.0+git.commit.dd5c96707e38681d0f562f27ce413be5ccb88bc9
@@ -87,6 +83,10 @@ shards:
   sixteen:
     git: https://github.com/ralsina/sixteen.git
     version: 0.3.1+git.commit.ceab99ad73b42dea82fa890c8607111c7d30ee9c
+
+  stumpy_core:
+    git: https://github.com/stumpycr/stumpy_core.git
+    version: 1.9.1
 
   totem:
     git: https://github.com/icyleaf/totem.git
