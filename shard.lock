@@ -1,0 +1,97 @@
+version: 2.0
+shards:
+  RSS:
+    git: https://github.com/ralsina/rss.cr.git
+    version: 0.1.1+git.commit.6f74fb4f3d312babe4f9cebec4a97cf4330023a5
+
+  baked_file_system:
+    git: https://github.com/ralsina/baked_file_system.git
+    version: 0.10.0+git.commit.beb373124c7a235cfb9cd94e36849d8168eaa04b
+
+  cr-discount:
+    git: https://github.com/ralsina/cr-discount.git
+    version: 0.2.0+git.commit.4e31bb0ab7cdb07514d45769c2e363a4680dca80
+
+  crinja:
+    git: https://github.com/straight-shoota/crinja.git
+    version: 0.8.1
+
+  cronic:
+    git: https://github.com/nanobowers/cronic.git
+    version: 0.1.0+git.commit.a35d80aa61180e6e4d50f36b38c4e3c0ddbfd297
+
+  croupier:
+    git: https://github.com/ralsina/croupier.git
+    version: 0.5.4
+
+  crystalline:
+    git: https://github.com/jtomschroeder/crystalline.git
+    version: 0.1.0+git.commit.e614f1c8b0a321fa74237db3c45bbb36aa3898e2
+
+  docopt:
+    git: https://github.com/chenkovsky/docopt.cr.git
+    version: 0.2.0+git.commit.620fce4f334ff15d7321e5ecb6665ad258fe9297
+
+  inotify:
+    git: https://github.com/petoem/inotify.cr.git
+    version: 1.0.3
+
+  kiwi:
+    git: https://github.com/ralsina/kiwi.git
+    version: 0.1.0+git.commit.65059b87771238593a28b2b8b9fdf77d8e2b9e89
+
+  lexbor:
+    git: https://github.com/kostya/lexbor.git
+    version: 3.2.0
+
+  live_reload:
+    git: https://github.com/bcardiff/live_reload.cr.git
+    version: 0.1.0
+
+  number_parser:
+    git: https://github.com/mhib/number_parser.git
+    version: 0.1.0
+
+  oplog:
+    git: https://github.com/ralsina/oplog.git
+    version: 0.1.1
+
+  pluto:
+    git: https://github.com/phenopolis/pluto.git
+    version: 1.0.1
+
+  polydocopt:
+    git: https://github.com/ralsina/polydocopt.git
+    version: 0.1.0+git.commit.dd5c96707e38681d0f562f27ce413be5ccb88bc9
+
+  popcorn:
+    git: https://github.com/icyleaf/popcorn.git
+    version: 0.3.0
+
+  progress_bar:
+    git: https://github.com/mgomes/progress_bar.git
+    version: 1.0.1+git.commit.d8d741d42f55f91b9c51f8551bf32abfc56e0ec1
+
+  shortcodes:
+    git: https://github.com/ralsina/shortcodes.git
+    version: 0.2.0+git.commit.310c6536ce113d6b6562a49f90d8570bb432098e
+
+  sixteen:
+    git: https://github.com/ralsina/sixteen.git
+    version: 0.3.1+git.commit.ceab99ad73b42dea82fa890c8607111c7d30ee9c
+
+  stumpy_core:
+    git: https://github.com/stumpycr/stumpy_core.git
+    version: 1.9.1
+
+  stumpy_png:
+    git: https://github.com/stumpycr/stumpy_png.git
+    version: 5.0.1
+
+  totem:
+    git: https://github.com/icyleaf/totem.git
+    version: 0.7.0
+
+  vips:
+    git: https://github.com/naqvis/crystal-vips.git
+    version: 0.1.6
