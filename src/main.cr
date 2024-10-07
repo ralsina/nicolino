@@ -1,7 +1,7 @@
 require "./commands/*"
 require "./*"
 
-exit Polydocopt.main("faaso", ["--help"]) if ARGV.empty?
+exit Polydocopt.main("nicolino", ["--help"]) if ARGV.empty?
 cmdname = ARGV[0]
 
 if cmdname == "version"
