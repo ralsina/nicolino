@@ -15,6 +15,12 @@ All notable changes to this project will be documented in this file.
 - Use fork of baked_file_system
 - Make static build work
 - Add do_release script
+- Lock versions
+- ARM static build fails
+
+### Bump
+
+- Release v0.2.1
 
 ### Chore
 

@@ -34,10 +34,10 @@ tasks:
     phony: true
     always_run: true
     dependencies:
-      - bin/hace
+      - bin/{{name}}
     commands: |
       rm ${HOME}/.local/bin/{{NAME}}
-      cp bin/hace ${HOME}/.local/bin/{{NAME}}
+      cp bin/{{name}} ${HOME}/.local/bin/{{NAME}}
 
   lint:
     dependencies:
@@ -68,7 +68,7 @@ tasks:
   pre-commit:
     default: true
     outputs:
-      - .git/hooks/commit-msg
+      - .git/hooks/commit-msgstatic
       - .git/hooks/pre-commit
     dependencies:
       - .pre-commit-config.yaml
@@ -84,8 +84,8 @@ tasks:
 
   static:
     outputs:
-      - bin/hace-{{name}}-linux-amd64
-      - bin/hace-{{name}}-linux-arm64
+      - bin/{{NAME}}-static-linux-amd64
+      - bin/{{NAME}}-static-linux-arm64
     commands: |
       hace clean
       ./build_static.sh
