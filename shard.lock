@@ -33,8 +33,8 @@ shards:
     version: 0.1.0+git.commit.e614f1c8b0a321fa74237db3c45bbb36aa3898e2
 
   docopt:
-    git: https://github.com/chenkovsky/docopt.cr.git
-    version: 0.2.0+git.commit.620fce4f334ff15d7321e5ecb6665ad258fe9297
+    git: https://github.com/ralsina/docopt.cr.git
+    version: 0.2.1
 
   inotify:
     git: https://github.com/petoem/inotify.cr.git
@@ -66,7 +66,7 @@ shards:
 
   polydocopt:
     git: https://github.com/ralsina/polydocopt.git
-    version: 0.1.0+git.commit.dd5c96707e38681d0f562f27ce413be5ccb88bc9
+    version: 0.1.1
 
   popcorn:
     git: https://github.com/icyleaf/popcorn.git
@@ -78,11 +78,11 @@ shards:
 
   shortcodes:
     git: https://github.com/ralsina/shortcodes.git
-    version: 0.2.0+git.commit.310c6536ce113d6b6562a49f90d8570bb432098e
+    version: 0.2.2+git.commit.54e4cecfcbd4f4e6aedfe719f9d70820e83acbc3
 
   sixteen:
     git: https://github.com/ralsina/sixteen.git
-    version: 0.3.1+git.commit.ceab99ad73b42dea82fa890c8607111c7d30ee9c
+    version: 0.5.1+git.commit.25862ccbf0c567825a36ece117e4970ce7ab4ec9
 
   stumpy_core:
     git: https://github.com/stumpycr/stumpy_core.git
