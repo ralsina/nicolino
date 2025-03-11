@@ -84,7 +84,7 @@ DOC
         # Then run in auto mode
         Croupier::TaskManager.auto_run(arguments) # FIXME: check options
         loop do
-          sleep 1
+          ::sleep(1.second)
         end
         0
         # rescue ex : Exception
