@@ -33,7 +33,7 @@ DOC
       def run : Int32
         path = Path[@options["PATH"].as(String)]
         raise "Can't create #{path}, new is used to create data inside #{Config.options.content}" \
-          if path.parts[0] != Config.options.content.rstrip("/")
+           if path.parts[0] != Config.options.content.rstrip("/")
         if path.parts.size < 3
           kind = "page"
         else

@@ -44,6 +44,7 @@ module FolderIndexes
           # FIXME: find correct way to use contents of folder as dependencies
           inputs: inputs,
           mergeable: false,
+          mutex: "crinja",
           proc: Croupier::TaskProc.new {
             Log.info { "👉 #{index.@output}" }
             html = Render.apply_template("templates/page.tmpl",

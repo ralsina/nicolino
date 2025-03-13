@@ -67,6 +67,7 @@ module Gallery
         Croupier::Task.new(
           id: "gallery",
           output: post.output(lang),
+          mutex: "crinja",
           inputs: [
             "conf.yml",
             post.source(lang),
