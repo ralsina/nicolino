@@ -5,13 +5,13 @@ docker run --rm --privileged \
   multiarch/qemu-user-static \
   --reset -p yes
 
-# Build for AMD64
+# # Build for AMD64
 docker build . -f Dockerfile.static -t nicolino-builder
-docker run -ti --rm -v "$PWD":/app --user="$UID" nicolino-builder /bin/sh -c "cd /app && rm -rf lib shard.lock && shards build -Dnovips --release --without-development --static && strip bin/nicolino"
+docker run -ti --rm -v "$PWD":/app --user="$UID" nicolino-builder /bin/sh -c "cd /app && rm -rf lib && shards build -Dnovips --release --without-development --static && strip bin/nicolino"
 mv bin/nicolino bin/nicolino-static-linux-amd64
 
 # # Build for ARM64
 # Currently segfaults building dependencies
-# docker build . -f Dockerfile.static --platform linux/arm64 -t nicolino-builder
-# docker run -ti --rm -v "$PWD":/app --platform linux/arm64 --user="$UID" nicolino-builder /bin/sh -c "cd /app && rm -rf lib shard.lock && shards build -Dnovips --without-development --static && strip bin/nicolino"
-# mv bin/nicolino bin/nicolino-static-linux-arm64
+docker build . -f Dockerfile.static --platform linux/arm64 -t nicolino-builder
+docker run -ti --rm -v "$PWD":/app --platform linux/arm64 --user="$UID" nicolino-builder /bin/sh -c "cd /app && rm -rf lib && shards build -Dnovips --without-development --static && strip bin/nicolino"
+mv bin/nicolino bin/nicolino-static-linux-arm64
