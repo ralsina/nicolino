@@ -46,7 +46,7 @@ shards:
 
   lexbor:
     git: https://github.com/kostya/lexbor.git
-    version: 3.2.0
+    version: 3.3.2
 
   live_reload:
     git: https://github.com/bcardiff/live_reload.cr.git
