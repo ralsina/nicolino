@@ -27,7 +27,7 @@ tasks:
     phony: true
     always_run: true
     commands: |
-      rm bin/nicolino
+      hace clean
       hace build FLAGS="--release -Dpreview_mt"
 
   install:
