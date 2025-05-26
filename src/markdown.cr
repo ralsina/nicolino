@@ -297,7 +297,6 @@ module Markdown
           output: post.output(lang),
           inputs: post.dependencies,
           mergeable: false,
-          mutex: "crinja",
           proc: Croupier::TaskProc.new {
             # Need to refresh post contents
             post.load lang if Croupier::TaskManager.auto_mode?
@@ -342,7 +341,6 @@ module Markdown
       output: output.to_s,
       inputs: inputs,
       mergeable: false,
-      mutex: "crinja",
       proc: Croupier::TaskProc.new {
         Log.info { "👉 #{output}" }
         content = Templates::Env.get_template("templates/index.tmpl").render(
