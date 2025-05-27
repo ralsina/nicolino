@@ -48,7 +48,7 @@ module Taxonomies
       @title,
       @term_title,
       @path,
-      @posts : Array(Markdown::File)
+      @posts : Array(Markdown::File),
     )
       @posts.each do |post|
         post_terms = post.metadata.fetch(@name, nil)

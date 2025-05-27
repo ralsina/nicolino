@@ -9,7 +9,7 @@ module Handler
   class Filter < IO
     def initialize(
       @proc : FilterProc,
-      @context : HTTP::Server::Context
+      @context : HTTP::Server::Context,
     )
       @io = @context.response.output
     end

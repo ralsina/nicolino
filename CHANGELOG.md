@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2025-05-27
+
+### 🚀 Features
+
+- Make tasks that use crinja serialized
+
+### 🐛 Bug Fixes
+
+- Deprecated sleep usage
+- Yield correctly so tasks actually parallelize over threads/fibers
+- No more mutex
+
+### Chore
+
+- *(build)* Fixes
+
 ## [0.2.1] - 2024-10-07
 
 ### 🐛 Bug Fixes
