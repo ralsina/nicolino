@@ -14,6 +14,10 @@ All notable changes to this project will be documented in this file.
 - Yield correctly so tasks actually parallelize over threads/fibers
 - No more mutex
 
+### Bump
+
+- Release v0.3.0
+
 ### Chore
 
 - *(build)* Fixes
