@@ -114,10 +114,17 @@ def create_tasks # ameba:disable Metrics/CyclomaticComplexity
     Search.render
   end
 
-  # Make indexes for gallery folders without a index.* file
+  # Make indexes for other folders without a index.* file
   # TODO: enable for other places once we have a way to handle conflicts
   return unless features.includes? "folder_indexes"
-  indexes = FolderIndexes.read_all(galleries_path)
+
+  # Get exclude patterns from config if available
+  exclude_patterns = [] of String
+  if Config.get("folder_indexes.exclude_dirs")
+    exclude_patterns = Config.get("folder_indexes.exclude_dirs").as_a.map(&.as_s)
+  end
+
+  indexes = FolderIndexes.read_all(galleries_path, exclude_patterns)
   FolderIndexes.render(indexes)
 end
 

@@ -52,7 +52,7 @@ library and a few choice dependencies.
     the config is a single YAML file, and so on.
 
 =It *is* lightweight=
-    I intend to keep it below 2000 lines of code. It currently has around 1550.
+    I intend to keep it below 2000 lines of code. It currently has around 1900.
 
 # Features (So far)
 
@@ -70,7 +70,7 @@ library and a few choice dependencies.
   the pages in the browser
 * [Shortcodes](/shortcodes.html) somewhat compatible with Nikola and Hugo
 * Incremental builds, so it only rebuilds what's needed
-* Image galleries (see [Fancy Turning](/galleries/fancy-turning) )
+* Image galleries (see [our sample galleries.](/galleries/) )
 * Optional table of contents in posts/pages
 * code blocks with syntax highlighting using [HighlightJS](https://highlightjs.org/)
 

@@ -74,4 +74,12 @@ module Templates
     return Crinja::Value.new(%(<a href="#{target["link"]}">#{target["name"]}</a>)) unless target["link"].empty?
     return target["name"]
   end
+
+  # Convert image filename to thumbnail filename
+  Env.filters["thumb_url"] = Crinja.filter() do
+    filename = target.to_s
+    ext = File.extname(filename)
+    basename = filename.chomp(ext)
+    return Crinja::Value.new("#{basename}.thumb#{ext}")
+  end
 end

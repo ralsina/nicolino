@@ -1,0 +1,11 @@
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <g fill="#34495e" stroke="#2c3e50" stroke-width="0.5">
+    <!-- Background triangles -->
+    <polygon points="100,20 160,80 100,140" fill="#e67e22" opacity="0.8"/>
+    <polygon points="40,60 100,120 40,180" fill="#16a085" opacity="0.8"/>
+    <polygon points="160,60 100,120 160,180" fill="#8e44ad" opacity="0.8"/>
+    <!-- Overlapping triangles -->
+    <polygon points="100,40 140,80 100,120 60,80" fill="#ecf0f1" opacity="0.9"/>
+    <polygon points="100,80 140,120 100,160 60,120" fill="#bdc3c7" opacity="0.7"/>
+  </g>
+</svg>

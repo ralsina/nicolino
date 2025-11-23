@@ -26,7 +26,7 @@ shards:
 
   croupier:
     git: https://github.com/ralsina/croupier.git
-    version: 0.5.4+git.commit.f0caf20268391a4f356f261c7cadb064fa7405c9
+    version: 0.5.4+git.commit.3b786b9d5cc6e125f62c498a4efc0b5f15f29340
 
   crystalline:
     git: https://github.com/jtomschroeder/crystalline.git
@@ -34,11 +34,11 @@ shards:
 
   docopt:
     git: https://github.com/ralsina/docopt.cr.git
-    version: 0.2.1
+    version: 0.3.1
 
   inotify:
     git: https://github.com/petoem/inotify.cr.git
-    version: 1.0.3
+    version: 1.1.0+git.commit.5ecee05d4c0009c8aceb8983cef1ca5bde15f543
 
   kiwi:
     git: https://github.com/ralsina/kiwi.git
@@ -46,7 +46,7 @@ shards:
 
   lexbor:
     git: https://github.com/kostya/lexbor.git
-    version: 3.3.2+git.commit.a9098ef1e094f08ef3048e789b2675d024491852
+    version: 3.4.2+git.commit.cb43404acf5d42741c2d16d037a2344f68d23e91
 
   live_reload:
     git: https://github.com/bcardiff/live_reload.cr.git
@@ -82,7 +82,7 @@ shards:
 
   sixteen:
     git: https://github.com/ralsina/sixteen.git
-    version: 0.5.1+git.commit.25862ccbf0c567825a36ece117e4970ce7ab4ec9
+    version: 0.5.2+git.commit.4b373cbbe165b0f8d3b19593dbb00b7c7cd1caa9
 
   stumpy_core:
     git: https://github.com/stumpycr/stumpy_core.git

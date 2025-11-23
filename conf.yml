@@ -54,6 +54,12 @@ options:
   # 5: trace
   verbosity: 3
 
+# Options for folder_indexes feature
+folder_indexes:
+  # Directories to exclude from automatic index generation
+  exclude_dirs:
+    - "galleries/"
+
 # Options for languages if you have more than one.
 # Each language key can contain all or part of this config file's structure,
 # which will be overlayed on the default config.

@@ -20,10 +20,13 @@ module FolderIndexes
     end
   end
 
-  def self.read_all(path : Path) : Array(FolderIndex)
+  def self.read_all(path : Path, exclude_patterns = [] of String) : Array(FolderIndex)
     indexes = [] of FolderIndex
     candidates = [path] + Dir.glob("#{path}/**/*/")
     candidates.map do |folder|
+      # Skip if folder matches any exclude pattern
+      next if exclude_patterns.any? { |pattern| folder.to_s.includes?(pattern) }
+
       if Dir.glob("#{folder}/index.*").empty?
         Log.debug { "👈 #{folder}" }
         indexes << FolderIndex.new(Path.new(folder))

@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(shards build:*)",
+      "Bash(make:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)",
+      "Bash(git branch:*)",
+      "Bash(content/galleries/woodworking/furniture/chair1.jpg)",
+      "Bash(content/galleries/woodworking/furniture/table1.png)",
+      "Bash(content/galleries/woodworking/tools/saw1.jpg)",
+      "Bash(t/gallery_test.cr)",
+      "Bash(./bin/nicolino build:*)",
+      "Bash(tree:*)",
+      "Bash(bin/ameba:*)",
+      "Bash(crystal spec)",
+      "Bash(for:*)",
+      "Bash(do convert:*)",
+      "Bash(done)",
+      "Bash(magick:*)",
+      "WebFetch(domain:publicdomainreview.org)",
+      "Bash(wget:*)",
+      "Bash(git rm:*)",
+      "Bash(git push)",
+      "WebSearch",
+      "Bash(vips list:*)",
+      "Bash(crystal eval:*)",
+      "Bash(do echo:*)",
+      "Bash(echo:*)",
+      "Bash(do rm \"$webp\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

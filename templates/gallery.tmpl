@@ -7,7 +7,7 @@
 <div class="grid lightbox">
     {% endif %}
     <div>
-        <a href="{{image}}" data-gall="gallery"><img src="{{image | replace( " .", ".thumb." )}}"></a>
+        <a href="{{image}}" data-gall="gallery"><img src="{{image | thumb_url}}"></a>
     </div>
     {% if (loop.index % 5 == 0) or (loop.index == image_list | length) %}
 </div>

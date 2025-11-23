@@ -20,7 +20,7 @@ dependencies:
     branch: master
   croupier:
     github: ralsina/croupier
-    branch: main
+    branch:  fix-parallel-work-stealing
   live_reload:
     github: bcardiff/live_reload.cr
   lexbor:
