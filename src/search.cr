@@ -23,22 +23,21 @@ module Search
       output: output = (Path[Config.options.output] / "search.json").to_s,
       inputs: inputs,
       mergeable: false,
-      no_save: true,
-      proc: Croupier::TaskProc.new {
-        Log.info { "👉 #{output}" }
-        File.open(output, "w") do |io|
-          data = Array(Hash(String, String | Int32)).new
-          inputs.each_with_index do |input, i|
-            item = extract_item(
-              input,
-              input.sub(/^output\//, "/"),
-              i
-            )
-            data << item unless item.nil?
-          end
-          data.to_json(io)
+      no_save: true
+    ) do
+      Log.info { "👉 #{output}" }
+      File.open(output, "w") do |io|
+        data = Array(Hash(String, String | Int32)).new
+        inputs.each_with_index do |input, i|
+          item = extract_item(
+            input,
+            input.sub(/^output\//, "/"),
+            i
+          )
+          data << item unless item.nil?
         end
-      }
-    )
+        data.to_json(io)
+      end
+    end
   end
 end

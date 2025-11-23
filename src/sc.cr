@@ -41,11 +41,11 @@ module Sc
         id: "shortcode",
         inputs: [template],
         output: "kv://#{template}",
-        mergeable: false,
-        proc: Croupier::TaskProc.new {
-          Log.debug { "👈 #{template}" }
-          File.read(template)
-        })
+        mergeable: false
+      ) do
+        Log.debug { "👈 #{template}" }
+        File.read(template)
+      end
     end
   end
 end

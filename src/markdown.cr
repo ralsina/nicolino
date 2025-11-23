@@ -296,18 +296,17 @@ module Markdown
           id: "markdown",
           output: post.output(lang),
           inputs: post.dependencies,
-          mergeable: false,
-          proc: Croupier::TaskProc.new {
-            # Need to refresh post contents
-            post.load lang if Croupier::TaskManager.auto_mode?
-            Log.info { "👉 #{post.output lang}" }
-            html = Render.apply_template("templates/page.tmpl",
-              {"content" => post.rendered(lang), "title" => post.title(lang)})
-            doc = Lexbor::Parser.new(html)
-            doc = HtmlFilters.make_links_relative(doc, post.link(lang))
-            doc.to_html
-          }
-        )
+          mergeable: false
+        ) do
+          # Need to refresh post contents
+          post.load lang if Croupier::TaskManager.auto_mode?
+          Log.info { "👉 #{post.output lang}" }
+          html = Render.apply_template("templates/page.tmpl",
+            {"content" => post.rendered(lang), "title" => post.title(lang)})
+          doc = Lexbor::Parser.new(html)
+          doc = HtmlFilters.make_links_relative(doc, post.link(lang))
+          doc.to_html
+        end
       end
     end
   end
@@ -340,25 +339,24 @@ module Markdown
       id: "index",
       output: output.to_s,
       inputs: inputs,
-      mergeable: false,
-      proc: Croupier::TaskProc.new {
-        Log.info { "👉 #{output}" }
-        content = Templates::Env.get_template("templates/index.tmpl").render(
-          {
-            "posts" => posts.map(&.value),
-          })
-        html = Render.apply_template("templates/page.tmpl",
-          {
-            "content"    => content,
-            "title"      => title,
-            "noindex"    => true,
-            "extra_feed" => extra_feed,
-          })
-        doc = Lexbor::Parser.new(html)
-        doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))
-        doc.to_html
-      }
-    )
+      mergeable: false
+    ) do
+      Log.info { "👉 #{output}" }
+      content = Templates::Env.get_template("templates/index.tmpl").render(
+        {
+          "posts" => posts.map(&.value),
+        })
+      html = Render.apply_template("templates/page.tmpl",
+        {
+          "content"    => content,
+          "title"      => title,
+          "noindex"    => true,
+          "extra_feed" => extra_feed,
+        })
+      doc = Lexbor::Parser.new(html)
+      doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))
+      doc.to_html
+    end
   end
 
   # Create a RSS file out of posts with title, save in output
@@ -369,21 +367,20 @@ module Markdown
       id: "rss",
       output: output.to_s,
       inputs: inputs,
-      mergeable: false,
-      proc: Croupier::TaskProc.new {
-        Log.info { "👉 #{output}" }
-        feed = RSS.new title: title
-        posts.each do |post|
-          feed.item(
-            title: post.title,
-            description: post.summary,
-            link: post.link,
-            pubDate: post.date.to_s,
-          )
-        end
-        feed.xml indent: true
-      }
-    )
+      mergeable: false
+    ) do
+      Log.info { "👉 #{output}" }
+      feed = RSS.new title: title
+      posts.each do |post|
+        feed.item(
+          title: post.title,
+          description: post.summary,
+          link: post.link,
+          pubDate: post.date.to_s,
+        )
+      end
+      feed.xml indent: true
+    end
   end
 
   # Parse all markdown posts in a path and build Markdown::File

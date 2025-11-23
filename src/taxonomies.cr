@@ -95,19 +95,18 @@ module Taxonomies
           id: "taxonomy",
           output: output,
           inputs: @posts.flat_map(&.dependencies) + ["kv://templates/taxonomy.tmpl"],
-          mergeable: false,
-          proc: Croupier::TaskProc.new {
-            Log.info { "👉 #{output}" }
-            html = Render.apply_template("templates/page.tmpl",
-              {
-                "content" => rendered,
-                "title"   => @title[lang],
-              })
-            doc = Lexbor::Parser.new(html)
-            doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))
-            doc.to_html
-          }
-        )
+          mergeable: false
+        ) do
+          Log.info { "👉 #{output}" }
+          html = Render.apply_template("templates/page.tmpl",
+            {
+              "content" => rendered,
+              "title"   => @title[lang],
+            })
+          doc = Lexbor::Parser.new(html)
+          doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))
+          doc.to_html
+        end
 
         @terms.values.each do |term|
           term.@posts.sort!

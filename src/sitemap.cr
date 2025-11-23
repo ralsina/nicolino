@@ -22,23 +22,22 @@ module Sitemap
       output: output = (Path[Config.options.output] / "sitemap.xml").to_s,
       inputs: inputs,
       mergeable: false,
-      no_save: true,
-      proc: Croupier::TaskProc.new {
-        Log.info { "👉 #{output}" }
-        File.open(output, "w") do |io|
-          io << HEADER
-          base = URI.parse(Config.get("site.url").as_s)
-          inputs.each do |input|
-            next if noindex? input
-            modtime = File.info(input).modification_time
-            input = input.sub(/^output\//, "")
-            io << %(<url>
-              <loc>#{base.resolve(input)}</loc>
-              <lastmod>#{modtime}</lastmod>
-             </url>)
-          end
+      no_save: true
+    ) do
+      Log.info { "👉 #{output}" }
+      File.open(output, "w") do |io|
+        io << HEADER
+        base = URI.parse(Config.get("site.url").as_s)
+        inputs.each do |input|
+          next if noindex? input
+          modtime = File.info(input).modification_time
+          input = input.sub(/^output\//, "")
+          io << %(<url>
+            <loc>#{base.resolve(input)}</loc>
+            <lastmod>#{modtime}</lastmod>
+           </url>)
         end
-      }
-    )
+      end
+    end
   end
 end
