@@ -2,14 +2,10 @@
 
 {{html}}
 {# Basically: every 5 images, wrap them in a grid div #}
+<div class="gallery">
 {% for image in image_list %}
-{% if loop.index % 5 == 1 %}
-<div class="grid lightbox">
-    {% endif %}
     <div>
         <a href="{{image}}" data-gall="gallery"><img src="{{image | thumb_url}}"></a>
     </div>
-    {% if (loop.index % 5 == 0) or (loop.index == image_list | length) %}
-</div>
-{% endif %}
 {% endfor %}
+</div>

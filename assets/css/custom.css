@@ -8,6 +8,53 @@ div.lightbox {
   width: 100%;
   text-align: center;
 }
+
+div.gallery {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+div.gallery div {
+  text-align: center;
+}
+
+div.gallery div img {
+  width: 100%;
+  height: auto;
+  border-radius: 0.5em;
+  transition: transform 0.2s ease-in-out;
+}
+
+div.gallery div img:hover {
+  transform: scale(1.05);
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 1200px) {
+  div.gallery {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  div.gallery {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  div.gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 400px) {
+  div.gallery {
+    grid-template-columns: 1fr;
+  }
+}
 html * {
   font-family: Quicksand, sans-serif;
 }
