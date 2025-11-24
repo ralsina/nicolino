@@ -1,5 +1,5 @@
 #!/bin/bash
-set e
+set -e
 
 PKGNAME=$(basename "$PWD")
 VERSION=$(git cliff --bumped-version |cut -dv -f2)

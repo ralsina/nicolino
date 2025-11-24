@@ -126,7 +126,7 @@ module Gallery
       gallery_base = Path[index_file]
 
       # Find images in this gallery directory (not subdirectories)
-      image_list = Dir.glob("#{gallery_dir}/*.{jpg,png,svg,webp,gif}").map do |img_path|
+      image_list = Dir.glob("#{gallery_dir}/*.{jpg,png,webp,gif}").map do |img_path|
         Path[img_path].basename.to_s
       end
 
@@ -162,7 +162,7 @@ module Gallery
         gallery_dir = base.parent
 
         # Find images in this gallery directory (not subdirectories)
-        image_list = Dir.glob("#{gallery_dir}/*.{jpg,png,svg,webp,gif}").map do |img_path|
+        image_list = Dir.glob("#{gallery_dir}/*.{jpg,png,webp,gif}").map do |img_path|
           Path[img_path].basename.to_s
         end
 
