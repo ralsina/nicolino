@@ -29,7 +29,12 @@
       "Bash(crystal eval:*)",
       "Bash(do echo:*)",
       "Bash(echo:*)",
-      "Bash(do rm \"$webp\")"
+      "Bash(do rm \"$webp\")",
+      "Bash(time:*)",
+      "WebFetch(domain:libvips.github.io)",
+      "WebFetch(domain:www.libvips.org)",
+      "Bash(find:*)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": []

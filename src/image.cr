@@ -23,9 +23,8 @@ module Image
         output: dest.to_s,
         inputs: ["conf.yml", src],
         no_save: true,
-        mergeable: false) do
+        mergeable: true) do
         Log.info { "👉 #{dest}" }
-        Dir.mkdir_p(dest.parent)
         Images.thumb(src, dest.to_s, Config.options.image_large)
         nil
       end
@@ -35,9 +34,8 @@ module Image
         output: thumb_dest.to_s,
         inputs: ["conf.yml", src],
         no_save: true,
-        mergeable: false) do
+        mergeable: true) do
         Log.info { "👉 #{thumb_dest}" }
-        Dir.mkdir_p(thumb_dest.parent)
         Images.thumb(src, thumb_dest.to_s, Config.options.image_thumb)
         nil
       end

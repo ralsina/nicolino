@@ -144,6 +144,9 @@ def run(
     Croupier::TaskManager.fast_mode = fast_mode
   end
 
+  # Pre-create all output directories for better performance
+  create_all_directories
+
   arguments = Croupier::TaskManager.tasks.keys if arguments.empty?
   # Run tasks for real
   Log.info { "Running tasks..." }
@@ -156,4 +159,31 @@ def run(
   )
   Log.info { "🏁 Done!" }
   0
+end
+
+def create_all_directories
+  Log.debug { "Pre-creating all output directories..." }
+  directories = Set(String).new
+
+  # Collect all unique parent directories from task outputs
+  Croupier::TaskManager.tasks.each do |task_id, task|
+    # For image processing tasks, we need parent directories of outputs
+    if task_id.starts_with?("image:") || task_id.starts_with?("thumb:")
+      task.outputs.each do |output|
+        directories.add(Path[output].parent.to_s)
+      end
+    else
+      # For other files, get parent directory
+      task.outputs.each do |output|
+        directories.add(Path[output].parent.to_s)
+      end
+    end
+  end
+
+  # Create all directories in one pass
+  directories.each do |dir|
+    Dir.mkdir_p(dir)
+  end
+
+  Log.debug { "Created #{directories.size} directories" }
 end
