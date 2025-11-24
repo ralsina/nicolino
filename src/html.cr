@@ -21,6 +21,8 @@ module HTML
     all_sources.map do |base, sources|
       begin
         next if File.posts.keys.includes? base.to_s
+        next if Utils.should_skip_file?(base)
+
         posts << File.new(sources, base)
       rescue ex
         Log.error { "Error parsing #{base}: #{ex.message}" }

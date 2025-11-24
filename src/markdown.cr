@@ -391,6 +391,8 @@ module Markdown
     all_sources = Utils.find_all(path, "md")
     all_sources.map do |base, sources|
       next if File.posts.keys.includes? base.to_s
+      next if Utils.should_skip_file?(base)
+
       posts << File.new(sources, base)
     end
     posts
