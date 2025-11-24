@@ -140,7 +140,12 @@ module Markdown
 
     # Parse shortcodes in the text recursively
     def full_shortcodes_list(text)
+      # Fast path: if no shortcode delimiters, skip parsing entirely
+      return [] of Shortcodes::Shortcode unless text.includes?("{{")
+
       sc_list = Shortcodes.parse(text)
+      return [] of Shortcodes::Shortcode if sc_list.shortcodes.empty?
+
       final_list = sc_list.shortcodes
       sc_list.shortcodes.each do |scode|
         if scode.markdown? # Recurse for nested shortcodes
@@ -197,6 +202,9 @@ module Markdown
     end
 
     def _replace_shortcodes(text : String) : String
+      # Fast path: if no shortcode delimiters, skip parsing entirely
+      return text unless text.includes?("{{")
+
       sc_list = Shortcodes.parse(text)
       return text if sc_list.shortcodes.empty?
       sc_list.errors.each do |e|

@@ -2,6 +2,7 @@
 # To create a Lexbor document, use `Lexbor::Parser.new(html)`
 module HtmlFilters
   @@html_filters_mutex = Mutex.new
+
   # Downgrade all headers by n levels (h1 -> h3 if n=2)
   def self.downgrade_headers(doc, n = 2)
     (1..(6 - n)).each do |i|

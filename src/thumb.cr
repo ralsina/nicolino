@@ -22,9 +22,9 @@ module Images
       Vips.concurrency = System.cpu_count
 
       # Optimize cache for thumbnail workloads
-      Vips::Cache.max = 1000        # More operations cached
-      Vips::Cache.max_mem = 512_u64 * 1024_u64 * 1024_u64  # 512MB cache (good for thumbnails)
-      Vips::Cache.max_files = 1000  # More files cached
+      Vips::Cache.max = 1000                              # More operations cached
+      Vips::Cache.max_mem = 512_u64 * 1024_u64 * 1024_u64 # 512MB cache (good for thumbnails)
+      Vips::Cache.max_files = 1000                        # More files cached
       @@vips_cache_initialized = true
     {% end %}
   end
@@ -59,11 +59,11 @@ module Images
         input,
         width: size,
         height: size,
-        size: Vips::Enums::Size::Down,  # Only downsize images (faster)
+        size: Vips::Enums::Size::Down, # Only downsize images (faster)
         no_rotate: true,               # Skip auto-rotation for performance
       ).write_to_file(output,
-        Q: 85,                         # Good quality with better performance
-        strip: true                    # Remove metadata for faster processing
+        Q: 85,      # Good quality with better performance
+        strip: true # Remove metadata for faster processing
       )
     {% end %}
   end
