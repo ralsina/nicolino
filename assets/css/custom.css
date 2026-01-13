@@ -151,6 +151,26 @@ summary.contents-heading {
     color: #a6adc8;
 }
 
+.post-external-link {
+    margin-top: 0;
+    display: block;
+    font-size: 0.85em;
+    color: #666;
+}
+
+[data-theme="dark"] .post-external-link {
+    color: #a6adc8;
+}
+
+.post-external-link a {
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.post-external-link a:hover {
+    text-decoration: underline;
+}
+
 .taxonomy a {
     color: #89b4fa;
     text-decoration: none;

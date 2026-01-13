@@ -6,6 +6,11 @@
   {% if metadata.updated and show_updated %}
     <span class="post-updated">(Updated: {{metadata.updated}})</span>
   {% endif %}
+  {% if metadata.link %}
+    <span class="post-external-link">
+      ⇒ <a href="{{metadata.link}}" target="_blank" rel="noopener">External Link</a>
+    </span>
+  {% endif %}
   {% if taxonomies | length > 0 %}
     {% for taxonomy, terms in taxonomies %}
       {% if terms | length > 0 %}
