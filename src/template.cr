@@ -48,6 +48,7 @@ module Templates
 
   # Load templates from templates/ and put them in the k/v store
   def self.load_templates
+    ensure_templates
     Log.debug { "Scanning Templates" }
     Dir.glob("templates/*.tmpl").each do |template|
       Croupier::Task.new(
@@ -61,6 +62,38 @@ module Templates
         # In auto mode the content may have changed though.
         File.read(template)
       end
+    end
+  end
+
+  # Ensure all baked-in templates exist in the templates/ directory
+  # If any are missing, extract them from the baked filesystem
+  def self.ensure_templates
+    templates_dir = Path["templates"]
+    FileUtils.mkdir_p(templates_dir) unless Dir.exists?(templates_dir)
+
+    # Get list of baked-in template files from init command
+    begin
+      baked_templates = Nicolino::TemplateFiles.files.map do |file|
+        Path[file.path].basename.to_s
+      end
+
+      # Check each baked template
+      baked_templates.each do |template_name|
+        template_path = templates_dir / template_name
+        unless File.exists?(template_path)
+          Log.info { "Installing missing template: #{template_name}" }
+          # Find and write the baked file
+          Nicolino::TemplateFiles.files.each do |file|
+            if file.path.ends_with?(template_name)
+              File.write(template_path, file.gets_to_end)
+              break
+            end
+          end
+        end
+      end
+    rescue ex
+      # If we can't access baked files (shouldn't happen), just log and continue
+      Log.debug { "Could not check for missing templates: #{ex.message}" }
     end
   end
 
