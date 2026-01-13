@@ -35,21 +35,19 @@ module Listings
       begin
         content = File.read(source_path)
 
-        # Determine language from extension
-        language = detect_language(filename)
-
         # Use filename as title (without extension)
         title = File.basename(filename, File.extname(filename))
 
+        # Tartrazine will auto-detect language from content/extension
         listing = Listing.new(
           source_path.to_s,
           title,
-          language,
+          "",  # Empty language, tartrazine will detect it
           content
         )
 
         listings << listing
-        Log.debug { "Found listing: #{filename} (#{language})" }
+        Log.debug { "Found listing: #{filename}" }
       rescue ex
         Log.warn { "Failed to read listing #{filename}: #{ex.message}" }
       end
@@ -94,7 +92,8 @@ module Listings
       )
 
       begin
-        lexer = Tartrazine.lexer(name: listing.language)
+        # Use tartrazine's auto-detection based on filename
+        lexer = Tartrazine.lexer(filename: listing.source)
         highlighted = formatter.format(listing.content, lexer)
       rescue ex
         Log.warn { "Failed to highlight #{listing.title}: #{ex.message}" }
@@ -105,7 +104,6 @@ module Listings
       # Render the listing template
       rendered = Templates.environment.get_template("templates/listing.tmpl").render({
         "title"       => listing.title,
-        "language"    => listing.language,
         "code"        => highlighted,
         "raw_content" => HTML.escape(listing.content),
       })
@@ -120,57 +118,6 @@ module Listings
       doc = Lexbor::Parser.new(html)
       doc = HtmlFilters.make_links_relative(doc, "/#{relative_path.rpartition('/')[0]}/")
       doc.to_html
-    end
-  end
-
-  # Detect programming language from file extension
-  def self.detect_language(filename : String) : String
-    ext = File.extname(filename).downcase[1..-1] || ""
-
-    # Common language mappings
-    case ext
-    when "cr"       then "crystal"
-    when "py"       then "python"
-    when "js"       then "javascript"
-    when "ts"       then "typescript"
-    when "rb"       then "ruby"
-    when "go"       then "go"
-    when "rs"       then "rust"
-    when "c", "h"   then "c"
-    when "cpp", "cc", "cxx", "hpp", "hxx" then "cpp"
-    when "java"     then "java"
-    when "kt", "kts" then "kotlin"
-    when "swift"    then "swift"
-    when "sh"       then "bash"
-    when "bash"     then "bash"
-    when "zsh"      then "zsh"
-    when "fish"     then "fish"
-    when "php"      then "php"
-    when "scala"    then "scala"
-    when "html", "htm" then "html"
-    when "css"      then "css"
-    when "scss"     then "scss"
-    when "sass"     then "sass"
-    when "xml"      then "xml"
-    when "json"     then "json"
-    when "yaml", "yml" then "yaml"
-    when "sql"      then "sql"
-    when "md"       then "markdown"
-    when "lua"      then "lua"
-    when "r"        then "r"
-    when "dart"     then "dart"
-    when "ex", "exs" then "elixir"
-    when "erl", "hrl" then "erlang"
-    when "clj", "cljs" then "clojure"
-    when "fs", "fsi", "fsx" then "fsharp"
-    when "vb"       then "vb"
-    when "pl", "pm" then "perl"
-    when "tcl"      then "tcl"
-    when "coffee"   then "coffeescript"
-    when "tsv"      then "tsv"
-    when "csv"      then "csv"
-    when "dockerfile" then "docker"
-    else "text"
     end
   end
 end
