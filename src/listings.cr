@@ -61,12 +61,38 @@ module Listings
 
     Log.info { "Generating #{listings.size} code listings" }
 
+    # Generate listings CSS file
+    render_css
+
     # Generate listings index page
     render_index(listings)
 
     # Generate individual listing pages
     listings.each do |listing|
       render_listing(listing)
+    end
+  end
+
+  def self.render_css
+    output_path = Path[Config.options.output] / "css" / "listings.css"
+
+    Croupier::Task.new(
+      id: "listings-css",
+      output: output_path.to_s,
+      inputs: ["conf.yml"],
+      mergeable: false,
+    ) do
+      Log.info { "👉 #{output_path}" }
+
+      # Generate CSS using tartrazine
+      formatter = Tartrazine::Html.new(
+        theme: Tartrazine.theme("default-dark"),
+        line_numbers: false,
+        standalone: false,
+        surrounding_pre: false
+      )
+
+      formatter.style_defs
     end
   end
 
@@ -156,6 +182,7 @@ module Listings
         "content"         => rendered,
         "title"           => listing.title,
         "no_highlightjs"  => true,
+        "listings_css"    => true,
       })
 
       # Process with HTML filters
