@@ -5,6 +5,7 @@ require "lexbor"
 module Listings
   include Utils
 
+  # Represents a source code file to be syntax-highlighted
   class Listing
     property source : String
     property title : String
@@ -42,7 +43,7 @@ module Listings
         listing = Listing.new(
           source_path.to_s,
           title,
-          "",  # Empty language, tartrazine will detect it
+          "", # Empty language, tartrazine will detect it
           content
         )
 
@@ -113,10 +114,10 @@ module Listings
 
       # Render the listings index template
       rendered = Templates.environment.get_template("templates/listings-index.tmpl").render({
-        "listings" => sorted_listings.map { |l|
+        "listings" => sorted_listings.map { |listing|
           {
-            "title" => l.title,
-            "link"  => "#{l.title}#{File.extname(l.source)}.html",
+            "title" => listing.title,
+            "link"  => "#{listing.title}#{File.extname(listing.source)}.html",
           }
         },
       })
@@ -179,10 +180,10 @@ module Listings
 
       # Apply to page template
       html = Render.apply_template("templates/page.tmpl", {
-        "content"         => rendered,
-        "title"           => listing.title,
-        "no_highlightjs"  => true,
-        "listings_css"    => true,
+        "content"        => rendered,
+        "title"          => listing.title,
+        "no_highlightjs" => true,
+        "listings_css"   => true,
       })
 
       # Process with HTML filters
