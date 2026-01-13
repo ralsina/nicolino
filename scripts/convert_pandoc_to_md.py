@@ -50,11 +50,12 @@ def convert_pandoc_to_markdown(input_path, dry_run=False):
         print(f"  ✗ No YAML frontmatter found, skipping")
         return False
 
-    # Convert the body content using pandoc
+    # Try to convert using pandoc, but fall back to keeping original if it fails
     try:
         # Use pandoc to convert from the input format to markdown
+        # markdown-smart prevents smart quote conversion (which adds backslashes)
         result = subprocess.run(
-            ["pandoc", "-f", "rst", "-t", "markdown", "--wrap=none"],
+            ["pandoc", "-f", "rst", "-t", "markdown-smart", "--wrap=none"],
             input=body_content,
             capture_output=True,
             text=True,
@@ -62,16 +63,16 @@ def convert_pandoc_to_markdown(input_path, dry_run=False):
         )
 
         if result.returncode != 0:
-            print(f"  ✗ Pandoc conversion failed: {result.stderr}")
-            return False
-
-        markdown_body = result.stdout
+            print(f"  ⚠ Pandoc conversion failed, keeping original content")
+            markdown_body = body_content
+        else:
+            markdown_body = result.stdout
     except subprocess.TimeoutExpired:
         print(f"  ✗ Pandoc conversion timed out")
         return False
     except FileNotFoundError:
-        print(f"  ✗ Pandoc not found in PATH")
-        return False
+        print(f"  ⚠ Pandoc not found in PATH, keeping original content")
+        markdown_body = body_content
 
     # Reconstruct with YAML frontmatter
     new_content = f"---\n{frontmatter}---\n\n{markdown_body}"
