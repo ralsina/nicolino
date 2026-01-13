@@ -7,7 +7,7 @@ module Archive
 
   def self.render(posts : Array(Markdown::File))
     # Filter posts that have dates
-    dated_posts = posts.select { |p| !p.date.nil? }
+    dated_posts = posts.select { |post| !post.date.nil? }
 
     # If no posts with dates, don't generate archive
     if dated_posts.empty?
@@ -19,7 +19,7 @@ module Archive
     years_hash = Hash(Int32, Hash(String, Array(Hash(String, String)))).new
 
     dated_posts.each do |post|
-      post_date = post.date.not_nil!
+      post_date = post.date.as(Time)
       year = post_date.year
       month = post_date.to_s("%Y-%m")
 

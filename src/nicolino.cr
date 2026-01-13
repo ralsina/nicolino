@@ -36,7 +36,7 @@ def create_tasks # ameba:disable Metrics/CyclomaticComplexity
 
   # Check for required external commands
   if features.includes? "pandoc"
-    unless `which pandoc`.strip.empty? == false
+    if `which pandoc`.strip.empty?
       Log.error { "The 'pandoc' feature is enabled but pandoc is not installed or not in PATH" }
       Log.error { "Please install pandoc or disable the 'pandoc' feature in conf.yml" }
       exit 1

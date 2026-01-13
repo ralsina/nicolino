@@ -114,12 +114,10 @@ module Markdown
       contents = ::File.read(source(lang))
       begin
         fragments = contents.split("---\n", 3)
-        if fragments.size >= 3
-          _, raw_metadata, @text[lang] = fragments
-        else
-          # Metadata is required - must have --- separators
-          raise "Missing metadata separators. All posts must have metadata between '---' delimiters. Format:\n---\ntitle: Your Title\ndate: YYYY-MM-DD\n---\nYour content here..."
-        end
+        # Metadata is required - must have --- separators
+        raise "Missing metadata separators. All posts must have metadata between '---' delimiters." unless fragments.size >= 3
+
+        _, raw_metadata, @text[lang] = fragments
       rescue ex
         Log.error { "Error reading metadata in #{source(lang)}: #{ex}" }
         raise ex
@@ -187,11 +185,11 @@ module Markdown
           # Try RFC 2822 format (common in RSS feeds and email)
           begin
             @date = Time::Format::RFC_2822.parse(t.to_s)
-          rescue ex2
+          rescue ex
             # Try YY/MM/DD HH:MM:SS TZ format (e.g., "16/05/14 18:14:24 UTC")
             begin
               @date = Time::Format.new("%y/%m/%d %H:%M:%S %z").parse(t.to_s)
-            rescue ex3
+            rescue ex
               # Try YYYY-MM-DD HH:MM:SS TZ format (e.g., "2024-08-02 13:21:11 UTC")
               # Convert named timezones to UTC offset
               begin
@@ -200,7 +198,7 @@ module Markdown
                 # This is a simple approach; for production you might want a proper timezone lib
                 normalized = date_str.gsub(/ (UTC|GMT|Z)$/, " +0000")
                 @date = Time::Format.new("%Y-%m-%d %H:%M:%S %z").parse(normalized)
-              rescue ex4
+              rescue ex
                 Log.error { "Error parsing date for #{source}, #{t}" }
                 Log.error { "Tried Cronic, RFC_2822, YY/MM/DD, and YYYY-MM-DD formats" }
                 raise "Failed to parse date '#{t}' for #{source}"
