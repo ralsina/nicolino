@@ -274,9 +274,9 @@ module Markdown
         # The path is usually output/section/file.html or output/section/subsection/file.html
         parts = output_path.parts
         section = if parts.size >= 2 && parts[0] == "output"
-                    parts[1]  # Get "blog", "posts", etc.
+                    parts[1] # Get "blog", "posts", etc.
                   else
-                    "posts"  # Fallback
+                    "posts" # Fallback
                   end
 
         [{name: section.capitalize,
@@ -342,14 +342,21 @@ module Markdown
           inputs: post.dependencies,
           mergeable: false
         ) do
-          # Need to refresh post contents
-          post.load lang if Croupier::TaskManager.auto_mode?
-          Log.info { "👉 #{post.output lang}" }
-          html = Render.apply_template("templates/page.tmpl",
-            {"content" => post.rendered(lang), "title" => post.title(lang)})
-          doc = Lexbor::Parser.new(html)
-          doc = HtmlFilters.make_links_relative(doc, post.link(lang))
-          doc.to_html
+          begin
+            # Need to refresh post contents
+            post.load lang if Croupier::TaskManager.auto_mode?
+            Log.info { "👉 #{post.output lang}" }
+            html = Render.apply_template("templates/page.tmpl",
+              {"content" => post.rendered(lang), "title" => post.title(lang)})
+            doc = Lexbor::Parser.new(html)
+            doc = HtmlFilters.make_links_relative(doc, post.link(lang))
+            doc.to_html
+          rescue ex
+            Log.error { "Error rendering post: #{post.source(lang)}" }
+            Log.error { "#{ex.class}: #{ex.message}" }
+            ex.backtrace.each { |line| Log.error { "  #{line}" } }
+            raise ex
+          end
         end
       end
     end

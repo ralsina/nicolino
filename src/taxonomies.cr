@@ -51,13 +51,15 @@ module Taxonomies
       @posts : Array(Markdown::File),
     )
       @posts.each do |post|
-        post_terms = post.metadata.fetch(@name, nil)
+        # Get metadata for the current locale language
+        post_metadata = post.metadata
+        post_terms = post_metadata.fetch(@name, nil)
         next if post_terms.nil?
         begin
           post_terms = YAML.parse(post_terms).as_a.map(&.to_s).reject(&.empty?)
         rescue ex
           # Alternative form tags: foo, bar
-          post_terms = post.metadata[@name] \
+          post_terms = post_metadata[@name] \
             .split(",").map(&.to_s.strip).reject(&.empty?)
         end
         post_terms.as(Array(String)).each do |term|

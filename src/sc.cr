@@ -39,7 +39,7 @@ module Sc
   def self.available_shortcodes : Array(String)
     Dir.glob("shortcodes/*.tmpl").map do |path|
       File.basename(path, ".tmpl")
-    end.sort
+    end.sort!
   end
 
   # Load shortcodes from shortcodes/ and put them in the k/v store

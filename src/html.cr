@@ -5,12 +5,13 @@ module HTML
   class File < Markdown::File
     def html(lang = nil)
       lang ||= Locale.language
-      # FIXME: Implement TOC using lexbor
       result = replace_shortcodes(lang)
       doc = Lexbor::Parser.new(result)
       doc = HtmlFilters.downgrade_headers(doc)
       doc = HtmlFilters.make_links_relative(doc, link)
       @html[lang] = doc.to_html
+      # HTML files don't have TOC generation yet, set to empty string
+      @toc[lang] = ""
     end
   end
 

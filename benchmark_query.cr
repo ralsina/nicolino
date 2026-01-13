@@ -27,8 +27,7 @@ Lexbor::Parser.new(html)
 Benchmark.ips do |x|
   jh_doc = JustHTML.parse(html)
   x.report("JustHTML query_selector_all") do
-    count = 0
-    count = jh_doc.query_selector_all("h1 h2 h3 h4").size
+    jh_doc.query_selector_all("h1 h2 h3 h4").size
   end
 
   lb_doc = Lexbor::Parser.new(html)
@@ -44,10 +43,10 @@ end
 # Benchmark JustHTML parse
 Benchmark.ips do |x|
   x.report("JustHTML parse") do
-    jh_doc = JustHTML.parse(html)
+    JustHTML.parse(html)
   end
 
   x.report("Lexbor parse") do
-    lb_doc = Lexbor::Parser.new(html)
+    Lexbor::Parser.new(html)
   end
 end
