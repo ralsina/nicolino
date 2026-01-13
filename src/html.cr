@@ -6,9 +6,11 @@ module HTML
     def html(lang = nil)
       lang ||= Locale.language
       # FIXME: Implement TOC using lexbor
-      @html[lang] = replace_shortcodes(lang)
-      @html[lang] = HtmlFilters.downgrade_headers(html(lang))
-      @html[lang] = HtmlFilters.make_links_relative(html(lang), link)
+      result = replace_shortcodes(lang)
+      doc = Lexbor::Parser.new(result)
+      doc = HtmlFilters.downgrade_headers(doc)
+      doc = HtmlFilters.make_links_relative(doc, link)
+      @html[lang] = doc.to_html
     end
   end
 
