@@ -1,6 +1,5 @@
-/* Clean breadcrumb styling */
+/* Collapsible breadcrumb in header */
 .breadcrumb {
-    margin: 0.5em 0;
     font-size: 0.9em;
     color: #666;
 }
@@ -18,7 +17,25 @@
     text-decoration: underline;
 }
 
-/* Post metadata section - minimal styling */
+/* Collapsed state */
+.breadcrumb-collapsed .breadcrumb-expanded-text {
+    display: none;
+}
+
+.breadcrumb-collapsed .breadcrumb-collapsed-text {
+    display: inline;
+}
+
+/* Expanded state */
+.breadcrumb-expanded .breadcrumb-expanded-text {
+    display: inline;
+}
+
+.breadcrumb-expanded .breadcrumb-collapsed-text {
+    display: none;
+}
+
+/* Post metadata section */
 .post-header {
     margin-bottom: 2em;
 }
@@ -40,16 +57,30 @@
     font-weight: 500;
 }
 
-.post-taxonomies a {
+/* Taxonomies */
+.post-taxonomies {
+    margin-top: 0.5em;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    font-size: 0.85em;
+    color: #666;
+}
+
+[data-theme="dark"] .post-taxonomies {
+    color: #a6adc8;
+}
+
+.taxonomy a {
     color: #89b4fa;
     text-decoration: none;
 }
 
-[data-theme="dark"] .post-taxonomies a {
+[data-theme="dark"] .taxonomy a {
     color: #89dceb;
 }
 
-.post-taxonomies a:hover {
+.taxonomy a:hover {
     text-decoration: underline;
 }
 

@@ -1,29 +1,31 @@
-<h2><a href="{{link}}">{{title}}</a></h2>
-
-{% if breadcrumbs|length > 0 %}
-<nav aria-label="breadcrumb" class="breadcrumb">
+<h2>
+  {% if breadcrumbs|length > 0 %}
+  <nav aria-label="breadcrumb" class="breadcrumb">
     <a href="/">Home</a>
     {% for item in breadcrumbs %}
-        {% if not loop.last %}
-            » <a href="{{ item.link }}">{{ item.name }}</a>
-        {% else %}
-            » {{ item.name }}
-        {% endif %}
+      {% if not loop.last %}
+        » <a href="{{ item.link }}">{{ item.name }}</a>
+      {% else %}
+        » <a href="{{link}}">{{ item.name }}</a>
+      {% endif %}
     {% endfor %}
-</nav>
-{% endif %}
+  </nav>
+  {% else %}
+  <a href="{{link}}">{{title}}</a>
+  {% endif %}
+</h2>
 
 {% if taxonomies | length > 1 %}
 <nav>
-    <ul>
-        {% for k,v in taxonomies %}
-        <li>
-            {{k | link }} :
-            {% for term in v %}
-            {{term | link}}
-            {% endfor%}
-        </li>
-        {% endfor %}
-    </ul>
+  <ul>
+    {% for k,v in taxonomies %}
+    <li>
+      {{k | link }} :
+      {% for term in v %}
+      {{term | link}}
+      {% endfor%}
+    </li>
+    {% endfor %}
+  </ul>
 </nav>
 {% endif %}
