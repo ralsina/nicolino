@@ -1,0 +1,2 @@
+# Baked filesystem files are large by design
+src/commands/init -linguist-generated

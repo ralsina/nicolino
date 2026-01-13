@@ -82,6 +82,7 @@ module Templates
         unless File.exists?(asset_path)
           Log.info { "Installing missing asset: #{asset_path}" }
           FileUtils.mkdir_p(File.dirname(asset_path))
+          file.rewind
           File.write(asset_path, file.gets_to_end)
         end
       end
@@ -96,24 +97,16 @@ module Templates
     templates_dir = Path["templates"]
     FileUtils.mkdir_p(templates_dir) unless Dir.exists?(templates_dir)
 
-    # Get list of baked-in template files from init command
     begin
-      baked_templates = Nicolino::TemplateFiles.files.map do |file|
-        Path[file.path].basename.to_s
-      end
-
-      # Check each baked template
-      baked_templates.each do |template_name|
+      # Check each baked template file directly
+      Nicolino::TemplateFiles.files.each do |file|
+        template_name = Path[file.path].basename.to_s
         template_path = templates_dir / template_name
+
         unless File.exists?(template_path)
           Log.info { "Installing missing template: #{template_name}" }
-          # Find and write the baked file
-          Nicolino::TemplateFiles.files.each do |file|
-            if file.path.ends_with?(template_name)
-              File.write(template_path, file.gets_to_end)
-              break
-            end
-          end
+          file.rewind
+          File.write(template_path, file.gets_to_end)
         end
       end
     rescue ex
