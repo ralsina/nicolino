@@ -64,22 +64,44 @@ module Templates
     end
   end
 
-  Env = Crinja.new
-  Env.loader = StoreLoader.new
-  # The cache seems to make no difference performance-wise
-  Env.cache = Crinja::TemplateCache::InMemory.new
+  # Thread-local environment cache
+  class EnvCache
+    @@envs = Hash(Fiber, Crinja).new
+    @@mutex = Mutex.new
 
-  # Convenience filters
-  Env.filters["link"] = Crinja.filter() do
-    return Crinja::Value.new(%(<a href="#{target["link"]}">#{target["name"]}</a>)) unless target["link"].empty?
-    return target["name"]
+    def self.get(env_factory : Proc(Crinja))
+      fiber = Fiber.current
+      @@mutex.synchronize do
+        @@envs[fiber] ||= env_factory.call
+      end
+    end
   end
 
-  # Convert image filename to thumbnail filename
-  Env.filters["thumb_url"] = Crinja.filter() do
-    filename = target.to_s
-    ext = File.extname(filename)
-    basename = filename.chomp(ext)
-    return Crinja::Value.new("#{basename}.thumb#{ext}")
+  # Create a new Crinja environment
+  private def self.create_env
+    env = Crinja.new
+    env.loader = StoreLoader.new
+    env.cache = Crinja::TemplateCache::InMemory.new
+
+    # Convenience filters
+    env.filters["link"] = Crinja.filter() do
+      return Crinja::Value.new(%(<a href="#{target["link"]}">#{target["name"]}</a>)) unless target["link"].empty?
+      return target["name"]
+    end
+
+    # Convert image filename to thumbnail filename
+    env.filters["thumb_url"] = Crinja.filter() do
+      filename = target.to_s
+      ext = File.extname(filename)
+      basename = filename.chomp(ext)
+      return Crinja::Value.new("#{basename}.thumb#{ext}")
+    end
+
+    env
+  end
+
+  # Get the thread/fiber-local Crinja environment
+  def self.environment
+    EnvCache.get(->create_env)
   end
 end

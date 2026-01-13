@@ -24,12 +24,22 @@ module Sc
     if sc.is_inline?
       Crinja.render(sc.data, context)
     else
-      template = Templates::Env.get_template("shortcodes/#{sc.name}.tmpl")
+      template = Templates.environment.get_template("shortcodes/#{sc.name}.tmpl")
       template.render(context)
     end
+  rescue ex : Crinja::TemplateNotFoundError
+    raise "Missing shortcode template: shortcodes/#{sc.name}.tmpl\n" +
+          "Available shortcodes: #{available_shortcodes.join(", ")}"
   rescue ex
     Log.error(exception: ex) { "Can't load shortcode #{sc.name}: #{ex.message}" }
     sc.whole
+  end
+
+  # Get list of available shortcodes for error messages
+  def self.available_shortcodes : Array(String)
+    Dir.glob("shortcodes/*.tmpl").map do |path|
+      File.basename(path, ".tmpl")
+    end.sort
   end
 
   # Load shortcodes from shortcodes/ and put them in the k/v store

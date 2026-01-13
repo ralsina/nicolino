@@ -89,7 +89,7 @@ module Taxonomies
       Config.languages.keys.each do |lang|
         base_path = Path[Config.options(lang).output] / Path["#{@path[lang]}"]
         output = (base_path / "index.html").to_s
-        rendered = Templates::Env.get_template("templates/taxonomy.tmpl").render({"taxonomy" => value(lang)})
+        rendered = Templates.environment.get_template("templates/taxonomy.tmpl").render({"taxonomy" => value(lang)})
 
         Croupier::Task.new(
           id: "taxonomy",

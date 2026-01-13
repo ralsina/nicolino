@@ -26,7 +26,7 @@ shards:
 
   croupier:
     git: https://github.com/ralsina/croupier.git
-    version: 0.5.4
+    version: 0.5.4+git.commit.060a4845847c72b93636306f285fe19843b2a8fb
 
   crystalline:
     git: https://github.com/jtomschroeder/crystalline.git
@@ -74,7 +74,7 @@ shards:
 
   progress_bar:
     git: https://github.com/mgomes/progress_bar.git
-    version: 1.0.1+git.commit.d8d741d42f55f91b9c51f8551bf32abfc56e0ec1
+    version: 1.0.1+git.commit.aa5ebab89d31167208387640db06d3964ec7922b
 
   shortcodes:
     git: https://github.com/ralsina/shortcodes.git
@@ -82,7 +82,7 @@ shards:
 
   sixteen:
     git: https://github.com/ralsina/sixteen.git
-    version: 0.5.2+git.commit.4b373cbbe165b0f8d3b19593dbb00b7c7cd1caa9
+    version: 0.6.3+git.commit.239757d13b7c16cfd8cb80f6dabdf5a2857644f7
 
   stumpy_core:
     git: https://github.com/stumpycr/stumpy_core.git

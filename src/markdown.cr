@@ -298,6 +298,16 @@ module Markdown
       result = ["conf.yml", "kv://templates/page.tmpl"]
       result << source
       result << "kv://#{template}"
+
+      # Validate that all referenced shortcodes exist
+      available = Sc.available_shortcodes
+      shortcodes.reject(&.is_inline?).each do |scode|
+        unless available.includes?(scode.name)
+          raise "Unknown shortcode '#{scode.name}' in #{source}\n" +
+                "Available shortcodes: #{available.join(", ")}"
+        end
+      end
+
       result += shortcodes.reject(&.is_inline?).map { |scode| "kv://shortcodes/#{scode.name}.tmpl" }
       result
     end

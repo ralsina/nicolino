@@ -13,6 +13,6 @@ module Render
     Config.get("site").as_h.map { |k, v|
       ctx["site_#{k}"] = (v.as_a?.try &.map(&.as_s)) || v.as_s?
     }
-    Templates::Env.get_template(template).render(ctx)
+    Templates.environment.get_template(template).render(ctx)
   end
 end

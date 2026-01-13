@@ -14,7 +14,7 @@ module Base16
         "light" => Sixteen.theme(Config.get("site.light_scheme").as_s).context("_"),
         "dark"  => Sixteen.theme(Config.get("site.dark_scheme").as_s).context("_"),
       }
-      Templates::Env.get_template("templates/base16.tmpl").render(
+      Templates.environment.get_template("templates/base16.tmpl").render(
         color_context)
     end
   end
