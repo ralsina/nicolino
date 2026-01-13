@@ -23,8 +23,6 @@ module Listings
 
     return listings unless Dir.exists?(listings_path)
 
-    Log.info { "Scanning for code listings in #{listings_path}" }
-
     # Find all files in listings directory
     Dir.each_child(listings_path) do |filename|
       source_path = listings_path / filename
@@ -59,8 +57,6 @@ module Listings
 
   def self.render(listings : Array(Listing))
     return if listings.empty?
-
-    Log.info { "Generating #{listings.size} code listings" }
 
     # Generate listings CSS file
     render_css

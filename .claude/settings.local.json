@@ -36,7 +36,9 @@
       "Bash(find:*)",
       "WebFetch(domain:github.com)",
       "Bash(./nicolino-md-optimized build:*)",
-      "mcp__acp__Bash"
+      "mcp__acp__Bash",
+      "mcp__web-reader__webReader",
+      "mcp__acp__Edit"
     ],
     "deny": [],
     "ask": []

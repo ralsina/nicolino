@@ -1,12 +1,9 @@
 # VIPS is not available as a static library so for
 # easy-to-install release purposes we offer an alternative
-# imgkit based thumbnailer.
+# pure-Crystal thumbnailer using crimage.
 
 {% if flag?(:novips) %}
-  require "pluto"
-  require "pluto/format/jpeg"
-  require "pluto/format/stumpy"
-  require "stumpy_png"
+  require "crimage"
 {% else %}
   require "vips"
 {% end %}
@@ -37,25 +34,9 @@ module Images
 
   def thumb(input : String, output : String, size : Int32)
     {% if flag?(:novips) %}
-      if File.extname(input).downcase == "png"
-        canvas = StumpyPNG.read(input)
-        image = Pluto::ImageRGBA.from_stumpy(canvas)
-      else
-        image = File.open(input) do |file|
-          Pluto::ImageRGBA.from_jpeg(file)
-        end
-      end
-
-      image.bilinear_resize!(size, size)
-
-      io = IO::Memory.new
-      if File.extname(input).downcase == "png"
-        StumpyPNG.write(image.to_stumpy, io)
-      else
-        image.to_jpeg(io)
-      end
-      io.rewind
-      File.write(output, io)
+      img = CrImage.read(input)
+      thumb = img.thumb(size)
+      CrImage::JPEG.write(output, thumb)
     {% else %}
       init_vips_cache
 
