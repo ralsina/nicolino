@@ -49,6 +49,7 @@ module Templates
   # Load templates from templates/ and put them in the k/v store
   def self.load_templates
     ensure_templates
+    ensure_assets
     Log.debug { "Scanning Templates" }
     Dir.glob("templates/*.tmpl").each do |template|
       Croupier::Task.new(
@@ -62,6 +63,30 @@ module Templates
         # In auto mode the content may have changed though.
         File.read(template)
       end
+    end
+  end
+
+  # Ensure all baked-in assets exist in the assets/ directory
+  # If any are missing, extract them from the baked filesystem
+  def self.ensure_assets
+    assets_dir = Path["assets"]
+    FileUtils.mkdir_p(assets_dir) unless Dir.exists?(assets_dir)
+
+    begin
+      # Get list of baked-in asset files
+      Nicolino::AssetsFiles.files.each do |file|
+        # Get the relative path from assets/
+        asset_path = Path[assets_dir, file.path[1..]].normalize
+
+        # Check if file exists
+        unless File.exists?(asset_path)
+          Log.info { "Installing missing asset: #{asset_path}" }
+          FileUtils.mkdir_p(File.dirname(asset_path))
+          File.write(asset_path, file.gets_to_end)
+        end
+      end
+    rescue ex
+      Log.debug { "Could not check for missing assets: #{ex.message}" }
     end
   end
 
