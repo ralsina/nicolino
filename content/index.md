@@ -71,7 +71,7 @@ library and a few choice dependencies.
 * [Shortcodes](/shortcodes.html) somewhat compatible with Nikola and Hugo
 * Incremental builds, so it only rebuilds what's needed
 * Image galleries (see [our sample galleries.](/galleries/) )
-* Code listings with syntax highlighting and line numbers (see [listings](/content/listings/) )
+* Code listings with syntax highlighting and line numbers (see [listings](/listings/) )
 * Optional table of contents in posts/pages
 * Code blocks with syntax highlighting using [HighlightJS](https://highlightjs.org/)
 

@@ -61,8 +61,50 @@ module Listings
 
     Log.info { "Generating #{listings.size} code listings" }
 
+    # Generate listings index page
+    render_index(listings)
+
+    # Generate individual listing pages
     listings.each do |listing|
       render_listing(listing)
+    end
+  end
+
+  def self.render_index(listings : Array(Listing))
+    base_path = Path[Config.options.output]
+    output_path = (base_path / "listings" / "index.html").normalize.to_s
+
+    Croupier::Task.new(
+      id: "listings-index",
+      output: output_path,
+      inputs: ["conf.yml", "kv://templates/listings-index.tmpl", "kv://templates/page.tmpl"],
+      mergeable: false
+    ) do
+      Log.info { "👉 #{output_path}" }
+
+      # Sort listings by title
+      sorted_listings = listings.sort_by(&.title)
+
+      # Render the listings index template
+      rendered = Templates.environment.get_template("templates/listings-index.tmpl").render({
+        "listings" => sorted_listings.map { |l|
+          {
+            "title" => l.title,
+            "link"  => "#{l.title}#{File.extname(l.source)}.html",
+          }
+        },
+      })
+
+      # Apply to page template
+      html = Render.apply_template("templates/page.tmpl", {
+        "content" => rendered,
+        "title"   => "Code Listings",
+      })
+
+      # Process with HTML filters
+      doc = Lexbor::Parser.new(html)
+      doc = HtmlFilters.make_links_relative(doc, "/listings/")
+      doc.to_html
     end
   end
 
@@ -72,7 +114,8 @@ module Listings
     # Config.options.content may or may not have trailing slash
     content_prefix = Regex.escape(Config.options.content).rchop('/') + "(/|\\\\)?"
     relative_path = listing.source.sub(/^#{content_prefix}/, "")
-    output_filename = File.basename(relative_path, File.extname(relative_path)) + ".html"
+    # Use full filename with extension for output to avoid conflicts
+    output_filename = File.basename(relative_path) + ".html"
     output_path = (base_path / File.dirname(relative_path) / output_filename).normalize.to_s
 
     Croupier::Task.new(

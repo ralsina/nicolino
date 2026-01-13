@@ -34,14 +34,14 @@ module Archive
     end
 
     # Sort years in descending order (newest first)
-    sorted_years = years_hash.keys.sort.reverse
+    sorted_years = years_hash.keys.sort!.reverse!
 
     # Get the latest year for the default open state
     latest_year = sorted_years.first?.try(&.to_s) || ""
 
     # Build the data structure for the template
     years_data = sorted_years.map do |year|
-      months = years_hash[year].keys.sort.reverse
+      months = years_hash[year].keys.sort!.reverse!
       {
         "year"   => year.to_s,
         "months" => months.map do |month|

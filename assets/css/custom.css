@@ -283,3 +283,23 @@ summary.contents-heading {
     font-size: 0.85em;
     line-height: 1.4;
 }
+
+/* Listings index */
+.listings-index ul {
+    list-style: none;
+    padding: 0;
+}
+
+.listings-index li {
+    margin: 0.5em 0;
+}
+
+.listings-index a {
+    text-decoration: none;
+    font-family: monospace;
+    font-size: 1.1em;
+}
+
+.listings-index a:hover {
+    text-decoration: underline;
+}
