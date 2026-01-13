@@ -8,8 +8,6 @@ targets:
   nicolino:
     main: src/main.cr
 
-crystal: 1.8.2
-
 license: MIT
 
 dependencies:
@@ -27,23 +25,21 @@ dependencies:
     branch: master
   cr-discount:
     github: ralsina/cr-discount
-    branch: main
   shortcodes:
     github: ralsina/shortcodes
-    branch: main
   totem:
     github: icyleaf/totem
+  tartrazine:
+    github: ralsina/tartrazine
   cronic:
     github: nanobowers/cronic
   baked_file_system:
     github: ralsina/baked_file_system
-    branch: master
   progress_bar:
     github: mgomes/progress_bar
     branch: master
   sixteen:
     github: ralsina/sixteen
-    branch: main
   vips:
     github: naqvis/crystal-vips
   pluto:
@@ -54,6 +50,7 @@ dependencies:
     github: ralsina/oplog
   polydocopt:
     github: ralsina/polydocopt
+    branch: main
 
 development_dependencies:
   ameba:

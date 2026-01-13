@@ -1,3 +1,4 @@
+# NOTICE: This lockfile contains some overrides from shard.override.yml
 version: 2.0
 shards:
   RSS:
@@ -12,9 +13,17 @@ shards:
     git: https://github.com/ralsina/baked_file_system.git
     version: 0.10.0+git.commit.beb373124c7a235cfb9cd94e36849d8168eaa04b
 
+  base58:
+    git: https://github.com/crystal-china/base58.cr.git
+    version: 0.1.0+git.commit.f7193c497efff614cf87b03f0bd07741915a592f
+
   cr-discount:
     git: https://github.com/ralsina/cr-discount.git
-    version: 0.2.0+git.commit.4e31bb0ab7cdb07514d45769c2e363a4680dca80
+    version: 0.2.0
+
+  crimage:
+    git: https://github.com/naqvis/crimage.git
+    version: 1.0.4+git.commit.b65f67df27f4cb8807a34d94a90dfd4162acf45a
 
   crinja:
     git: https://github.com/straight-shoota/crinja.git
@@ -26,13 +35,13 @@ shards:
 
   croupier:
     git: https://github.com/ralsina/croupier.git
-    version: 0.5.4+git.commit.060a4845847c72b93636306f285fe19843b2a8fb
+    version: 0.6.0
 
   crystalline:
     git: https://github.com/jtomschroeder/crystalline.git
     version: 0.1.0+git.commit.e614f1c8b0a321fa74237db3c45bbb36aa3898e2
 
-  docopt:
+  docopt: # Overridden
     git: https://github.com/ralsina/docopt.cr.git
     version: 0.3.1
 
@@ -66,7 +75,7 @@ shards:
 
   polydocopt:
     git: https://github.com/ralsina/polydocopt.git
-    version: 0.1.1
+    version: 0.1.1+git.commit.52edc8790d30e0b6d8fe941adaeb618e97cad30b
 
   popcorn:
     git: https://github.com/icyleaf/popcorn.git
@@ -78,11 +87,11 @@ shards:
 
   shortcodes:
     git: https://github.com/ralsina/shortcodes.git
-    version: 0.2.2+git.commit.54e4cecfcbd4f4e6aedfe719f9d70820e83acbc3
+    version: 0.2.2
 
   sixteen:
     git: https://github.com/ralsina/sixteen.git
-    version: 0.6.3+git.commit.239757d13b7c16cfd8cb80f6dabdf5a2857644f7
+    version: 0.6.3
 
   stumpy_core:
     git: https://github.com/stumpycr/stumpy_core.git
@@ -91,6 +100,10 @@ shards:
   stumpy_png:
     git: https://github.com/stumpycr/stumpy_png.git
     version: 5.0.1
+
+  tartrazine:
+    git: https://github.com/ralsina/tartrazine.git
+    version: 0.20.0
 
   totem:
     git: https://github.com/icyleaf/totem.git

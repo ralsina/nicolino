@@ -204,3 +204,82 @@ summary.contents-heading {
 [data-theme="dark"] .table-of-contents {
     background: #1e1e2e;
 }
+
+/* Code listings */
+.listing {
+    margin: 2em 0;
+}
+
+.listing h1 {
+    margin-bottom: 0.5em;
+}
+
+.listing-meta {
+    margin: 1em 0;
+    font-size: 0.9em;
+    color: #666;
+}
+
+[data-theme="dark"] .listing-meta {
+    color: #a6adc8;
+}
+
+.listing-language {
+    display: inline-block;
+    padding: 0.25em 0.75em;
+    background: #f0f0f0;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+[data-theme="dark"] .listing-language {
+    background: #3e3e3e;
+}
+
+.listing-code {
+    margin: 1.5em 0;
+    overflow-x: auto;
+}
+
+.listing-code pre {
+    margin: 0;
+    padding: 1em;
+    border-radius: 4px;
+    background: #f8f8f8;
+}
+
+[data-theme="dark"] .listing-code pre {
+    background: #1e1e1e;
+}
+
+.listing-code code {
+    display: block;
+    line-height: 1.5;
+}
+
+.listing-raw {
+    margin: 1.5em 0;
+}
+
+.listing-raw summary {
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.listing-raw pre {
+    margin: 0.5em 0 0 0;
+    padding: 1em;
+    background: #f8f8f8;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+[data-theme="dark"] .listing-raw pre {
+    background: #1e1e1e;
+}
+
+.listing-raw code {
+    font-family: monospace;
+    font-size: 0.85em;
+    line-height: 1.4;
+}

@@ -8,6 +8,7 @@ require "./html"
 require "./http_handlers"
 require "./image"
 require "./folder_indexes"
+require "./listings"
 require "./locale"
 require "./markdown"
 require "./pandoc"
@@ -116,6 +117,18 @@ def create_tasks # ameba:disable Metrics/CyclomaticComplexity
   if features.includes? "images"
     images = Image.read_all(content_path)
     Image.render(images)
+  end
+
+  # Render code listings
+  if features.includes? "listings"
+    listings_dir = begin
+      Config.get("listings").as_s
+    rescue
+      "listings"
+    end
+    listings_path = content_path / listings_dir
+    listings = Listings.read_all(listings_path)
+    Listings.render(listings)
   end
 
   # Render sitemap

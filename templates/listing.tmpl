@@ -1,0 +1,16 @@
+<section class="listing">
+  <h1>{{ title }}</h1>
+
+  <div class="listing-meta">
+    <span class="listing-language">Language: {{ language }}</span>
+  </div>
+
+  <div class="listing-code">
+    {{ code|safe }}
+  </div>
+
+  <details class="listing-raw">
+    <summary role="button">View Raw Source</summary>
+    <pre><code>{{ raw_content }}</code></pre>
+  </details>
+</section>

@@ -90,6 +90,7 @@ features:
   - folder_indexes
   - galleries
   - images
+  - listings
   - pages
   - pandoc
   - posts
