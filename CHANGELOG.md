@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0] - 2026-01-13
+
+### 🚀 Features
+
+- Add thumbnail shortcode and fix HTML recursion
+- Improve blog post layout and navigation
+- Improve breadcrumb navigation in heading
+- Improve navigation, breadcrumbs, and metadata display
+- Add archive page with collapsible years
+- Auto-install missing templates from baked filesystem
+- Auto-install missing assets from baked filesystem
+- Only show updated timestamp if significantly different
+- Add external link display and pandoc conversion script
+- Add code listings feature with tartrazine syntax highlighting
+- Improve listings with index page and better filenames
+- Add tartrazine CSS generation for syntax highlighting
+
+### 🐛 Bug Fixes
+
+- Address critical code quality issues
+- Improve error message for missing shortcodes
+- Resolve HTML file rendering missing TOC hash key error
+- Properly rewind baked files before writing
+- Use markdown-smart to prevent quote escaping in pandoc conversion
+- Avoid ambiguous requirement
+- Disable highlight.js on listing pages to use tartrazine styling
+
+### 🚜 Refactor
+
+- Use block syntax for Croupier Task in auto command
+- Use tartrazine auto-detection for language detection
+- Use Process.find_executable instead of which command
+
+### ⚡ Performance
+
+- Optimize header downgrading by moving children directly
+- Optimize make_links_relative and shortcode replacement
+
+### 🎨 Styling
+
+- Fix ameba linting issues in listings.cr
+- Fix all remaining ameba linting issues
+
 ## [0.4.0] - 2025-11-24
 
 ### 🚀 Features
@@ -22,11 +65,6 @@ All notable changes to this project will be documented in this file.
 
 - Optimize image processing pipeline
 - Implement shortcode fast-path optimization
-
-### Bump
-
-- Release v0.4.0
-- Release v0.4.0
 
 ## [0.3.0] - 2025-05-27
 
