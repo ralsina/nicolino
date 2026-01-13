@@ -211,27 +211,38 @@ module Markdown
         # TODO: show actual error
         Log.error { Shortcodes.nice_error(e, text) }
       end
-      # Starting at the end of text, go backwards
-      # replacing each shortcode with its output
 
       # FIXME: context needs stuff
       context = Crinja::Context.new
-      sc_list.shortcodes.reverse_each do |scode|
+
+      # Build output efficiently using IO::Memory instead of string concatenation
+      output = IO::Memory.new
+      last_pos = 0
+
+      sc_list.shortcodes.each do |scode|
         if scode.markdown? # Recurse for nested shortcodes
           # If there are nested shortcodes, handle them
           scode.data = _replace_shortcodes(scode.data)
         end
-        middle = Sc.render_sc(scode, context)
-        if scode.position > 0
-          text = text[...scode.position] +
-                 middle +
-                 text[(scode.position + scode.whole.size)..]
-        else
-          text = middle +
-                 text[(scode.position + scode.whole.size)..]
+
+        # Append text before this shortcode
+        if scode.position > last_pos
+          output << text[last_pos...scode.position]
         end
+
+        # Append the rendered shortcode
+        middle = Sc.render_sc(scode, context)
+        output << middle
+
+        last_pos = scode.position + scode.whole.size
       end
-      text
+
+      # Append remaining text after last shortcode
+      if last_pos < text.size
+        output << text[last_pos..]
+      end
+
+      output.to_s
     end
 
     def replace_shortcodes(lang)

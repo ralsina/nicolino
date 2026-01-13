@@ -41,20 +41,37 @@ module HtmlFilters
       base_uri = URI.parse(base)
       doc.nodes("a").each do |node|
         next unless node.has_key? "href"
-        node["href"] = base_uri.relativize(base_uri.resolve(node["href"])).to_s
+        href = node["href"]
+        # Fast path: skip anchors and already-root-relative URLs
+        if href.starts_with?("#") || href.starts_with?("/")
+          next
+        end
+        node["href"] = base_uri.relativize(base_uri.resolve(href)).to_s
       end
       doc.nodes("link").each do |node|
         next if node.fetch("rel", nil) == "canonical"
         next unless node.has_key? "href"
-        node["href"] = base_uri.relativize(base_uri.resolve(node["href"])).to_s
+        href = node["href"]
+        if href.starts_with?("/")
+          next
+        end
+        node["href"] = base_uri.relativize(base_uri.resolve(href)).to_s
       end
       doc.nodes("img").each do |node|
         next unless node.has_key? "src"
-        node["src"] = base_uri.relativize(base_uri.resolve(node["src"])).to_s
+        src = node["src"]
+        if src.starts_with?("/")
+          next
+        end
+        node["src"] = base_uri.relativize(base_uri.resolve(src)).to_s
       end
       doc.nodes("script").each do |node|
         next unless node.has_key? "src"
-        node["src"] = base_uri.relativize(base_uri.resolve(node["src"])).to_s
+        src = node["src"]
+        if src.starts_with?("/")
+          next
+        end
+        node["src"] = base_uri.relativize(base_uri.resolve(src)).to_s
       end
       doc
     end
