@@ -1,4 +1,5 @@
 require "./assets"
+require "./archive"
 require "./commands/*"
 require "./base16"
 require "./config"
@@ -77,6 +78,10 @@ def create_tasks # ameba:disable Metrics/CyclomaticComplexity
           posts
         ).render
       end
+    end
+
+    if features.includes? "archive"
+      Archive.render(posts)
     end
 
     Markdown.render_rss(
