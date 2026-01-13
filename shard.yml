@@ -25,6 +25,7 @@ dependencies:
     branch: master
   cr-discount:
     github: ralsina/cr-discount
+    branch: main
   shortcodes:
     github: ralsina/shortcodes
   totem:

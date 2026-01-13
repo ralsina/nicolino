@@ -35,7 +35,8 @@
       "WebFetch(domain:www.libvips.org)",
       "Bash(find:*)",
       "WebFetch(domain:github.com)",
-      "Bash(./nicolino-md-optimized build:*)"
+      "Bash(./nicolino-md-optimized build:*)",
+      "mcp__acp__Bash"
     ],
     "deny": [],
     "ask": []

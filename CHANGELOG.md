@@ -45,6 +45,10 @@ All notable changes to this project will be documented in this file.
 - Fix ameba linting issues in listings.cr
 - Fix all remaining ameba linting issues
 
+### Bump
+
+- Release v0.5.0
+
 ## [0.4.0] - 2025-11-24
 
 ### 🚀 Features
