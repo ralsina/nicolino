@@ -59,22 +59,21 @@ DOC
         Croupier::Task.new(
           id: "LiveReload",
           inputs: Croupier::TaskManager.tasks.keys,
-          mergeable: false,
-          proc: Croupier::TaskProc.new {
-            modified = Set(String).new
-            Croupier::TaskManager.modified.each do |path|
-              next if path.lchop? "kv://"
-              Croupier::TaskManager.depends_on(path).each do |dep|
-                next unless dep.lchop? "output/"
-                modified << Utils.path_to_link(dep)
-              end
+          mergeable: false
+        ) do
+          modified = Set(String).new
+          Croupier::TaskManager.modified.each do |path|
+            next if path.lchop? "kv://"
+            Croupier::TaskManager.depends_on(path).each do |dep|
+              next unless dep.lchop? "output/"
+              modified << Utils.path_to_link(dep)
             end
-            modified.each do |path|
-              Log.info { "LiveReload: #{path}" }
-              live_reload.send_reload(path: path, liveCSS: path.ends_with?(".css"))
-            end
-          }
-        )
+          end
+          modified.each do |path|
+            Log.info { "LiveReload: #{path}" }
+            live_reload.send_reload(path: path, liveCSS: path.ends_with?(".css"))
+          end
+        end
 
         # First do a normal run
         arguments = Croupier::TaskManager.tasks.keys if arguments.empty?
