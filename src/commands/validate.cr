@@ -12,8 +12,9 @@ Currently it will validate markdown and pandoc documents.
 More checks will be added over time.
 
 Usage:
-  nicolino validate [-c <file>][-q|-v <level>]
+  nicolino validate [--help][-c <file>][-q|-v <level>]
 Options:
+  --help            Show this help message
   -c <file>         Specify a config file to use [default: conf.yml]
   -v level          Control the verbosity, 0 to 6 [default: 4]
   -q                Don't log anything

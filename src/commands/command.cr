@@ -10,7 +10,8 @@ module Nicolino
     abstract struct Command < Polydocopt::Command
       def initialize(@options)
         # Load config and setup logging
-        Config.config(@options.fetch("-c", "conf.yml").as(String))
+        config_file = @options["-c"]? ? @options["-c"].as(String) : "conf.yml"
+        Config.config(config_file)
         verbosity = @options.fetch("-v", 4).to_s.to_i
         verbosity = 0 if @options["-q"] == 1
         progress = @options.fetch("--progress", nil)
