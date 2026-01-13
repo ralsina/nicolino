@@ -171,19 +171,16 @@ module Gallery
       end
     end
 
-    # Build parent-child relationships
+    # Build parent-child relationships using hash map for O(n) lookup
+    gallery_by_dir = all_galleries.to_h { |gallery| {Path[gallery.base].parent, gallery} }
+
     all_galleries.each do |gallery|
       gallery_dir = Path[gallery.base].parent
-
-      # Find potential parent galleries by looking for index.md in parent directories
       parent_dir = gallery_dir.parent
 
-      all_galleries.each do |potential_parent|
-        if potential_parent.base.parent == parent_dir
-          gallery.parent_gallery = potential_parent
-          potential_parent.sub_galleries << gallery unless potential_parent.sub_galleries.includes?(gallery)
-          break
-        end
+      if potential_parent = gallery_by_dir[parent_dir]?
+        gallery.parent_gallery = potential_parent
+        potential_parent.sub_galleries << gallery unless potential_parent.sub_galleries.includes?(gallery)
       end
     end
 

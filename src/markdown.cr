@@ -96,7 +96,10 @@ module Markdown
       if self.@date.nil? || other.@date.nil?
         self.title <=> other.title
       else
-        -1 * (self.@date.as(Time) <=> other.@date.as(Time))
+        # Both dates are non-nil here based on the check above
+        my_date = @date.as(Time)
+        other_date = other.@date.as(Time)
+        -1 * (my_date <=> other_date)
       end
     end
 
@@ -198,7 +201,7 @@ module Markdown
     # Render the markdown HTML into the right template for the fragment
     def rendered(lang = nil)
       lang ||= Locale.language
-      Templates::Env.get_template(template(lang)).render(value(lang))
+      Templates.environment.get_template(template(lang)).render(value(lang))
     end
 
     def _replace_shortcodes(text : String) : String
@@ -361,7 +364,7 @@ module Markdown
       mergeable: false
     ) do
       Log.info { "👉 #{output}" }
-      content = Templates::Env.get_template("templates/index.tmpl").render(
+      content = Templates.environment.get_template("templates/index.tmpl").render(
         {
           "posts" => posts.map(&.value),
         })

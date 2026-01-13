@@ -8,10 +8,18 @@ module Utils
   # >> path_to_link("output/foo/../bar") # => "/bar"
   def self.path_to_link(path, extension = nil)
     p = Path[path].normalize
-    raise "Invalid path: #{path}" unless p.parts[0] == "output"
+    # Ensure path starts with "output" and doesn't escape it via ".."
+    if p.parts.empty? || p.parts[0] != "output"
+      raise "Invalid path: #{path} (must start with output/)"
+    end
 
-    return "/#{p.parts[1..].join("/")}" if extension.nil?
-    "/#{p.parts[1..].join("/").rchop(p.extension)}#{extension}"
+    # Remove "output" prefix and convert to link
+    link_parts = p.parts[1..]
+    if extension.nil?
+      "/#{link_parts.join("/")}"
+    else
+      "/#{link_parts.join("/").rchop(p.extension)}#{extension}"
+    end
   end
 
   # Filter out files from directories that correspond to disabled features
