@@ -153,8 +153,9 @@ module Listings
 
       # Apply to page template
       html = Render.apply_template("templates/page.tmpl", {
-        "content" => rendered,
-        "title"   => listing.title,
+        "content"         => rendered,
+        "title"           => listing.title,
+        "no_highlightjs"  => true,
       })
 
       # Process with HTML filters
