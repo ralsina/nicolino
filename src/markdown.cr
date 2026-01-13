@@ -267,13 +267,25 @@ module Markdown
     # What to show as breadcrumbs for this post
     def breadcrumbs(lang = nil)
       lang ||= Locale.language
-      # For blog posts, breadcrumb goes to the index
-      return [{name: "Posts",
-               link: Utils.path_to_link(Path[Config.options(lang).output] /
-                                        "posts/index.html")},
-              {name: title(lang)}] if date
-      # FIXME this should be the path to the page
-      [] of String
+      # For blog posts, detect the actual section from the path
+      if date
+        # Get the section from the output path (e.g., "blog" or "posts")
+        output_path = Path[output(lang)]
+        # The path is usually output/section/file.html or output/section/subsection/file.html
+        parts = output_path.parts
+        section = if parts.size >= 2 && parts[0] == "output"
+                    parts[1]  # Get "blog", "posts", etc.
+                  else
+                    "posts"  # Fallback
+                  end
+
+        [{name: section.capitalize,
+          link: Utils.path_to_link(Path[Config.options(lang).output] / "#{section}/index.html")},
+         {name: title(lang)}]
+      else
+        # FIXME this should be the path to the page
+        [] of String
+      end
     end
 
     # Return a value Crinja can use in templates

@@ -37,7 +37,7 @@ options:
   galleries: "galleries/"
   # Default localization options.
   # If you want more than one language look at the laguages section
-  date_output_format: "%Y-%m-%d %H:%M"
+  date_output_format: "%B %e, %Y"
   locale: "en_US.UTF-8"
   language: "en"
   # What extensions you want associated with what pandoc format.

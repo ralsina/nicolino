@@ -1,12 +1,34 @@
-{% include "templates/title.tmpl" %}
-{% if date %}
-date: {{date}}
-{% endif %}
-</br>
-{% if toc | length > 0 %}
-<details closed>
+<article>
+  <header class="post-header">
+    {% include "templates/title.tmpl" %}
+
+    {% if date %}
+    <div class="post-meta">
+      <span class="post-date">{{date}}</span>
+      {% if taxonomies | length > 0 %}
+        {% for k,v in taxonomies %}
+          {% if v | length > 0 %}
+            <span class="post-taxonomies">
+              {{k}}:
+              {% for term in v %}
+                {{term | link}}{% if not loop.last %}, {% endif %}
+              {% endfor %}
+            </span>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+    {% endif %}
+  </header>
+
+  {% if toc | length > 0 %}
+  <details closed class="table-of-contents">
     <summary class="contents-heading secondary" role="link">Contents</summary>
     {{toc}}
-</details>
-{% endif %}
-{{html}}
+  </details>
+  {% endif %}
+
+  <div class="post-content">
+    {{html}}
+  </div>
+</article>
