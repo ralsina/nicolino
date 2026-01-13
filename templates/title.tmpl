@@ -1,13 +1,9 @@
 <h2>
   {% if breadcrumbs|length > 0 %}
   <nav aria-label="breadcrumb" class="breadcrumb">
-    <a href="/">Home</a>
     {% for item in breadcrumbs %}
-      {% if not loop.last %}
-        » <a href="{{ item.link }}">{{ item.name }}</a>
-      {% else %}
-        » <a href="{{link}}">{{ item.name }}</a>
-      {% endif %}
+      {% if not loop.first %} » {% endif %}
+      <a href="{{ item.link }}">{{ item.name }}</a>
     {% endfor %}
   </nav>
   {% else %}

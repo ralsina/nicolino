@@ -7,11 +7,11 @@
     <span class="post-updated">(Updated: {{metadata.updated}})</span>
   {% endif %}
   {% if taxonomies | length > 0 %}
-    {% for k,v in taxonomies %}
-      {% if v | length > 0 %}
+    {% for taxonomy, terms in taxonomies %}
+      {% if terms | length > 0 %}
         <span class="post-taxonomies">
-          {{k}}:
-          {% for term in v %}
+          <a href="{{ taxonomy.link }}">{{ taxonomy.name }}</a>:
+          {% for term in terms %}
             {{term | link}}{% if not loop.last %}, {% endif %}
           {% endfor %}
         </span>

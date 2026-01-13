@@ -185,8 +185,14 @@ module Markdown
         begin
           @date = Cronic.parse(t.to_s)
         rescue ex
-          Log.error { "Error parsing date for #{source}, #{t}" }
-          @date = nil
+          # Try RFC 2822 format (common in RSS feeds and email)
+          begin
+            @date = Time::Format::RFC_2822.parse(t.to_s)
+          rescue ex2
+            Log.error { "Error parsing date for #{source}, #{t}" }
+            Log.debug { "Tried Cronic and RFC_2822 formats" }
+            @date = nil
+          end
         end
       end
       @date
@@ -279,12 +285,16 @@ module Markdown
                     "posts" # Fallback
                   end
 
-        [{name: section.capitalize,
+        [{name: "Home",
+          link: "/"},
+         {name: section.capitalize,
           link: Utils.path_to_link(Path[Config.options(lang).output] / "#{section}/index.html")},
-         {name: title(lang)}]
+         {name: title(lang),
+          link: link(lang)}]
       else
-        # FIXME this should be the path to the page
-        [] of String
+        # For pages without dates, just show the title
+        [{name: title(lang),
+          link: link(lang)}] of {name: String, link: String}
       end
     end
 

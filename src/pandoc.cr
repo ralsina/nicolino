@@ -1,4 +1,5 @@
 require "./markdown"
+require "lexbor"
 
 module Pandoc
   # A file written in markdown
@@ -8,12 +9,15 @@ module Pandoc
       # FIXME: Figure out how to extract TOC
       ext = Path[source].extension
       format = Config.options.formats[ext]
-      @html[lang], @toc[lang] = compile(
+      result, toc_content = compile(
         replace_shortcodes(lang),
         metadata(lang).fetch("toc", nil) != nil,
         format: format)
-      @html[lang] = HtmlFilters.downgrade_headers(html(lang))
-      @html[lang] = HtmlFilters.make_links_relative(html(lang), link)
+      doc = Lexbor::Parser.new(result)
+      doc = HtmlFilters.downgrade_headers(doc)
+      doc = HtmlFilters.make_links_relative(doc, link)
+      @html[lang] = doc.to_html
+      @toc[lang] = toc_content
     end
 
     # Use a memoized compile method because pandoc is so slow

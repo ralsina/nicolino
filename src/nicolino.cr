@@ -32,6 +32,15 @@ def create_tasks # ameba:disable Metrics/CyclomaticComplexity
   content_post_output_path = output_path / Config.options.posts
   galleries_path = content_path / Config.options.galleries
 
+  # Check for required external commands
+  if features.includes? "pandoc"
+    unless `which pandoc`.strip.empty? == false
+      Log.error { "The 'pandoc' feature is enabled but pandoc is not installed or not in PATH" }
+      Log.error { "Please install pandoc or disable the 'pandoc' feature in conf.yml" }
+      exit 1
+    end
+  end
+
   # Load templates to k/v store
   Templates.load_templates
 
@@ -120,8 +129,18 @@ def create_tasks # ameba:disable Metrics/CyclomaticComplexity
 
   # Get exclude patterns from config if available
   exclude_patterns = [] of String
-  if Config.get("folder_indexes.exclude_dirs")
-    exclude_patterns = Config.get("folder_indexes.exclude_dirs").as_a.map(&.as_s)
+  begin
+    exclude_dirs = Config.get("folder_indexes.exclude_dirs")
+    exclude_patterns = exclude_dirs.as_a.map(&.as_s) if exclude_dirs
+  rescue
+    # Key doesn't exist, use empty array
+  end
+
+  # Automatically exclude galleries directory if galleries feature is enabled
+  # to avoid conflicts with gallery index generation
+  if features.includes? "galleries"
+    galleries_exclude = Config.options.galleries
+    exclude_patterns << galleries_exclude unless exclude_patterns.includes?(galleries_exclude)
   end
 
   indexes = FolderIndexes.read_all(galleries_path, exclude_patterns)

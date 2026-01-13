@@ -2,6 +2,9 @@
 .breadcrumb {
     font-size: 0.9em;
     color: #666;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25em;
 }
 
 [data-theme="dark"] .breadcrumb {
@@ -11,6 +14,15 @@
 .breadcrumb a {
     color: inherit;
     text-decoration: none;
+}
+
+.breadcrumb a:not(:first-child)::before {
+    content: " » ";
+    color: #666;
+}
+
+[data-theme="dark"] .breadcrumb a:not(:first-child)::before {
+    color: #aaa;
 }
 
 .breadcrumb a:hover {
@@ -42,27 +54,37 @@
 
 .post-meta {
     margin-top: 0.5em;
+    margin-bottom: 1.5em;
+    padding-bottom: 1em;
+    border-bottom: 1px solid #e0e0e0;
     display: flex;
-    flex-wrap: wrap;
-    gap: 1em;
+    flex-direction: column;
+    gap: 0.5em;
     font-size: 0.9em;
     color: #666;
 }
 
 [data-theme="dark"] .post-meta {
+    border-bottom-color: #3e3e3e;
     color: #a6adc8;
+}
+
+.post-meta span {
+    display: block;
 }
 
 .post-date {
     font-weight: 500;
 }
 
-/* Taxonomies */
+.post-updated {
+    font-weight: normal;
+    font-style: italic;
+}
+
 .post-taxonomies {
-    margin-top: 0.5em;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1em;
+    margin-top: 0;
+    display: block;
     font-size: 0.85em;
     color: #666;
 }
