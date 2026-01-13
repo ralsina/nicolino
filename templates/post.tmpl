@@ -3,7 +3,7 @@
 {% if date %}
 <div class="post-meta">
   <span class="post-date">Posted: {{date}}</span>
-  {% if metadata.updated and metadata.updated != date %}
+  {% if metadata.updated and show_updated %}
     <span class="post-updated">(Updated: {{metadata.updated}})</span>
   {% endif %}
   {% if taxonomies | length > 0 %}

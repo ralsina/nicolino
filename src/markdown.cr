@@ -312,20 +312,40 @@ module Markdown
       end
     end
 
+    # Check if the updated date should be shown (at least 1 minute different from post date)
+    def show_updated?(lang = nil)
+      lang ||= Locale.language
+      return false if @date.nil?
+
+      updated_str = metadata(lang).fetch("updated", nil)
+      return false if updated_str.nil?
+
+      # Try to parse the updated date
+      begin
+        updated_time = Cronic.parse(updated_str)
+        return false if updated_time.nil?
+        # Show if updated is at least 1 minute (60 seconds) after the original date
+        (updated_time - @date.as(Time)) >= Time::Span.new(seconds: 60)
+      rescue
+        false
+      end
+    end
+
     # Return a value Crinja can use in templates
     def value(lang = nil)
       lang = lang || Locale.language
       {
-        "breadcrumbs" => breadcrumbs(lang),
-        "date"        => date.try &.as(Time).to_s(Config.options(lang).date_output_format),
-        "html"        => html(lang),
-        "link"        => link(lang),
-        "source"      => source(lang),
-        "summary"     => summary(lang),
-        "taxonomies"  => taxonomies,
-        "title"       => title(lang),
-        "toc"         => toc(lang),
-        "metadata"    => metadata(lang),
+        "breadcrumbs"  => breadcrumbs(lang),
+        "date"         => date.try &.as(Time).to_s(Config.options(lang).date_output_format),
+        "html"         => html(lang),
+        "link"         => link(lang),
+        "source"       => source(lang),
+        "summary"      => summary(lang),
+        "taxonomies"   => taxonomies,
+        "title"        => title(lang),
+        "toc"          => toc(lang),
+        "metadata"     => metadata(lang),
+        "show_updated" => show_updated?(lang),
       }
     end
 
