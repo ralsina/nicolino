@@ -10,9 +10,19 @@ module HtmlFilters
       headers = doc.nodes("h#{i}").to_a
       headers.each do |node|
         downgraded = doc.create_node("h#{i + n}")
-        downgraded.inner_html = node.inner_html
+        # Copy attributes
         if node.attributes.has_key? "class"
           downgraded["class"] = node.attributes["class"]
+        end
+        node.each_attribute do |key_slice, value_slice|
+          key = String.new(key_slice)
+          next if key == "class"
+          value = value_slice ? String.new(value_slice) : nil
+          downgraded[key] = value
+        end
+        # Move children directly (faster than inner_html which parses HTML)
+        node.children.each do |child|
+          downgraded.append_child(child)
         end
         node.insert_before(downgraded)
       end
