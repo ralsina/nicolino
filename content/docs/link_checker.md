@@ -2,8 +2,6 @@
 title: Link Checker
 ---
 
-# Link Checker
-
 The **link checker** feature validates all internal links in your built site to ensure they point to existing pages. This is especially useful when migrating content from other static site generators or when restructuring your site.
 
 ## Why Use the Link Checker?

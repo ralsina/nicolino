@@ -2,8 +2,6 @@
 title: Continuous Import
 ---
 
-# Continuous Import
-
 The **continuous import** feature allows you to import content from external RSS/Atom feeds into your Nicolino site. This enables **data ownership** - you can mirror content from third-party platforms (like GitHub releases, blog feeds, or any other RSS/Atom source) and have full control over it in your own site.
 
 ## Why Use Continuous Import?
@@ -97,8 +95,6 @@ Templates are stored in the `user_templates/` directory (not bundled with Nicoli
 ### Example Template
 
 ```markdown
-## {{ title }}
-
 {{ content }}
 
 [View Original]({{ link }})
@@ -135,8 +131,6 @@ Here's a complete example of how to import GitHub releases for your project.
 Create `user_templates/github_release.tmpl`:
 
 ```markdown
-## {{ title }}
-
 {{ content }}
 
 [View on GitHub]({{ link }})
@@ -196,8 +190,6 @@ continuous_import:
 
 **Template** (`user_templates/nicolino_release.tmpl`):
 ```markdown
-## {{ title }}
-
 {{ content }}
 
 [View on GitHub]({{ link }})

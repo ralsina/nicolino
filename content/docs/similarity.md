@@ -2,8 +2,6 @@
 title: Similarity Feature
 ---
 
-# Similarity Feature
-
 The **similarity feature** provides automatic "related posts" functionality using MinHash signatures to estimate content similarity between posts.
 
 ## Overview
