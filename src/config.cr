@@ -28,7 +28,7 @@ module Config
     property locale = "en_US.UTF-8"
     property language = "en"
     property verbosity = 3
-    property continuous_import_templates = "templates/continuous_import"
+    property continuous_import_templates = "user_templates"
   end
 
   @@options = Hash(String, Options).new
