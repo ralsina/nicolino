@@ -11,34 +11,6 @@
   {% endif %}
 </h2>
 
-<style>
-.breadcrumb-sep {
-  margin-left: 0;
-  margin-right: 8px;
-  width: 0px;
-  display: inline-block;
-}
-
-.breadcrumb-collapsed {
-  max-width: 0px;
-  overflow: hidden;
-  display: inline-block;
-  white-space: nowrap;
-  opacity: 0;
-  transition: max-width 0.3s ease, opacity 0.3s ease;
-  vertical-align: middle;
-}
-
-.breadcrumb:hover .breadcrumb-collapsed {
-  max-width: 200px;
-  opacity: 1;
-}
-
-.breadcrumb {
-  display: inline-block;
-}
-</style>
-
 {% if taxonomies | length > 1 %}
 <nav>
   <ul>

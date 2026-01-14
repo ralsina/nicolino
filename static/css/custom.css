@@ -2,9 +2,7 @@
 .breadcrumb {
     font-size: 0.9em;
     color: #666;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25em;
+    display: inline-block;
 }
 
 [data-theme="dark"] .breadcrumb {
@@ -16,35 +14,34 @@
     text-decoration: none;
 }
 
-.breadcrumb a:not(:first-child)::before {
-    content: " » ";
-    color: #666;
-}
-
-[data-theme="dark"] .breadcrumb a:not(:first-child)::before {
-    color: #aaa;
-}
-
 .breadcrumb a:hover {
     text-decoration: underline;
 }
 
-/* Collapsed state */
-.breadcrumb-collapsed .breadcrumb-expanded-text {
-    display: none;
+/* Breadcrumb separator */
+.breadcrumb-sep {
+    margin-left: 0;
+    margin-right: 8px;
+    width: 0px;
+    display: inline-block;
 }
 
-.breadcrumb-collapsed .breadcrumb-collapsed-text {
-    display: inline;
+/* Collapsed breadcrumb items */
+.breadcrumb-collapsed {
+    max-width: 0px;
+    overflow: hidden;
+    display: inline-block;
+    white-space: nowrap;
+    opacity: 0;
+    transition:
+        max-width 0.3s ease,
+        opacity 0.3s ease;
+    vertical-align: middle;
 }
 
-/* Expanded state */
-.breadcrumb-expanded .breadcrumb-expanded-text {
-    display: inline;
-}
-
-.breadcrumb-expanded .breadcrumb-collapsed-text {
-    display: none;
+.breadcrumb:hover .breadcrumb-collapsed {
+    max-width: 200px;
+    opacity: 1;
 }
 
 /* Post metadata section */
