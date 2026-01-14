@@ -2,14 +2,42 @@
   {% if breadcrumbs|length > 0 %}
   <nav aria-label="breadcrumb" class="breadcrumb">
     {% for item in breadcrumbs %}
-      {% if not loop.first %} » {% endif %}
-      <a href="{{ item.link }}">{{ item.name }}</a>
+      {% if not loop.first %}<span class="breadcrumb-sep"> » </span>{% endif %}
+      <a href="{{ item.link }}" class="{% if not loop.last %}breadcrumb-collapsed{% endif %}">{{ item.name }}</a>
     {% endfor %}
   </nav>
   {% else %}
   <a href="{{link}}">{{title}}</a>
   {% endif %}
 </h2>
+
+<style>
+.breadcrumb-sep {
+  margin-left: 0;
+  margin-right: 8px;
+  width: 0px;
+  display: inline-block;
+}
+
+.breadcrumb-collapsed {
+  max-width: 0px;
+  overflow: hidden;
+  display: inline-block;
+  white-space: nowrap;
+  opacity: 0;
+  transition: max-width 0.3s ease, opacity 0.3s ease;
+  vertical-align: middle;
+}
+
+.breadcrumb:hover .breadcrumb-collapsed {
+  max-width: 200px;
+  opacity: 1;
+}
+
+.breadcrumb {
+  display: inline-block;
+}
+</style>
 
 {% if taxonomies | length > 1 %}
 <nav>
