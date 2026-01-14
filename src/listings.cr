@@ -8,6 +8,20 @@ module Listings
   # Register output folder to exclude from folder_indexes
   FolderIndexes.register_exclude("listings/")
 
+  # Enable listings feature
+  def self.enable(is_enabled : Bool, content_path : Path)
+    return unless is_enabled
+
+    listings_dir = begin
+      Config.get("listings").as_s
+    rescue
+      "listings"
+    end
+    listings_path = content_path / listings_dir
+    listings = read_all(listings_path)
+    render(listings)
+  end
+
   # Represents a source code file to be syntax-highlighted
   class Listing
     property source : String

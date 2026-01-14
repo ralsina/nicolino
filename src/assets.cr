@@ -1,4 +1,10 @@
 module Assets
+  # Enable assets feature if enabled
+  def self.enable(is_enabled : Bool)
+    return unless is_enabled
+    render
+  end
+
   # Copy assets from assets/ to output/
   def self.render
     Dir.glob("assets/**/*").each do |src|

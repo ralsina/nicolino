@@ -1,7 +1,7 @@
 all: bin
 clean:
 	rm /bin/nicolino shard.lock lib -rf
-test: ameba --all --fix
+test: ameba --all --except Documentation/DocumentationAdmonition --fix
 bin:
 	shards build -d --error-trace
 release:

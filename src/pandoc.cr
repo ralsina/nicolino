@@ -2,6 +2,16 @@ require "./markdown"
 require "lexbor"
 
 module Pandoc
+  # Enable pandoc feature and check if installed
+  def self.enable(is_enabled : Bool)
+    return unless is_enabled
+
+    return unless Process.find_executable("pandoc").nil?
+    Log.error { "The 'pandoc' feature is enabled but pandoc is not installed or not in PATH" }
+    Log.error { "Please install pandoc or disable the 'pandoc' feature in conf.yml" }
+    exit 1
+  end
+
   # A file written in markdown
   class File < Markdown::File
     def html(lang = nil)

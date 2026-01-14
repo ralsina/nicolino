@@ -16,8 +16,15 @@ module Search
     }
   end
 
+  def self.enable(is_enabled : Bool)
+    return unless is_enabled
+    render
+  end
+
   def self.render
+    start = Time.monotonic
     inputs = Croupier::TaskManager.tasks.keys.select(&.to_s.ends_with?(".html"))
+    Log.info { "🔍 Search: collected #{inputs.size} inputs in #{(Time.monotonic - start).total_milliseconds}ms" }
     Croupier::Task.new(
       id: "search",
       output: output = (Path[Config.options.output] / "search.json").to_s,

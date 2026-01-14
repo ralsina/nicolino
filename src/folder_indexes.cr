@@ -13,6 +13,33 @@ module FolderIndexes
     @@excluded_folders
   end
 
+  # Enable folder_indexes feature
+  def self.enable(is_enabled : Bool, content_path : Path)
+    return unless is_enabled
+
+    # Collect exclude patterns from two sources:
+    # 1. Config file (manual overrides)
+    # 2. Feature modules that register their output folders
+
+    exclude_patterns = [] of String
+
+    # 1. Get exclude patterns from config if available
+    begin
+      exclude_dirs = Config.get("folder_indexes.exclude_dirs")
+      exclude_patterns = exclude_dirs.as_a.map(&.as_s) if exclude_dirs
+    rescue
+      # Key doesn't exist, use empty array
+    end
+
+    # 2. Get registered exclusions from feature modules
+    exclude_patterns += excluded_folders
+
+    # Scan full content path for folders needing indexes
+    content_path = content_path.expand
+    indexes = read_all(content_path, exclude_patterns)
+    render(indexes)
+  end
+
   # Generates indexes for folders that have no index file
   struct FolderIndex
     @path : Path

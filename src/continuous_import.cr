@@ -168,7 +168,6 @@ module ContinuousImport
   private def self.parse_atom_item(entry_node : XML::Node) : FeedItem?
     data = {} of String => String | Array(String)
 
-    # Get title using child iteration
     title = "Untitled"
     link = ""
     content = ""
@@ -177,30 +176,57 @@ module ContinuousImport
     entry_node.children.each do |child|
       next unless child.element?
 
-      case child.name
-      when "title"
-        title = child.content || "Untitled"
-      when "link"
-        if href = child["href"]?
-          link = href
-        end
-      when "content", "summary"
-        if content.empty?
-          content = child.content || ""
-        end
-      when "published", "updated"
-        if pub_date_str.empty?
-          pub_date_str = child.content || ""
-        end
-      end
-
-      # Store all fields in data hash
+      title, link, content, pub_date_str = process_atom_child(
+        child, title, link, content, pub_date_str
+      )
       data[child.name] = child.content || ""
     end
 
     pub_date = parse_date(pub_date_str)
 
     FeedItem.new(title, link, pub_date, content, data)
+  end
+
+  # Process a single child node in Atom entry
+  private def self.process_atom_child(
+    child : XML::Node,
+    title : String,
+    link : String,
+    content : String,
+    pub_date_str : String
+  ) : Tuple(String, String, String, String)
+    title = extract_atom_title(child, title)
+    link = extract_atom_link(child, link)
+    content = extract_atom_content(child, content)
+    pub_date_str = extract_atom_date(child, pub_date_str)
+
+    {title, link, content, pub_date_str}
+  end
+
+  # Extract title from Atom child node
+  private def self.extract_atom_title(child : XML::Node, current : String) : String
+    return current unless child.name == "title"
+    child.content || "Untitled"
+  end
+
+  # Extract link from Atom child node
+  private def self.extract_atom_link(child : XML::Node, current : String) : String
+    return current unless child.name == "link"
+    child["href"]? || ""
+  end
+
+  # Extract content from Atom child node
+  private def self.extract_atom_content(child : XML::Node, current : String) : String
+    return current unless {"content", "summary"}.includes?(child.name)
+    return current unless current.empty?
+    child.content || ""
+  end
+
+  # Extract date from Atom child node
+  private def self.extract_atom_date(child : XML::Node, current : String) : String
+    return current unless {"published", "updated"}.includes?(child.name)
+    return current unless current.empty?
+    child.content || ""
   end
 
   # Parse date from various formats
@@ -305,41 +331,13 @@ module ContinuousImport
   def self.import_feed(name : String, config : FeedConfig, templates_dir : String)
     Log.info { "Importing feed: #{name}" }
 
-    # Load template - try user template first, fall back to default
-    template_content = nil
-
-    template_path = File.join(templates_dir, config.template)
-    if File.exists?(template_path)
-      template_content = File.read(template_path)
-      Log.debug { "Using template: #{template_path}" }
-    else
-      Log.info { "Template not found: #{template_path}, using default template" }
-      template_content = DEFAULT_TEMPLATE
-    end
-
-    # Output directory
-    output_dir = File.join("content", config.output_folder)
-    Dir.mkdir_p(output_dir)
-
-    # Track existing posts to avoid duplicates
-    existing_posts = Dir.glob(File.join(output_dir, "*#{config.file_extension}"))
-      .map { |filepath| File.basename(filepath) }
-      .to_set
-
-    # Parse start_at date if specified
-    start_date = if config.start_at
-                   parse_date(config.start_at)
-                 else
-                   nil
-                 end
+    template_content = load_feed_template(config, templates_dir)
+    output_dir = setup_feed_output_dir(config)
+    existing_posts = get_existing_posts(output_dir, config)
+    start_date = parse_date(config.start_at)
 
     # Fetch and process all URLs
-    all_items = [] of FeedItem
-
-    config.urls.each do |url|
-      items = fetch_feed(url)
-      all_items.concat(items)
-    end
+    all_items = fetch_all_feed_items(config)
 
     # Sort by date (newest first)
     all_items.sort_by! { |item| item.pub_date || Time.utc }
@@ -349,62 +347,118 @@ module ContinuousImport
     skipped_count = 0
 
     all_items.each do |item|
-      # Check if should be skipped
-      if config.skip_titles.includes?(item.title)
-        Log.debug { "Skipping skipped title: #{item.title}" }
+      if should_skip_item(item, config, start_date, existing_posts)
         skipped_count += 1
         next
       end
 
-      # Check date filter
-      if start_date && (pub = item.pub_date)
-        if pub < start_date
-          Log.debug { "Skipping old item: #{item.title} (#{item.pub_date})" }
-          skipped_count += 1
-          next
-        end
-      end
-
-      # Generate filename
       filename = generate_filename(item, config)
-
-      # Check if already exists
-      if existing_posts.includes?(filename)
-        Log.debug { "Skipping existing: #{filename}" }
-        skipped_count += 1
-        next
-      end
-
-      # Generate content
-      content = generate_post(item, config, template_content)
-
-      # Write post file
-      output_path = File.join(output_dir, filename)
-
-      # Generate frontmatter
-      date = get_post_date(item, config)
-      title = if title_val = config.metadata["title"]?
-                get_metadata(item, [title_val.as_s]) || item.title
-              else
-                item.title
-              end
-
-      frontmatter = <<-FRONT
-        ---
-        title: "#{title.gsub(/"/, "\\\"")}"
-        date: #{date.to_s("%Y-%m-%d %H:%M:%S %z")}
-        tags: #{config.tags}
-        lang: #{config.lang}
-        ---
-
-        FRONT
-
-      File.write(output_path, frontmatter + content)
-      Log.info { "Created: #{output_path}" }
+      write_feed_post(item, config, template_content, output_dir, filename)
       imported_count += 1
     end
 
     Log.info { "Imported #{imported_count} posts, skipped #{skipped_count}" }
+  end
+
+  # Load template for feed, falling back to default
+  private def self.load_feed_template(config : FeedConfig, templates_dir : String) : String
+    template_path = File.join(templates_dir, config.template)
+    if File.exists?(template_path)
+      template_content = File.read(template_path)
+      Log.debug { "Using template: #{template_path}" }
+      template_content
+    else
+      Log.info { "Template not found: #{template_path}, using default template" }
+      DEFAULT_TEMPLATE
+    end
+  end
+
+  # Setup output directory for feed
+  private def self.setup_feed_output_dir(config : FeedConfig) : String
+    output_dir = File.join("content", config.output_folder)
+    Dir.mkdir_p(output_dir)
+    output_dir
+  end
+
+  # Get set of existing post filenames
+  private def self.get_existing_posts(output_dir : String, config : FeedConfig) : Set(String)
+    Dir.glob(File.join(output_dir, "*#{config.file_extension}"))
+      .map { |filepath| File.basename(filepath) }
+      .to_set
+  end
+
+  # Fetch all items from all configured URLs
+  private def self.fetch_all_feed_items(config : FeedConfig) : Array(FeedItem)
+    all_items = [] of FeedItem
+    config.urls.each do |url|
+      items = fetch_feed(url)
+      all_items.concat(items)
+    end
+    all_items
+  end
+
+  # Check if an item should be skipped
+  private def self.should_skip_item(
+    item : FeedItem,
+    config : FeedConfig,
+    start_date : Time?,
+    existing_posts : Set(String)
+  ) : Bool
+    # Check if should be skipped
+    if config.skip_titles.includes?(item.title)
+      Log.debug { "Skipping skipped title: #{item.title}" }
+      return true
+    end
+
+    # Check date filter
+    if start_date && (pub = item.pub_date)
+      if pub < start_date
+        Log.debug { "Skipping old item: #{item.title} (#{item.pub_date})" }
+        return true
+      end
+    end
+
+    # Check if already exists
+    filename = generate_filename(item, config)
+    if existing_posts.includes?(filename)
+      Log.debug { "Skipping existing: #{filename}" }
+      return true
+    end
+
+    false
+  end
+
+  # Write a feed post to file
+  private def self.write_feed_post(
+    item : FeedItem,
+    config : FeedConfig,
+    template_content : String,
+    output_dir : String,
+    filename : String
+  )
+    content = generate_post(item, config, template_content)
+    output_path = File.join(output_dir, filename)
+
+    # Generate frontmatter
+    date = get_post_date(item, config)
+    title = if title_val = config.metadata["title"]?
+              get_metadata(item, [title_val.as_s]) || item.title
+            else
+              item.title
+            end
+
+    frontmatter = <<-FRONT
+      ---
+      title: "#{title.gsub(/"/, "\\\"")}"
+      date: #{date.to_s("%Y-%m-%d %H:%M:%S %z")}
+      tags: #{config.tags}
+      lang: #{config.lang}
+      ---
+
+      FRONT
+
+    File.write(output_path, frontmatter + content)
+    Log.info { "Created: #{output_path}" }
   end
 
   # Import all configured feeds

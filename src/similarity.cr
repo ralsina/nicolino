@@ -9,6 +9,12 @@
 # small signatures that estimate Jaccard similarity.
 
 module Similarity
+  # Enable similarity feature (actual work is done in Posts.create_tasks)
+  def self.enable(is_enabled : Bool, posts : Array(Markdown::File))
+    # Similarity tasks are created by Posts.enable() before rendering
+    # This is a no-op for API consistency
+  end
+
   # Configuration for MinHash generation
   class_property num_permutations : Int32 = 128
   class_property ngram_size : Int32 = 3

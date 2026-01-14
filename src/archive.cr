@@ -8,6 +8,12 @@ module Archive
   # Register output folder to exclude from folder_indexes
   FolderIndexes.register_exclude("archive/")
 
+  # Enable archive feature if posts are available
+  def self.enable(is_enabled : Bool, posts : Array(Markdown::File))
+    return unless is_enabled
+    render(posts)
+  end
+
   def self.render(posts : Array(Markdown::File))
     # Filter posts that have dates
     dated_posts = posts.select { |post| !post.date.nil? }
@@ -64,7 +70,11 @@ module Archive
       Croupier::Task.new(
         id: "archive",
         output: output_path,
-        inputs: dated_posts.flat_map(&.dependencies) + ["kv://templates/archive.tmpl", "kv://templates/title.tmpl", "kv://templates/page.tmpl"],
+        inputs: dated_posts.flat_map(&.dependencies) + [
+          "kv://templates/archive.tmpl",
+          "kv://templates/title.tmpl",
+          "kv://templates/page.tmpl",
+        ],
         mergeable: false
       ) do
         Log.info { "👉 #{output_path}" }

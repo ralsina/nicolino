@@ -5,6 +5,22 @@ require "./utils"
 module Taxonomies
   include Utils
 
+  # Enable taxonomies feature if posts are available
+  def self.enable(is_enabled : Bool, posts : Array(Markdown::File))
+    return unless is_enabled
+
+    Config.taxonomies.map do |k, v|
+      Log.debug { "Scanning taxonomy: #{k}" }
+      Taxonomy.new(
+        k,
+        v.title,
+        v.term_title,
+        v.location,
+        posts
+      ).render
+    end
+  end
+
   # Register output folder to exclude from folder_indexes
   # Default is "tags/" but can be configured
   begin
@@ -107,7 +123,13 @@ module Taxonomies
         output = (base_path / "index.html").to_s
 
         # Create breadcrumbs for taxonomy index
-        breadcrumbs = [{name: "Home", link: "/"}, {name: @title[lang], link: Utils.path_to_link(Path[Config.options(lang).output] / "#{@path[lang]}/")}] of NamedTuple(name: String, link: String)
+        taxonomy_link = Utils.path_to_link(
+          Path[Config.options(lang).output] / "#{@path[lang]}/"
+        )
+        breadcrumbs = [
+          {name: "Home", link: "/"},
+          {name: @title[lang], link: taxonomy_link},
+        ] of NamedTuple(name: String, link: String)
 
         # Include title.tmpl which handles breadcrumbs
         title_html = Templates.environment.get_template("templates/title.tmpl").render({

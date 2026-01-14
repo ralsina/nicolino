@@ -9,6 +9,11 @@ module Sitemap
 
   FOOTER = "</urlset>"
 
+  def self.enable(is_enabled : Bool)
+    return unless is_enabled
+    render
+  end
+
   def self.noindex?(path)
     File.read(path).includes? %(<meta name="robots" content="noindex">)
   end
@@ -16,7 +21,9 @@ module Sitemap
   def self.render
     # TODO: support robot exclusion
     # TODO: support alternates for locations
+    start = Time.monotonic
     inputs = Croupier::TaskManager.tasks.keys.select(&.ends_with?(".html"))
+    Log.info { "🗺️ Sitemap: collected #{inputs.size} inputs in #{(Time.monotonic - start).total_milliseconds}ms" }
     Croupier::Task.new(
       id: "sitemap",
       output: output = (Path[Config.options.output] / "sitemap.xml").to_s,

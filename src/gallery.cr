@@ -15,6 +15,15 @@ module Gallery
   # Register output folder to exclude from folder_indexes
   FolderIndexes.register_exclude("galleries/")
 
+  # Enable galleries feature
+  def self.enable(is_enabled : Bool, galleries_path : Path)
+    return unless is_enabled
+
+    # Render galleries
+    galleries = read_all(galleries_path)
+    render(galleries, Config.options.galleries)
+  end
+
   # An image gallery
   class Gallery < Markdown::File
     property sub_galleries : Array(Gallery)

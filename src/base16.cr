@@ -3,6 +3,12 @@ require "sixteen"
 module Base16
   extend self
 
+  # Enable base16 feature if enabled
+  def self.enable(is_enabled : Bool)
+    return unless is_enabled
+    render_base16
+  end
+
   def self.render_base16
     Croupier::Task.new(
       id: "base16",

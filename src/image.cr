@@ -1,6 +1,14 @@
 require "./thumb"
 
 module Image
+  # Enable images feature
+  def self.enable(is_enabled : Bool, content_path : Path)
+    return unless is_enabled
+
+    images = read_all(content_path)
+    render(images)
+  end
+
   # An image to be processed
   struct Image
     property path : Path

@@ -25,7 +25,7 @@ require "yaml"
 
 VERSION = {{ `shards version #{__DIR__}`.chomp.stringify }}
 
-def create_tasks # ameba:disable Metrics/CyclomaticComplexity
+def create_tasks
   # Load config file
   features = Set.new(Config.get("features").as_a)
 
@@ -34,13 +34,7 @@ def create_tasks # ameba:disable Metrics/CyclomaticComplexity
   galleries_path = content_path / Config.options.galleries
 
   # Check for required external commands
-  if features.includes? "pandoc"
-    if Process.find_executable("pandoc").nil?
-      Log.error { "The 'pandoc' feature is enabled but pandoc is not installed or not in PATH" }
-      Log.error { "Please install pandoc or disable the 'pandoc' feature in conf.yml" }
-      exit 1
-    end
-  end
+  Pandoc.enable(features.includes?("pandoc"))
 
   # Load templates to k/v store
   Templates.load_templates
@@ -48,123 +42,24 @@ def create_tasks # ameba:disable Metrics/CyclomaticComplexity
   # Load shortcodes to k/v store
   Sc.load_shortcodes
 
-  # Copy assets/ to output/
-  if features.includes? "assets"
-    Assets.render
-  end
+  # Enable features
+  Assets.enable(features.includes?("assets"))
+  Base16.enable(features.includes?("base16"))
 
-  # Render custom color scheme
-  if features.includes? "base16"
-    Base16.render_base16
-  end
+  # Posts must be enabled before taxonomies, archive, and similarity
+  posts = Posts.enable(features.includes?("posts"), content_post_path, features)
 
-  # Render posts and RSS feed
-  if features.includes? "posts"
-    # FIXME: use a compiler registry or something
-    posts = Markdown.read_all(content_post_path)
-    posts += HTML.read_all(content_post_path)
-    posts += Pandoc.read_all(content_post_path) if features.includes? "pandoc"
-    posts.sort!
+  Taxonomies.enable(features.includes?("taxonomies"), posts) if posts
+  Similarity.enable(features.includes?("similarity"), posts) if posts
+  Archive.enable(features.includes?("archive"), posts) if posts
 
-    # Calculate MinHash signatures for similarity feature
-    # This must happen before rendering so related_posts are available
-    if features.includes? "similarity"
-      Similarity.create_tasks(posts)
-    end
-
-    Markdown.render(posts, require_date: true)
-
-    if features.includes? "taxonomies"
-      Config.taxonomies.map do |k, v|
-        Log.debug { "Scanning taxonomy: #{k}" }
-        Taxonomies::Taxonomy.new(
-          k,
-          v.title,
-          v.term_title,
-          v.location,
-          posts
-        ).render
-      end
-    end
-
-    if features.includes? "archive"
-      Archive.render(posts)
-    end
-
-    Markdown.render_rss(
-      posts[..10],
-      Path[Config.options.output] / "rss.xml",
-      Config.get("site.title").as_s,
-    )
-  end
-
-  if features.includes? "galleries"
-    # Render galleries
-    galleries = Gallery.read_all(galleries_path)
-    Gallery.render(galleries, Config.options.galleries)
-  end
-
-  # Render pages last because it's a catchall and will find gallery
-  # posts, blog posts, etc.
-  if features.includes? "pages"
-    pages = Markdown.read_all(content_path)
-    pages += HTML.read_all(content_path)
-    pages += Pandoc.read_all(content_path) if features.includes? "pandoc"
-    Markdown.render(pages, require_date: false)
-  end
-
-  # Render images from content
-  if features.includes? "images"
-    images = Image.read_all(content_path)
-    Image.render(images)
-  end
-
-  # Render code listings
-  if features.includes? "listings"
-    listings_dir = begin
-      Config.get("listings").as_s
-    rescue
-      "listings"
-    end
-    listings_path = content_path / listings_dir
-    listings = Listings.read_all(listings_path)
-    Listings.render(listings)
-  end
-
-  # Render sitemap
-  if features.includes? "sitemap"
-    Sitemap.render
-  end
-
-  # Render search data
-  if features.includes? "search"
-    Search.render
-  end
-
-  # Make indexes for folders without a index.* file
-  return unless features.includes? "folder_indexes"
-
-  # Collect exclude patterns from two sources:
-  # 1. Config file (manual overrides)
-  # 2. Feature modules that register their output folders
-
-  exclude_patterns = [] of String
-
-  # 1. Get exclude patterns from config if available
-  begin
-    exclude_dirs = Config.get("folder_indexes.exclude_dirs")
-    exclude_patterns = exclude_dirs.as_a.map(&.as_s) if exclude_dirs
-  rescue
-    # Key doesn't exist, use empty array
-  end
-
-  # 2. Get registered exclusions from feature modules
-  exclude_patterns += FolderIndexes.excluded_folders
-
-  # Scan full content path for folders needing indexes
-  content_path = Path.new(Config.options.content).expand
-  indexes = FolderIndexes.read_all(content_path, exclude_patterns)
-  FolderIndexes.render(indexes)
+  Gallery.enable(features.includes?("galleries"), galleries_path)
+  Pages.enable(features.includes?("pages"), content_path, features)
+  Image.enable(features.includes?("images"), content_path)
+  Listings.enable(features.includes?("listings"), content_path)
+  Sitemap.enable(features.includes?("sitemap"))
+  Search.enable(features.includes?("search"))
+  FolderIndexes.enable(features.includes?("folder_indexes"), content_path)
 end
 
 def run(

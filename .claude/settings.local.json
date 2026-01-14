@@ -42,7 +42,13 @@
       "mcp__acp__Write",
       "mcp__web-search-prime__webSearchPrime",
       "Skill(superpowers:brainstorming)",
-      "Skill(superpowers:brainstorming:*)"
+      "Skill(superpowers:brainstorming:*)",
+      "Skill(superpowers:writing-plans)",
+      "Skill(superpowers:writing-plans:*)",
+      "Skill(superpowers:executing-plans)",
+      "Skill(superpowers:executing-plans:*)",
+      "Skill(superpowers:systematic-debugging)",
+      "Skill(superpowers:systematic-debugging:*)"
     ],
     "deny": [],
     "ask": []
