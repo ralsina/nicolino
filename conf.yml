@@ -12,8 +12,8 @@ site:
   # scheme in CSS, which can be imported in custom.css
   # Also, to choose the HighlightJS color schemes for syntax
   # highlighting.
-  dark_scheme: "unikitty-dark"
-  light_scheme: "unikitty-light"
+  dark_scheme: "unikitty"
+  light_scheme: "unikitty"
   # This is a list of items to show in the navigation bar.
   # In the default theme they are shown at the right of
   # the title.

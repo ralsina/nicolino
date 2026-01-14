@@ -4,68 +4,69 @@ module Nicolino
   module Commands
     # nicolino color_schemes command
     #
-    # List and explore available base16 color schemes.
+    # List available base16 color scheme families.
     struct ColorSchemes < Command
       @@name = "color_schemes"
       @@doc = <<-DOC
-List and explore available base16 color schemes.
+List available base16 color scheme families.
 
 Usage:
-  nicolino color_schemes [--help][-c <file>][--families][--info <scheme>][--list][--interactive][-q|-v <level>]
+  nicolino color_schemes [--help][-c <file>][-q|-v <level>]
 
 Options:
   --help            Show this help message
   -c <file>         Specify a config file to use [default: conf.yml]
-  --families        Show theme families (dark/light variant groups)
-  --info <scheme>   Show detailed info about a specific scheme
-  --list            List all available schemes (default)
-  --interactive     Interactive theme browser
   -v level          Control the verbosity, 0 to 6 [default: 4]
   -q                Don't log anything
 
-Examples:
-  nicolino color_schemes              # List all schemes
-  nicolino color_schemes --families   # Show dark/light pairs
-  nicolino color_schemes --info unikitty-dark
-
 Configuration:
 
-Color schemes are configured in conf.yml:
+Color schemes are configured in conf.yml using a family base name:
 
   site:
-    dark_scheme: "unikitty-dark"
-    light_scheme: "unikitty-light"
+    dark_scheme: "unikitty"
+    light_scheme: "unikitty"
 
-To use a different scheme, simply change the scheme name. The 'sixteen'
-library includes 200+ base16 schemes. Use this command to discover them.
+The sixteen library will automatically find the dark and light variants
+for each family (e.g., unikitty-dark and unikitty-light).
 
-When you pick a scheme, consider using both dark and light variants from
-the same family for better consistency. Use --families to see related
-schemes.
+Examples of families with both dark and light variants:
+  - unikitty
+  - catppuccin
+  - rose-pine
+  - atelier-cave, atelier-dune, atelier-forest, etc.
+
+Use this command to see all available families and their variants.
 DOC
 
       def run : Int32
-        # Build args for the sixteen command
-        args = ["sixteen"]
-
-        if @options["--families"]?
-          args << "--families"
-        elsif info_scheme = @options["--info"]?
-          args << "--info"
-          args << info_scheme.as(String)
-        elsif @options["--interactive"]?
-          args << "--interactive"
-        else
-          args << "--list"
-        end
-
-        # Run the sixteen command with our args
-        Log.debug { "Running: sixteen #{args.join(" ")}" }
-        result = Process.run("sixteen", args[1..], output: Process::Redirect::Inherit, error: Process::Redirect::Inherit)
-        result.exit_code
+        show_families
+        0
       rescue ex : Exception
         Log.error(exception: ex) { "Error: #{ex.message}" }
         1
+      end
+
+      private def show_families
+        puts "Color scheme families (with dark and light variants):"
+        puts
+
+        families = Sixteen.theme_families.select { |family|
+          !family.dark_themes.empty? && !family.light_themes.empty?
+        }.sort_by!(&.base_name)
+
+        families.each do |family|
+          puts "#{family.base_name}"
+          puts "  dark:  #{family.dark_themes.join(", ")}"
+          puts "  light: #{family.light_themes.join(", ")}"
+          puts unless family == families.last?
+        end
+
+        puts "\nTotal families: #{families.size}"
+        puts "\nConfigure in conf.yml using the family base name:"
+        puts "  site:"
+        puts "    dark_scheme: \"<family-name>\""
+        puts "    light_scheme: \"<family-name>\""
       end
     end
   end
