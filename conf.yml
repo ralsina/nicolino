@@ -83,6 +83,19 @@ taxonomies:
     # Where the files are located in content/ and on output/
     location: "tags/"
 
+# Continuous import - fetch content from external feeds
+continuous_import:
+  nicolino_releases:
+    urls:
+      - "https://github.com/ralsina/nicolino/releases.atom"
+    template: "nicolino_release.tmpl"
+    output_folder: "posts/releases"
+    format: "md"
+    tags: "releases, nicolino"
+    metadata:
+      title: "title"
+      date: "published"
+
 # Features you want to enable are listed here
 features:
   - assets

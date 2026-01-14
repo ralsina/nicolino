@@ -39,7 +39,8 @@
       "mcp__acp__Bash",
       "mcp__web-reader__webReader",
       "mcp__acp__Edit",
-      "mcp__acp__Write"
+      "mcp__acp__Write",
+      "mcp__web-search-prime__webSearchPrime"
     ],
     "deny": [],
     "ask": []

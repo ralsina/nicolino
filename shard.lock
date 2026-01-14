@@ -85,6 +85,10 @@ shards:
     git: https://github.com/mgomes/progress_bar.git
     version: 1.0.1+git.commit.aa5ebab89d31167208387640db06d3964ec7922b
 
+  rss:
+    git: https://github.com/ruivieira/rss.git
+    version: 0.1.1
+
   shortcodes:
     git: https://github.com/ralsina/shortcodes.git
     version: 0.2.2
