@@ -36,7 +36,9 @@
   {% if not no_highlightjs %}
   <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
   {% endif %}
-  <!-- Custom style-->
+  <!-- Theme styles -->
+  <link rel="stylesheet" href="/css/theme.css" />
+  <!-- Custom style (loaded last for user overrides) -->
   <link rel="stylesheet" href="/css/custom.css" />
   {% if listings_css %}
   <link rel="stylesheet" href="/css/listings.css" />
