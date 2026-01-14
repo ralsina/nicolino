@@ -298,8 +298,6 @@ module ContinuousImport
 
   # Default template (baked-in) for simple use cases
   DEFAULT_TEMPLATE = <<-TEMPLATE
-  ## {{ title }}
-
   {{ content }}
   TEMPLATE
 

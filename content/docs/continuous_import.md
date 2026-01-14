@@ -328,7 +328,7 @@ This means:
 
 ## See Also
 
-- [Similarity Feature](/similarity.html) - Related posts functionality
+- [Similarity Feature](/docs/similarity.html) - Related posts functionality
 - [Templates Documentation](https://crinja.github.io/) - Crinja templating reference
 - [RSS 2.0 Specification](https://www.rssboard.org/rss-specification) - RSS format
 - [Atom Format](https://www.rfc-editor.org/rfc/rfc4287) - Atom format

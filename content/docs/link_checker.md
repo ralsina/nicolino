@@ -311,6 +311,6 @@ find content -type f -exec sed -i 's|broken-link-pattern|correct-link|g' {} \+
 
 ## See Also
 
-- [Continuous Import](/continuous_import.html) - For importing content from feeds
-- [Similarity Feature](/similarity.html) - For finding related posts
+- [Continuous Import](/docs/continuous_import.html) - For importing content from feeds
+- [Similarity Feature](/docs/similarity.html) - For finding related posts
 - [Deployment](https://nicolino.ralsina.me) - General deployment practices
