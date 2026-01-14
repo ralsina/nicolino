@@ -68,12 +68,6 @@ def create_tasks # ameba:disable Metrics/CyclomaticComplexity
     posts += Pandoc.read_all(content_post_path) if features.includes? "pandoc"
     posts.sort!
 
-    # Debug: print post order after sorting
-    Log.debug { "Posts after sorting (first 5):" }
-    posts[..5].each do |post|
-      Log.debug { "  #{post.title} - #{post.date}" }
-    end
-
     # Calculate MinHash signatures for similarity feature
     # This must happen before rendering so related_posts are available
     if features.includes? "similarity"

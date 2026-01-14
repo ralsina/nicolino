@@ -459,9 +459,11 @@ module Markdown
       mergeable: false
     ) do
       Log.info { "👉 #{output}" }
+      # Sort posts by date descending (newest first), posts without dates go last
+      sorted_posts = posts.sort_by { |p| p.date || Time.utc(1970, 1, 1) }.reverse
       content = Templates.environment.get_template("templates/index.tmpl").render(
         {
-          "posts" => posts.map(&.value),
+          "posts" => sorted_posts.map(&.value),
         })
       html = Render.apply_template("templates/page.tmpl",
         {
