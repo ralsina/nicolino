@@ -16,6 +16,7 @@ require "./render"
 require "./sc"
 require "./search"
 require "./sitemap"
+require "./similarity"
 require "./taxonomies"
 require "./template"
 require "croupier"
@@ -65,8 +66,21 @@ def create_tasks # ameba:disable Metrics/CyclomaticComplexity
     posts = Markdown.read_all(content_post_path)
     posts += HTML.read_all(content_post_path)
     posts += Pandoc.read_all(content_post_path) if features.includes? "pandoc"
-    Markdown.render(posts, require_date: true)
     posts.sort!
+
+    # Debug: print post order after sorting
+    Log.debug { "Posts after sorting (first 5):" }
+    posts[..5].each do |post|
+      Log.debug { "  #{post.title} - #{post.date}" }
+    end
+
+    # Calculate MinHash signatures for similarity feature
+    # This must happen before rendering so related_posts are available
+    if features.includes? "similarity"
+      Similarity.create_tasks(posts)
+    end
+
+    Markdown.render(posts, require_date: true)
 
     if features.includes? "taxonomies"
       Config.taxonomies.map do |k, v|

@@ -108,6 +108,7 @@ features:
   - pandoc
   - posts
   - search
+  - similarity
   - sitemap
   - taxonomies
   - archive

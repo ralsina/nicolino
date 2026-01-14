@@ -1,5 +1,6 @@
 require "./html_filters"
 require "./sc"
+require "./similarity"
 require "./taxonomies"
 require "cr-discount"
 require "cronic"
@@ -333,18 +334,34 @@ module Markdown
     def value(lang = nil)
       lang = lang || Locale.language
       {
-        "breadcrumbs"  => breadcrumbs(lang),
-        "date"         => date.try &.as(Time).to_s(Config.options(lang).date_output_format),
-        "html"         => html(lang),
-        "link"         => link(lang),
-        "source"       => source(lang),
-        "summary"      => summary(lang),
-        "taxonomies"   => taxonomies,
-        "title"        => title(lang),
-        "toc"          => toc(lang),
-        "metadata"     => metadata(lang),
-        "show_updated" => show_updated?(lang),
+        "breadcrumbs"   => breadcrumbs(lang),
+        "date"          => date.try &.as(Time).to_s(Config.options(lang).date_output_format),
+        "html"          => html(lang),
+        "link"          => link(lang),
+        "source"        => source(lang),
+        "summary"       => summary(lang),
+        "taxonomies"    => taxonomies,
+        "title"         => title(lang),
+        "toc"           => toc(lang),
+        "metadata"      => metadata(lang),
+        "show_updated"  => show_updated?(lang),
+        "related_posts" => related_posts(lang),
       }
+    end
+
+    # Get related posts based on similarity
+    def related_posts(lang = nil)
+      lang ||= Locale.language
+      features = Config.get("features").as_a.map(&.as_s)
+      return [] of Hash(String, String | Float64) unless features.includes?("similarity")
+
+      # Only try to find related posts if signatures exist
+      # This avoids errors during initial build or when signatures aren't ready
+      begin
+        Similarity.find_related(self, lang, 5)
+      rescue
+        [] of Hash(String, String | Float64)
+      end
     end
 
     # List of all files and kv store items this post uses
@@ -363,6 +380,13 @@ module Markdown
       end
 
       result += shortcodes.reject(&.is_inline?).map { |scode| "kv://shortcodes/#{scode.name}.tmpl" }
+
+      # Add similarity index as dependency if feature is enabled
+      features = Config.get("features").as_a.map(&.as_s)
+      if features.includes?("similarity")
+        result << "kv://similarity/index/en"
+      end
+
       result
     end
   end

@@ -34,3 +34,16 @@
 {% endif %}
 
 {{html}}
+
+{% if related_posts and related_posts | length > 0 %}
+<section class="related-posts">
+  <h2>Related Posts</h2>
+  <ul>
+  {% for related in related_posts %}
+    <li>
+      <a href="{{ related.link }}">{{ related.title }}</a>
+    </li>
+  {% endfor %}
+  </ul>
+</section>
+{% endif %}
