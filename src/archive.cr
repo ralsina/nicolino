@@ -64,10 +64,21 @@ module Archive
       Croupier::Task.new(
         id: "archive",
         output: output_path,
-        inputs: dated_posts.flat_map(&.dependencies) + ["kv://templates/archive.tmpl", "kv://templates/page.tmpl"],
+        inputs: dated_posts.flat_map(&.dependencies) + ["kv://templates/archive.tmpl", "kv://templates/title.tmpl", "kv://templates/page.tmpl"],
         mergeable: false
       ) do
         Log.info { "👉 #{output_path}" }
+
+        # Create breadcrumbs for archive
+        breadcrumbs = [{name: "Home", link: "/"}, {name: "Archive", link: "/archive/"}] of NamedTuple(name: String, link: String)
+
+        # Include title.tmpl which handles breadcrumbs
+        title_html = Templates.environment.get_template("templates/title.tmpl").render({
+          "title"       => "Archive",
+          "link"        => "/archive/",
+          "breadcrumbs" => breadcrumbs,
+          "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
+        })
 
         # Render the archive template
         rendered = Templates.environment.get_template("templates/archive.tmpl").render({
@@ -77,8 +88,9 @@ module Archive
 
         # Apply to page template
         html = Render.apply_template("templates/page.tmpl", {
-          "content" => rendered,
-          "title"   => "Archive",
+          "content"     => title_html + rendered,
+          "title"       => "Archive",
+          "breadcrumbs" => breadcrumbs,
         })
 
         # Process with HTML filters

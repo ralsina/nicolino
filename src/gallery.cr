@@ -50,6 +50,9 @@ module Gallery
       lang ||= Locale.language
       breadcrumbs = [] of NamedTuple(name: String, link: String)
 
+      # Add "Home" first
+      breadcrumbs << {name: "Home", link: "/"}
+
       # Add "Galleries" root
       gal_path = "/galleries/"
       breadcrumbs << {name: "Galleries", link: gal_path}

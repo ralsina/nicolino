@@ -2,10 +2,10 @@
 
 {{html}}
 {# Basically: every 5 images, wrap them in a grid div #}
-<div class="gallery">
+<div class="gallery lightbox">
 {% for image in image_list %}
     <div>
-        <a href="{{image}}" data-gall="gallery"><img src="{{image | thumb_url}}"></a>
+        <a href="{{image}}" data-gall="myGallery"><img src="{{image | thumb_url}}"></a>
     </div>
 {% endfor %}
 </div>

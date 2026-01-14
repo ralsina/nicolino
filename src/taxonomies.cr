@@ -105,19 +105,32 @@ module Taxonomies
       Config.languages.keys.each do |lang|
         base_path = Path[Config.options(lang).output] / Path["#{@path[lang]}"]
         output = (base_path / "index.html").to_s
+
+        # Create breadcrumbs for taxonomy index
+        breadcrumbs = [{name: "Home", link: "/"}, {name: @title[lang], link: Utils.path_to_link(Path[Config.options(lang).output] / "#{@path[lang]}/")}] of NamedTuple(name: String, link: String)
+
+        # Include title.tmpl which handles breadcrumbs
+        title_html = Templates.environment.get_template("templates/title.tmpl").render({
+          "title"       => @title[lang],
+          "link"        => Utils.path_to_link(Path[Config.options(lang).output] / "#{@path[lang]}/"),
+          "breadcrumbs" => breadcrumbs,
+          "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
+        })
+
         rendered = Templates.environment.get_template("templates/taxonomy.tmpl").render({"taxonomy" => value(lang)})
 
         Croupier::Task.new(
           id: "taxonomy",
           output: output,
-          inputs: @posts.flat_map(&.dependencies) + ["kv://templates/taxonomy.tmpl"],
+          inputs: @posts.flat_map(&.dependencies) + ["kv://templates/taxonomy.tmpl", "kv://templates/title.tmpl"],
           mergeable: false
         ) do
           Log.info { "👉 #{output}" }
           html = Render.apply_template("templates/page.tmpl",
             {
-              "content" => rendered,
-              "title"   => @title[lang],
+              "content"     => title_html + rendered,
+              "title"       => @title[lang],
+              "breadcrumbs" => breadcrumbs,
             })
           doc = Lexbor::Parser.new(html)
           doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))

@@ -161,10 +161,21 @@ module Listings
     Croupier::Task.new(
       id: "listing:#{listing.source}",
       output: output_path,
-      inputs: listing.dependencies + ["kv://templates/listing.tmpl", "kv://templates/page.tmpl"],
+      inputs: listing.dependencies + ["kv://templates/listing.tmpl", "kv://templates/title.tmpl", "kv://templates/page.tmpl"],
       mergeable: false
     ) do
       Log.info { "👉 #{output_path}" }
+
+      # Create breadcrumbs for listing page
+      breadcrumbs = [{name: "Home", link: "/"}, {name: "Code Listings", link: "/listings/"}] of NamedTuple(name: String, link: String)
+
+      # Include title.tmpl which handles breadcrumbs
+      title_html = Templates.environment.get_template("templates/title.tmpl").render({
+        "title"       => listing.title,
+        "link"        => "",
+        "breadcrumbs" => breadcrumbs,
+        "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
+      })
 
       # Generate syntax-highlighted HTML using tartrazine
       formatter = Tartrazine::Html.new(
@@ -193,10 +204,11 @@ module Listings
 
       # Apply to page template
       html = Render.apply_template("templates/page.tmpl", {
-        "content"        => rendered,
+        "content"        => title_html + rendered,
         "title"          => listing.title,
         "no_highlightjs" => true,
         "listings_css"   => true,
+        "breadcrumbs"    => breadcrumbs,
       })
 
       # Process with HTML filters
