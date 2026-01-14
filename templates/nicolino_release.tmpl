@@ -1,0 +1,20 @@
+{#
+  nicolino_release.tmpl - GitHub release post template
+
+  Simple template for imported GitHub releases:
+  - Release title as heading
+  - Release content body
+  - Link to GitHub release page
+
+  Variables:
+  - title: Release title/version
+  - content: Release notes/body
+  - link: GitHub release URL
+
+  Used by: Continuous import feature for nicolino_releases
+#}
+## {{ title }}
+
+{{ content }}
+
+[View on GitHub]({{ link }})
