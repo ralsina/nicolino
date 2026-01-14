@@ -3,3 +3,7 @@
 # Exclude directories
 exclude:
   - ^templates/
+
+# Disable documentation admonition warnings globally
+Documentation/DocumentationAdmonition:
+  Enabled: false
