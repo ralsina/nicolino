@@ -105,13 +105,13 @@ module FolderIndexes
           "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
         })
 
-        # Build content manually
+        # Build content using common template style
         content_html = String.build do |io|
-          io << "<div class=\"folder-contents\">\n"
+          io << "<section class=\"item-list-index\">\n"
 
           unless contents[:subdirs].empty?
             io << "  <h3>Subdirectories</h3>\n"
-            io << "  <ul class=\"file-list subdir-list\">\n"
+            io << "  <ul class=\"item-list subdir-list\">\n"
             contents[:subdirs].each do |subdir|
               io << "    <li><a href=\"#{subdir[:link]}\">#{subdir[:name]}</a></li>\n"
             end
@@ -120,7 +120,7 @@ module FolderIndexes
 
           unless contents[:files].empty?
             io << "  <h3>Pages</h3>\n"
-            io << "  <ul class=\"file-list pages-list\">\n"
+            io << "  <ul class=\"item-list pages-list\">\n"
             contents[:files].each do |file|
               io << "    <li><a href=\"#{file[:link]}\">#{file[:title]}</a></li>\n"
             end
@@ -131,14 +131,15 @@ module FolderIndexes
             io << "  <p>This folder is empty.</p>\n"
           end
 
-          io << "</div>\n"
+          io << "</section>\n"
           io << "<style>\n"
-          io << ".file-list { list-style-type: disc; padding-left: 1.5rem; margin: 1rem 0; }\n"
+          io << ".item-list-index { margin: 2rem 0; }\n"
+          io << ".item-list-index h3 { margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2em; color: var(--b16-base03); }\n"
           io << ".subdir-list { margin-bottom: 2rem; }\n"
-          io << ".file-list li { margin: 0.5rem 0; }\n"
-          io << ".file-list a { text-decoration: none; color: var(--b16-base0D); font-size: 1.1em; }\n"
-          io << ".file-list a:hover { text-decoration: underline; }\n"
-          io << ".folder-contents h3 { margin-top: 1.5rem; font-size: 1.2em; color: var(--b16-base03); }\n"
+          io << ".item-list { list-style-type: disc; padding-left: 1.5rem; margin: 1rem 0; }\n"
+          io << ".item-list li { margin: 0.5rem 0; }\n"
+          io << ".item-list a { text-decoration: none; color: var(--b16-base0D); font-size: 1.1em; }\n"
+          io << ".item-list a:hover { text-decoration: underline; }\n"
           io << "</style>\n"
         end
 

@@ -103,28 +103,42 @@ module Listings
     Croupier::Task.new(
       id: "listings-index",
       output: output_path,
-      inputs: ["conf.yml", "kv://templates/listings-index.tmpl", "kv://templates/page.tmpl"],
+      inputs: ["conf.yml", "kv://templates/item_list.tmpl", "kv://templates/title.tmpl", "kv://templates/page.tmpl"],
       mergeable: false
     ) do
       Log.info { "👉 #{output_path}" }
 
-      # Sort listings by title
-      sorted_listings = listings.sort_by(&.title)
+      # Create breadcrumbs for listings index
+      breadcrumbs = [{name: "Home", link: "/"}, {name: "Code Listings", link: "/listings/"}] of NamedTuple(name: String, link: String)
 
-      # Render the listings index template
-      rendered = Templates.environment.get_template("templates/listings-index.tmpl").render({
-        "listings" => sorted_listings.map { |listing|
-          {
-            "title" => listing.title,
-            "link"  => "#{listing.title}#{File.extname(listing.source)}.html",
-          }
-        },
+      # Include title.tmpl which handles breadcrumbs
+      title_html = Templates.environment.get_template("templates/title.tmpl").render({
+        "title"       => "Code Listings",
+        "link"        => "/listings/",
+        "breadcrumbs" => breadcrumbs,
+        "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
+      })
+
+      # Sort listings by title and build items list
+      items = listings.sort_by(&.title).map { |listing|
+        {
+          link:  "#{listing.title}#{File.extname(listing.source)}.html",
+          title: listing.title,
+        }
+      }
+
+      # Render the item list template
+      content = Templates.environment.get_template("templates/item_list.tmpl").render({
+        "title"       => "Code Listings",
+        "description" => "A collection of source code files with syntax highlighting.",
+        "items"       => items,
       })
 
       # Apply to page template
       html = Render.apply_template("templates/page.tmpl", {
-        "content" => rendered,
-        "title"   => "Code Listings",
+        "content"     => title_html + content,
+        "title"       => "Code Listings",
+        "breadcrumbs" => breadcrumbs,
       })
 
       # Process with HTML filters

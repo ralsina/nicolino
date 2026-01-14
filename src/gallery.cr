@@ -245,29 +245,41 @@ module Gallery
       Croupier::Task.new(
         id: "galleries_index",
         output: output_path.to_s,
-        inputs: ["conf.yml", "kv://templates/page.tmpl"],
+        inputs: ["conf.yml", "kv://templates/page.tmpl", "kv://templates/title.tmpl"],
         mergeable: false
       ) do
         Log.info { "👉 #{output_path}" }
 
-        # Create a simple index page with gallery listings
-        gallery_links = [] of String
-        galleries.each do |gallery|
+        # Create breadcrumbs for galleries index
+        breadcrumbs = [{name: "Home", link: "/"}, {name: "Galleries", link: "/galleries/"}] of NamedTuple(name: String, link: String)
+
+        # Include title.tmpl which handles breadcrumbs
+        title_html = Templates.environment.get_template("templates/title.tmpl").render({
+          "title"       => "Galleries",
+          "link"        => "/galleries/",
+          "breadcrumbs" => breadcrumbs,
+          "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
+        })
+
+        # Build items list for the template
+        items = galleries.map do |gallery|
           gallery_output = gallery.output(lang)
           gallery_dir = File.dirname(gallery_output)
           gallery_link = gallery_dir.gsub(/^output\//, "/")
-          gallery_links << %(<li><a href="#{gallery_link}">#{gallery.title(lang)}</a></li>)
+          {link: gallery_link, title: gallery.title(lang)}
         end
 
-        content = if gallery_links.empty?
-                    "<p>No galleries found.</p>"
-                  else
-                    "<h2>Available Galleries</h2><ul>#{gallery_links.join("")}</ul>"
-                  end
+        # Render the item list template
+        content = Templates.environment.get_template("templates/item_list.tmpl").render({
+          "title"       => "Galleries",
+          "description" => "A collection of image galleries.",
+          "items"       => items,
+        })
 
         html = Render.apply_template("templates/page.tmpl", {
-          "content" => content,
-          "title"   => "Galleries",
+          "content"     => title_html + content,
+          "title"       => "Galleries",
+          "breadcrumbs" => breadcrumbs,
         })
         doc = Lexbor::Parser.new(html)
         doc = HtmlFilters.make_links_relative(doc, output_path.to_s)
