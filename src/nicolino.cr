@@ -29,10 +29,8 @@ def create_tasks # ameba:disable Metrics/CyclomaticComplexity
   # Load config file
   features = Set.new(Config.get("features").as_a)
 
-  output_path = Path[Config.options.output]
   content_path = Path[Config.options.content]
   content_post_path = content_path / Config.options.posts
-  content_post_output_path = output_path / Config.options.posts
   galleries_path = content_path / Config.options.galleries
 
   # Check for required external commands
@@ -74,7 +72,7 @@ def create_tasks # ameba:disable Metrics/CyclomaticComplexity
       Similarity.create_tasks(posts)
     end
 
-    Markdown.render(posts, require_date = true)
+    Markdown.render(posts, require_date: true)
 
     if features.includes? "taxonomies"
       Config.taxonomies.map do |k, v|
