@@ -9,12 +9,14 @@ The **continuous import** feature allows you to import content from external RSS
 ## Why Use Continuous Import?
 
 Many platforms host content that you create:
+
 - **GitHub releases** for your software projects
 - **Blog posts** on platforms like Medium, Blogger, or WordPress
 - **Podcast episodes** from podcast hosting services
 - **News feeds** from various sources
 
 With continuous import, you can:
+
 - **Own your data** - Import and host copies of your content on your own site
 - **Customize presentation** - Apply your own styling and templates
 - **Preserve content** - Keep your content even if the original platform shuts down
@@ -29,6 +31,7 @@ With continuous import, you can:
 4. **Build your site** normally with the imported content included
 
 The import process:
+
 - Fetches RSS/Atom feeds via HTTP
 - Parses feed items (entries, articles, etc.)
 - Generates markdown files with frontmatter
@@ -162,6 +165,7 @@ nicolino import --feed nicolino_releases
 ```
 
 This will create markdown files in `content/posts/releases/` like:
+
 - `2026-01-13-release-v050.md`
 - `2025-11-25-release-v040.md`
 - etc.
@@ -254,6 +258,7 @@ continuous_import:
 ### Date Handling
 
 The importer tries multiple date formats automatically:
+
 - RFC 2822 (common in RSS/email)
 - ISO 8601
 - HTTP dates
@@ -271,6 +276,7 @@ The import process prevents duplicate posts by checking titles:
 4. **Create** new post if no match found
 
 This means:
+
 - Re-running `nicolino import` is safe - it won't create duplicates
 - You can delete imported posts and re-import to regenerate them
 - Editing an imported post manually won't cause it to be re-imported (title matches)

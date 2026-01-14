@@ -50,6 +50,7 @@ J(A,B) = |A ∩ B| / |A ∪ B|
 ```
 
 MinHash allows us to estimate this efficiently by comparing signature elements:
+
 - Count how many of the 128 hash values match between two signatures
 - Divide by 128 to get the similarity score (0.0 to 1.0)
 
@@ -61,6 +62,7 @@ The MinHash approach reduces similarity computation from **O(n²)** to **O(n)**:
 - **MinHash**: Each post has a fixed-size signature, comparison is O(1)
 
 For a site with 1000 posts:
+
 - Traditional: ~500,000 comparisons
 - MinHash: ~5,000 comparisons (only for candidates)
 

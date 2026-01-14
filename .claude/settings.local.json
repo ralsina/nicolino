@@ -40,7 +40,9 @@
       "mcp__web-reader__webReader",
       "mcp__acp__Edit",
       "mcp__acp__Write",
-      "mcp__web-search-prime__webSearchPrime"
+      "mcp__web-search-prime__webSearchPrime",
+      "Skill(superpowers:brainstorming)",
+      "Skill(superpowers:brainstorming:*)"
     ],
     "deny": [],
     "ask": []

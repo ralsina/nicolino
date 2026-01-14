@@ -39,6 +39,7 @@ The link checker:
 4. **Reports** broken links with source file and context
 
 It **skips**:
+
 - External links (to other domains)
 - Anchor links (page-internal `#section` references)
 - Non-HTML files (treated as dependencies, not validated as pages)
@@ -52,6 +53,7 @@ nicolino check_links
 ```
 
 This will:
+
 - Scan `output/` directory (or your configured output directory)
 - Check all in-site links
 - Display a summary of broken links
@@ -109,6 +111,7 @@ When migrating content from another SSG, use this workflow:
 ### 1. Import Your Content
 
 First, bring your content into Nicolino using whatever method works:
+
 - Copy markdown/html files manually
 - Use a custom import script
 - Use the continuous import feature for feeds

@@ -296,18 +296,28 @@ module ContinuousImport
     item.pub_date || Time.utc
   end
 
+  # Default template (baked-in) for simple use cases
+  DEFAULT_TEMPLATE = <<-TEMPLATE
+  ## {{ title }}
+
+  {{ content }}
+  TEMPLATE
+
   # Import items from a feed configuration
   def self.import_feed(name : String, config : FeedConfig, templates_dir : String)
     Log.info { "Importing feed: #{name}" }
 
-    # Load template
-    template_path = File.join(templates_dir, config.template)
-    unless File.exists?(template_path)
-      Log.error { "Template not found: #{template_path}" }
-      return
-    end
+    # Load template - try user template first, fall back to default
+    template_content = nil
 
-    template_content = File.read(template_path)
+    template_path = File.join(templates_dir, config.template)
+    if File.exists?(template_path)
+      template_content = File.read(template_path)
+      Log.debug { "Using template: #{template_path}" }
+    else
+      Log.info { "Template not found: #{template_path}, using default template" }
+      template_content = DEFAULT_TEMPLATE
+    end
 
     # Output directory
     output_dir = File.join("content", config.output_folder)
