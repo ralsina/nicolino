@@ -12,7 +12,7 @@ site:
   # scheme in CSS. The sixteen library automatically
   # finds the dark and light variants.
   # Also used for HighlightJS syntax highlighting.
-  color_scheme: "nord"
+  color_scheme: "selenized-dark"
   # This is a list of items to show in the navigation bar.
   # In the default theme they are shown at the right of
   # the title.
@@ -59,8 +59,7 @@ folder_indexes:
   # Directories to exclude from automatic index generation.
   # Most features (galleries, listings, tags, archive) automatically
   # register their output folders. Use this only for custom exclusions.
-  exclude_dirs:
-    - "4000/"
+  exclude_dirs: []
 
 # Options for languages if you have more than one.
 # Each language key can contain all or part of this config file's structure,
