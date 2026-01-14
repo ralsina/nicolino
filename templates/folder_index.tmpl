@@ -3,88 +3,44 @@
 <h2>{{ title }}</h2>
 
 <div class="folder-contents">
-  {# Check if this is a gallery directory with galleries #}
-  {% if contents %}
-    <div class="gallery-contents">
-      {% if contents | length > 0 %}
-        <h3>Galleries in this folder:</h3>
-        <div class="gallery-list">
-          {% for item in contents %}
-            {% if item.ends_with('.md') %}
-              {# This is likely a gallery index - check if it's a gallery #}
-              {% set gallery_name = item | replace('/index.md', '') | split('/') | last %}
-              {% set gallery_link = item | replace('/index.md', '/index.html') %}
-              <div class="gallery-item">
-                <h4><a href="{{ gallery_link }}">{{ gallery_name | capitalize }}</a></h4>
-              </div>
-            {% endif %}
-          {% endfor %}
-        </div>
-      {% else %}
-        <p>No galleries found in this folder.</p>
-      {% endif %}
-    </div>
+  {% if posts and posts | length > 0 %}
+    <h3>Posts</h3>
+    <ul class="file-list posts-list">
+      {% for post in posts %}
+        <li>
+          <a href="{{ post.link }}">{{ post.title }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>This folder is empty.</p>
   {% endif %}
-
-  {# Show breadcrumb navigation #}
-  <nav class="breadcrumb">
-    <a href="/galleries/">Galleries</a>
-    {% if path and path != '' %}
-      {# Note: path navigation would need a custom split filter or different approach #}
-      <span class="separator"> / </span>
-      {{ path | capitalize }}
-    {% endif %}
-  </nav>
 </div>
 
 <style>
-.gallery-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin: 2rem 0;
-}
-
-.gallery-item {
-  border: 1px solid var(--b16-base02);
-  border-radius: 8px;
-  padding: 1rem;
-  background-color: var(--b16-base01);
-}
-
-.gallery-item h4 {
-  margin: 0 0 0.5rem 0;
-}
-
-.gallery-item h4 a {
-  text-decoration: none;
-  color: var(--b16-base05);
-}
-
-.gallery-item h4 a:hover {
-  text-decoration: underline;
-}
-
-.breadcrumb {
+.file-list {
+  list-style: none;
+  padding: 0;
   margin: 1rem 0;
-  font-size: 0.9em;
 }
 
-.breadcrumb a {
+.file-list li {
+  margin: 0.5rem 0;
+}
+
+.file-list a {
   text-decoration: none;
-  color: var(--b16-base04);
+  color: var(--b16-base0D);
+  font-size: 1.1em;
 }
 
-[data-theme="dark"] .breadcrumb a {
-  color: var(--b16-base03);
-}
-
-.breadcrumb a:hover {
+.file-list a:hover {
   text-decoration: underline;
 }
 
-.separator {
+.folder-contents h3 {
+  margin-top: 1.5rem;
+  font-size: 1.2em;
   color: var(--b16-base03);
-  margin: 0 0.5rem;
 }
 </style>

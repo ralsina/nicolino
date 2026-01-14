@@ -5,6 +5,9 @@ require "lexbor"
 module Archive
   include Utils
 
+  # Register output folder to exclude from folder_indexes
+  FolderIndexes.register_exclude("archive/")
+
   def self.render(posts : Array(Markdown::File))
     # Filter posts that have dates
     dated_posts = posts.select { |post| !post.date.nil? }

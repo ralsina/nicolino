@@ -5,6 +5,20 @@ require "./utils"
 module Taxonomies
   include Utils
 
+  # Register output folder to exclude from folder_indexes
+  # Default is "tags/" but can be configured
+  begin
+    tax_config = Config.get("taxonomies")
+    if tax_config.as_h?
+      tax_config.as_h.each do |name, config|
+        location = config.as_h?.try(&.["location"]?.try(&.as_s)) || "#{name}/"
+        FolderIndexes.register_exclude(location)
+      end
+    end
+  rescue
+    # No taxonomies configured, skip registration
+  end
+
   # A Taxonomy Term, which is one of the classifications
   # within a taxonomy
   class Term

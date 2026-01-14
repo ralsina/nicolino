@@ -5,6 +5,9 @@ require "lexbor"
 module Listings
   include Utils
 
+  # Register output folder to exclude from folder_indexes
+  FolderIndexes.register_exclude("listings/")
+
   # Represents a source code file to be syntax-highlighted
   class Listing
     property source : String

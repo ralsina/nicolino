@@ -74,7 +74,7 @@ def create_tasks # ameba:disable Metrics/CyclomaticComplexity
       Similarity.create_tasks(posts)
     end
 
-    Markdown.render(posts, require_date: true)
+    Markdown.render(posts, require_date = true)
 
     if features.includes? "taxonomies"
       Config.taxonomies.map do |k, v|
@@ -97,12 +97,6 @@ def create_tasks # ameba:disable Metrics/CyclomaticComplexity
       posts[..10],
       Path[Config.options.output] / "rss.xml",
       Config.get("site.title").as_s,
-    )
-
-    Markdown.render_index(
-      posts[..10],
-      content_post_output_path / "index.html",
-      title: "Latest posts"
     )
   end
 
@@ -149,12 +143,16 @@ def create_tasks # ameba:disable Metrics/CyclomaticComplexity
     Search.render
   end
 
-  # Make indexes for other folders without a index.* file
-  # TODO: enable for other places once we have a way to handle conflicts
+  # Make indexes for folders without a index.* file
   return unless features.includes? "folder_indexes"
 
-  # Get exclude patterns from config if available
+  # Collect exclude patterns from two sources:
+  # 1. Config file (manual overrides)
+  # 2. Feature modules that register their output folders
+
   exclude_patterns = [] of String
+
+  # 1. Get exclude patterns from config if available
   begin
     exclude_dirs = Config.get("folder_indexes.exclude_dirs")
     exclude_patterns = exclude_dirs.as_a.map(&.as_s) if exclude_dirs
@@ -162,14 +160,12 @@ def create_tasks # ameba:disable Metrics/CyclomaticComplexity
     # Key doesn't exist, use empty array
   end
 
-  # Automatically exclude galleries directory if galleries feature is enabled
-  # to avoid conflicts with gallery index generation
-  if features.includes? "galleries"
-    galleries_exclude = Config.options.galleries
-    exclude_patterns << galleries_exclude unless exclude_patterns.includes?(galleries_exclude)
-  end
+  # 2. Get registered exclusions from feature modules
+  exclude_patterns += FolderIndexes.excluded_folders
 
-  indexes = FolderIndexes.read_all(galleries_path, exclude_patterns)
+  # Scan full content path for folders needing indexes
+  content_path = Path.new(Config.options.content).expand
+  indexes = FolderIndexes.read_all(content_path, exclude_patterns)
   FolderIndexes.render(indexes)
 end
 

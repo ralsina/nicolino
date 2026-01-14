@@ -286,7 +286,7 @@ module Markdown
     # What to show as breadcrumbs for this post
     def breadcrumbs(lang = nil)
       lang ||= Locale.language
-      result = [{name: "Home", link: "/"}]
+      result = [] of NamedTuple(name: String, link: String)
 
       output_path = Path[output(lang)]
       parts = output_path.parts
@@ -294,6 +294,15 @@ module Markdown
       # Skip "output" directory and build breadcrumbs from remaining path parts
       # For example: output/docs/continuous_import.html -> docs -> continuous_import
       if parts.size >= 2 && parts[0] == "output"
+        # Check if this is the home page (index.html at root)
+        if parts.size == 2 && parts[1] == "index.html"
+          # This IS the home page, no breadcrumbs needed
+          return [{name: title(lang), link: link(lang)}]
+        end
+
+        # Not the home page, add "Home" as first breadcrumb
+        result << {name: "Home", link: "/"}
+
         # Build breadcrumb path incrementally
         current_path = ""
         parts[1..-2].each do |part|

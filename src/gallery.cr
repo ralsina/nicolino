@@ -12,6 +12,9 @@ require "./markdown"
 #   with its contents and a nice display of the
 #   images and sub-galleries below it.
 module Gallery
+  # Register output folder to exclude from folder_indexes
+  FolderIndexes.register_exclude("galleries/")
+
   # An image gallery
   class Gallery < Markdown::File
     property sub_galleries : Array(Gallery)

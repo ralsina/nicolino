@@ -12,11 +12,12 @@ site:
   # scheme in CSS. The sixteen library automatically
   # finds the dark and light variants.
   # Also used for HighlightJS syntax highlighting.
-  color_scheme: "unikitty-dark"
+  color_scheme: "nord"
   # This is a list of items to show in the navigation bar.
   # In the default theme they are shown at the right of
   # the title.
   nav_items:
+    - "<span role='button' class='outline'><a href='/docs/'>Docs</a></span>"
     - "<span role='button' class='outline'><a href='https://github.com/ralsina/nicolino'>GitHub</a></span>"
 # Some options affecting output
 options:
@@ -55,9 +56,11 @@ options:
 
 # Options for folder_indexes feature
 folder_indexes:
-  # Directories to exclude from automatic index generation
+  # Directories to exclude from automatic index generation.
+  # Most features (galleries, listings, tags, archive) automatically
+  # register their output folders. Use this only for custom exclusions.
   exclude_dirs:
-    - "galleries/"
+    - "4000/"
 
 # Options for languages if you have more than one.
 # Each language key can contain all or part of this config file's structure,
