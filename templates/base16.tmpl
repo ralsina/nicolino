@@ -1,32 +1,68 @@
-/* These are just a tiny fraction of the pico color variables,
-   will add more as I know what they do and which semantic
-   value from base16 may make sense */
+/* Base16 color scheme integration for Nicolino
+   Generated from: {{dark.scheme_name}} (dark) and {{light.scheme_name}} (light)
+   Authors: {{dark.scheme_author}} / {{light.scheme_author}} */
 
 /* Theme: {{dark.scheme_name}} */
-/* Author: {{dark.scheme_author}} */
 
 [data-theme=dark] {
-    --pico-background-color: #{{dark.base00_hex}}; /* Default backround */
-    --pico-color: #{{dark.base05_hex}}; /* Default foreground */
-    --pico-text-selection-color: #{{dark.base02_hex}}; /* Selection background */
-    --pico-primary: #{{dark.base0D_hex}}; /* Headings */
+    /* Pico CSS color variables */
+    --pico-background-color: #{{dark.base00_hex}};
+    --pico-color: #{{dark.base05_hex}};
+    --pico-text-selection-color: #{{dark.base02_hex}};
+    --pico-primary: #{{dark.base0D_hex}};
     --pico-primary-underline: var(--pico-primary);
     --pico-primary-background: #{{dark.base02_hex}};
-    --pico-primary-hover: #{{dark.base09_hex}}; /* Link URL */
+    --pico-primary-hover: #{{dark.base09_hex}};
     --pico-primary-hover-underline: var(--pico-primary-hover);
+
+    /* Base16 palette colors for use in custom styles */
+    --b16-base00: #{{dark.base00_hex}}; /* Default background */
+    --b16-base01: #{{dark.base01_hex}}; /* Lighter background */
+    --b16-base02: #{{dark.base02_hex}}; /* Selection background */
+    --b16-base03: #{{dark.base03_hex}}; /* Comments, secondary */
+    --b16-base04: #{{dark.base04_hex}}; /* Darker foreground */
+    --b16-base05: #{{dark.base05_hex}}; /* Default foreground */
+    --b16-base06: #{{dark.base06_hex}}; /* Lighter foreground */
+    --b16-base07: #{{dark.base07_hex}}; /* Lightest foreground */
+    --b16-base08: #{{dark.base08_hex}}; /* Variables, etc */
+    --b16-base09: #{{dark.base09_hex}}; /* Integers, constants */
+    --b16-base0A: #{{dark.base0A_hex}}; /* Classes, search match */
+    --b16-base0B: #{{dark.base0B_hex}}; /* Strings */
+    --b16-base0C: #{{dark.base0C_hex}}; /* Support, regex */
+    --b16-base0D: #{{dark.base0D_hex}}; /* Functions, methods */
+    --b16-base0E: #{{dark.base0E_hex}}; /* Keywords */
+    --b16-base0F: #{{dark.base0F_hex}}; /* Builtin, punctuation */
 }
 
 /* Theme: {{light.scheme_name}} */
-/* Author: {{light.scheme_author}} */
 
 :root:not([data-theme=dark]),
 [data-theme=light] {
-    --pico-background-color: #{{light.base00_hex}}; /* Default backround */
-    --pico-color: #{{light.base05_hex}}; /* Default foreground */
-    --pico-text-selection-color: #{{light.base02_hex}}; /* Selection background */
-    --pico-primary: #{{light.base0D_hex}}; /* Headings */
+    /* Pico CSS color variables */
+    --pico-background-color: #{{light.base00_hex}};
+    --pico-color: #{{light.base05_hex}};
+    --pico-text-selection-color: #{{light.base02_hex}};
+    --pico-primary: #{{light.base0D_hex}};
     --pico-primary-underline: var(--pico-primary);
     --pico-primary-background: #{{light.base02_hex}};
-    --pico-primary-hover: #{{light.base09_hex}}; /* Link URL */
+    --pico-primary-hover: #{{light.base09_hex}};
     --pico-primary-hover-underline: var(--pico-primary-hover);
+
+    /* Base16 palette colors for use in custom styles */
+    --b16-base00: #{{light.base00_hex}}; /* Default background */
+    --b16-base01: #{{light.base01_hex}}; /* Lighter background */
+    --b16-base02: #{{light.base02_hex}}; /* Selection background */
+    --b16-base03: #{{light.base03_hex}}; /* Comments, secondary */
+    --b16-base04: #{{light.base04_hex}}; /* Darker foreground */
+    --b16-base05: #{{light.base05_hex}}; /* Default foreground */
+    --b16-base06: #{{light.base06_hex}}; /* Lighter foreground */
+    --b16-base07: #{{light.base07_hex}}; /* Lightest foreground */
+    --b16-base08: #{{light.base08_hex}}; /* Variables, etc */
+    --b16-base09: #{{light.base09_hex}}; /* Integers, constants */
+    --b16-base0A: #{{light.base0A_hex}}; /* Classes, search match */
+    --b16-base0B: #{{light.base0B_hex}}; /* Strings */
+    --b16-base0C: #{{light.base0C_hex}}; /* Support, regex */
+    --b16-base0D: #{{light.base0D_hex}}; /* Functions, methods */
+    --b16-base0E: #{{light.base0E_hex}}; /* Keywords */
+    --b16-base0F: #{{light.base0F_hex}}; /* Builtin, punctuation */
 }

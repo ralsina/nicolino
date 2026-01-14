@@ -46,10 +46,10 @@
 }
 
 .gallery-item {
-  border: 1px solid #ddd;
+  border: 1px solid var(--b16-base02);
   border-radius: 8px;
   padding: 1rem;
-  background-color: #f9f9f9;
+  background-color: var(--b16-base01);
 }
 
 .gallery-item h4 {
@@ -58,7 +58,7 @@
 
 .gallery-item h4 a {
   text-decoration: none;
-  color: #333;
+  color: var(--b16-base05);
 }
 
 .gallery-item h4 a:hover {
@@ -72,7 +72,11 @@
 
 .breadcrumb a {
   text-decoration: none;
-  color: #666;
+  color: var(--b16-base04);
+}
+
+[data-theme="dark"] .breadcrumb a {
+  color: var(--b16-base03);
 }
 
 .breadcrumb a:hover {
@@ -80,7 +84,7 @@
 }
 
 .separator {
-  color: #999;
+  color: var(--b16-base03);
   margin: 0 0.5rem;
 }
 </style>
