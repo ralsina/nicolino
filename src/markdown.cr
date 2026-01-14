@@ -286,29 +286,28 @@ module Markdown
     # What to show as breadcrumbs for this post
     def breadcrumbs(lang = nil)
       lang ||= Locale.language
-      # For blog posts, detect the actual section from the path
-      if date
-        # Get the section from the output path (e.g., "blog" or "posts")
-        output_path = Path[output(lang)]
-        # The path is usually output/section/file.html or output/section/subsection/file.html
-        parts = output_path.parts
-        section = if parts.size >= 2 && parts[0] == "output"
-                    parts[1] # Get "blog", "posts", etc.
-                  else
-                    "posts" # Fallback
-                  end
+      result = [{name: "Home", link: "/"}]
 
-        [{name: "Home",
-          link: "/"},
-         {name: section.capitalize,
-          link: Utils.path_to_link(Path[Config.options(lang).output] / "#{section}/index.html")},
-         {name: title(lang),
-          link: link(lang)}]
-      else
-        # For pages without dates, just show the title
-        [{name: title(lang),
-          link: link(lang)}] of {name: String, link: String}
+      output_path = Path[output(lang)]
+      parts = output_path.parts
+
+      # Skip "output" directory and build breadcrumbs from remaining path parts
+      # For example: output/docs/continuous_import.html -> docs -> continuous_import
+      if parts.size >= 2 && parts[0] == "output"
+        # Build breadcrumb path incrementally
+        current_path = ""
+        parts[1..-2].each do |part|
+          current_path = Path[current_path] / part
+          result << {
+            name: part,
+            link: Utils.path_to_link(Path[Config.options(lang).output] / Path[current_path] / "index.html"),
+          }
+        end
       end
+
+      # Add the current page title
+      result << {name: title(lang), link: link(lang)}
+      result
     end
 
     # Check if the updated date should be shown (at least 1 minute different from post date)
@@ -413,7 +412,7 @@ module Markdown
             post.load lang if Croupier::TaskManager.auto_mode?
             Log.info { "👉 #{post.output lang}" }
             html = Render.apply_template("templates/page.tmpl",
-              {"content" => post.rendered(lang), "title" => post.title(lang)})
+              {"content" => post.rendered(lang), "title" => post.title(lang), "breadcrumbs" => post.breadcrumbs(lang)})
             doc = Lexbor::Parser.new(html)
             doc = HtmlFilters.make_links_relative(doc, post.link(lang))
             doc.to_html

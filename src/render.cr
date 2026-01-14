@@ -5,7 +5,8 @@ require "lexbor"
 module Render
   # Generates pretty HTML properly templated
   def self.apply_template(template, context)
-    ctx = Hash(String, (Array(String) | String | Nil | Bool | NamedTuple(link: String, title: String))).new
+    # ameba:enable Layout/LineLength
+    ctx = Hash(String, Array(String) | Array(NamedTuple(name: String, link: String)) | String | Nil | Bool | NamedTuple(link: String, title: String)).new # ameba:disable Layout/LineLength
     context.map { |k, v|
       ctx[k] = v
     }
