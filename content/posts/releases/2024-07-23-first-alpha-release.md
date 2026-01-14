@@ -18,7 +18,3 @@ lang: en
 <p><strong>Full Changelog</strong>: <a href="https://github.com/ralsina/nicolino/commits/v0.2.0">https://github.com/ralsina/nicolino/commits/v0.2.0</a></p>
 
 [View on GitHub](https://github.com/ralsina/nicolino/releases/tag/v0.2.0)
-
-**Published:**
-
-**Tags:** `releases` `nicolino`
