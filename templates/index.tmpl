@@ -1,3 +1,16 @@
+{#
+  index.tmpl - Blog index/homepage template
+
+  Renders a list of blog posts with:
+  - Post title with link
+  - Post date
+  - Post summary
+
+  Variables:
+  - posts: Array of post objects with link, title, date, summary
+
+  Used by: Markdown.render_index for generating index pages
+#}
 {% for post in posts %}
 <section>
     <h2><a href="{{post.link}}">{{post.title}}</a></h2>

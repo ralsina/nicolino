@@ -1,3 +1,26 @@
+{#
+  post.tmpl - Blog post/article content template
+
+  Renders a blog post with:
+  - Title with breadcrumbs (via title.tmpl include)
+  - Post metadata (date, updated date, external link)
+  - Taxonomy links (tags, categories)
+  - Table of contents (if present)
+  - Main post HTML content
+  - Related posts section (if present)
+
+  Variables:
+  - breadcrumbs, title, link: Passed to title.tmpl
+  - date: Post publication date
+  - metadata.updated: Last updated date (optional)
+  - metadata.link: External source link (optional)
+  - taxonomies: Post taxonomies (tags, categories, etc.)
+  - toc: Table of contents HTML (optional)
+  - html: Main post content HTML
+  - related_posts: Array of related post links (optional)
+
+  Used by: Markdown::File for rendering blog posts
+#}
 {% include "templates/title.tmpl" %}
 
 {% if date %}

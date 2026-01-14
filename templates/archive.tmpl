@@ -1,3 +1,17 @@
+{#
+  archive.tmpl - Blog archive template
+
+  Renders a chronological archive of posts organized by year/month:
+  - Collapsible years (current year expanded by default)
+  - Months within each year
+  - Post list within each month
+
+  Variables:
+  - years: Array of year objects with year, months array
+  - latest_year: The year number of the most recent year
+
+  Used by: Archive feature for /archive/index.html
+#}
 <section class="archive">
   <h1>Archive</h1>
 

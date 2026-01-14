@@ -1,3 +1,19 @@
+{#
+  gallery.tmpl - Image gallery template
+
+  Renders an image gallery with:
+  - Title with breadcrumbs (via title.tmpl include)
+  - Gallery introduction HTML content
+  - Grid of thumbnail images with lightbox links
+  - VenoBox lightbox integration for image viewing
+
+  Variables:
+  - breadcrumbs, title, link: Passed to title.tmpl
+  - html: Gallery introduction/description HTML
+  - image_list: Array of image paths
+
+  Used by: Gallery class for rendering gallery pages
+#}
 {% include "templates/title.tmpl" %}
 
 {{html}}

@@ -1,3 +1,17 @@
+{#
+  item_list.tmpl - Generic item list template
+
+  Renders a simple list of items with:
+  - Optional description paragraph
+  - Bulleted list of item links
+
+  Variables:
+  - title: List title (not rendered here, passed from caller)
+  - description: Optional description text
+  - items: Array of {link, title} tuples
+
+  Used by: Galleries index, Listings index, and other feature indexes
+#}
 <section class="item-list-index">
 
   {% if description %}
