@@ -121,20 +121,6 @@
 
   <!-- Main -->
   <main class="container">
-    {% if breadcrumbs and breadcrumbs | length > 1 %}
-    <h2>
-      <nav aria-label="breadcrumb" class="breadcrumb">
-        {% for item in breadcrumbs %}
-          {% if not loop.first %} » {% endif %}
-          {% if not loop.last %}
-            <a href="{{ item.link }}">{{ item.name }}</a>
-          {% else %}
-            {{ item.name }}
-          {% endif %}
-        {% endfor %}
-      </nav>
-    </h2>
-    {% endif %}
     {{ content }}
   </main>
   <!-- /Main -->
