@@ -469,9 +469,15 @@ module Markdown
       Log.info { "👉 #{output}" }
       # Sort posts by date descending (newest first), posts without dates go last
       sorted_posts = posts.sort_by { |post| post.date || Time.utc(1970, 1, 1) }.reverse!
+
+      # Limit to 100 posts for index pages
+      has_more = sorted_posts.size > 100
+      display_posts = sorted_posts.first(100)
+
       content = Templates.environment.get_template("templates/index.tmpl").render(
         {
-          "posts" => sorted_posts.map(&.value),
+          "posts"    => display_posts.map(&.value),
+          "has_more" => has_more,
         })
       html = Render.apply_template("templates/page.tmpl",
         {

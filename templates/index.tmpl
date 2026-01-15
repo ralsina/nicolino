@@ -5,9 +5,11 @@
   - Post title with link
   - Post date
   - Post summary
+  - Link to archive for older posts (if has_more is true)
 
   Variables:
   - posts: Array of post objects with link, title, date, summary
+  - has_more: Boolean indicating if there are more posts in the archive
 
   Used by: Markdown.render_index for generating index pages
 #}
@@ -19,3 +21,9 @@
     {{post.summary}}
 </section>
 {% endfor %}
+
+{% if has_more %}
+<p class="older-posts-link">
+    📅 To see older posts, check the <a href="/archive/">archive</a>.
+</p>
+{% endif %}
