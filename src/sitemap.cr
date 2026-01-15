@@ -24,6 +24,7 @@ module Sitemap
     start = Time.monotonic
     inputs = Croupier::TaskManager.tasks.keys.select(&.ends_with?(".html"))
     Log.info { "🗺️ Sitemap: collected #{inputs.size} inputs in #{(Time.monotonic - start).total_milliseconds}ms" }
+
     Croupier::Task.new(
       id: "sitemap",
       output: output = (Path[Config.options.output] / "sitemap.xml").to_s,
@@ -32,19 +33,53 @@ module Sitemap
       no_save: true
     ) do
       Log.info { "👉 #{output}" }
-      File.open(output, "w") do |io|
-        io << HEADER
-        base = URI.parse(Config.get("site.url").as_s)
-        inputs.each do |input|
-          next if noindex? input
-          modtime = File.info(input).modification_time
-          input = input.sub(/^output\//, "")
-          io << %(<url>
-            <loc>#{base.resolve(input)}</loc>
-            <lastmod>#{modtime}</lastmod>
-           </url>)
+
+      # Split into chunks for parallel processing
+      chunk_size = 100
+      num_chunks = (inputs.size // chunk_size) + 1
+
+      # Channel for collecting XML chunks from fibers
+      channels = Channel(String).new
+
+      # Process each chunk in a separate fiber
+      num_chunks.times do |chunk_idx|
+        spawn do
+          begin
+            start_idx = chunk_idx * chunk_size
+            end_idx = Math.min(start_idx + chunk_size, inputs.size)
+            chunk_data = inputs[start_idx...end_idx]
+
+            base = URI.parse(Config.get("site.url").as_s)
+            chunk_xml = String.build do |str|
+              chunk_data.each do |input|
+                next if noindex?(input)
+                modtime = File.info(input).modification_time
+                input_path = input.sub(/^output\//, "")
+                str << %(<url>
+                <loc>#{base.resolve(input_path)}</loc>
+                <lastmod>#{modtime}</lastmod>
+              </url>)
+              end
+            end
+            channels.send(chunk_xml)
+          rescue ex
+            Log.error { "Error in sitemap chunk: #{ex.message}" }
+            channels.send("")
+          end
         end
       end
+
+      # Write output
+      File.open(output, "w") do |io|
+        io << HEADER
+        num_chunks.times do
+          chunk = channels.receive
+          io << chunk unless chunk.empty?
+        end
+        io << FOOTER
+      end
+
+      "" # Return empty string for task output
     end
   end
 end

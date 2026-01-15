@@ -33,18 +33,56 @@ module Search
       no_save: true
     ) do
       Log.info { "👉 #{output}" }
-      File.open(output, "w") do |io|
-        data = Array(Hash(String, String | Int32)).new
-        inputs.each_with_index do |input, i|
-          item = extract_item(
-            input,
-            input.sub(/^output\//, "/"),
-            i
-          )
-          data << item unless item.nil?
+
+      # Split into chunks for parallel processing
+      chunk_size = 100
+      num_chunks = (inputs.size // chunk_size) + 1
+
+      # Channel for collecting results from fibers
+      channels = Channel(Array(Hash(String, String | Int32)) | Exception).new
+
+      # Process each chunk in a separate fiber
+      num_chunks.times do |chunk_idx|
+        spawn do
+          begin
+            start_idx = chunk_idx * chunk_size
+            end_idx = Math.min(start_idx + chunk_size, inputs.size)
+            chunk_data = inputs[start_idx...end_idx]
+
+            results = Array(Hash(String, String | Int32)).new
+            chunk_data.each_with_index do |input, i|
+              item = extract_item(
+                input,
+                input.sub(/^output\//, "/"),
+                start_idx + i
+              )
+              results << item unless item.nil?
+            end
+            channels.send(results)
+          rescue ex
+            channels.send(ex)
+          end
         end
-        data.to_json(io)
       end
+
+      # Collect all results and write to file
+      File.open(output, "w") do |io|
+        all_data = Array(Hash(String, String | Int32)).new
+
+        num_chunks.times do
+          result = channels.receive
+          case result
+          when Array
+            all_data.concat(result)
+          when Exception
+            Log.error { "Error in search chunk: #{result.message}" }
+          end
+        end
+
+        all_data.to_json(io)
+      end
+
+      "" # Return empty string for task output
     end
   end
 end
