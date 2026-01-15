@@ -123,7 +123,11 @@ module Books
 
     # Get the link for this chapter
     def link(book_name : String) : String
-      "/books/#{book_name}/#{slug}.html"
+      if slug.empty?
+        "/books/#{book_name}/"
+      else
+        "/books/#{book_name}/#{slug}.html"
+      end
     end
 
     # Find the next chapter
@@ -176,7 +180,7 @@ module Books
       title = extract_title(summary_content, book_name)
       description = SummaryParser.extract_description(summary_content)
 
-      # Build flat list of all chapters for navigation (only entries with content)
+      # Build flat list of all chapters for navigation
       flat_chapters = flatten_entries(entries).select(&.has_content?)
       Log.info { "📚 Flattened to #{flat_chapters.size} total chapters" }
 
@@ -317,14 +321,24 @@ module Books
   end
 
   # Build navigation hash for a chapter
-  private def self.build_navigation(entry : ChapterEntry, flat_chapters : Array(ChapterEntry), book : Book, book_name : String) : Hash(String, Hash(String, String)?)
+  private def self.build_navigation(entry : ChapterEntry, flat_chapters : Array(ChapterEntry), book : Book, book_name : String) : Hash(String, Hash(String, String) | Nil)
     idx = flat_chapters.index(entry)
 
     prev_entry = flat_chapters[idx - 1]? if idx && idx > 0
     next_entry = flat_chapters[idx + 1]? if idx
 
+    # For the first chapter, use the book index as the previous link
+    if idx == 0
+      prev_nav = {
+        "title" => book.title,
+        "link"  => "/books/#{book_name}/",
+      }
+    else
+      prev_nav = prev_entry ? nav_hash_for_entry(prev_entry, book_name) : nil
+    end
+
     {
-      "prev" => prev_entry ? nav_hash_for_entry(prev_entry, book_name) : nil,
+      "prev" => prev_nav,
       "next" => next_entry ? nav_hash_for_entry(next_entry, book_name) : nil,
     }
   end
@@ -365,8 +379,9 @@ module Books
     entry_title = entry.title
     entry_link = entry.link(book_name)
 
-    # If entry has no path, link to first child instead
-    if !entry.has_content? && !entry.children.empty?
+    # If entry has no path and is not the root index, link to first child instead
+    # The root index (level 0) should always link to itself
+    if !entry.has_content? && !entry.children.empty? && entry.level > 0
       first_child = find_first_chapter(entry.children)
       if first_child
         entry_title = first_child.title

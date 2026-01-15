@@ -40,12 +40,12 @@ function toggleBookSidebar() {
 
 <!-- Navigation buttons -->
 <nav class="chapter-nav">
-  {% if navigation.prev %}
+  {% if navigation.prev and navigation.prev.title %}
   <a href="{{ navigation.prev.link }}" class="nav-prev">
     ← {{ navigation.prev.title }}
   </a>
   {% endif %}
-  {% if navigation.next %}
+  {% if navigation.next and navigation.next.title %}
   <a href="{{ navigation.next.link }}" class="nav-next">
     {{ navigation.next.title }} →
   </a>
