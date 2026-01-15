@@ -97,6 +97,46 @@ Renders a list of blog posts with:
 
 **Used by**: `Markdown.render_index` for generating index pages
 
+## Book Templates
+
+### `book_index.tmpl` - Book Landing Page
+
+Renders the landing/index page for a book with:
+
+- Collapsible sidebar table of contents
+- Book title and description
+- "Start Reading" link to first chapter
+- Mobile-friendly TOC display
+
+**Variables**:
+
+- `book`: Book object with `name`, `title`, `description`
+- `toc_html`: Pre-rendered TOC HTML
+- `first_chapter`: First chapter object with `link` and `title`
+
+**Used by**: Books feature for `/books/{book-name}/index.html`
+
+### `book_chapter.tmpl` - Book Chapter Page
+
+Renders individual book chapters with:
+
+- Collapsible sidebar TOC with current chapter highlighted
+- Chapter content
+- Previous/Next navigation buttons
+
+**Variables**:
+
+- `book`: Book object with `name`, `title`
+- `chapter`: Chapter object with `title`, `formatted_number`, `content`, `link`
+- `toc_html`: Pre-rendered TOC HTML
+- `navigation`: Hash with `prev` and `next` chapter links
+
+**Used by**: Books feature for individual chapter pages
+
+### `book_toc_item.tmpl` - Book TOC Item Component
+
+Renders a single item in the book table of contents (used internally by `Books` module).
+
 ## Feature-Specific Templates
 
 ### `archive.tmpl` - Blog Archive
@@ -141,6 +181,20 @@ Renders a syntax-highlighted code file with:
 - `raw_content`: Escaped raw source code
 
 **Used by**: Listings feature for individual code file pages
+
+### `language_switcher.tmpl` - Language Switcher Component
+
+Displays a dropdown menu for switching between language versions of the current page:
+
+- Globe emoji (🌐) icon
+- Dropdown with links to alternate language versions
+- Only shows when multiple languages are available
+
+**Variables**:
+
+- `language_links`: Array of objects with `lang`, `link`, and `title`
+
+**Used by**: `page.tmpl` in the header navigation
 
 ### `nicolino_release.tmpl` - GitHub Release
 
