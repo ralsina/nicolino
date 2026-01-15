@@ -39,6 +39,13 @@ module Utils
       return true if base_path.to_s.starts_with?(galleries_path.to_s)
     end
 
+    # Skip all files in books directories (they are handled by the Books feature)
+    # Books have their own rendering logic and don't use the regular Pages flow
+    books_path = Path[content_path] / "books"
+    if base_path.to_s.starts_with?(books_path.to_s)
+      return true
+    end
+
     # Skip other feature directories as needed in the future
     # Example: posts, images, etc.
 

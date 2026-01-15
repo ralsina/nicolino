@@ -16,18 +16,18 @@
 
   Used by: post.tmpl, gallery.tmpl, folder_index feature, and manually in code
 #}
-<h2 class="primary">
+<h1 class="primary">
   {% if breadcrumbs|length > 0 %}
   <nav aria-label="breadcrumb" class="breadcrumb">
     {% for item in breadcrumbs %}
-      {% if not loop.first %}<span class="breadcrumb-sep"> » </span>{% endif %}
+      {% if not loop.first %}<span class="breadcrumb-sep {% if loop.last %}breadcrumb-sep-last{% else %}breadcrumb-collapsed{% endif %}"> » </span>{% endif %}
       <a href="{{ item.link }}" class="{% if not loop.last %}breadcrumb-collapsed{% endif %}">{{ item.name }}</a>
     {% endfor %}
   </nav>
   {% else %}
   <a href="{{link}}">{{title}}</a>
   {% endif %}
-</h2>
+</h1>
 
 {% if taxonomies | length > 1 %}
 <nav>

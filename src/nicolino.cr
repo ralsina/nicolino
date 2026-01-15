@@ -2,6 +2,7 @@ require "./assets"
 require "./archive"
 require "./commands/*"
 require "./base16"
+require "./books"
 require "./config"
 require "./gallery"
 require "./html"
@@ -57,6 +58,7 @@ def create_tasks
   Pages.enable(features.includes?("pages"), content_path, features)
   Image.enable(features.includes?("images"), content_path)
   Listings.enable(features.includes?("listings"), content_path)
+  Books.enable(features.includes?("books"))
   Sitemap.enable(features.includes?("sitemap"))
   Search.enable(features.includes?("search"))
   FolderIndexes.enable(features.includes?("folder_indexes"), content_path)

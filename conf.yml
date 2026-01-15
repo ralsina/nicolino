@@ -17,7 +17,7 @@ site:
   # In the default theme they are shown at the right of
   # the title.
   nav_items:
-    - "<span role='button' class='outline'><a href='/docs/'>Docs</a></span>"
+    - "<span role='button' class='outline'><a href='/books/user-guide/'>Docs</a></span>"
     - "<span role='button' class='outline'><a href='https://github.com/ralsina/nicolino'>GitHub</a></span>"
 # Some options affecting output
 options:
@@ -101,6 +101,7 @@ continuous_import:
 features:
   - assets
   - base16
+  - books
   - folder_indexes
   - galleries
   - images

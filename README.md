@@ -2,6 +2,17 @@
 
 A performant, tiny, SSG (yeah, sure)
 
+## Features
+
+- **Markdown-based content** - Write in markdown, get HTML
+- **Posts and pages** - Blog posts with RSS feeds and static pages
+- **Taxonomies** - Tags, categories, and custom classification systems
+- **Image galleries** - Automatic thumbnails with lightbox
+- **Books** - mdbook/gitbook-style documentation with hierarchical chapters, sidebar TOC, and navigation
+- **Search** - Site search functionality
+- **Sitemap** - Automatic XML sitemap generation
+- **Fast builds** - Parallel, incremental builds via Croupier task system
+
 ## WARNING
 
 This is a toy. Do not use this for anything important. Yet, maybe.
