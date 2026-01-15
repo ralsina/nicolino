@@ -99,11 +99,20 @@ module Books
     property children : Array(ChapterEntry)
     property number : Array(Int32)
     property level : Int32
+    # ameba:disable Naming/QueryBoolMethods
     property is_part : Bool
 
     def initialize(@title, @path = nil, @number = [] of Int32, @level = 0)
       @children = [] of ChapterEntry
       @is_part = false
+    end
+
+    def part?
+      @is_part
+    end
+
+    def part=(value : Bool)
+      @is_part = value
     end
 
     def formatted_number : String
@@ -321,7 +330,7 @@ module Books
   end
 
   # Build navigation hash for a chapter
-  private def self.build_navigation(entry : ChapterEntry, flat_chapters : Array(ChapterEntry), book : Book, book_name : String) : Hash(String, Hash(String, String) | Nil)
+  private def self.build_navigation(entry : ChapterEntry, flat_chapters : Array(ChapterEntry), book : Book, book_name : String) : Hash(String, Hash(String, String)?)
     idx = flat_chapters.index(entry)
 
     prev_entry = flat_chapters[idx - 1]? if idx && idx > 0
@@ -405,7 +414,7 @@ module Books
   # Render a single TOC item as HTML
   private def self.render_toc_item_html(entry : ChapterEntry, current : ChapterEntry?, book_name : String) : String
     # Skip part titles in TOC
-    return "" if entry.is_part
+    return "" if entry.part?
 
     active_class = entry == current ? "active" : ""
     has_children = !entry.children.empty?
@@ -417,7 +426,7 @@ module Books
       end.join("\n")
 
       # Open if this is the current entry OR if current is a descendant
-      should_open = entry == current || is_ancestor?(entry, current)
+      should_open = entry == current || ancestor?(entry, current)
       open_attr = should_open ? "open" : ""
 
       if entry.has_content?
@@ -450,12 +459,12 @@ module Books
   end
 
   # Check if target is a descendant of ancestor
-  private def self.is_ancestor?(ancestor : ChapterEntry, target : ChapterEntry?) : Bool
+  private def self.ancestor?(ancestor : ChapterEntry, target : ChapterEntry?) : Bool
     return false unless target
     return true if ancestor == target
 
     ancestor.children.any? do |child|
-      is_ancestor?(child, target)
+      ancestor?(child, target)
     end
   end
 
@@ -596,7 +605,7 @@ module Books
   private def self.find_first_chapter(entries : Array(ChapterEntry)) : ChapterEntry?
     entries.each do |entry|
       # Skip part titles
-      next if entry.is_part
+      next if entry.part?
 
       # If this entry has content, return it
       return entry if entry.has_content?
@@ -612,8 +621,8 @@ module Books
   # Check for orphaned .md files in book directory that aren't in SUMMARY.md
   private def self.check_orphaned_files(book_dir : String, flat_chapters : Array(ChapterEntry))
     # Get all .md files in book directory (excluding SUMMARY.md)
-    all_md_files = Dir.glob(File.join(book_dir, "*.md")).reject do |f|
-      File.basename(f) == "SUMMARY.md"
+    all_md_files = Dir.glob(File.join(book_dir, "*.md")).reject do |file|
+      File.basename(file) == "SUMMARY.md"
     end
 
     # Get all files referenced in SUMMARY.md
@@ -626,12 +635,12 @@ module Books
     end.to_set
 
     # Find orphaned files
-    orphaned = all_md_files.reject { |f| referenced_files.includes?(f) }
+    orphaned = all_md_files.reject { |file| referenced_files.includes?(file) }
 
-    return unless orphaned.any?
+    return if orphaned.empty?
     Log.warn { "📚 Book '#{File.basename(book_dir)}' has #{orphaned.size} unreferenced .md file(s):" }
-    orphaned.each do |f|
-      Log.warn { "  - #{File.basename(f)}" }
+    orphaned.each do |file|
+      Log.warn { "  - #{File.basename(file)}" }
     end
   end
 end

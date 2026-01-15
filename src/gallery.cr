@@ -240,8 +240,13 @@ module Gallery
           # Need to refresh post contents in auto mode
           post.load(lang) if Croupier::TaskManager.auto_mode?
           Log.info { "👉 #{post.output(lang)}" }
-          html = Render.apply_template("templates/page.tmpl",
-            {"content" => post.rendered(lang), "title" => post.title(lang), "breadcrumbs" => post.breadcrumbs(lang), "language_links" => post.language_links(lang)})
+          template_context = {
+            "content"        => post.rendered(lang),
+            "title"          => post.title(lang),
+            "breadcrumbs"    => post.breadcrumbs(lang),
+            "language_links" => post.language_links(lang),
+          }
+          html = Render.apply_template("templates/page.tmpl", template_context)
           doc = Lexbor::Parser.new(html)
           doc = HtmlFilters.make_links_relative(doc, post.output(lang))
           doc.to_html

@@ -6,12 +6,21 @@ module Books
     property title : String
     property path : String?
     property children : Array(ChapterEntry)
-    property number : Array(Int32)  # e.g., [1, 2] for "1.2"
-    property level : Int32          # Nesting level (0 = root)
+    property number : Array(Int32) # e.g., [1, 2] for "1.2"
+    property level : Int32         # Nesting level (0 = root)
+    # ameba:disable Naming/QueryBoolMethods
     property is_part : Bool = false # True if this is a part title (H1)
 
     def initialize(@title, @path = nil, @number = [] of Int32, @level = 0)
       @children = [] of ChapterEntry
+    end
+
+    def part?
+      @is_part
+    end
+
+    def part=(value : Bool)
+      @is_part = value
     end
 
     # Returns the formatted chapter number (e.g., "1.2.3")
@@ -79,7 +88,7 @@ module Books
         if line.starts_with?("# ")
           title = line[2..].strip
           chapter = ChapterEntry.new(title, nil, [] of Int32, 0)
-          chapter.is_part = true
+          chapter.part = true
           chapters << chapter
           next
         end
@@ -148,7 +157,7 @@ module Books
 
       if level == 0
         # Root level - count existing root chapters (excluding part titles)
-        root_count = chapters.count { |c| !c.is_part }
+        root_count = chapters.count { |chapter| !chapter.part? }
         number << (root_count + 1)
       else
         # Nested level - get parent number and add child count
