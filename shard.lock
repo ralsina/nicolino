@@ -51,7 +51,7 @@ shards:
 
   lexbor:
     git: https://github.com/kostya/lexbor.git
-    version: 3.4.2+git.commit.cb43404acf5d42741c2d16d037a2344f68d23e91
+    version: 3.4.2
 
   live_reload:
     git: https://github.com/bcardiff/live_reload.cr.git
@@ -108,3 +108,4 @@ shards:
   vips:
     git: https://github.com/naqvis/crystal-vips.git
     version: 0.1.6
+
