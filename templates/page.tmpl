@@ -71,35 +71,7 @@
       </ul>
       <ul>
         <li>
-          <input type="search" id="search" style="width: 2em" _="
-              init
-                set :documents to []
-                make a MiniSearch from {
-                  fields: ['title', 'text'],
-                  searchOptions: {
-                    boost: { title: 2 },
-                    fuzzy: 0.2
-                  }} called :miniSearch
-              on focus
-                if no :documents
-                  fetch /search.json as json put the result into :documents
-                  call :miniSearch.addAll(:documents)
-                end
-                transition my *width to 15em
-              on blur
-                transition my *width to 2em
-                hide #search_results
-              on input
-                set :results to []
-                call :miniSearch.search(my value) put the result into :results
-                show #search_results
-                set #search_results.innerHTML to '<ul>'
-                repeat for r in :results
-                  repeat for d in :documents
-                    if d.id is r.id then append `<li><a href='${d.url}'>${d.title}</a><br>` to #search_results.innerHTML
-                  end
-                end
-            " />
+          <input type="search" id="search" placeholder="Search..." style="width: 2em" />
         </li>
         {% if language_links and language_links|length > 0 %}
         <li>
@@ -178,6 +150,7 @@
     hljs.highlightAll();
     {% endif %}
   </script>
+  <script src="/search.js"></script>
 </body>
 
 </html>
