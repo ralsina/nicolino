@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.0] - 2026-01-15
+
+### 🚀 Features
+
+- Add mdbook/gitbook-style books feature
+- Limit blog index to 100 posts with archive link
+- Add multilingual blog index language switcher
+
+### 🐛 Bug Fixes
+
+- Replace hyperscript search with JavaScript implementation
+- Add book index as previous link for first chapter
+
+### 🚜 Refactor
+
+- Remove obsolete content/docs directory
+
+### 📚 Documentation
+
+- Added release
+
 ## [0.6.0] - 2026-01-15
 
 ### 🚀 Features
@@ -59,6 +80,10 @@ All notable changes to this project will be documented in this file.
 
 - Set flags
 - Disable ARM
+
+### Bump
+
+- Release v0.6.0
 
 ## [0.5.0] - 2026-01-13
 
