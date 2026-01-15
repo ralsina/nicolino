@@ -17,7 +17,7 @@ site:
   # In the default theme they are shown at the right of
   # the title.
   nav_items:
-    - "<span role='button' class='outline'><a href='/books/user-guide/'>Docs</a></span>"
+    - "<span role='button' class='outline'><a href='/books/'>Docs</a></span>"
     - "<span role='button' class='outline'><a href='https://github.com/ralsina/nicolino'>GitHub</a></span>"
 # Some options affecting output
 options:
