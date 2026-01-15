@@ -1,6 +1,6 @@
 # User Guide
 
-Complete documentation for the Nicolino static site generator.
+Incomplete documentation for the Nicolino static site generator.
 
 - [Templates](templates.md)
 - [Features]()
