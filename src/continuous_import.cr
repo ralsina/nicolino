@@ -193,7 +193,7 @@ module ContinuousImport
     title : String,
     link : String,
     content : String,
-    pub_date_str : String
+    pub_date_str : String,
   ) : Tuple(String, String, String, String)
     title = extract_atom_title(child, title)
     link = extract_atom_link(child, link)
@@ -402,7 +402,7 @@ module ContinuousImport
     item : FeedItem,
     config : FeedConfig,
     start_date : Time?,
-    existing_posts : Set(String)
+    existing_posts : Set(String),
   ) : Bool
     # Check if should be skipped
     if config.skip_titles.includes?(item.title)
@@ -434,7 +434,7 @@ module ContinuousImport
     config : FeedConfig,
     template_content : String,
     output_dir : String,
-    filename : String
+    filename : String,
   )
     content = generate_post(item, config, template_content)
     output_path = File.join(output_dir, filename)

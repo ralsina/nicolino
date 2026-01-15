@@ -22,7 +22,6 @@ dependencies:
     github: bcardiff/live_reload.cr
   lexbor:
     github: kostya/lexbor
-    branch: master
   cr-discount:
     github: ralsina/cr-discount
     branch: main
