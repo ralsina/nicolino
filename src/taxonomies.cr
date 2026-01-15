@@ -119,12 +119,16 @@ module Taxonomies
     def render
       # Render taxonomy index
       Config.languages.keys.each do |lang|
-        base_path = Path[Config.options(lang).output] / Path["#{@path[lang]}"]
+        # Make output path language-specific to avoid conflicts
+        # For example: tags/ for en and es/ for other languages
+        # Only add language suffix if not the default language
+        lang_suffix = lang == "en" ? "" : ".#{lang}"
+        base_path = Path[Config.options(lang).output] / Path["#{@path[lang].chomp('/')}#{lang_suffix}"]
         output = (base_path / "index.html").to_s
 
         # Create breadcrumbs for taxonomy index
         taxonomy_link = Utils.path_to_link(
-          Path[Config.options(lang).output] / "#{@path[lang]}/"
+          Path[Config.options(lang).output] / "#{@path[lang].chomp('/')}#{lang_suffix}/"
         )
         breadcrumbs = [
           {name: "Home", link: "/"},
@@ -178,6 +182,7 @@ module Taxonomies
             (base_path / "#{Utils.slugify(term.@name)}/index.html").normalize.to_s,
             title,
             extra_feed: {link: Utils.path_to_link(feed_path), title: "#{title} RSS"},
+            lang: lang,
           )
         end
       end

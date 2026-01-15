@@ -4,3 +4,29 @@
  * Add your own custom styles here. This file is loaded after theme.css,
  * so you can override any theme styles as needed.
  */
+
+/* Language switcher button alignment */
+nav ul li details .language-switcher {
+    padding: 0 !important;
+    margin: 0 !important;
+    min-width: 2.5rem !important;
+    width: auto !important;
+    height: 2.25rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.2rem !important;
+}
+
+/* Ensure the details element doesn't add extra spacing */
+nav ul li details {
+    margin: 0 !important;
+    margin-bottom: 0 !important;
+    padding: 0 !important;
+}
+
+/* Align all nav items (but not the first/left ul) */
+nav > ul:last-child > li {
+    display: flex !important;
+    align-items: center !important;
+}

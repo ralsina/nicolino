@@ -101,7 +101,20 @@
                 end
             " />
         </li>
+        {% if language_links and language_links|length > 0 %}
         <li>
+          <details style="margin: 0;">
+            <summary role="button" aria-haspopup="listbox" class="language-switcher">🌐</summary>
+            <ul>
+              {% for link in language_links %}
+              <li><a href="{{link.link}}">{{link.lang}} - {{link.title}}</a></li>
+              {% endfor %}
+            </ul>
+          </details>
+        </li>
+        {% endif %}
+        <li>
+          <label>
           <input type="checkbox" id="switch_theme" name="switch" role="switch" value="1" _="
               def setTheme()
                 get the closest <html/>
@@ -125,6 +138,9 @@
                 set cookies['isLight'] to (cookies['isLight'] is not 'true')
                 setTheme()
             " />
+
+<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-28 346-160H160v-186L28-480l132-134v-186h186l134-132 134 132h186v186l132 134-132 134v186H614L480-28Zm0-252q83 0 141.5-58.5T680-480q0-83-58.5-141.5T480-680v400Zm0 140 100-100h140v-140l100-100-100-100v-140H580L480-820 380-720H240v140L140-480l100 100v140h140l100 100Zm0-340Z"/></svg>
+            </label>
         </li>
         {% for item in site_nav_items %}
         <li>{{item}}</li>

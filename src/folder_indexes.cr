@@ -60,14 +60,15 @@ module FolderIndexes
     end
 
     # Get all posts whose output starts with this folder's path (prefix-matching)
-    def posts_by_prefix
+    def posts_by_prefix(lang : String? = nil)
+      lang ||= Locale.language
       content_path = Path.new(Config.options.content).expand
       output_prefix = Config.options.output.rchop('/')
       output_folder = "#{output_prefix}/#{@path.relative_to(content_path)}"
 
       # Find all posts whose output path starts with this folder
       Markdown::File.posts.values.select do |post|
-        post.output.starts_with?(output_folder)
+        post.output(lang).starts_with?(output_folder)
       end.sort_by! { |post_data| post_data.date || Time.utc(1970, 1, 1) }.reverse!
     end
 
@@ -232,16 +233,20 @@ module FolderIndexes
   def self.render(indexes : Array(FolderIndex))
     Config.languages.keys.each do |lang|
       out_path = Path.new(Config.options(lang).output)
+      # Make output paths language-specific to avoid conflicts
+      lang_suffix = lang == "en" ? "" : ".#{lang}"
 
       # First, render posts folders using Markdown.render_index
       indexes.select(&.posts_folder?).each do |index|
-        folder_posts = index.posts_by_prefix
+        folder_posts = index.posts_by_prefix(lang)
         next if folder_posts.empty?
 
-        output = (out_path / index.@output).to_s
+        # Add language suffix to output path
+        output_path = index.@output.to_s.sub(/\.html$/, "#{lang_suffix}.html")
+        output = (out_path / output_path).to_s
         title = index.@path.basename.to_s.capitalize
 
-        Markdown.render_index(folder_posts, output, title)
+        Markdown.render_index(folder_posts, output, title, lang: lang)
       end
 
       # Then, render other folders using simple template
@@ -250,7 +255,9 @@ module FolderIndexes
         all_posts = Markdown::File.posts.map(&.last.source)
 
         inputs = ["kv://templates/folder_index.tmpl", "conf.yml"] + all_posts
-        output = (out_path / index.@output).to_s
+        # Add language suffix to output path
+        output_path = index.@output.to_s.sub(/\.html$/, "#{lang_suffix}.html")
+        output = (out_path / output_path).to_s
         # Use unique task ID based on output path
         task_id = "folder_index::#{output}"
         Croupier::Task.new(

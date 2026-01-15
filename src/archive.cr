@@ -65,7 +65,9 @@ module Archive
     # Generate archive for each language
     Config.languages.keys.each do |lang|
       base_path = Path[Config.options(lang).output]
-      output_path = (base_path / "archive" / "index.html").normalize.to_s
+      # Make output path language-specific to avoid conflicts
+      lang_suffix = lang == "en" ? "" : ".#{lang}"
+      output_path = (base_path / "archive#{lang_suffix}" / "index.html").normalize.to_s
 
       Croupier::Task.new(
         id: "archive",
@@ -80,12 +82,13 @@ module Archive
         Log.info { "👉 #{output_path}" }
 
         # Create breadcrumbs for archive
-        breadcrumbs = [{name: "Home", link: "/"}, {name: "Archive", link: "/archive/"}] of NamedTuple(name: String, link: String)
+        archive_link = "/archive#{lang_suffix}/"
+        breadcrumbs = [{name: "Home", link: "/"}, {name: "Archive", link: archive_link}] of NamedTuple(name: String, link: String)
 
         # Include title.tmpl which handles breadcrumbs
         title_html = Templates.environment.get_template("templates/title.tmpl").render({
           "title"       => "Archive",
-          "link"        => "/archive/",
+          "link"        => archive_link,
           "breadcrumbs" => breadcrumbs,
           "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
         })
@@ -105,7 +108,7 @@ module Archive
 
         # Process with HTML filters
         doc = Lexbor::Parser.new(html)
-        doc = HtmlFilters.make_links_relative(doc, "/archive/")
+        doc = HtmlFilters.make_links_relative(doc, archive_link)
         doc.to_html
       end
     end

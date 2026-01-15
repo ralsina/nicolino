@@ -108,6 +108,7 @@ module Gallery
         "image_list"        => @image_list,
         "has_sub_galleries" => has_sub_galleries?.to_s,
         "has_images"        => has_images?.to_s,
+        "language_links"    => language_links(lang),
       }
     end
 
@@ -240,7 +241,7 @@ module Gallery
           post.load(lang) if Croupier::TaskManager.auto_mode?
           Log.info { "👉 #{post.output(lang)}" }
           html = Render.apply_template("templates/page.tmpl",
-            {"content" => post.rendered(lang), "title" => post.title(lang)})
+            {"content" => post.rendered(lang), "title" => post.title(lang), "breadcrumbs" => post.breadcrumbs(lang), "language_links" => post.language_links(lang)})
           doc = Lexbor::Parser.new(html)
           doc = HtmlFilters.make_links_relative(doc, post.output(lang))
           doc.to_html
@@ -252,7 +253,10 @@ module Gallery
   # Render the main galleries index page
   private def self.render_galleries_index(galleries : Array(Gallery), prefix = "")
     Config.languages.keys.each do |lang|
-      output_path = Path[Config.options(lang).output] / prefix / "index.html"
+      # Make output path language-specific to avoid conflicts
+      lang_suffix = lang == "en" ? "" : ".#{lang}"
+      galleries_dir = prefix.empty? ? "galleries" : "#{prefix}/galleries"
+      output_path = Path[Config.options(lang).output] / "#{galleries_dir}#{lang_suffix}" / "index.html"
 
       Croupier::Task.new(
         id: "galleries_index",
@@ -263,12 +267,13 @@ module Gallery
         Log.info { "👉 #{output_path}" }
 
         # Create breadcrumbs for galleries index
-        breadcrumbs = [{name: "Home", link: "/"}, {name: "Galleries", link: "/galleries/"}] of NamedTuple(name: String, link: String)
+        galleries_link = "/galleries#{lang_suffix}/"
+        breadcrumbs = [{name: "Home", link: "/"}, {name: "Galleries", link: galleries_link}] of NamedTuple(name: String, link: String)
 
         # Include title.tmpl which handles breadcrumbs
         title_html = Templates.environment.get_template("templates/title.tmpl").render({
           "title"       => "Galleries",
-          "link"        => "/galleries/",
+          "link"        => galleries_link,
           "breadcrumbs" => breadcrumbs,
           "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
         })

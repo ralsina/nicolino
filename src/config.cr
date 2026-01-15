@@ -59,6 +59,15 @@ module Config
         },
       })
       @@config.set_default("languages", {"en" => Hash(String, String).new})
+
+      # Ensure "en" is always in languages if other languages are configured
+      # This allows users to add additional languages without explicitly defining "en"
+      configured_langs = @@config.get("languages").as_h
+      if !configured_langs.empty? && !configured_langs.has_key?("en")
+        # Merge "en" with existing languages
+        merged_langs = configured_langs.merge({"en" => Hash(String, String).new})
+        @@config.set("languages", merged_langs)
+      end
     end
     @@config
   end

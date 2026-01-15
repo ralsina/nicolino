@@ -38,15 +38,52 @@ module Markdown
       @base = base
       @sources.map { |lang, _|
         p = Path[base]
-        # FIXME: posts/ is configurable
         # Remove the leading "posts/"
         p = Path[p.parts].relative_to Config.options.content
+        # Add language code to output path to avoid conflicts
+        # Rules:
+        # 1. Language-specific files (e.g., 958.es.md):
+        #    - Default language (en) files -> no suffix
+        #    - Non-default language files -> add suffix (e.g., 958.es.html)
+        #    This prevents conflicts when both foo.md and foo.es.md exist
+        # 2. Shared files (e.g., 958.md used by multiple languages):
+        #    - Default language (en) -> no suffix
+        #    - Non-default languages -> add suffix (e.g., 958.es.html)
         p = Path[Config.options(lang).output] / p
+
+        # Add suffix for non-default languages (both language-specific and shared files)
+        if lang != "en"
+          p = Path[p.dirname] / "#{p.stem}.#{lang}#{p.extension}"
+        end
+
         @output[lang] = "#{p}.html"
       }
       @@posts[base.to_s] = self
-      Config.languages.keys.each do |lang|
-        load lang
+
+      # Load each unique source file once, then share data across languages
+      # This enables bidirectional fallback: any language can use any available file
+      loaded_files = Set(String).new
+      @sources.each do |lang, source_file|
+        unless loaded_files.includes?(source_file)
+          Log.debug { "Loading #{source_file} for language #{lang}" }
+          load lang
+          loaded_files << source_file
+
+          # Share this data with all other languages that use the same file
+          @sources.each do |other_lang, other_source|
+            if other_source == source_file && other_lang != lang
+              Log.debug { "Language #{other_lang} shares content with #{lang} from #{source_file}" }
+              @text[other_lang] = @text[lang]
+              @metadata[other_lang] = @metadata[lang]
+              @title[other_lang] = @title[lang]
+              @html[other_lang] = @html[lang] if @html.has_key?(lang)
+              @toc[other_lang] = @toc[lang] if @toc.has_key?(lang)
+              # Set @link for the other language based on its @output path
+              @link[other_lang] = (Path.new ["/", @output[other_lang].split("/")[1..]]).to_s
+              @shortcodes[other_lang] = @shortcodes[lang] if @shortcodes.has_key?(lang)
+            end
+          end
+        end
       end
     end
 
@@ -130,7 +167,7 @@ module Markdown
         @metadata[lang] = YAML.parse(raw_metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
         @title[lang] = metadata(lang)["title"].to_s
       end
-      @link[lang] = (Path.new ["/", output.split("/")[1..]]).to_s
+      @link[lang] = (Path.new ["/", @output[lang].split("/")[1..]]).to_s
       # Performance Note: usually parse takes ~.1 seconds to
       # parse 1000 short posts that have no shortcodes.
       @shortcodes[lang] = full_shortcodes_list(@text[lang])
@@ -342,19 +379,45 @@ module Markdown
     def value(lang = nil)
       lang = lang || Locale.language
       {
-        "breadcrumbs"   => breadcrumbs(lang),
-        "date"          => date.try &.as(Time).to_s(Config.options(lang).date_output_format),
-        "html"          => html(lang),
-        "link"          => link(lang),
-        "source"        => source(lang),
-        "summary"       => summary(lang),
-        "taxonomies"    => taxonomies,
-        "title"         => title(lang),
-        "toc"           => toc(lang),
-        "metadata"      => metadata(lang),
-        "show_updated"  => show_updated?(lang),
-        "related_posts" => related_posts(lang),
+        "breadcrumbs"    => breadcrumbs(lang),
+        "date"           => date.try &.as(Time).to_s(Config.options(lang).date_output_format),
+        "html"           => html(lang),
+        "link"           => link(lang),
+        "source"         => source(lang),
+        "summary"        => summary(lang),
+        "taxonomies"     => taxonomies,
+        "title"          => title(lang),
+        "toc"            => toc(lang),
+        "metadata"       => metadata(lang),
+        "show_updated"   => show_updated?(lang),
+        "related_posts"  => related_posts(lang),
+        "language_links" => language_links(lang),
       }
+    end
+
+    # Get language alternate links for this post
+    # Returns an array of Hash for Crinja compatibility
+    def language_links(lang : String? = nil)
+      lang ||= Locale.language
+      result = [] of Hash(String, String)
+
+      # For each configured language, check if we have this post
+      Config.languages.keys.each do |other_lang|
+        # Skip the current language
+        next if other_lang == lang
+
+        # Check if this post has content in the other language
+        # (it will if the languages share a source file or have language-specific files)
+        if @sources.has_key?(other_lang)
+          result << {
+            "lang"  => other_lang,
+            "link"  => link(other_lang),
+            "title" => title(other_lang),
+          }
+        end
+      end
+
+      result
     end
 
     # Get related posts based on similarity
@@ -420,8 +483,13 @@ module Markdown
             # Need to refresh post contents
             post.load lang if Croupier::TaskManager.auto_mode?
             Log.info { "👉 #{post.output lang}" }
-            html = Render.apply_template("templates/page.tmpl",
-              {"content" => post.rendered(lang), "title" => post.title(lang), "breadcrumbs" => post.breadcrumbs(lang)})
+            template_vars = {
+              "content"        => post.rendered(lang),
+              "title"          => post.title(lang),
+              "breadcrumbs"    => post.breadcrumbs(lang),
+              "language_links" => post.language_links(lang),
+            }
+            html = Render.apply_template("templates/page.tmpl", template_vars)
             doc = Lexbor::Parser.new(html)
             doc = HtmlFilters.make_links_relative(doc, post.link(lang))
             doc.to_html
@@ -453,7 +521,8 @@ module Markdown
   end
 
   # Create an index page out of a list of posts, save in output
-  def self.render_index(posts, output, title = nil, extra_inputs = [] of String, extra_feed = nil)
+  def self.render_index(posts, output, title = nil, extra_inputs = [] of String, extra_feed = nil, lang = nil)
+    lang ||= Locale.language
     inputs = [
       "conf.yml",
       "kv://templates/index.tmpl",
@@ -476,20 +545,66 @@ module Markdown
 
       content = Templates.environment.get_template("templates/index.tmpl").render(
         {
-          "posts"    => display_posts.map(&.value),
+          "posts"    => display_posts.map(&.value(lang)),
           "has_more" => has_more,
         })
+
+      # Calculate language links for this index
+      # Get alternate language versions of this index page
+      language_links = calculate_index_language_links(output, lang)
+
       html = Render.apply_template("templates/page.tmpl",
         {
-          "content"    => content,
-          "title"      => title,
-          "noindex"    => true,
-          "extra_feed" => extra_feed,
+          "content"        => content,
+          "title"          => title,
+          "noindex"        => true,
+          "extra_feed"     => extra_feed,
+          "language_links" => language_links,
         })
       doc = Lexbor::Parser.new(html)
       doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))
       doc.to_html
     end
+  end
+
+  # Calculate language alternate links for index pages
+  # Returns an array of Hash for Crinja compatibility
+  private def self.calculate_index_language_links(output_path : String | Path, lang : String)
+    result = [] of Hash(String, String)
+    output_str = output_path.to_s
+
+    # For each configured language, check if an alternate index exists
+    Config.languages.keys.each do |other_lang|
+      next if other_lang == lang
+
+      # Determine the alternate index path
+      # If current is output/posts/index.html, alternate should be output/posts/index.es.html
+      # If current is output/posts/index.es.html, alternate should be output/posts/index.html
+      if lang == "en"
+        # Current is English, look for .es.html (or other language suffixes)
+        lang_suffix = ".#{other_lang}"
+        alt_path = output_str.sub(/\.html$/, "#{lang_suffix}.html")
+      else
+        # Current is non-English (e.g., index.es.html)
+        # Look for English version (no suffix)
+        alt_path = output_str.sub(/\.#{lang}\.html$/, ".html")
+      end
+
+      # Check if the alternate file would exist (by checking if it's in a known location)
+      # For now, we'll assume it exists if the path pattern matches
+      site_title = begin
+        Config.languages[other_lang].as_h["site"].as_h["title"].as_s
+      rescue
+        other_lang.upcase
+      end
+      result << {
+        "lang"  => other_lang,
+        "link"  => Utils.path_to_link(Path[alt_path]),
+        "title" => site_title,
+      }
+    end
+
+    result
   end
 
   # Create a RSS file out of posts with title, save in output
