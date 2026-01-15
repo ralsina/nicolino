@@ -2,6 +2,64 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0] - 2026-01-15
+
+### 🚀 Features
+
+- Use crimage for static builds, convert gallery webp to jpeg
+- Add link checker command
+- Add continuous import feature for RSS/Atom feeds
+- Add MinHash similarity feature for related posts
+- Add continuous import documentation and move templates to user_templates
+- Add baked-in default template for continuous import
+- Add proper breadcrumbs to all pages
+- Make all colors respect base16 theme from conf.yml
+- Add color_schemes command for theme discovery
+- Simplify color scheme config to use family names
+- Add --apply option to color_schemes command
+- Improve folder_indexes and add docs navigation
+- Add common item_list template for consistent index styling
+- Add breadcrumbs to all pages using title.tmpl
+- Remove 4000/ from folder_indexes exclusion
+- Improve title.tmpl breadcrumb styling
+
+### 🐛 Bug Fixes
+
+- Correct post order in index (newest first)
+- Remove duplicate Published and Tags from release posts
+- Remove duplicate breadcrumb from page template
+- Remove duplicate h1 title from item_list template
+- Remove useless assignments flagged by linter
+- Missing file
+- Ensure progress bar reaches 100% on last task completion
+
+### 🚜 Refactor
+
+- Move breadcrumb CSS from title.tmpl to custom.css
+- Reorganize CSS into theme.css and custom.css
+- Move nicolino_release.tmpl to templates/import/
+- Add enable() to all features
+
+### 📚 Documentation
+
+- Add comprehensive link checker documentation
+- Move feature documentation to content/docs/
+- Remove duplicate titles from feature docs
+- Add template documentation and descriptive comments
+
+### ⚡ Performance
+
+- Parallelize search and sitemap generation with chunked processing
+
+### ◀️ Revert
+
+- Undo progress bar 100% fix
+
+### Build
+
+- Set flags
+- Disable ARM
+
 ## [0.5.0] - 2026-01-13
 
 ### 🚀 Features
