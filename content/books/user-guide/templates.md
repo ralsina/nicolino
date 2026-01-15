@@ -32,6 +32,7 @@ Renders the page title with breadcrumb navigation:
 - Taxonomy links (tags, categories, etc.) if present
 
 **Variables**:
+
 - `breadcrumbs`: Array of `{name, link}` tuples for navigation
 - `link`: URL for the page title (used when no breadcrumbs)
 - `title`: Page title text
@@ -53,6 +54,7 @@ Renders a blog post with:
 - Related posts section (if present)
 
 **Variables**:
+
 - `breadcrumbs`, `title`, `link`: Passed to `title.tmpl`
 - `date`: Post publication date
 - `metadata.updated`: Last updated date (optional)
@@ -74,6 +76,7 @@ Renders an image gallery with:
 - VenoBox lightbox integration for image viewing
 
 **Variables**:
+
 - `breadcrumbs`, `title`, `link`: Passed to `title.tmpl`
 - `html`: Gallery introduction/description HTML
 - `image_list`: Array of image paths
@@ -89,6 +92,7 @@ Renders a list of blog posts with:
 - Post summary
 
 **Variables**:
+
 - `posts`: Array of post objects with `link`, `title`, `date`, `summary`
 
 **Used by**: `Markdown.render_index` for generating index pages
@@ -104,6 +108,7 @@ Renders a chronological archive organized by year/month:
 - Post list within each month
 
 **Variables**:
+
 - `years`: Array of year objects with `year`, `months` array
 - `latest_year`: The year number of the most recent year
 
@@ -116,6 +121,7 @@ Renders a simple list of taxonomy terms (tags, categories):
 - Links to each term's index page
 
 **Variables**:
+
 - `taxonomy`: Taxonomy object with `terms` array
 
 **Used by**: Taxonomy feature for taxonomy index pages (e.g., `/tags/`)
@@ -129,6 +135,7 @@ Renders a syntax-highlighted code file with:
 - Collapsible raw source view
 
 **Variables**:
+
 - `title`: Listing title (filename)
 - `code`: Syntax-highlighted HTML code
 - `raw_content`: Escaped raw source code
@@ -144,6 +151,7 @@ Simple template for imported GitHub releases:
 - Link to GitHub release page
 
 **Variables**:
+
 - `title`: Release title/version
 - `content`: Release notes/body
 - `link`: GitHub release URL
@@ -160,6 +168,7 @@ Renders a simple list of items with:
 - Bulleted list of item links
 
 **Variables**:
+
 - `title`: List title (not rendered here, passed from caller)
 - `description`: Optional description text
 - `items`: Array of `{link, title}` tuples
@@ -189,6 +198,7 @@ Generates CSS variables for Base16 color schemes:
 - Theme switcher integration
 
 **Variables**:
+
 - `dark`: Dark theme object with scheme data
 - `light`: Light theme object with scheme data
 
@@ -199,6 +209,7 @@ Generates CSS variables for Base16 color schemes:
 Generates CSS for code syntax highlighting using Tartrazine.
 
 **Variables**:
+
 - `css`: Generated CSS from Tartrazine formatter
 
 **Used by**: Listings feature for `output/css/listings.css`
