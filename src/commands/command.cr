@@ -25,10 +25,18 @@ module Nicolino
           )
           bar = Progress::Bar.new(theme: theme)
           done = 0
+          total = Croupier::TaskManager.tasks.size
           Croupier::TaskManager.progress_callback = ->(_id : String) {
             done += 1
-            step = done * 100.0 / Croupier::TaskManager.tasks.size - bar.current
-            bar.tick(step) if step >= 1
+            # Calculate progress, ensuring we reach exactly 100 on the last task
+            if done == total
+              # Last task - tick to exactly 100
+              remaining = 100.0 - bar.current
+              bar.tick(remaining) if remaining > 0
+            else
+              step = done * 100.0 / total - bar.current
+              bar.tick(step) if step >= 1
+            end
           }
         end
         Oplog.setup(verbosity)
