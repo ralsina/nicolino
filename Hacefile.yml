@@ -85,7 +85,6 @@ tasks:
   static:
     outputs:
       - bin/{{NAME}}-static-linux-amd64
-      - bin/{{NAME}}-static-linux-arm64
     commands: |
       hace clean
       ./build_static.sh
