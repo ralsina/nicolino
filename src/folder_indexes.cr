@@ -216,15 +216,30 @@ module FolderIndexes
       # Skip if folder matches any exclude pattern
       next if exclude_patterns.any? { |pattern| folder.to_s.includes?(pattern) }
 
-      # Check if there's an index.md file that would generate this folder's index.html
-      has_index_md = File.file?("#{folder}/index.md")
+      # Create a temporary FolderIndex to check the expected output path
+      temp_index = FolderIndex.new(Path.new(folder))
 
-      # Only generate folder index if no index.md exists
-      if has_index_md
-        Log.debug { "Skipping #{folder}: index.md exists" }
+      # Check if any task already produces this folder's index.html
+      # This handles cases like:
+      # - index.md files (regardless of slug metadata)
+      # - Custom index pages from other features
+      # - Any task that outputs to folder/index.html
+      expected_output = temp_index.@output.to_s
+      has_task_for_output = Croupier::TaskManager.tasks.values.any? do |task|
+        task.outputs.includes?(expected_output)
+      end
+
+      # Check if there's a .noindex file to exclude this folder
+      has_noindex = File.file?("#{folder}/.noindex")
+
+      # Only generate folder index if no task produces this output and no .noindex file
+      if has_task_for_output
+        Log.debug { "Skipping #{folder}: index.html already produced by another task" }
+      elsif has_noindex
+        Log.debug { "Skipping #{folder}: .noindex found" }
       else
         Log.debug { "👈 #{folder}" }
-        indexes << FolderIndex.new(Path.new(folder))
+        indexes << temp_index
       end
     end
     indexes
