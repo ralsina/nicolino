@@ -224,9 +224,9 @@ module FolderIndexes
       # - index.md files (regardless of slug metadata)
       # - Custom index pages from other features
       # - Any task that outputs to folder/index.html
-      expected_output = temp_index.@output.to_s
+      expected_output = Path[Config.options.output] / temp_index.@output
       has_task_for_output = Croupier::TaskManager.tasks.values.any? do |task|
-        task.outputs.includes?(expected_output)
+        task.outputs.includes?(expected_output.to_s)
       end
 
       # Check if there's a .noindex file to exclude this folder
@@ -273,8 +273,8 @@ module FolderIndexes
         # Add language suffix to output path
         output_path = index.@output.to_s.sub(/\.html$/, "#{lang_suffix}.html")
         output = (out_path / output_path).to_s
-        # Use unique task ID based on output path
-        task_id = "folder_index::#{output}"
+        # Use unique task ID based on output path and language
+        task_id = "folder_index::#{lang}::#{index.@output.to_s}"
         Croupier::Task.new(
           id: task_id,
           output: output,
