@@ -264,9 +264,11 @@
 }
 
 /* Highlight.js syntax highlighting - dark theme */
+pre code.hljs,
+[data-theme=dark] pre code.hljs,
 [data-theme=dark] .hljs {
     color: #{{dark.base05_hex}};
-    background: #{{dark.base00_hex}};
+    background: #{{dark.base01_hex}};
 }
 [data-theme=dark] .hljs-comment,
 [data-theme=dark] .hljs-quote {
@@ -333,10 +335,13 @@
 }
 
 /* Highlight.js syntax highlighting - light theme */
+pre code.hljs,
+:root:not([data-theme=dark]) pre code.hljs,
+[data-theme=light] pre code.hljs,
 :root:not([data-theme=dark]) .hljs,
 [data-theme=light] .hljs {
     color: #{{light.base05_hex}};
-    background: #{{light.base00_hex}};
+    background: #{{light.base01_hex}};
 }
 :root:not([data-theme=dark]) .hljs-comment,
 :root:not([data-theme=dark]) .hljs-quote,
