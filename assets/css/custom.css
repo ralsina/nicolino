@@ -5,6 +5,15 @@
  * so you can override any theme styles as needed.
  */
 
+/* Links inside headings should inherit heading color, not use link color */
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+    color: inherit;
+}
+
+h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover, h5 a:hover, h6 a:hover {
+    color: var(--pico-primary);
+}
+
 /* Language switcher button alignment */
 nav ul li details .language-switcher {
     padding: 0 !important;
