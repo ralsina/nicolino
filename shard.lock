@@ -91,7 +91,7 @@ shards:
 
   sixteen:
     git: https://github.com/ralsina/sixteen.git
-    version: 0.6.3
+    version: 0.7.0
 
   stumpy_core:
     git: https://github.com/stumpycr/stumpy_core.git
@@ -103,7 +103,7 @@ shards:
 
   tartrazine:
     git: https://github.com/ralsina/tartrazine.git
-    version: 0.20.0
+    version: 0.20.1
 
   totem:
     git: https://github.com/icyleaf/totem.git
