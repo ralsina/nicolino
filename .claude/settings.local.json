@@ -48,7 +48,10 @@
       "Skill(superpowers:executing-plans)",
       "Skill(superpowers:executing-plans:*)",
       "Skill(superpowers:systematic-debugging)",
-      "Skill(superpowers:systematic-debugging:*)"
+      "Skill(superpowers:systematic-debugging:*)",
+      "Bash(grep:*)",
+      "Bash(/home/ralsina/code/nicolino/bin/nicolino:*)",
+      "Bash(ameba:*)"
     ],
     "deny": [],
     "ask": []

@@ -274,7 +274,7 @@ module FolderIndexes
         output_path = index.@output.to_s.sub(/\.html$/, "#{lang_suffix}.html")
         output = (out_path / output_path).to_s
         # Use unique task ID based on output path and language
-        task_id = "folder_index::#{lang}::#{index.@output.to_s}"
+        task_id = "folder_index::#{lang}::#{index.@output}"
         Croupier::Task.new(
           id: task_id,
           output: output,

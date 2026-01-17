@@ -18,24 +18,10 @@ module Base16
     ) do
       scheme = Config.get("site.color_scheme").as_s
 
-      # Try to use it directly as a theme name first
-      # If that fails, use it as a family base name with dark_variant/light_variant
-      begin
-        dark_theme = Sixteen.theme(scheme)
-        # For light theme, we need to find the light variant of this family
-        # Try to find it by replacing -dark with -light or using find_variant
-        light_scheme = scheme.gsub(/-dark$/, "-light")
-        light_theme = begin
-          Sixteen.theme(light_scheme)
-        rescue
-          # If that doesn't work, use the light_variant method
-          Sixteen.light_variant(scheme)
-        end
-      rescue
-        # Not a valid theme name, treat it as a family base name
-        dark_theme = Sixteen.dark_variant(scheme)
-        light_theme = Sixteen.light_variant(scheme)
-      end
+      # Always use dark_variant and light_variant to ensure proper variant resolution
+      # This handles auto-generation when variants don't exist
+      dark_theme = Sixteen.dark_variant(scheme)
+      light_theme = Sixteen.light_variant(scheme)
 
       color_context = {
         "light" => light_theme.context("_"),

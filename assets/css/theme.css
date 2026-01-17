@@ -1,17 +1,13 @@
 /* Collapsible breadcrumb in header */
 .breadcrumb {
     font-size: 0.9em;
-    color: #666;
+    color: var(--pico-muted-color);
     display: inline-block;
 }
 
 /* Set Pico CSS font variables globally to use Quicksand */
 :root {
     --pico-font-family: "Quicksand", sans-serif;
-}
-
-[data-theme="dark"] .breadcrumb {
-    color: #aaa;
 }
 
 .breadcrumb a {
@@ -70,17 +66,12 @@
     margin-top: 0.5em;
     margin-bottom: 1.5em;
     padding-bottom: 1em;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--pico-muted-border-color);
     display: flex;
     flex-direction: column;
     gap: 0.5em;
     font-size: 0.9em;
-    color: #666;
-}
-
-[data-theme="dark"] .post-meta {
-    border-bottom-color: #3e3e3e;
-    color: #a6adc8;
+    color: var(--pico-muted-color);
 }
 
 .post-meta span {
@@ -100,20 +91,12 @@
     margin-top: 0;
     display: block;
     font-size: 0.85em;
-    color: #666;
-}
-
-[data-theme="dark"] .post-taxonomies {
-    color: #a6adc8;
+    color: var(--pico-muted-color);
 }
 
 .taxonomy a {
-    color: #89b4fa;
+    color: var(--pico-primary);
     text-decoration: none;
-}
-
-[data-theme="dark"] .taxonomy a {
-    color: #89dceb;
 }
 
 .taxonomy a:hover {
@@ -133,12 +116,9 @@
 .table-of-contents {
     margin: 1.5em 0;
     padding: 1em;
-    background: #f8f9fa;
+    background: var(--pico-card-background-color);
+    border: 1px solid var(--pico-muted-border-color);
     border-radius: 4px;
-}
-
-[data-theme="dark"] .table-of-contents {
-    background: #1e1e2e;
 }
 
 /* Book layout */
@@ -176,26 +156,17 @@
 
 .book-sidebar-toggle {
     background: none;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--pico-muted-border-color);
     border-radius: 4px;
     padding: 0.25em 0.5em;
     cursor: pointer;
     font-size: 1em;
-    color: #666;
+    color: var(--pico-color);
     flex-shrink: 0;
 }
 
-[data-theme="dark"] .book-sidebar-toggle {
-    border-color: #4e4e4e;
-    color: #a6adc8;
-}
-
 .book-sidebar-toggle:hover {
-    background: #f0f0f0;
-}
-
-[data-theme="dark"] .book-sidebar-toggle:hover {
-    background: #3e3e3e;
+    background: var(--pico-secondary-hover-background);
 }
 
 .book-title {
@@ -224,12 +195,8 @@
 .chapter-number {
     display: block;
     font-size: 0.9em;
-    color: #666;
+    color: var(--pico-muted-color);
     margin-bottom: 0.5em;
-}
-
-[data-theme="dark"] .chapter-number {
-    color: #a6adc8;
 }
 
 /* Book TOC (sidebar and index) */
@@ -252,21 +219,13 @@
 }
 
 .toc-link:hover {
-    background: #f0f0f0;
+    background: var(--pico-secondary-hover-background);
     text-decoration: none;
 }
 
-[data-theme="dark"] .toc-link:hover {
-    background: #3e3e3e;
-}
-
 .toc-link.active {
-    background: #e0e0e0;
+    background: var(--pico-secondary-background);
     font-weight: 500;
-}
-
-[data-theme="dark"] .toc-link.active {
-    background: #4e4e4e;
 }
 
 .toc-title {
@@ -276,11 +235,7 @@
 }
 
 .toc-title.disabled {
-    color: #999;
-}
-
-[data-theme="dark"] .toc-title.disabled {
-    color: #666;
+    color: var(--pico-muted-color);
 }
 
 .toc-group {
@@ -303,11 +258,7 @@
 .toc-children {
     margin-left: 1em;
     padding-left: 0.5em;
-    border-left: 2px solid #e0e0e0;
-}
-
-[data-theme="dark"] .toc-children {
-    border-left-color: #4e4e4e;
+    border-left: 2px solid var(--pico-muted-border-color);
 }
 
 .toc-level-1 .toc-link {
@@ -325,12 +276,8 @@
 
 .book-description {
     font-size: 1.1em;
-    color: #666;
+    color: var(--pico-muted-color);
     margin-bottom: 2em;
-}
-
-[data-theme="dark"] .book-description {
-    color: #a6adc8;
 }
 
 .book-full-toc {
@@ -344,16 +291,12 @@
     gap: 1em;
     margin: 3em 0 2em;
     padding-top: 1em;
-    border-top: 1px solid #e0e0e0;
-}
-
-[data-theme="dark"] .chapter-nav {
-    border-top-color: #3e3e3e;
+    border-top: 1px solid var(--pico-muted-border-color);
 }
 
 .chapter-nav a {
     padding: 0.5em 1em;
-    background: #f0f0f0;
+    background: var(--pico-secondary-background);
     border-radius: 4px;
     text-decoration: none;
     color: inherit;
@@ -361,16 +304,8 @@
 }
 
 .chapter-nav a:hover {
-    background: #e0e0e0;
+    background: var(--pico-secondary-hover-background);
     text-decoration: none;
-}
-
-[data-theme="dark"] .chapter-nav a {
-    background: #3e3e3e;
-}
-
-[data-theme="dark"] .chapter-nav a:hover {
-    background: #4e4e4e;
 }
 
 .nav-prev,
