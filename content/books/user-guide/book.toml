@@ -1,0 +1,11 @@
+[book]
+title = "Nicolino User Guide"
+description = "Complete user documentation for the Nicolino static site generator"
+authors = ["Roberto Alsina"]
+
+[build]
+create-missing = false
+
+[output.html]
+git-repository-url = "https://github.com/ralsina/nicolino"
+edit-url-template = "https://github.com/ralsina/nicolino/edit/main/content/books/user-guide/{path}"

@@ -51,6 +51,9 @@ dependencies:
   polydocopt:
     github: ralsina/polydocopt
     branch: main
+  toml:
+    github: manastech/crystal-toml
+    version: ~> 0.8.0
 
 development_dependencies:
   ameba:

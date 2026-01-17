@@ -3,8 +3,107 @@ require "./folder_indexes"
 require "./sc"
 require "json"
 require "shortcodes"
+require "toml"
 
 module Books
+  # Configuration from book.toml (mdbook compatibility)
+  #
+  # Supported sections from mdbook spec:
+  # - [book]: title, description, authors, language
+  # - [build]: create-missing (auto-create missing chapter files)
+  # - [output.html]: git-repository-url, edit-url-template (shown in sidebar/footer)
+  #
+  # Not supported (noted for future reference):
+  # - [build]: extra-watch-dirs, build-dir
+  # - [output.html.*]: mdbook-specific output settings (except the above)
+  # - [output.html.playground]: Rust playground integration
+  # - [output.html.search]: Search config (we have our own search feature)
+  # - [output.html.redirect]: Redirects
+  # - [preprocessor.*]: mdbook preprocessor system
+  struct BookConfig
+    property title : String?
+    property authors : Array(String)?
+    property description : String?
+    property language : String?
+    # ameba:disable Naming/QueryBoolMethods
+    property create_missing : Bool = false
+    property git_repository_url : String?
+    property edit_url_template : String?
+
+    def initialize(
+      @title : String? = nil,
+      @authors : Array(String)? = nil,
+      @description : String? = nil,
+      @language : String? = nil,
+      @create_missing : Bool = false,
+      @git_repository_url : String? = nil,
+      @edit_url_template : String? = nil,
+    )
+    end
+
+    # ameba:disable Metrics/CyclomaticComplexity
+    def self.from_file(book_toml_path : String) : BookConfig?
+      return nil unless File.exists?(book_toml_path)
+
+      toml_content = File.read(book_toml_path)
+      parsed = TOML.parse(toml_content)
+
+      title = nil
+      authors = nil
+      description = nil
+      language = nil
+      create_missing = false
+      git_repository_url = nil
+      edit_url_template = nil
+
+      # Extract from [book] section
+      if book_section = parsed["book"]?
+        if title_val = book_section.as_h["title"]?
+          title = title_val.as_s
+        end
+        if desc_val = book_section.as_h["description"]?
+          description = desc_val.as_s
+        end
+        if authors_val = book_section.as_h["authors"]?
+          authors = authors_val.as_a.map(&.as_s)
+        end
+        if lang_val = book_section.as_h["language"]?
+          language = lang_val.as_s
+        end
+      end
+
+      # Extract from [build] section
+      if build_section = parsed["build"]?
+        if create_missing_val = build_section.as_h["create-missing"]? || build_section.as_h["create_missing"]?
+          create_missing = create_missing_val.as_bool
+        end
+      end
+
+      # Extract from [output.html] section
+      if html_section = parsed["output.html"]?
+        if git_url_val = html_section.as_h["git-repository-url"]? || html_section.as_h["git_repository_url"]?
+          git_repository_url = git_url_val.as_s
+        end
+        if edit_url_val = html_section.as_h["edit-url-template"]? || html_section.as_h["edit_url_template"]?
+          edit_url_template = edit_url_val.as_s
+        end
+      end
+
+      new(
+        title: title,
+        authors: authors,
+        description: description,
+        language: language,
+        create_missing: create_missing,
+        git_repository_url: git_repository_url,
+        edit_url_template: edit_url_template,
+      )
+    rescue ex
+      Log.warn { "Failed to parse book.toml: #{ex.message}" }
+      nil
+    end
+  end
+
   # Book chapter file that reuses Markdown::File but handles optional metadata
   class BookChapter < Markdown::File
     def initialize(sources, base, title_override : String? = nil)
@@ -78,17 +177,22 @@ module Books
     property title : String
     property description : String?
     property chapters : Array(ChapterEntry)
+    property config : BookConfig?
 
-    def initialize(@name, @title, @chapters, @description = nil)
+    def initialize(@name, @title, @chapters, @description = nil, @config : BookConfig? = nil)
     end
 
     # Convert to hash for template rendering
-    def to_context : Hash(String, String)
-      {
-        "name"        => @name,
-        "title"       => @title,
-        "description" => @description || "",
+    def to_context : Hash(String, String | Nil)
+      ctx = {
+        "name"               => @name,
+        "title"              => @title,
+        "description"        => @description || "",
+        "git_repository_url" => @config.try(&.git_repository_url),
+        "edit_url_template"  => @config.try(&.edit_url_template),
+        "authors"            => @config.try(&.authors).try(&.join(", ")) || nil,
       }
+      ctx
     end
   end
 
@@ -180,23 +284,42 @@ module Books
       book_dir = File.dirname(summary_file)
       book_name = File.basename(book_dir)
 
+      # Check for book.toml (mdbook compatibility)
+      book_toml_path = File.join(book_dir, "book.toml")
+      book_config = BookConfig.from_file(book_toml_path)
+
       # Read and parse SUMMARY.md
       summary_content = File.read(summary_file)
       entries = SummaryParser.parse(summary_content)
       Log.info { "📚 Parsed #{entries.size} top-level entries" }
 
-      # Get book title and description from SUMMARY.md
-      title = extract_title(summary_content, book_name)
-      description = SummaryParser.extract_description(summary_content)
+      # Get book title and description - prefer book.toml, fall back to SUMMARY.md
+      title = if (toml_title = book_config.try(&.title)) && !toml_title.empty?
+                Log.info { "📚 Using title from book.toml: #{toml_title}" }
+                toml_title
+              else
+                extract_title(summary_content, book_name)
+              end
+
+      description = if (toml_desc = book_config.try(&.description)) && !toml_desc.empty?
+                      toml_desc
+                    else
+                      SummaryParser.extract_description(summary_content)
+                    end
 
       # Build flat list of all chapters for navigation
       flat_chapters = flatten_entries(entries).select(&.has_content?)
       Log.info { "📚 Flattened to #{flat_chapters.size} total chapters" }
 
-      # Check for orphaned .md files (files in book dir not referenced in SUMMARY.md)
+      # Check for orphaned .md files (files in book dir not referenced in SUMMARY.md
       check_orphaned_files(book_dir, flat_chapters)
 
-      book = Book.new(book_name, title, entries, description)
+      # Create missing files if requested
+      if book_config && book_config.create_missing
+        create_missing_chapters(entries, book_dir)
+      end
+
+      book = Book.new(book_name, title, entries, description, book_config)
       books << book
 
       # Create tasks for this book
@@ -225,7 +348,13 @@ module Books
   end
 
   # Recursively create tasks for chapters
-  private def self.create_chapter_tasks(entries : Array(ChapterEntry), book : Book, book_dir : String, summary_path : String, flat_chapters : Array(ChapterEntry))
+  private def self.create_chapter_tasks(
+    entries : Array(ChapterEntry),
+    book : Book,
+    book_dir : String,
+    summary_path : String,
+    flat_chapters : Array(ChapterEntry),
+  )
     entries.each do |entry|
       if entry.has_content?
         if path = entry.path
@@ -244,13 +373,27 @@ module Books
   end
 
   # Create task for a single chapter
-  private def self.create_chapter_task(entry : ChapterEntry, book : Book, source_file : String, summary_path : String, flat_chapters : Array(ChapterEntry))
+  private def self.create_chapter_task(
+    entry : ChapterEntry,
+    book : Book,
+    source_file : String,
+    summary_path : String,
+    flat_chapters : Array(ChapterEntry),
+  )
     output_path = Path[Config.options.output] / "books" / book.name / "#{entry.slug}.html"
+
+    inputs = [
+      source_file,
+      summary_path,
+      "conf.yml",
+      "kv://templates/page.tmpl",
+      "kv://templates/title.tmpl",
+    ] + Templates.get_deps("templates/book_chapter.tmpl")
 
     Croupier::Task.new(
       id: "book/#{book.name}/#{entry.slug}",
       output: output_path.to_s,
-      inputs: [source_file, summary_path, "conf.yml", "kv://templates/page.tmpl", "kv://templates/title.tmpl"] + Templates.get_deps("templates/book_chapter.tmpl"),
+      inputs: inputs,
       mergeable: false
     ) do
       Log.info { "📖 Rendering chapter: #{entry.title}" }
@@ -330,7 +473,12 @@ module Books
   end
 
   # Build navigation hash for a chapter
-  private def self.build_navigation(entry : ChapterEntry, flat_chapters : Array(ChapterEntry), book : Book, book_name : String) : Hash(String, Hash(String, String)?)
+  private def self.build_navigation(
+    entry : ChapterEntry,
+    flat_chapters : Array(ChapterEntry),
+    book : Book,
+    book_name : String,
+  ) : Hash(String, Hash(String, String)?)
     idx = flat_chapters.index(entry)
 
     prev_entry = flat_chapters[idx - 1]? if idx && idx > 0
@@ -472,10 +620,17 @@ module Books
   private def self.create_book_index_task(book : Book, book_dir : String)
     output_path = Path[Config.options.output] / "books" / book.name / "index.html"
 
+    inputs = [
+      File.join(book_dir, "SUMMARY.md"),
+      "conf.yml",
+      "kv://templates/page.tmpl",
+      "kv://templates/title.tmpl",
+    ] + Templates.get_deps("templates/book_index.tmpl")
+
     Croupier::Task.new(
       id: "book/#{book.name}/index",
       output: output_path.to_s,
-      inputs: [File.join(book_dir, "SUMMARY.md"), "conf.yml", "kv://templates/page.tmpl", "kv://templates/title.tmpl"] + Templates.get_deps("templates/book_index.tmpl"),
+      inputs: inputs,
       mergeable: false
     ) do
       Log.info { "📖 Rendering book index: #{book.title}" }
@@ -641,6 +796,25 @@ module Books
     Log.warn { "📚 Book '#{File.basename(book_dir)}' has #{orphaned.size} unreferenced .md file(s):" }
     orphaned.each do |file|
       Log.warn { "  - #{File.basename(file)}" }
+    end
+  end
+
+  # Create missing chapter files if create-missing is enabled
+  private def self.create_missing_chapters(entries : Array(ChapterEntry), book_dir : String)
+    entries.each do |entry|
+      create_missing_chapters(entry.children, book_dir)
+      if path = entry.path
+        source_path = resolve_source_path(path, book_dir)
+        if source_path && !File.exists?(source_path)
+          Log.info { "📚 Creating missing chapter: #{source_path}" }
+          # Create directory if needed
+          dir = File.dirname(source_path)
+          Dir.mkdir_p(dir) unless Dir.exists?(dir)
+
+          # Create file with placeholder content
+          File.write(source_path, "# #{entry.title}\n\nTODO: Write content for #{entry.title}.\n")
+        end
+      end
     end
   end
 end
