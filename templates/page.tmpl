@@ -44,6 +44,7 @@
   <script src="https://cdn.jsdelivr.net/npm/minisearch@6.1.0/dist/umd/index.min.js"></script>
   {% if not no_highlightjs %}
   <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
+  <script src="https://unpkg.com/highlightjs-copy@1.0.3/dist/highlightjs-copy.min.js"></script>
   {% endif %}
   <!-- Theme styles -->
   <link rel="stylesheet" href="/css/theme.css" />
@@ -139,6 +140,7 @@
     });
     {% if not no_highlightjs %}
     hljs.highlightAll();
+    hljsCopyPlugin();
     {% endif %}
   </script>
   <script src="/search.js"></script>
