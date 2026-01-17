@@ -12,7 +12,7 @@ site:
   # scheme in CSS. The sixteen library automatically
   # finds the dark and light variants.
   # Also used for HighlightJS syntax highlighting.
-  color_scheme: "ashes"
+  color_scheme: "katy"
   # This is a list of items to show in the navigation bar.
   # In the default theme they are shown at the right of
   # the title.
