@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.0] - 2026-01-17
+
+### 🚀 Features
+
+- Improve folder indexes and add feature documentation
+- Improve color_schemes command and fix theme CSS
+- Add highlight.js CSS to base16 color scheme
+
+### 🐛 Bug Fixes
+
+- Correct folder index output path check
+
+### 📚 Documentation
+
+- Fix list formatting in book documentation
+- Add missing book and language switcher templates to documentation
+- Add Developer Guide book
+- Add notes about documentation status
+- Point Docs link to /books/ index
+
+### 🎨 Styling
+
+- Make links in headings inherit heading color
+
 ## [0.7.0] - 2026-01-15
 
 ### 🚀 Features
@@ -22,6 +46,10 @@ All notable changes to this project will be documented in this file.
 ### 📚 Documentation
 
 - Added release
+
+### Bump
+
+- Release v0.7.0
 
 ## [0.6.0] - 2026-01-15
 
