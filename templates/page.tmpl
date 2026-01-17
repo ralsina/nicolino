@@ -40,11 +40,6 @@
   <!-- Lightbox -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.js"></script>
-  {% if not no_highlightjs %}
-  <!-- highlightks -->
-  <link id="hljscss" rel="stylesheet"
-    href="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/base16/{{site_dark_scheme}}.min.css" />
-  {% endif %}
   <script src="https://unpkg.com/hyperscript.org@0.9.9"></script>
   <script src="https://cdn.jsdelivr.net/npm/minisearch@6.1.0/dist/umd/index.min.js"></script>
   {% if not no_highlightjs %}
@@ -94,16 +89,10 @@
                 get the closest <html/>
                 if cookies['isLight'] is 'true'
                   set its @data-theme to 'light'
-                  {% if not no_highlightjs %}
-                  set #hljscss.href to 'https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/base16/{{site_light_scheme}}.min.css'
-                  {% endif %}
                   set cookies['isLight'] to true
                   set my @checked to false
                 else
                   set its @data-theme to 'dark'
-                  {% if not no_highlightjs %}
-                  set #hljscss.href to 'https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/base16/{{site_dark_scheme}}.min.css'
-                  {% endif %}
                   set cookies['isLight'] to false
                   set my @checked to true
               end
