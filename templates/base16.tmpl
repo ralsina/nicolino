@@ -455,12 +455,14 @@ pre code.hljs,
     border: 1px solid var(--pico-muted-color);
     border-radius: 4px;
     font-size: 0.75rem;
+    color: var(--pico-color);
     cursor: pointer;
     transition: background 0.2s, border-color 0.2s, opacity 0.2s;
     opacity: 0;
     pointer-events: none;
 }
-pre:hover .hljs-copy-button {
+pre:hover .hljs-copy-button,
+.hljs-copy-button:hover {
     opacity: 1;
     pointer-events: auto;
 }
