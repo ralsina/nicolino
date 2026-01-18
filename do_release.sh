@@ -5,6 +5,7 @@ PKGNAME=$(basename "$PWD")
 VERSION=$(git cliff --bumped-version |cut -dv -f2)
 
 sed "s/^version:.*$/version: $VERSION/g" -i shard.yml
+pre-commit run --all-files -v
 hace lint test
 hace static
 git add shard.yml
