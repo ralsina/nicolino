@@ -68,7 +68,7 @@ library and a few choice dependencies.
 * `serve` mode, so you can see what the site looks like
 * `auto` mode, which rebuilds while you edit and automatically reloads
   the pages in the browser
-* [Shortcodes](/shortcodes.html) somewhat compatible with Nikola and Hugo
+* [Shortcodes](/books/user-guide/shortcodes.html) somewhat compatible with Nikola and Hugo
 * Incremental builds, so it only rebuilds what's needed
 * Image galleries (see [our sample galleries.](/galleries/) )
 * Code listings with syntax highlighting and line numbers (see [listings](/listings/) )

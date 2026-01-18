@@ -14,8 +14,7 @@ Posts are markdown files stored in the `content/posts/` directory (configurable 
 
 Add metadata to your posts using YAML frontmatter:
 
-```markdown
----
+<pre><code class="language-yaml">---
 title: My Post Title
 date: 2024-01-15
 tags: tag1, tag2
@@ -25,9 +24,10 @@ categories: technology
 # Post Content
 
 Your markdown content here...
-```
+</code></pre>
 
 **Available Fields:**
+
 - `title` - Post title (required)
 - `date` - Publication date (defaults to file modification time)
 - `updated` - Last updated date (optional)
@@ -56,20 +56,14 @@ Posts are rendered to `output/posts/` with the same directory structure:
 output/posts/
   my-post.html
   my-post/index.html
-  2024/
-    01/
-      15/
-        my-post.html
+  2024-01-15-my-post.html
+  subdir/
+    another-post.html
 ```
 
 ## Shortcodes
 
-Posts support [shortcodes](shortcodes.md) for adding dynamic content:
-
-```markdown
-{{< youtube id="dQw4w9WgXcQ" >}}
-{{< gallery name="my-gallery" >}}
-```
+Posts support [shortcodes](shortcodes.md) for adding dynamic content.
 
 ## Related Posts
 

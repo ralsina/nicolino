@@ -128,43 +128,18 @@ module Books
       end
     end
 
-    # Override load to handle files WITHOUT metadata (unlike parent class)
+    # Override load to handle files WITHOUT metadata (book chapters have no metadata)
     def load(lang = nil) : Nil
       lang ||= Locale.language
       Log.debug { "👉 #{source(lang)}" }
-      contents = ::File.read(source(lang))
-
-      # Check if file has metadata separators
-      if contents.includes?("---\n")
-        # Has metadata - use parent's logic
-        begin
-          fragments = contents.split("---\n", 3)
-          raise "Missing metadata separators" unless fragments.size >= 3
-
-          _, raw_metadata, @text[lang] = fragments
-        rescue ex
-          Log.error { "Error reading metadata in #{source(lang)}: #{ex}" }
-          raise ex
-        end
-
-        if raw_metadata.nil?
-          @metadata[lang] = {} of String => String
-          @title[lang] = @title_override || ""
-        else
-          @metadata[lang] = YAML.parse(raw_metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
-          @title[lang] = @title_override || metadata(lang)["title"]?.to_s || ""
-        end
-      else
-        # No metadata - use entire content as text
-        @text[lang] = contents
-        @metadata[lang] = {} of String => String
-        @title[lang] = @title_override || ""
-      end
+      @text[lang] = ::File.read(source(lang))
+      @metadata[lang] = {} of String => String
+      @title[lang] = @title_override || ""
 
       @link[lang] = (Path.new ["/", output.split("/")[1..]]).to_s
       @shortcodes[lang] = full_shortcodes_list(@text[lang])
     rescue ex
-      Log.error { "Error parsing metadata in #{source(lang)}: #{ex}" }
+      Log.error { "Error reading book chapter #{source(lang)}: #{ex}" }
       raise ex
     end
 

@@ -54,7 +54,8 @@
       "Bash(ameba:*)",
       "Bash(git clean:*)",
       "Bash(shards install:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []

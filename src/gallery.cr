@@ -1,4 +1,5 @@
 require "./markdown"
+require "json"
 
 # Create automatic image galleries
 #
@@ -266,6 +267,42 @@ module Gallery
           doc = Lexbor::Parser.new(html)
           doc = HtmlFilters.make_links_relative(doc, post.output(lang))
           doc.to_html
+        end
+
+        # Create gallery.json for this gallery
+        # Get the gallery directory from the output path
+        gallery_output_dir = Path[post.output(lang)].parent
+        gallery_json_path = gallery_output_dir / "gallery.json"
+
+        # Get the gallery path relative to content for use in shortcodes
+        gallery_rel_path = Path[post.base].relative_to(Config.options.content).to_s
+
+        Croupier::Task.new(
+          id: "gallery_json_#{gallery_rel_path.gsub("/", "_")}",
+          output: gallery_json_path.to_s,
+          inputs: ["conf.yml", post.source(lang)] + post.@image_list.map { |i| "#{basedir}/#{i}" },
+          mergeable: false
+        ) do
+          # Build gallery JSON data
+          gallery_data = {
+            "name"   => Path[post.base].basename.to_s,
+            "title"  => post.title(lang),
+            "images" => post.@image_list.map do |img|
+              {
+                "filename" => img,
+                "url"      => "#{gallery_rel_path}/#{img}",
+                "thumb"    => "#{gallery_rel_path}/.thumbnails/#{img}",
+              }
+            end,
+            "sub_galleries" => post.sub_galleries.map do |sub|
+              {
+                "name"  => Path[sub.base].basename.to_s,
+                "title" => sub.title(lang),
+                "url"   => Path[sub.base].relative_to(Config.options.content).to_s,
+              }
+            end,
+          }
+          gallery_data.to_json
         end
       end
     end
