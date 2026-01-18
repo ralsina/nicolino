@@ -445,35 +445,10 @@ pre code.hljs,
     color: #{{light.base0F_hex}};
 }
 
-/* Copy button for code blocks (highlightjs-copy plugin) */
-.hljs-copy-button {
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 0.25rem 0.5rem;
-    background: var(--pico-card-background-color);
-    border: 1px solid var(--pico-muted-color);
-    border-radius: 4px;
-    font-size: 0.75rem;
-    color: var(--pico-color);
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s, opacity 0.2s;
-    opacity: 0;
-    pointer-events: none;
+/* Theme-specific override for copy button background */
+[data-theme=dark] .hljs-copy-button {
+    background-color: #444267;
 }
-pre:hover .hljs-copy-button,
-.hljs-copy-button:hover {
-    opacity: 1;
-    pointer-events: auto;
-}
-.hljs-copy-button:hover {
-    background: var(--pico-primary-background);
-    border-color: var(--pico-primary-border);
-}
-.hljs-copy-button:active {
-    transform: translateY(1px);
-}
-/* Position code blocks relatively to allow absolute positioning of copy button */
-pre {
-    position: relative;
+[data-theme=light] .hljs-copy-button {
+    background-color: #9894b5;
 }
