@@ -159,3 +159,39 @@ This has an **orange** background.
 {{% tag div class="pico-background-orange-350" %}}
 This has an **orange** background.
 {{% /tag %}}
+
+
+## YouTube
+
+Embed YouTube videos by video ID. Example:
+
+```markdown
+{{< raw >}}
+{{< youtube id="dQw4w9WgXcQ" >}}
+{{< /raw >}}
+```
+
+You can also specify custom width and height:
+
+```markdown
+{{< raw >}}
+{{< youtube id="dQw4w9WgXcQ" width="560" height="315" >}}
+{{< /raw >}}
+```
+
+{{< youtube id="dQw4w9WgXcQ" >}}
+
+
+## Gallery
+
+Embed image galleries directly in your content. The gallery loads images from the gallery's `gallery.json` file and displays them in a responsive grid with lightbox functionality. Example:
+
+```markdown
+{{< raw >}}
+{{< gallery name="fancy-turning" >}}
+{{< /raw >}}
+```
+
+This renders a grid of thumbnail images. Users can click thumbnails to view full-size images in a lightbox.
+
+{{< gallery name="fancy-turning" >}}

@@ -69,12 +69,11 @@ Your custom index will be used instead of the auto-generated one.
 
 Add frontmatter to directory items:
 
-```markdown
----
+<pre><code class="language-yaml">---
 title: "My Post"
 description: "A great post"
 ---
-```
+</code></pre>
 
 The index will use the title and description if available.
 

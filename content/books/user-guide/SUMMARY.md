@@ -2,6 +2,7 @@
 
 Incomplete documentation for the Nicolino static site generator.
 
+- [Introduction](intro.md)
 - [Templates](templates.md)
 - [Features]()
   - [Posts](posts.md)

@@ -28,8 +28,7 @@ content/
 
 Pages can include simple frontmatter:
 
-```markdown
----
+<pre><code class="language-yaml">---
 title: About Us
 noindex: true
 ---
@@ -37,7 +36,7 @@ noindex: true
 # About Us
 
 Content here...
-```
+</code></pre>
 
 **Available Fields:**
 - `title` - Page title (defaults to first heading or filename)

@@ -1,6 +1,6 @@
 [book]
-title = "Nicolino User Guide"
-description = "Complete user documentation for the Nicolino static site generator"
+title = "User Guide"
+description = "User documentation for the Nicolino static site generatori [WIP]"
 authors = ["Roberto Alsina"]
 
 [build]

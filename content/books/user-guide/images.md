@@ -29,9 +29,8 @@ content/
 
 Images are processed to generate multiple sizes:
 
-- **Thumbnail** - Small version for previews
-- **Medium** - Standard display size
-- **Large** - Full/high-resolution version
+- **Thumbnail** - Small version for previews (default: 1024px max dimension)
+- **Large** - Full/high-resolution version (default: 4096px max dimension)
 
 ## Usage in Markdown
 
@@ -45,9 +44,8 @@ The rendered HTML includes responsive `srcset`:
 
 ```html
 <img src="/images/photo.jpg"
-     srcset="/images/photo.thumb.jpg 640w,
-             /images/photo.medium.jpg 1280w,
-             /images/photo.large.jpg 1920w"
+     srcset="/images/photo.thumb.jpg 1024w,
+             /images/photo.jpg 4096w"
      alt="Alt text">
 ```
 
@@ -62,8 +60,8 @@ features:
 
 **Image size options:**
 ```yaml
-image_large: 1920   # Max dimension for large images
-image_thumb: 640    # Max dimension for thumbnails
+image_large: 4096   # Max dimension for large images
+image_thumb: 1024   # Max dimension for thumbnails
 ```
 
 ## Supported Formats
@@ -91,8 +89,6 @@ output/
   images/
     logo.png
     logo.thumb.png
-    logo.medium.png
-    logo.large.png
 ```
 
 ## Optimization

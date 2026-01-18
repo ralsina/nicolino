@@ -47,15 +47,14 @@ output/galleries/
 
 Add a `description.md` file to provide gallery introduction:
 
-```markdown
----
+<pre><code class="language-yaml">---
 title: My Photo Gallery
 ---
 
 # My Gallery
 
 A collection of my favorite photos.
-```
+</code></pre>
 
 Place this in the gallery directory:
 

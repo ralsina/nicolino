@@ -62,14 +62,13 @@ The Archive feature requires the Posts feature to be enabled.
 
 Posts must have a `date` field in their frontmatter:
 
-```markdown
----
+<pre><code class="language-yaml">---
 title: My Post
 date: 2024-01-15
 ---
 
 Content...
-```
+</code></pre>
 
 Archive uses the `date_output_format` from config for display:
 

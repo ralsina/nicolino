@@ -97,14 +97,13 @@ Default priorities are assigned:
 
 To exclude pages from the sitemap, add `noindex: true` to frontmatter:
 
-```markdown
----
+<pre><code class="language-yaml">---
 title: Private Page
 noindex: true
 ---
 
 Content...
-```
+</code></pre>
 
 ## Multilingual Sitemaps
 

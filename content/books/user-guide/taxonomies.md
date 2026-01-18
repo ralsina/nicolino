@@ -33,15 +33,14 @@ taxonomies:
 
 Add tags and categories to post frontmatter:
 
-```markdown
----
+<pre><code class="language-yaml">---
 title: My Post
 tags: crystal, ssg, tutorial
 categories: technology, programming
 ---
 
 Content...
-```
+</code></pre>
 
 ## Generated Pages
 
