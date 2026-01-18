@@ -51,7 +51,10 @@
       "Skill(superpowers:systematic-debugging:*)",
       "Bash(grep:*)",
       "Bash(/home/ralsina/code/nicolino/bin/nicolino:*)",
-      "Bash(ameba:*)"
+      "Bash(ameba:*)",
+      "Bash(git clean:*)",
+      "Bash(shards install:*)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []

@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.0] - 2026-01-18
+
+### 🚀 Features
+
+- Add book.toml support for mdbook compatibility
+- Add copy button to code blocks using highlightjs-copy
+- Use official highlightjs-copy CSS instead of custom styles
+
+### 🐛 Bug Fixes
+
+- Use base01 for code block background instead of base00
+- Use correct highlightjs-copy plugin initialization
+- Make copy button only visible on hover
+- Make copy button text visible with proper color
+
 ## [0.8.0] - 2026-01-17
 
 ### 🚀 Features
@@ -25,6 +40,10 @@ All notable changes to this project will be documented in this file.
 ### 🎨 Styling
 
 - Make links in headings inherit heading color
+
+### Bump
+
+- Release v0.8.0
 
 ## [0.7.0] - 2026-01-15
 
