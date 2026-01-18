@@ -205,14 +205,14 @@ Execute shell commands during build and include their output in your pages. This
 
 ### Usage
 
-```markdown
+```
+{{< raw >}}
 {{% shell command="git log -1 --format=%h" %}}
+{{< /raw >}}
 ```
 
-Renders as:
-
 ```
-a1443d54
+{{% shell command="git log -1 --format=%h" %}}
 ```
 
 ### Arguments
@@ -224,52 +224,50 @@ a1443d54
 
 Show current git commit:
 
-```markdown
+```
+{{< raw >}}
 Current commit: {{% shell command="git log -1 --format=%h" %}}
+{{< /raw >}}
 ```
 
-Renders as:
-
 ```
-Current commit: a1443d54
+Current commit: {{% shell command="git log -1 --format=%h" %}}
 ```
 
 Show current date:
 
-```markdown
+```
+{{< raw >}}
 Built on {{% shell command="date +%Y-%m-%d" %}}
+{{< /raw >}}
 ```
 
-Renders as:
-
 ```
-Built on 2026-01-18
+Built on {{% shell command="date +%Y-%m-%d" %}}
 ```
 
 List files in a directory:
 
-```markdown
+```
+{{< raw >}}
 {{% shell command="ls -1 content/posts | head -5" %}}
+{{< /raw >}}
 ```
 
-Renders as:
-
 ```
-0.2.0-release.md
-releases
-shell-test.md
+{{% shell command="ls -1 content/posts | head -5" %}}
 ```
 
 Run command in specific directory:
 
-```markdown
+```
+{{< raw >}}
 {{% shell command="pwd" cd="content" %}}
+{{< /raw >}}
 ```
 
-Renders as:
-
 ```
-/home/ralsina/code/nicolino/content
+{{% shell command="pwd" cd="content" %}}
 ```
 
 ### Error Handling
