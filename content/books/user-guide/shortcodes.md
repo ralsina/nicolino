@@ -205,6 +205,10 @@ Execute shell commands during build and include their output in your pages. This
 
 ### Usage
 
+```
+{{% shell command="git log -1 --format=%h" %}}
+```
+
 {{< raw >}}
 {{% shell command="git log -1 --format=%h" %}}
 {{< /raw >}}
@@ -224,11 +228,19 @@ a1443d54
 
 Show current git commit:
 
+```
+Current commit: {{% shell command="git log -1 --format=%h" %}}
+```
+
 {{< raw >}}
 Current commit: {{% shell command="git log -1 --format=%h" %}}
 {{< /raw >}}
 
 Show current date:
+
+```
+Built on {{% shell command="date +%Y-%m-%d" %}}
+```
 
 {{< raw >}}
 Built on {{% shell command="date +%Y-%m-%d" %}}
@@ -236,11 +248,19 @@ Built on {{% shell command="date +%Y-%m-%d" %}}
 
 List files in a directory:
 
+```
+{{% shell command="ls -1 content/posts | head -5" %}}
+```
+
 {{< raw >}}
 {{% shell command="ls -1 content/posts | head -5" %}}
 {{< /raw >}}
 
 Run command in specific directory:
+
+```
+{{% shell command="pwd" cd="content" %}}
+```
 
 {{< raw >}}
 {{% shell command="pwd" cd="content" %}}
