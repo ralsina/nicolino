@@ -274,8 +274,11 @@ module Gallery
         gallery_output_dir = Path[post.output(lang)].parent
         gallery_json_path = gallery_output_dir / "gallery.json"
 
-        # Get the gallery path relative to content for use in shortcodes
-        gallery_rel_path = Path[post.base].relative_to(Config.options.content).to_s
+        # Get the gallery URL path for use in shortcodes
+        # post.base is something like "content/galleries/fancy-turning/index.md"
+        # We need to convert to "/galleries/fancy-turning/"
+        gallery_dir = Path[post.base].parent
+        gallery_rel_path = "/" + gallery_dir.relative_to(Config.options.content).to_s
 
         Croupier::Task.new(
           id: "gallery_json_#{gallery_rel_path.gsub("/", "_")}",
@@ -288,17 +291,22 @@ module Gallery
             "name"   => Path[post.base].basename.to_s,
             "title"  => post.title(lang),
             "images" => post.@image_list.map do |img|
+              # Generate thumbnail filename: image.jpg -> image.thumb.jpg
+              ext = File.extname(img)
+              base_name = img.sub(ext, "")
+              thumb_name = "#{base_name}.thumb#{ext}"
+
               {
                 "filename" => img,
                 "url"      => "#{gallery_rel_path}/#{img}",
-                "thumb"    => "#{gallery_rel_path}/.thumbnails/#{img}",
+                "thumb"    => "#{gallery_rel_path}/#{thumb_name}",
               }
             end,
             "sub_galleries" => post.sub_galleries.map do |sub|
               {
                 "name"  => Path[sub.base].basename.to_s,
                 "title" => sub.title(lang),
-                "url"   => Path[sub.base].relative_to(Config.options.content).to_s,
+                "url"   => "/" + Path[sub.base].parent.relative_to(Config.options.content).to_s,
               }
             end,
           }

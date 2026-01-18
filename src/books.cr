@@ -422,7 +422,7 @@ module Books
       doc = Lexbor::Parser.new(html)
       doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output_path.to_s))
       result = doc.to_html
-      Log.info { "📖 #{entry.title}" }
+      Log.info { "👉 #{output_path}" }
       result
     end
   end
@@ -588,7 +588,7 @@ module Books
       inputs: inputs,
       mergeable: false
     ) do
-      Log.info { "📖 Rendering book index: #{book.title}" }
+      Log.info { "👉 #{output_path}" }
 
       # Create breadcrumbs
       breadcrumbs = [
@@ -646,7 +646,7 @@ module Books
       inputs: ["conf.yml", "kv://templates/page.tmpl", "kv://templates/title.tmpl"] + Templates.get_deps("templates/item_list.tmpl"),
       mergeable: false
     ) do
-      Log.info { "📚 Rendering books index" }
+      Log.info { "👉 #{output_path}" }
 
       # Create breadcrumbs
       breadcrumbs = [{name: "Home", link: "/"}, {name: "Books", link: "/books/"}] of NamedTuple(name: String, link: String)
