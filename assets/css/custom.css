@@ -119,3 +119,8 @@ nav > ul:last-child > li {
     background: var(--pico-card-background-color, #1a1a1a);
     border-color: var(--pico-muted-border-color, #333);
 }
+
+/* Make definition list term names bold */
+dt {
+  font-weight: bold;
+}

@@ -19,34 +19,34 @@ years ago.
 On the other hand, Nicolino has an approach you may like, need or enjoy:
 
 =It's batteries included.=
-  It has quite a lot of features. You can look at the sidebar and check them out.
+    It has quite a lot of features. You can look at the sidebar and check them out.
 
-  * It will render [books](/books) like gitbook or mdbook (not *quite* as well, but nicely enough )
-  * It will do [image galleries](/galleries) (not *quite* like a specialized tool)
-  * It will show [code listings](/listings) even if not like github
+    * It will render [books](/books) like gitbook or mdbook (not *quite* as well, but nicely enough )
+    * It will do [image galleries](/galleries) (not *quite* like a specialized tool)
+    * It will show [code listings](/listings) even if not like github
 
-  See a pattern? It's a swiss army knife. Not great at anything, but what other
-  tool lets you do those things (and [more](import.html)) plus a blog plus normal webpages?
+    See a pattern? It's a swiss army knife. Not great at anything, but what other
+    tool lets you do those things (and [more](import.html)) plus a blog plus normal webpages?
 
 =It's pretty fast.=
-  Yes, really. 20% faster than Hugo in some benchmarks. Faster or slower than
-  other similar software. But pretty fast in general!
+    Yes, really. 20% faster than Hugo in some benchmarks. Faster or slower than
+    other similar software. But pretty fast in general!
 
-  Also, it's built around only doing what needs doing so in normal usage it
-  will be even faster. Ideally, when there is nothing to be done, it should be
-  instantaneous, and if there is just a few things to do, it should be fast.
+    Also, it's built around only doing what needs doing so in normal usage it
+    will be even faster. Ideally, when there is nothing to be done, it should be
+    instantaneous, and if there is just a few things to do, it should be fast.
 
 =It's reasonable.=
-  Whenever possible I am trying to keep it simple. The config file is a simple YAML.
-  If you want to create a gallery, create a folder in `content/galleries` if you
-  want a new post, throw markdown in `content/posts` and so on. The output should
-  be ok.
+    Whenever possible I am trying to keep it simple. The config file is a simple YAML.
+    If you want to create a gallery, create a folder in `content/galleries` if you
+    want a new post, throw markdown in `content/posts` and so on. The output should
+    be ok.
 
 =It's multilingual.=
-  While it still needs work on translations, it TRIES to do the right thing when
-  a site is in multiple languages. If there are gaps in a language they are filled
-  using another. If a thing is available in more than one language, they are linked
-  to each other, and so on.
+    While it still needs work on translations, it TRIES to do the right thing when
+    a site is in multiple languages. If there are gaps in a language they are filled
+    using another. If a thing is available in more than one language, they are linked
+    to each other, and so on.
 
 ## So, How do I use it?
 

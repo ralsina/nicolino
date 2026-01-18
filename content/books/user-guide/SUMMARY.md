@@ -1,6 +1,6 @@
 # User Guide
 
-Incomplete documentation for the Nicolino static site generator.
+Documentation for the Nicolino static site generator.
 
 - [Introduction](intro.md)
 - [Templates](templates.md)
@@ -16,8 +16,17 @@ Incomplete documentation for the Nicolino static site generator.
   - [Listings](listings.md)
   - [Books](books.md)
   - [Folder Indexes](folder_indexes.md)
-  - [Color Schemes](color_schemes.md)
   - [Similarity](similarity.md)
-  - [Continuous Import](continuous_import.md)
-  - [Link Checker](link_checker.md)
+- [Commands]()
+  - [auto](cli/auto.md)
+  - [build](cli/build.md)
+  - [check_links](cli/check_links.md)
+  - [clean](cli/clean.md)
+  - [color_schemes](cli/color_schemes.md)
+  - [continuous_import](cli/continuous_import.md)
+  - [init](cli/init.md)
+  - [link_checker](cli/link_checker.md)
+  - [new](cli/new.md)
+  - [serve](cli/serve.md)
+  - [validate](cli/validate.md)
   - [Shortcodes](shortcodes.md)

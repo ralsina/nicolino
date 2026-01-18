@@ -55,7 +55,8 @@
       "Bash(git clean:*)",
       "Bash(shards install:*)",
       "Bash(ls:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(xargs basename:*)"
     ],
     "deny": [],
     "ask": []
