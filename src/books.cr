@@ -258,17 +258,14 @@ module Books
 
   # Enable books feature
   def self.enable(is_enabled : Bool)
-    Log.info { "📚 Books.enable called with is_enabled=#{is_enabled}" }
     return unless is_enabled
 
     # Register books output folder for exclusion from folder_indexes
     FolderIndexes.register_exclude("books/")
 
     books_path = Path[Config.options.content] / "books"
-    Log.info { "📚 Looking for books in: #{books_path}" }
     return unless Dir.exists?(books_path)
 
-    Log.info { "📚 Books directory exists, creating tasks..." }
     create_tasks(books_path.to_s)
   end
 
@@ -278,9 +275,7 @@ module Books
 
     # Find all directories containing SUMMARY.md
     glob_pattern = "#{books_path}/*/SUMMARY.md"
-    Log.info { "📚 Searching for SUMMARY.md with pattern: #{glob_pattern}" }
     Dir.glob(glob_pattern).each do |summary_file|
-      Log.info { "📚 Found book: #{summary_file}" }
       book_dir = File.dirname(summary_file)
       book_name = File.basename(book_dir)
 
@@ -291,11 +286,9 @@ module Books
       # Read and parse SUMMARY.md
       summary_content = File.read(summary_file)
       entries = SummaryParser.parse(summary_content)
-      Log.info { "📚 Parsed #{entries.size} top-level entries" }
 
       # Get book title and description - prefer book.toml, fall back to SUMMARY.md
       title = if (toml_title = book_config.try(&.title)) && !toml_title.empty?
-                Log.info { "📚 Using title from book.toml: #{toml_title}" }
                 toml_title
               else
                 extract_title(summary_content, book_name)
@@ -309,7 +302,6 @@ module Books
 
       # Build flat list of all chapters for navigation
       flat_chapters = flatten_entries(entries).select(&.has_content?)
-      Log.info { "📚 Flattened to #{flat_chapters.size} total chapters" }
 
       # Check for orphaned .md files (files in book dir not referenced in SUMMARY.md
       check_orphaned_files(book_dir, flat_chapters)
@@ -323,7 +315,6 @@ module Books
       books << book
 
       # Create tasks for this book
-      Log.info { "📚 Creating tasks for book: #{book_name}" }
       create_book_tasks(book, book_dir, flat_chapters)
     end
 
@@ -359,9 +350,9 @@ module Books
       if entry.has_content?
         if path = entry.path
           source_file = resolve_source_path(path, book_dir)
-          Log.info { "📚 Chapter: #{entry.title} -> source: #{source_file}" }
+          Log.debug { "📚 Chapter: #{entry.title} -> source: #{source_file}" }
           if source_file && File.exists?(source_file)
-            Log.info { "📚 Creating task for chapter: #{entry.title}" }
+            Log.debug { "📚 Creating task for chapter: #{entry.title}" }
             create_chapter_task(entry, book, source_file, summary_path, flat_chapters)
           else
             Log.warn { "📚 Source file not found for chapter: #{entry.title} (#{source_file})" }
@@ -396,8 +387,6 @@ module Books
       inputs: inputs,
       mergeable: false
     ) do
-      Log.info { "📖 Rendering chapter: #{entry.title}" }
-
       # Create a BookChapter instance to reuse Markdown::File functionality
       chapter_file = BookChapter.new({Locale.language => source_file}, Path[source_file].relative_to(Config.options.content), entry.title)
 
@@ -418,9 +407,7 @@ module Books
       # Render chapter with book template
       template = Templates.environment.get_template("templates/book_chapter.tmpl")
 
-      Log.info { "📖 Building TOC for chapter: #{entry.title}" }
       toc_html = render_toc_html(book.chapters, entry, book.name)
-      Log.info { "📖 TOC built" }
 
       ctx = {
         "chapter" => {
@@ -434,14 +421,7 @@ module Books
         "toc_html"   => toc_html,
       }
 
-      Log.info { "📖 Rendering template for chapter: #{entry.title}" }
-      begin
-        html = template.render(ctx)
-        Log.info { "📖 Rendered book_chapter HTML length: #{html.size}" }
-      rescue ex
-        Log.error { "📖 Error rendering book_chapter template: #{ex.message}" }
-        raise ex
-      end
+      html = template.render(ctx)
 
       # Apply page template wrapper with title.tmpl for breadcrumbs
       page_title = entry.formatted_number.empty? ? entry.title : "#{entry.formatted_number} #{entry.title}"
@@ -467,7 +447,7 @@ module Books
       doc = Lexbor::Parser.new(html)
       doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output_path.to_s))
       result = doc.to_html
-      Log.info { "📖 Final HTML length: #{result.size}" }
+      Log.info { "📖 #{entry.title}" }
       result
     end
   end

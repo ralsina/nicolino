@@ -126,9 +126,9 @@ module Gallery
       result = [] of Hash(String, String)
 
       # For galleries, language links point to the parent gallery's alternate language index pages
-      if @parent_gallery
+      if parent = @parent_gallery
         # Get the parent gallery's language links
-        result.concat(@parent_gallery.language_links(lang))
+        result.concat(parent.language_links(lang))
       else
         # This is a root-level gallery, so we don't have language alternates
         # Just return empty array
