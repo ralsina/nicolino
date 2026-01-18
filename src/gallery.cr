@@ -121,6 +121,22 @@ module Gallery
       !@image_list.empty?
     end
 
+    def language_links(lang : String? = nil)
+      lang ||= Locale.language
+      result = [] of Hash(String, String)
+
+      # For galleries, language links point to the parent gallery's alternate language index pages
+      if @parent_gallery
+        # Get the parent gallery's language links
+        result.concat(@parent_gallery.language_links(lang))
+      else
+        # This is a root-level gallery, so we don't have language alternates
+        # Just return empty array
+      end
+
+      result
+    end
+
     def depth
       current = @parent_gallery
       depth = 0
