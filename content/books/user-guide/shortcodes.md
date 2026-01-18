@@ -205,11 +205,11 @@ Execute shell commands during build and include their output in your pages. This
 
 ### Usage
 
-```markdown
+{{< raw >}}
 {{% shell command="git log -1 --format=%h" %}}
-```
+{{< /raw >}}
 
-This will execute the command and replace the shortcode with the command's output:
+This renders as:
 
 ```
 a1443d54
@@ -224,27 +224,27 @@ a1443d54
 
 Show current git commit:
 
-```markdown
+{{< raw >}}
 Current commit: {{% shell command="git log -1 --format=%h" %}}
-```
+{{< /raw >}}
 
 Show current date:
 
-```markdown
+{{< raw >}}
 Built on {{% shell command="date +%Y-%m-%d" %}}
-```
+{{< /raw >}}
 
 List files in a directory:
 
-```markdown
+{{< raw >}}
 {{% shell command="ls -1 content/posts | head -5" %}}
-```
+{{< /raw >}}
 
 Run command in specific directory:
 
-```markdown
+{{< raw >}}
 {{% shell command="pwd" cd="content" %}}
-```
+{{< /raw >}}
 
 ### Error Handling
 
