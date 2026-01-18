@@ -140,7 +140,7 @@
     });
     {% if not no_highlightjs %}
     hljs.highlightAll();
-    hljsCopyPlugin();
+    hljs.addPlugin(new CopyButtonPlugin());
     {% endif %}
   </script>
   <script src="/search.js"></script>
