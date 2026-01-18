@@ -9,12 +9,13 @@ module Nicolino
 Serve the website over HTTP
 
 Starts a local web server so you can see the site in your
-browser.
+browser at http://localhost:8080
 
 Usage:
-  nicolino serve [-c <file>][-q|-v <level>]
+  nicolino serve [--help][-c <file>][-q|-v <level>]
 
 Options:
+  --help            Show this help message
   -c <file>         Specify a config file to use [default: conf.yml]
   -v level          Control the verbosity, 0 to 6 [default: 4]
   -q                Don't log anything

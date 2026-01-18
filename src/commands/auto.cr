@@ -13,10 +13,11 @@ files for changes and triggering rebuilds. Also, if you
 have a page open in a browser, it will trigger a reload.
 
 Usage:
-  nicolino auto [TARGET...] [--fast-mode][-c <file>]
+  nicolino auto [--help][TARGET...] [--fast-mode][-c <file>]
                 [-q|-v <level>]
 
 Options:
+  --help            Show this help message
   -c <file>         Specify a config file to use [default: conf.yml]
   --fast-mode       Use file timestamps rather than contents to
                     decide rebuilds.

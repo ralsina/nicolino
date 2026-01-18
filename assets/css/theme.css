@@ -155,18 +155,23 @@
 }
 
 .book-sidebar-toggle {
-    background: none;
-    border: 1px solid var(--pico-muted-border-color);
-    border-radius: 4px;
-    padding: 0.25em 0.5em;
+    background: var(--pico-background-color);
+    border: 1px solid var(--pico-primary);
+    border-radius: var(--pico-border-radius);
+    padding: 0.375em 0.5em;
     cursor: pointer;
-    font-size: 1em;
-    color: var(--pico-color);
+    font-size: 1.1em;
+    color: var(--pico-primary);
     flex-shrink: 0;
+    transition: all 0.2s ease;
+    line-height: 1;
+    min-width: 2em;
 }
 
 .book-sidebar-toggle:hover {
-    background: var(--pico-secondary-hover-background);
+    background: var(--pico-primary);
+    color: var(--pico-primary-inverse);
+    border-color: var(--pico-primary);
 }
 
 .book-title {
@@ -361,4 +366,31 @@
         text-align: center;
         order: -1;
     }
+}
+
+/* Code blocks - allow horizontal scroll */
+.book-content pre,
+main pre {
+    overflow-x: auto !important;
+    max-width: 100%;
+    position: relative; /* For absolute positioning of copy button */
+}
+
+.book-content code,
+main code {
+    white-space: pre !important;
+}
+
+/* Prevent copy button from causing horizontal scroll */
+.hljs-copy-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translateY(-100%); /* Move up outside when not hovered */
+    transition: transform 0.2s;
+}
+
+.hljs-copy-button:hover,
+.hljs-copy-button:focus {
+    transform: translateY(0); /* Slide down from top when hovered */
 }

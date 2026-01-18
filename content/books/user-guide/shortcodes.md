@@ -195,3 +195,63 @@ Embed image galleries directly in your content. The gallery loads images from th
 This renders a grid of thumbnail images. Users can click thumbnails to view full-size images in a lightbox.
 
 {{< gallery name="fancy-turning" >}}
+
+
+## Shell
+
+Execute shell commands during build and include their output in your pages. This is useful for including dynamic content like git commit hashes, dates, or command outputs.
+
+**Warning**: This shortcode executes arbitrary shell commands. Only use it in trusted content.
+
+### Usage
+
+```markdown
+{{% shell command="git log -1 --format=%h" %}}
+```
+
+This will execute the command and replace the shortcode with the command's output:
+
+```
+a1443d54
+```
+
+### Arguments
+
+- `command` (required) - The shell command to execute
+- `cd` (optional) - Directory to change to before running the command (default: current directory)
+
+### Examples
+
+Show current git commit:
+
+```markdown
+Current commit: {{% shell command="git log -1 --format=%h" %}}
+```
+
+Show current date:
+
+```markdown
+Built on {{% shell command="date +%Y-%m-%d" %}}
+```
+
+List files in a directory:
+
+```markdown
+{{% shell command="ls -1 content/posts | head -5" %}}
+```
+
+Run command in specific directory:
+
+```markdown
+{{% shell command="pwd" cd="content" %}}
+```
+
+### Error Handling
+
+If a command fails, an error message will be included in the output:
+
+```html
+<span class="shell-error">Command failed: [error details]</span>
+```
+
+You can style this with CSS to make errors visible during development.

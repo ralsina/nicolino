@@ -1,24 +1,21 @@
-# New
-
-`new` command documentation.
-
+Creates a new post, gallery or page.
 ## Usage
 
-```bash
-nicolino new <type> <name>
+```text
+{{% shell command="bin/nicolino new --help" %}}
 ```
 
 ## Description
 
-Creates a new content item of the specified type:
-- `post` - Creates a new blog post
-- `gallery` - Creates a new image gallery
-- `page` - Creates a new page
+The PATH is where it will be created. The kind of object to be
+created depends on the PATH.
 
-## Examples
+For example:
 
-```bash
-nicolino new post my-new-post
-nicolino gallery my-photo-gallery
-nicolpage about
-```
+* content/galleries/foo will create a new gallery
+* content/posts/foo will create a new blog post
+
+Anything else will create a new page. The template for the file
+being created is inside models/
+
+Those paths may vary depending on your configuration.

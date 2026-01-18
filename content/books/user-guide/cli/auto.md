@@ -1,17 +1,12 @@
-# Auto
-
-`auto` command documentation.
-
+Run forever automatically rebuilding the site.
 ## Usage
 
-```bash
-nicolino auto
+```text
+{{% shell command="bin/nicolino auto --help" %}}
 ```
 
 ## Description
 
-Automatically rebuilds the site when files change. Runs a development server that watches for changes and regenerates content dynamically.
-
-## Options
-
-This command has no options.
+This command will run the site in auto mode, monitoring
+files for changes and triggering rebuilds. Also, if you
+have a page open in a browser, it will trigger a reload.

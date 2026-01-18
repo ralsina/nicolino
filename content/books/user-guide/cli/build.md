@@ -1,17 +1,12 @@
-# Build
-
-`build` command documentation.
-
+Build the site.
 ## Usage
 
-```bash
-nicolino build
+```text
+{{% shell command="bin/nicolino build --help" %}}
 ```
 
 ## Description
 
-Builds a static site from the content directory, processing all markdown files and generating the final HTML output in the output directory.
-
-## Options
-
-This command has no options.
+Build the output site based on your content and configuration.
+If you specify one or more TARGETs, only those files will be
+built. If you don't specify any, the whole site will be built.

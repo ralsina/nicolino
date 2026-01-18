@@ -13,9 +13,10 @@ When given a path, it will create a folder with the
 skeleton of a Nicolino site in it, ready to use.
 
 Usage:
-  nicolino init PATH [-c <file>][-q|-v <level>]
+  nicolino init [--help] PATH [-c <file>][-q|-v <level>]
 
 Options:
+  --help            Show this help message
   -c <file>         Specify a config file to use [default: conf.yml]
   -v level          Control the verbosity, 0 to 6 [default: 4]
   -q                Don't log anything

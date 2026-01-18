@@ -1,13 +1,11 @@
-# Validate
-
-`validate` command documentation.
-
+Check your content for errors.
 ## Usage
 
-```bash
-nicolino validate
+```text
+{{% shell command="bin/nicolino validate --help" %}}
 ```
 
 ## Description
 
-Validates the site structure and configuration to ensure everything is properly set up. Checks for missing files, invalid configuration, or other issues.
+Currently it will validate markdown and pandoc documents.
+More checks will be added over time.

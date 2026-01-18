@@ -148,6 +148,50 @@ module Templates
       return Crinja::Value.new("#{basename}.thumb#{ext}")
     end
 
+    # Shell command execution for the shell shortcode
+    env.functions["shell"] = Crinja.function do
+      args = arguments.varargs[0].as_h
+
+      # Get command - try named arg or positional arg
+      cmd = if args["command"]?
+              args["command"].to_s
+            elsif args["0"]?
+              args["0"].to_s
+            else
+              return Crinja::Value.new("<span class=\"shell-error\">Error: shell shortcode requires a command argument</span>")
+            end
+
+      # Get working directory - default to current dir
+      work_dir = if args["cd"]?
+                    args["cd"].to_s
+                  else
+                    "."
+                  end
+
+      output = IO::Memory.new
+      error = IO::Memory.new
+      status = Process.run(
+        cmd,
+        shell: true,
+        output: output,
+        error: error,
+        chdir: work_dir
+      )
+
+      result = output.to_s.strip
+
+      if status.success?
+        Crinja::Value.new(result)
+      else
+        error_msg = error.to_s.strip
+        if error_msg.empty?
+          error_msg = "Command failed with exit code #{status.exit_code}"
+        end
+        Log.warn { "Shell command failed: #{cmd} - #{error_msg}" }
+        Crinja::Value.new("<span class=\"shell-error\">Command failed: #{error_msg}</span>")
+      end
+    end
+
     env
   end
 

@@ -1,13 +1,11 @@
-# Init
-
-`init` command documentation.
-
+Create a new site.
 ## Usage
 
-```bash
-nicolino init
+```text
+{{% shell command="bin/nicolino init --help" %}}
 ```
 
 ## Description
 
-Initializes a new Nicolino project in the current directory. Creates the basic directory structure and configuration files needed.
+When given a path, it will create a folder with the
+skeleton of a Nicolino site in it, ready to use.
