@@ -456,7 +456,13 @@ pre code.hljs,
     border-radius: 4px;
     font-size: 0.75rem;
     cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
+    transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+    opacity: 0;
+    pointer-events: none;
+}
+pre:hover .hljs-copy-button {
+    opacity: 1;
+    pointer-events: auto;
 }
 .hljs-copy-button:hover {
     background: var(--pico-primary-background);
