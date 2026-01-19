@@ -210,7 +210,7 @@ module Markdown
       # 4000 short posts. Calling each filter is much faster.
       doc = Lexbor::Parser.new(@html[lang])
       doc = HtmlFilters.downgrade_headers(doc)
-      @html[lang] = doc.to_html
+      @html[lang] = HtmlFilters.fix_code_classes(doc).to_html
     end
 
     def date : Time | Nil
@@ -492,7 +492,7 @@ module Markdown
             html = Render.apply_template("templates/page.tmpl", template_vars)
             doc = Lexbor::Parser.new(html)
             doc = HtmlFilters.make_links_relative(doc, post.link(lang))
-            doc.to_html
+            HtmlFilters.fix_code_classes(doc).to_html
           rescue ex
             Log.error { "Error rendering post: #{post.source(lang)}" }
             Log.error { "#{ex.class}: #{ex.message}" }
@@ -563,7 +563,7 @@ module Markdown
         })
       doc = Lexbor::Parser.new(html)
       doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))
-      doc.to_html
+      HtmlFilters.fix_code_classes(doc).to_html
     end
   end
 

@@ -158,7 +158,7 @@ module Listings
       # Process with HTML filters
       doc = Lexbor::Parser.new(html)
       doc = HtmlFilters.make_links_relative(doc, "/listings/")
-      doc.to_html
+      HtmlFilters.fix_code_classes(doc).to_html
     end
   end
 
@@ -228,7 +228,7 @@ module Listings
       # Process with HTML filters
       doc = Lexbor::Parser.new(html)
       doc = HtmlFilters.make_links_relative(doc, "/#{relative_path.rpartition('/')[0]}/")
-      doc.to_html
+      HtmlFilters.fix_code_classes(doc).to_html
     end
   end
 end

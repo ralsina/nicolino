@@ -32,7 +32,7 @@ so you can use the `figure` shortcode to embed a figure:
 The definition is just a template which can use the arguments
 you pass:
 
-```jinja
+```django
 <figure>
     <a href="{{args.link}}"><img src="{{args.src}}"
         alt="{{args.caption}}"/></a>
@@ -59,7 +59,7 @@ This is called "inner"
 In those shortcodes, you can access that content as `inner`.
 The template for `raw` is pretty simple:
 
-```jinja
+```django
 {{inner}}
 ```
 

@@ -76,4 +76,20 @@ module HtmlFilters
       doc
     end
   end
+
+  # Post-process HTML to add language- prefix to code blocks
+  def self.fix_code_classes(doc)
+    doc.css("pre code").each do |node|
+      next unless node.has_key? "class"
+      classes = node["class"].to_s
+      # If there's a class but no language- prefix, add it
+      if classes && !classes.starts_with?("language-")
+        split_classes = classes.split()
+        node["data-lang"] = split_classes[0]
+        split_classes[0] = "#{split_classes[0]} language-#{split_classes[0]}"
+        node["class"]=split_classes.join(" ")
+      end
+    end
+    doc
+  end
 end

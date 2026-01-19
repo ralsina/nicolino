@@ -26,7 +26,7 @@ module Pandoc
       doc = Lexbor::Parser.new(result)
       doc = HtmlFilters.downgrade_headers(doc)
       doc = HtmlFilters.make_links_relative(doc, link)
-      @html[lang] = doc.to_html
+      @html[lang] = HtmlFilters.fix_code_classes(doc).to_html
       @toc[lang] = toc_content
     end
 
