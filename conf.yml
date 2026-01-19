@@ -7,7 +7,7 @@ site:
   title: "Nicolino"
   description: "Nicolino: a static site generator"
   url: "https://nicolino.ralsina.me"
-  footer: "Default Nicolino Theme"
+  footer: ""
   # These are used to generate a base16 color
   # scheme in CSS. The sixteen library automatically
   # finds the dark and light variants.

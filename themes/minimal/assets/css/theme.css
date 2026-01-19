@@ -107,6 +107,11 @@ h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover, h5 a:hover, h6 a:hover {
     overflow-y: auto;
     transition: transform 0.3s ease;
     z-index: 999;
+    transform: translateX(-100%);
+}
+
+body.sidebar-open .sidebar {
+    transform: translateX(0);
 }
 
 .sidebar-content {
@@ -182,19 +187,29 @@ h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover, h5 a:hover, h6 a:hover {
 
 /* Main Content */
 .main-content {
-    margin-left: var(--sidebar-width);
+    margin-left: 0;
     margin-top: 60px;
     padding: 2rem;
     max-width: none;
+    transition: margin-left 0.3s ease;
+}
+
+body.sidebar-open .main-content {
+    margin-left: var(--sidebar-width);
 }
 
 /* Footer */
 .footer {
-    margin-left: var(--sidebar-width);
+    margin-left: 0;
     padding: 2rem;
     text-align: center;
     border-top: 1px solid var(--pico-muted-border-color);
     background: var(--pico-card-background-color);
+    transition: margin-left 0.3s ease;
+}
+
+body.sidebar-open .footer {
+    margin-left: var(--sidebar-width);
 }
 
 .footer small {
@@ -444,26 +459,6 @@ main code {
 
 /* Responsive */
 @media (max-width: 768px) {
-    .sidebar-toggle {
-        display: block;
-    }
-
-    .sidebar {
-        transform: translateX(-100%);
-    }
-
-    body.sidebar-open .sidebar {
-        transform: translateX(0);
-    }
-
-    .main-content {
-        margin-left: 0;
-    }
-
-    .footer {
-        margin-left: 0;
-    }
-
     .book-layout {
         flex-direction: column;
         gap: 2em;
