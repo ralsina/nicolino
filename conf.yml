@@ -12,7 +12,7 @@ site:
   # scheme in CSS. The sixteen library automatically
   # finds the dark and light variants.
   # Also used for HighlightJS syntax highlighting.
-  color_scheme: "katy"
+  color_scheme: "darcula"
   # This is a list of items to show in the navigation bar.
   # In the default theme they are shown at the right of
   # the title.
@@ -22,7 +22,7 @@ site:
 # Some options affecting output
 options:
   # Theme to use (themes/<theme>/templates and assets)
-  theme: "minimal"
+  theme: "lanyon"
   # Format HTML nicely. Makes it larger but easier to read
   # and understand.
   pretty_html: true

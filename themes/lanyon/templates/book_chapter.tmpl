@@ -1,0 +1,19 @@
+{# book_chapter.tmpl - Template for rendering individual book chapters (minimal theme) #}
+{# This template is wrapped by page.tmpl, so it only defines the content #}
+{# The book TOC is injected into the main sidebar via sidebar_content variable #}
+
+{{ chapter.content|safe }}
+
+<!-- Navigation buttons -->
+<nav class="chapter-nav">
+  {% if navigation.prev and navigation.prev.title %}
+  <a href="{{ navigation.prev.link }}" class="nav-prev">
+    ← {{ navigation.prev.title }}
+  </a>
+  {% endif %}
+  {% if navigation.next and navigation.next.title %}
+  <a href="{{ navigation.next.link }}" class="nav-next">
+    {{ navigation.next.title }} →
+  </a>
+  {% endif %}
+</nav>

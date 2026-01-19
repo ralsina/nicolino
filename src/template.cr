@@ -16,21 +16,21 @@ module Templates
     Crinja::Template.new(source).nodes.@children \
       .select(Crinja::AST::TagNode) \
         .select { |node| node.@name == "include" }.each { |node|
-        # Resolve included template path to full theme path
-        included_template = node.@arguments[0].value.as(String)
-        # If include path starts with "templates/", remove it and add theme path
-        # If include path starts with "shortcodes/", use it as-is (shortcodes are not in themes)
-        # Otherwise it's a relative path, just add theme path
-        if included_template.starts_with?("templates/")
-          included_key = "#{Theme.path}/#{included_template}"
-        elsif included_template.starts_with?("themes/")
-          included_key = included_template
-        elsif included_template.starts_with?("shortcodes/")
-          included_key = included_template
-        else
-          included_key = "#{Theme.templates_dir}/#{included_template}"
-        end
-        deps << "kv://#{included_key}"
+      # Resolve included template path to full theme path
+      included_template = node.@arguments[0].value.as(String)
+      # If include path starts with "templates/", remove it and add theme path
+      # If include path starts with "shortcodes/", use it as-is (shortcodes are not in themes)
+      # Otherwise it's a relative path, just add theme path
+      if included_template.starts_with?("templates/")
+        included_key = "#{Theme.path}/#{included_template}"
+      elsif included_template.starts_with?("themes/")
+        included_key = included_template
+      elsif included_template.starts_with?("shortcodes/")
+        included_key = included_template
+      else
+        included_key = "#{Theme.templates_dir}/#{included_template}"
+      end
+      deps << "kv://#{included_key}"
     }
     deps
   end
