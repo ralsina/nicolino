@@ -1,26 +1,13 @@
-/* Set Pico CSS font variables globally to use Quicksand */
-:root {
-    --pico-font-family: "Quicksand", sans-serif;
-}
-
-/* Links inside headings should inherit heading color, not use link color */
-h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
-    color: inherit;
-}
-
-h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover, h5 a:hover, h6 a:hover,
-.breadcrumb a:hover,
-.taxonomy a:hover,
-.toc-link:hover,
-.chapter-nav a:hover {
-    color: var(--pico-primary);
-    text-decoration: underline;
-}
-
-/* Breadcrumb styling */
+/* Collapsible breadcrumb in header */
 .breadcrumb {
     font-size: 0.9em;
     color: var(--pico-muted-color);
+    display: inline-block;
+}
+
+/* Set Pico CSS font variables globally to use Quicksand */
+:root {
+    --pico-font-family: "Quicksand", sans-serif;
 }
 
 .breadcrumb a {
@@ -28,21 +15,38 @@ h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover, h5 a:hover, h6 a:hover,
     text-decoration: none;
 }
 
-.breadcrumb-sep,
-.breadcrumb-sep-last {
-    margin-left: 0;
-    margin-right: 8px;
+.breadcrumb a:hover {
+    text-decoration: underline;
 }
 
+/* Breadcrumb separator */
+.breadcrumb-sep {
+    margin-left: 0;
+    margin-right: 8px;
+    display: inline-block;
+}
+
+/* Collapsed separators should not take space */
 .breadcrumb-sep.breadcrumb-collapsed {
     margin-right: 0;
 }
 
+.breadcrumb-sep-last {
+    margin-left: 0;
+    margin-right: 8px;
+    display: inline-block;
+}
+
+/* Collapsed breadcrumb items */
 .breadcrumb-collapsed {
-    max-width: 0;
+    max-width: 0px;
     overflow: hidden;
+    display: inline-block;
+    white-space: nowrap;
     opacity: 0;
-    transition: max-width 0.3s ease, opacity 0.3s ease;
+    transition:
+        max-width 0.3s ease,
+        opacity 0.3s ease;
     vertical-align: middle;
     visibility: hidden;
 }
@@ -53,35 +57,7 @@ h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover, h5 a:hover, h6 a:hover,
     visibility: visible;
 }
 
-/* Navigation */
-nav ul li details {
-    margin: 0;
-    padding: 0;
-}
-
-nav ul li details .language-switcher {
-    padding: 0;
-    margin: 0;
-    min-width: 2.5rem;
-    width: auto;
-    height: 2.25rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-}
-
-nav > ul:last-child > li {
-    display: flex;
-    align-items: center;
-}
-
-/* Definition lists */
-dt {
-    font-weight: bold;
-}
-
-/* Post metadata */
+/* Post metadata section */
 .post-header {
     margin-bottom: 2em;
 }
@@ -121,6 +97,10 @@ dt {
 .taxonomy a {
     color: var(--pico-primary);
     text-decoration: none;
+}
+
+.taxonomy a:hover {
+    text-decoration: underline;
 }
 
 /* Post content */
@@ -243,6 +223,11 @@ dt {
     transition: background 0.2s;
 }
 
+.toc-link:hover {
+    background: var(--pico-secondary-hover-background);
+    text-decoration: none;
+}
+
 .toc-link.active {
     background: var(--pico-secondary-background);
     font-weight: 500;
@@ -318,12 +303,14 @@ dt {
     padding: 0.5em 1em;
     background: var(--pico-secondary-background);
     border-radius: 4px;
+    text-decoration: none;
     color: inherit;
     transition: background 0.2s;
 }
 
 .chapter-nav a:hover {
     background: var(--pico-secondary-hover-background);
+    text-decoration: none;
 }
 
 .nav-prev,
@@ -384,98 +371,26 @@ dt {
 /* Code blocks - allow horizontal scroll */
 .book-content pre,
 main pre {
-    overflow-x: auto;
+    overflow-x: auto !important;
     max-width: 100%;
-    position: relative;
+    position: relative; /* For absolute positioning of copy button */
 }
 
 .book-content code,
 main code {
-    white-space: pre;
+    white-space: pre !important;
 }
 
-/* Copy button positioning */
+/* Prevent copy button from causing horizontal scroll */
 .hljs-copy-button {
     position: absolute;
     right: 0;
     top: 0;
-    transform: translateY(-100%);
+    transform: translateY(-100%); /* Move up outside when not hovered */
     transition: transform 0.2s;
 }
 
 .hljs-copy-button:hover,
 .hljs-copy-button:focus {
-    transform: translateY(0);
-}
-
-/* Search results styling */
-#search_results {
-    position: fixed;
-    top: 5rem;
-    right: 2rem;
-    max-width: 400px;
-    max-height: 70vh;
-    overflow-y: auto;
-    background: var(--pico-card-background-color, #fff);
-    border: 1px solid var(--pico-muted-border-color);
-    border-radius: 0.5rem;
-    padding: 1rem;
-    box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    display: none;
-}
-
-#search_results.searching::after {
-    content: "🔍";
-    display: block;
-    text-align: center;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-#search_results .search-results-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-#search_results .search-results-list li {
-    margin: 0.5rem 0;
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    transition: background-color 0.2s;
-    list-style: none;
-}
-
-#search_results .search-results-list li:hover {
-    background-color: var(--pico-muted-background-color, #f0f0f0);
-    cursor: pointer;
-}
-
-[data-theme="dark"] #search_results .search-results-list li:hover {
-    background-color: var(--pico-muted-background-color, #2a2a2a);
-}
-
-#search_results .search-results-list a {
-    text-decoration: none;
-    color: var(--pico-primary);
-    font-weight: 500;
-    display: block;
-    width: 100%;
-    height: 100%;
-}
-
-#search_results .no-results {
-    text-align: center;
-    color: var(--pico-muted-color);
-    margin: 0;
-}
-
-[data-theme="dark"] #search_results {
-    background: var(--pico-card-background-color, #1a1a1a);
-    border-color: var(--pico-muted-border-color, #333);
+    transform: translateY(0); /* Slide down from top when hovered */
 }
