@@ -1,4 +1,8 @@
 require "./command.cr"
+require "../creatable"
+require "../markdown"
+require "../gallery"
+require "crinja"
 
 module Nicolino
   module Commands
@@ -6,20 +10,18 @@ module Nicolino
     struct New < Command
       @@name = "new"
       @@doc = <<-DOC
-Creates a new post, gallery or page.
+Creates a new content item.
 
-The PATH is where it will be created. The kind of object to be
-created depends on the PATH.
+The content type is determined by the directory name in the PATH.
+Features can register their own creatable types.
 
-For example:
+Common types:
 
-* content/galleries/foo will create a new gallery
-* content/posts/foo will create a new blog post
+* content/posts/foo - Blog post
+* content/galleries/foo - Image gallery
+* content/pages/foo - Static page
 
-Anything else will create a new page. The template for the file
-being created is inside models/
-
-Those paths may vary depending on your configuration.
+Anything else creates a static page.
 
 Usage:
   nicolino new [--help] PATH [-c <file>][-q|-v <level>]
@@ -32,31 +34,70 @@ Options:
 DOC
 
       def run : Int32
+        # Populate the creatable registry with built-in types
+        register_builtins
+
         path = Path[@options["PATH"].as(String)]
         raise "Can't create #{path}, new is used to create data inside #{Config.options.content}" \
           if path.parts[0] != Config.options.content.rstrip("/")
+
+        # Determine content type from directory
         if path.parts.size < 3
           kind = "page"
         else
-          # FIXME: This could be generalized so it works with more than one level
-          # of subdirectory, so galleries could be in content/image/galleries
-          kind = {
-            Config.options.galleries.rstrip("/") => "gallery",
-            Config.options.posts.rstrip("/")     => "post",
-          }.fetch(path.parts[1], "page")
+          dir_name = path.parts[1]
+          kind = if ct = Creatable.find_by_directory(dir_name)
+                   ct.name
+                 else
+                   "page"
+                 end
         end
-        # Call the proper module's content generator with the path
-        if kind == "post"
-          Markdown.new_post path
-        elsif kind == "gallery"
-          Gallery.new_gallery path
+
+        # Find and call the creator
+        if ct = Creatable.all.find { |ct_item| ct_item.name == kind }
+          Log.info { "Creating new #{kind}: #{path}" }
+          ct.creator.call(path)
+          0
         else
-          Markdown.new_page path
+          Log.error { "Unknown content type: #{kind}" }
+          1
         end
-        0
       rescue ex : Exception
         Log.error(exception: ex) { "Error creating new content: #{ex.message}" }
         1
+      end
+
+      # Register built-in content types
+      private def register_builtins
+        # Only register if not already populated
+        return unless Creatable.all.empty?
+
+        Creatable.register("post", "posts", "Blog post") do |path|
+          Markdown.new_post(path)
+        end
+
+        Creatable.register("gallery", "galleries", "Image gallery") do |path|
+          raise "Galleries are folders, not documents" if path.to_s.ends_with?(".md")
+          gallery_path = path / "index.md"
+          Log.info { "Creating new gallery #{gallery_path}" }
+          raise "#{gallery_path} already exists" if ::File.exists?(gallery_path)
+          Dir.mkdir_p(gallery_path.dirname)
+          ::File.open(gallery_path, "w") do |io|
+            template = <<-TEMPLATE
+---
+title: Add title here
+date: {{date}}
+---
+
+Add content here
+TEMPLATE
+            io << Crinja.render(template, {date: Time.local.to_s})
+          end
+        end
+
+        Creatable.register("page", "pages", "Static page") do |path|
+          Markdown.new_page(path)
+        end
       end
     end
   end

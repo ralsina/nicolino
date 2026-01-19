@@ -657,7 +657,15 @@ module Markdown
     raise "#{path} already exists" if ::File.exists? path
     Dir.mkdir_p(path.dirname)
     ::File.open(path, "w") do |io|
-      io << Crinja.render(::File.read(Path["models", "page.tmpl"]), {date: "#{Time.local}"})
+      template = <<-TEMPLATE
+---
+title: Add title here
+date: {{date}}
+---
+
+Add content here
+TEMPLATE
+      io << Crinja.render(template, {date: Time.local.to_s})
     end
   end
 
@@ -668,7 +676,15 @@ module Markdown
     raise "#{path} already exists" if ::File.exists? path
     Dir.mkdir_p(path.dirname)
     ::File.open(path, "w") do |io|
-      io << Crinja.render(::File.read(Path["models", "post.tmpl"]), {date: "#{Time.local}"})
+      template = <<-TEMPLATE
+---
+title: Add title here
+date: {{date}}
+---
+
+Add content here
+TEMPLATE
+      io << Crinja.render(template, {date: Time.local.to_s})
     end
   end
 end

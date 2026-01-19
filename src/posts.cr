@@ -5,12 +5,16 @@ require "./markdown"
 require "./html"
 require "./pandoc"
 require "./similarity"
+require "./creatable"
 
 module Posts
   # Enable posts feature and return array of posts for dependent features
   # Returns nil if posts feature is disabled
   def self.enable(is_enabled : Bool, content_post_path : Path, feature_set : Set(Totem::Any)) : Array(Markdown::File)?
     return nil unless is_enabled
+
+    # Note: Posts are already registered by nicolino new command,
+    # but features can register additional types here if needed
 
     # Convert Totem::Any set to string set for easier use
     features = feature_set.map(&.as_s).to_set

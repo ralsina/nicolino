@@ -1,5 +1,6 @@
 require "./markdown"
 require "./theme"
+require "./creatable"
 require "json"
 
 # Create automatic image galleries
@@ -20,6 +21,9 @@ module Gallery
   # Enable galleries feature
   def self.enable(is_enabled : Bool, galleries_path : Path)
     return unless is_enabled
+
+    # Note: Galleries are already registered by nicolino new command,
+    # but features can register additional types here if needed
 
     # Render galleries
     galleries = read_all(galleries_path)
@@ -388,7 +392,15 @@ module Gallery
     raise "#{path} already exists" if ::File.exists? path
     Dir.mkdir_p(path.dirname)
     ::File.open(path, "w") do |io|
-      io << Crinja.render(::File.read(Path["models", "page.tmpl"]), {date: "#{Time.local}"})
+      template = <<-TEMPLATE
+---
+title: Add title here
+date: {{date}}
+---
+
+Add content here
+TEMPLATE
+      io << Crinja.render(template, {date: Time.local.to_s})
     end
   end
 end

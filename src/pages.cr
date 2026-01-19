@@ -4,6 +4,7 @@
 require "./markdown"
 require "./html"
 require "./pandoc"
+require "./creatable"
 
 module Pages
   # Enable pages feature
@@ -11,6 +12,9 @@ module Pages
   # posts, blog posts, etc.
   def self.enable(is_enabled : Bool, content_path : Path, feature_set : Set(Totem::Any))
     return unless is_enabled
+
+    # Note: Pages are already registered by nicolino new command,
+    # but features can register additional types here if needed
 
     # Convert Totem::Any set to string set for easier use
     features = feature_set.map(&.as_s).to_set
