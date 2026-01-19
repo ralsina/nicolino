@@ -2,6 +2,56 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.0] - 2026-01-19
+
+### 🚀 Features
+
+- Add youtube and gallery shortcodes
+- Add youtube and gallery shortcodes, fix gallery grid layout, improve logging
+- Add shell shortcode and improve CLI documentation
+- Add Django/Jinja2 syntax highlighting support
+- Add theming system
+- Add theme assets feature
+- Add minimal theme with sidebar navigation
+- Inject book TOC into main sidebar for minimal theme
+- Add Lanyon-inspired theme with sliding sidebar
+
+### 🐛 Bug Fixes
+
+- Restore galleries/index.html generation by adding language_links to Gallery
+- Reduce books logging and fix gallery grid layout
+- Markdown issues in posts.md
+- Add proper hljs classes for code blocks
+- Use crimage instead of pluto for -Dnovips fallback
+- Restore theme.css from main branch
+- Style sidebar navigation links properly in minimal theme
+- Make sidebar collapsible on all screen sizes in minimal theme
+- Galleries index path duplication
+- Resolve template include paths relative to theme directory
+- Resolve shortcode template paths correctly
+
+### 🚜 Refactor
+
+- Optimize theme.css
+
+### 📚 Documentation
+
+- User intro
+- Fixes
+- More docs
+- Wrap shell shortcode examples with raw tags
+- Add plain code blocks before raw-wrapped shell examples
+- Show rendered output instead of raw blocks for shell examples
+- Show both raw syntax and rendered output for shell examples
+- Fixes
+- More docs
+- Add themes and markdown chapters, fix book tree structure
+- Minor doc fixes
+
+### ◀️ Revert
+
+- Remove lanyon theme experiment
+
 ## [0.9.0] - 2026-01-18
 
 ### 🚀 Features
@@ -16,6 +66,10 @@ All notable changes to this project will be documented in this file.
 - Use correct highlightjs-copy plugin initialization
 - Make copy button only visible on hover
 - Make copy button text visible with proper color
+
+### Bump
+
+- Release v0.9.0
 
 ## [0.8.0] - 2026-01-17
 
