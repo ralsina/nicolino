@@ -22,7 +22,7 @@ site:
 # Some options affecting output
 options:
   # Theme to use (themes/<theme>/templates and assets)
-  theme: "lanyon"
+  theme: "default"
   # Format HTML nicely. Makes it larger but easier to read
   # and understand.
   pretty_html: true
