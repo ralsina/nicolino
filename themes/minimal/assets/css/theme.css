@@ -220,7 +220,7 @@ body.sidebar-open .footer {
 /* Definition lists */
 dt {
     font-family: "Michroma", sans-serif;
-    font-weight: 400;
+    font-weight: bold;
     font-size: 0.95em;
     letter-spacing: 0.02em;
 }

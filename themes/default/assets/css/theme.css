@@ -259,9 +259,10 @@
     gap: 0.5em;
 }
 
-.toc-summary .toc-link {
-    display: inline;
+.toc-summary .toc-link,
+.toc-summary .toc-title {
     flex: 1;
+    min-width: 0;
 }
 
 /* Position the details marker properly */
@@ -281,6 +282,11 @@
 
 .toc-level-1 .toc-link {
     font-size: 0.95em;
+}
+
+/* Definition lists */
+dt {
+    font-weight: bold;
 }
 
 /* Book index page */
