@@ -1,5 +1,3 @@
-# Images
-
 The Images feature processes individual images with automatic optimization and responsive size generation.
 
 ## How It Works

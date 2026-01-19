@@ -1,6 +1,3 @@
-
-# What are Shortcodes?
-
 A shortcode is a small template you can embed in your posts to
 provide functionality markdown lacks. They are defined using
 [Crinja templates](https://straight-shoota.github.io/crinja/)

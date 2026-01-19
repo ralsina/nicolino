@@ -1,5 +1,3 @@
-# Archive
-
 The Archive feature generates chronological archive pages organizing your posts by year and month.
 
 ## How It Works

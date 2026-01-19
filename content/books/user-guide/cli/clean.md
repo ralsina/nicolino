@@ -1,4 +1,5 @@
 Clean unknown files.
+
 ## Usage
 
 ```text

@@ -1,5 +1,3 @@
-# Galleries
-
 The Galleries feature creates image gallery pages with automatic thumbnail generation and lightbox functionality.
 
 ## How It Works

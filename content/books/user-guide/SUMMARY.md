@@ -1,5 +1,3 @@
-# User Guide
-
 Documentation for the Nicolino static site generator.
 
 - [Introduction](intro.md)

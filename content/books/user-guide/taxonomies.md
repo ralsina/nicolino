@@ -1,5 +1,3 @@
-# Taxonomies
-
 The Taxonomies feature organizes content into categories and tags, with automatic index page generation.
 
 ## How It Works

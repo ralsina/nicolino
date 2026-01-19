@@ -1,5 +1,3 @@
-# Posts
-
 The Posts feature is the core blogging functionality of Nicolino. It processes markdown files with frontmatter and renders them as HTML pages.
 
 ## How It Works

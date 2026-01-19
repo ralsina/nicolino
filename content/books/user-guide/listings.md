@@ -1,5 +1,3 @@
-# Listings
-
 The Listings feature displays source code files with syntax highlighting and raw source views.
 
 ## How It Works

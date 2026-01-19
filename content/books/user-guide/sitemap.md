@@ -1,5 +1,3 @@
-# Sitemap
-
 The Sitemap feature automatically generates XML sitemaps for search engines.
 
 ## How It Works

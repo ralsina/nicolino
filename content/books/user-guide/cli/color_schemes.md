@@ -1,4 +1,5 @@
 List and apply available base16 color scheme families.
+
 ## Usage
 
 ```text

@@ -1,5 +1,3 @@
-# Books
-
 The Books feature provides mdbook/gitbook-style documentation with hierarchical chapters, navigation, and table of contents.
 
 ## How It Works

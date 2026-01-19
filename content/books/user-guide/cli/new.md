@@ -1,4 +1,5 @@
 Creates a new post, gallery or page.
+
 ## Usage
 
 ```text

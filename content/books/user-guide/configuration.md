@@ -1,5 +1,3 @@
-## Configuration
-
 Nicolino is configured through a single `conf.yml` file in your project root. This YAML file controls all aspects of your site.
 
 ## Basic Structure

@@ -1,4 +1,3 @@
-
 Nicolino uses the **Crinja** templating engine (Jinja2-compatible) to render HTML pages. Templates are stored in the `templates/` directory and use the `.tmpl` file extension.
 
 ## Template Overview

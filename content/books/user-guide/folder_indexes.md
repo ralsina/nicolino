@@ -1,5 +1,3 @@
-# Folder Indexes
-
 The Folder Indexes feature automatically generates index pages for directories containing content files.
 
 ## How It Works

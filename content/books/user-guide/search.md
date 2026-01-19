@@ -1,5 +1,3 @@
-# Search
-
 The Search feature provides full-text search functionality using MiniSearch, a lightweight JavaScript search library.
 
 ## How It Works
