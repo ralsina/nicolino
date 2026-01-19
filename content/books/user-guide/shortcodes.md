@@ -11,7 +11,7 @@ in the `shortcodes` directory.
 Markdown doesn't have support for the `<figure>` tag,
 so you can use the `figure` shortcode to embed a figure:
 
-```markdown
+```django
 {{< raw >}}
 {{% figure
     src="/nicolino.thumb.jpg"
@@ -48,7 +48,7 @@ Paired shortcodes have content between
 opening and closing tags. For example, there is `raw` which just
 passes whatever is inside as-is:
 
-```markdown
+```django
 {{< raw >}}
 {{< raw >}}
 This is called "inner"
@@ -59,7 +59,7 @@ This is called "inner"
 In those shortcodes, you can access that content as `inner`.
 The template for `raw` is pretty simple:
 
-```django
+```plaintext
 {{inner}}
 ```
 
@@ -67,7 +67,7 @@ The template for `raw` is pretty simple:
 
 A shortcode can be `inline` so it doesn't require a separate template file. For example:
 
-```markdown
+```django
 {{< raw >}}
 {{< foo.inline "this will be in title case" >}}{{ args.0 | title}}{{< /foo.inline >}}
 {{< /raw >}}
@@ -91,7 +91,7 @@ to the template as-is (thus: verbatim).
 Nicolino supports nesting shortcodes as long as the outer shortcode is not verbatim.
 For example, you can nest two `tag` shortcodes:
 
-```markdown
+```django
 {{< raw >}}
 {{% tag div class="outer" %}}
 {{< tag div class="inner" >}}
@@ -114,7 +114,7 @@ This is inside two divs
 
 Support for the `<figure>` tag. Example
 
-```markdown
+```django
 {{< raw >}}
 {{% figure foo
     src="/nicolino.thumb.jpg"
@@ -130,7 +130,7 @@ Support for the `<figure>` tag. Example
 Used when you want to show content that looks like shortcodes or to
 avoid processing markdown in a piece of text. Example:
 
-```markdown
+```django
 {{< raw >}}
 {{< raw >}}
 This is **passed** as-is
@@ -140,7 +140,6 @@ This is **passed** as-is
 {{< raw >}}
 This is **passed** as-is
 {{< /raw >}}
-
 ```
 
 
@@ -148,7 +147,7 @@ This is **passed** as-is
 
 Used to wrap markdown with any required tag. Example
 
-```markdown
+```django
 {{< raw >}}
 {{% tag div class="pico-background-orange-350" %}}
 This has an **orange** background.
@@ -165,7 +164,7 @@ This has an **orange** background.
 
 Embed YouTube videos by video ID. Example:
 
-```markdown
+```django
 {{< raw >}}
 {{< youtube id="dQw4w9WgXcQ" >}}
 {{< /raw >}}
@@ -173,7 +172,7 @@ Embed YouTube videos by video ID. Example:
 
 You can also specify custom width and height:
 
-```markdown
+```django
 {{< raw >}}
 {{< youtube id="dQw4w9WgXcQ" width="560" height="315" >}}
 {{< /raw >}}
@@ -186,7 +185,7 @@ You can also specify custom width and height:
 
 Embed image galleries directly in your content. The gallery loads images from the gallery's `gallery.json` file and displays them in a responsive grid with lightbox functionality. Example:
 
-```markdown
+```django
 {{< raw >}}
 {{< gallery name="fancy-turning" >}}
 {{< /raw >}}
@@ -205,13 +204,13 @@ Execute shell commands during build and include their output in your pages. This
 
 ### Usage
 
-```
+```django
 {{< raw >}}
 {{% shell command="git log -1 --format=%h" %}}
 {{< /raw >}}
 ```
 
-```
+```plaintext
 {{% shell command="git log -1 --format=%h" %}}
 ```
 
@@ -224,49 +223,49 @@ Execute shell commands during build and include their output in your pages. This
 
 Show current git commit:
 
-```
+```django
 {{< raw >}}
 Current commit: {{% shell command="git log -1 --format=%h" %}}
 {{< /raw >}}
 ```
 
-```
+```plaintext
 Current commit: {{% shell command="git log -1 --format=%h" %}}
 ```
 
 Show current date:
 
-```
+```django
 {{< raw >}}
 Built on {{% shell command="date +%Y-%m-%d" %}}
 {{< /raw >}}
 ```
 
-```
+```plaintext
 Built on {{% shell command="date +%Y-%m-%d" %}}
 ```
 
 List files in a directory:
 
-```
+```django
 {{< raw >}}
 {{% shell command="ls -1 content/posts | head -5" %}}
 {{< /raw >}}
 ```
 
-```
+```plaintext
 {{% shell command="ls -1 content/posts | head -5" %}}
 ```
 
 Run command in specific directory:
 
-```
+```django
 {{< raw >}}
 {{% shell command="pwd" cd="content" %}}
 {{< /raw >}}
 ```
 
-```
+```plaintext
 {{% shell command="pwd" cd="content" %}}
 ```
 

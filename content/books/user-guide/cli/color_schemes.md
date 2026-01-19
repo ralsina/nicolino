@@ -24,3 +24,5 @@ Examples of theme families:
 
 Use `--apply` to set the color scheme, or run without options to list
 all available families with color swatches.
+
+You can browse all the color families at <https://sixteen.ralsina.me>
