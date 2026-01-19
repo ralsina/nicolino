@@ -8,46 +8,19 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
     color: inherit;
 }
 
-h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover, h5 a:hover, h6 a:hover {
+h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover, h5 a:hover, h6 a:hover,
+.breadcrumb a:hover,
+.taxonomy a:hover,
+.toc-link:hover,
+.chapter-nav a:hover {
     color: var(--pico-primary);
+    text-decoration: underline;
 }
 
-/* Language switcher button alignment */
-nav ul li details .language-switcher {
-    padding: 0 !important;
-    margin: 0 !important;
-    min-width: 2.5rem !important;
-    width: auto !important;
-    height: 2.25rem !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: 1.2rem !important;
-}
-
-/* Ensure the details element doesn't add extra spacing */
-nav ul li details {
-    margin: 0 !important;
-    margin-bottom: 0 !important;
-    padding: 0 !important;
-}
-
-/* Align all nav items (but not the first/left ul) */
-nav > ul:last-child > li {
-    display: flex !important;
-    align-items: center !important;
-}
-
-/* Make definition list term names bold */
-dt {
-    font-weight: bold;
-}
-
-/* Collapsible breadcrumb in header */
+/* Breadcrumb styling */
 .breadcrumb {
     font-size: 0.9em;
     color: var(--pico-muted-color);
-    display: inline-block;
 }
 
 .breadcrumb a {
@@ -55,38 +28,21 @@ dt {
     text-decoration: none;
 }
 
-.breadcrumb a:hover {
-    text-decoration: underline;
-}
-
-/* Breadcrumb separator */
-.breadcrumb-sep {
+.breadcrumb-sep,
+.breadcrumb-sep-last {
     margin-left: 0;
     margin-right: 8px;
-    display: inline-block;
 }
 
-/* Collapsed separators should not take space */
 .breadcrumb-sep.breadcrumb-collapsed {
     margin-right: 0;
 }
 
-.breadcrumb-sep-last {
-    margin-left: 0;
-    margin-right: 8px;
-    display: inline-block;
-}
-
-/* Collapsed breadcrumb items */
 .breadcrumb-collapsed {
-    max-width: 0px;
+    max-width: 0;
     overflow: hidden;
-    display: inline-block;
-    white-space: nowrap;
     opacity: 0;
-    transition:
-        max-width 0.3s ease,
-        opacity 0.3s ease;
+    transition: max-width 0.3s ease, opacity 0.3s ease;
     vertical-align: middle;
     visibility: hidden;
 }
@@ -97,7 +53,35 @@ dt {
     visibility: visible;
 }
 
-/* Post metadata section */
+/* Navigation */
+nav ul li details {
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li details .language-switcher {
+    padding: 0;
+    margin: 0;
+    min-width: 2.5rem;
+    width: auto;
+    height: 2.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+nav > ul:last-child > li {
+    display: flex;
+    align-items: center;
+}
+
+/* Definition lists */
+dt {
+    font-weight: bold;
+}
+
+/* Post metadata */
 .post-header {
     margin-bottom: 2em;
 }
@@ -137,10 +121,6 @@ dt {
 .taxonomy a {
     color: var(--pico-primary);
     text-decoration: none;
-}
-
-.taxonomy a:hover {
-    text-decoration: underline;
 }
 
 /* Post content */
@@ -263,11 +243,6 @@ dt {
     transition: background 0.2s;
 }
 
-.toc-link:hover {
-    background: var(--pico-secondary-hover-background);
-    text-decoration: none;
-}
-
 .toc-link.active {
     background: var(--pico-secondary-background);
     font-weight: 500;
@@ -343,14 +318,12 @@ dt {
     padding: 0.5em 1em;
     background: var(--pico-secondary-background);
     border-radius: 4px;
-    text-decoration: none;
     color: inherit;
     transition: background 0.2s;
 }
 
 .chapter-nav a:hover {
     background: var(--pico-secondary-hover-background);
-    text-decoration: none;
 }
 
 .nav-prev,
@@ -411,28 +384,28 @@ dt {
 /* Code blocks - allow horizontal scroll */
 .book-content pre,
 main pre {
-    overflow-x: auto !important;
+    overflow-x: auto;
     max-width: 100%;
-    position: relative; /* For absolute positioning of copy button */
+    position: relative;
 }
 
 .book-content code,
 main code {
-    white-space: pre !important;
+    white-space: pre;
 }
 
-/* Prevent copy button from causing horizontal scroll */
+/* Copy button positioning */
 .hljs-copy-button {
     position: absolute;
     right: 0;
     top: 0;
-    transform: translateY(-100%); /* Move up outside when not hovered */
+    transform: translateY(-100%);
     transition: transform 0.2s;
 }
 
 .hljs-copy-button:hover,
 .hljs-copy-button:focus {
-    transform: translateY(0); /* Slide down from top when hovered */
+    transform: translateY(0);
 }
 
 /* Search results styling */
@@ -460,35 +433,31 @@ main code {
 }
 
 @keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 #search_results .search-results-list {
-    list-style: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 #search_results .search-results-list li {
-    margin: 0.5rem 0 !important;
-    padding: 0.5rem !important;
-    border-radius: 0.25rem !important;
-    transition: background-color 0.2s !important;
-    list-style: none !important;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s;
+    list-style: none;
 }
 
 #search_results .search-results-list li:hover {
-    background-color: var(--pico-muted-background-color, #f0f0f0) !important;
+    background-color: var(--pico-muted-background-color, #f0f0f0);
     cursor: pointer;
 }
 
 [data-theme="dark"] #search_results .search-results-list li:hover {
-    background-color: var(--pico-muted-background-color, #2a2a2a) !important;
+    background-color: var(--pico-muted-background-color, #2a2a2a);
 }
 
 #search_results .search-results-list a {
@@ -498,10 +467,6 @@ main code {
     display: block;
     width: 100%;
     height: 100%;
-}
-
-#search_results .search-results-list li:hover a {
-    text-decoration: underline;
 }
 
 #search_results .no-results {
