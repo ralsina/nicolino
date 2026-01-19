@@ -3,6 +3,9 @@
 Documentation for the Nicolino static site generator.
 
 - [Introduction](intro.md)
+- [Getting Started](getting-started.md)
+- [Directory Layout](directory-layout.md)
+- [Configuration](configuration.md)
 - [Markdown](markdown.md)
 - [Features]()
   - [Posts](posts.md)
