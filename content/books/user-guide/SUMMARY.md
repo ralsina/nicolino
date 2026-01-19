@@ -3,6 +3,7 @@
 Documentation for the Nicolino static site generator.
 
 - [Introduction](intro.md)
+- [Markdown](markdown.md)
 - [Features]()
   - [Posts](posts.md)
   - [Pages](pages.md)
@@ -28,5 +29,5 @@ Documentation for the Nicolino static site generator.
   - [new](cli/new.md)
   - [serve](cli/serve.md)
   - [validate](cli/validate.md)
-- [Themes]()
+- [Themes](themes.md)
   - [Templates](templates.md)
