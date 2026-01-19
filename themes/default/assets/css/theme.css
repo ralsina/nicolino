@@ -254,10 +254,23 @@
 .toc-summary {
     cursor: pointer;
     list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
 }
 
 .toc-summary .toc-link {
     display: inline;
+    flex: 1;
+}
+
+/* Position the details marker properly */
+.toc-summary::-webkit-details-marker {
+    flex-shrink: 0;
+}
+
+.toc-summary::marker {
+    flex-shrink: 0;
 }
 
 .toc-children {
