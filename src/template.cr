@@ -16,7 +16,18 @@ module Templates
     Crinja::Template.new(source).nodes.@children \
       .select(Crinja::AST::TagNode) \
         .select { |node| node.@name == "include" }.each { |node|
-      deps << "kv://#{node.@arguments[0].value}"
+      # Resolve included template path to full theme path
+      included_template = node.@arguments[0].value.as(String)
+      # If include path starts with "templates/", remove it and add theme path
+      # Otherwise it's a relative path, just add theme path
+      if included_template.starts_with?("templates/")
+        included_key = "#{Theme.path}/#{included_template}"
+      elsif included_template.starts_with?("themes/")
+        included_key = included_template
+      else
+        included_key = "#{Theme.templates_dir}/#{included_template}"
+      end
+      deps << "kv://#{included_key}"
     }
     deps
   end
@@ -35,13 +46,30 @@ module Templates
     end
 
     def _get_source(env : Crinja, template : String) : String
-      source = Croupier::TaskManager.get("#{template}")
-      raise "Template #{template} not found" if source.nil?
+      # Resolve template path - if it doesn't start with themes/, prefix with current theme path
+      if template.starts_with?("templates/")
+        template_key = "#{Theme.path}/#{template}"
+      elsif template.starts_with?("themes/")
+        template_key = template
+      else
+        template_key = "#{Theme.templates_dir}/#{template}"
+      end
+      source = Croupier::TaskManager.get("#{template_key}")
+      raise "Template #{template} not found (looked for #{template_key})" if source.nil?
       # FIXME should really traverse the node tree
       Crinja::Template.new(source).nodes.@children \
         .select(Crinja::AST::TagNode) \
           .select { |node| node.@name == "include" }.each { |node|
-        Croupier::TaskManager.tasks["kv://#{template}"].inputs << "kv://#{node.@arguments[0].value}"
+        # Resolve included template path to full theme path
+        included_template = node.@arguments[0].value.as(String)
+        if included_template.starts_with?("templates/")
+          included_key = "#{Theme.path}/#{included_template}"
+        elsif included_template.starts_with?("themes/")
+          included_key = included_template
+        else
+          included_key = "#{Theme.templates_dir}/#{included_template}"
+        end
+        Croupier::TaskManager.tasks["kv://#{template_key}"].inputs << "kv://#{included_key}"
       }
       source
     end

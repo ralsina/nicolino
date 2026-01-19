@@ -1,30 +1,17 @@
 {#
-  gallery.tmpl - Image gallery template
+  gallery.tmpl - Image gallery content template (minimal theme, no breadcrumbs)
 
-  Renders an image gallery with:
-  - Title with breadcrumbs (via title.tmpl include)
-  - Gallery introduction HTML content
-  - Grid of thumbnail images with lightbox links
-  - VenoBox lightbox integration for image viewing
+  Renders a gallery with:
+  - Simple title (no breadcrumbs)
+  - Gallery description/content
+  - VenoBox lightbox integration
 
   Variables:
-  - breadcrumbs, title, link: Passed to title.tmpl
-  - html: Gallery introduction/description HTML
-  - image_list: Array of image paths
+  - title: Gallery title
+  - html: Gallery content HTML
 
-  Used by: Gallery class for rendering gallery pages
+  Used by: Gallery feature for rendering gallery pages
 #}
-{% include "templates/title.tmpl" %}
+<h1 class="primary">{{title}}</h1>
 
 {{html}}
-<div class="gallery lightbox">
-{% for image in image_list %}
-  {% if loop.index0 % 5 == 0 %}
-<div class="grid">
-  {% endif %}
-    <a href="{{image}}" data-gall="myGallery"><img src="{{image | thumb_url}}" loading="lazy"></a>
-  {% if loop.index0 % 5 == 4 or loop.last %}
-</div>
-  {% endif %}
-{% endfor %}
-</div>
