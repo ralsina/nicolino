@@ -21,12 +21,12 @@ On the other hand, Nicolino has an approach you may like, need or enjoy:
 =It's batteries included.=
     It has quite a lot of features. You can look at the sidebar and check them out.
 
-    * It will render [books](/books) like gitbook or mdbook (not *quite* as well, but nicely enough )
-    * It will do [image galleries](/galleries) (not *quite* like a specialized tool)
-    * It will show [code listings](/listings) even if not like github
+    * It will render [books](books.html) like gitbook or mdbook (not *quite* as well, but nicely enough )
+    * It will do [image galleries](galleries.html) (not *quite* like a specialized tool)
+    * It will show [code listings](listings.html) even if not like github
 
     See a pattern? It's a swiss army knife. Not great at anything, but what other
-    tool lets you do those things (and [more](import.html)) plus a blog plus normal webpages?
+    tool lets you do those things (and [continuous import](cli/continuous_import.html)) plus a blog plus normal webpages?
 
 =It's pretty fast.=
     Yes, really. 20% faster than Hugo in some benchmarks. Faster or slower than
@@ -50,7 +50,7 @@ On the other hand, Nicolino has an approach you may like, need or enjoy:
 
 ## So, How do I use it?
 
-Go read the CLI docs for [init,](cli.html#init) [new,](cli.html#new) and [build](cli.html#build) ... that should be enough.
+Go read the CLI docs for [init](cli/init.html), [new](cli/new.html), and [build](cli/build.html) ... that should be enough.
 
 ## Who can I complain to?
 

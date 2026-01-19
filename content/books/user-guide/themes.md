@@ -58,8 +58,9 @@ Nicolino comes with two built-in themes:
 
 ### Default Theme
 
-The `default` theme is a full-featured theme with:
-- Two-column layout with sidebar
+The `default` theme is the theme for [the Nicolino site](https://nicolino.ralsina.me)
+so you can expect it to work pretty well and be complete.
+
 - Breadcrumb navigation
 - Responsive design
 - Support for all content types (posts, pages, books, galleries)
@@ -69,6 +70,7 @@ The `default` theme is a full-featured theme with:
 ### Minimal Theme
 
 The `minimal` theme provides:
+
 - Cleaner, simpler layout
 - Book table of contents integrated into main sidebar
 - Reduced visual chrome
@@ -138,8 +140,6 @@ If you want to customize a theme's CSS without creating a whole new theme, creat
 For example:
 
 ```bash
-# Create custom CSS file
-cat > assets/custom.css << 'EOF'
 /* Override theme colors */
 :root {
   --pico-primary: #ff6b6b;
@@ -150,7 +150,6 @@ cat > assets/custom.css << 'EOF'
 h1.primary {
   font-size: 2.5rem;
 }
-EOF
 ```
 
 This approach lets you tweak a theme's appearance while keeping the theme intact.

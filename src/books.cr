@@ -204,13 +204,15 @@ module Books
       !@path.nil?
     end
 
-    # Get the slug from path
+    # Get the slug from path (preserves directory structure)
     def slug : String
       return "" unless path = @path
-      File.basename(path).rchop(".md")
+      # Keep the full relative path without the .md extension
+      # e.g., "cli/build.md" -> "cli/build"
+      path.rchop(".md")
     end
 
-    # Get the link for this chapter
+    # Get the link for this chapter (preserves directory structure)
     def link(book_name : String) : String
       if slug.empty?
         "/books/#{book_name}/"
