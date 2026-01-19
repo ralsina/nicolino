@@ -91,6 +91,13 @@
         </nav>
       </div>
 
+      <!-- Extra Sidebar Content (e.g., Book TOC) -->
+      {% if sidebar_content %}
+      <div class="sidebar-section">
+        {{ sidebar_content }}
+      </div>
+      {% endif %}
+
       <!-- Language Switcher -->
       {% if language_links and language_links|length > 0 %}
       <div class="sidebar-section">

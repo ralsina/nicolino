@@ -308,37 +308,6 @@ main code {
     margin: 2em 0;
 }
 
-.book-sidebar {
-    width: 250px;
-    flex-shrink: 0;
-    position: sticky;
-    top: 80px;
-    max-height: calc(100vh - 100px);
-    overflow-y: auto;
-    border-left: 1px solid var(--pico-muted-border-color);
-    padding-left: 1.5em;
-}
-
-.book-sidebar-header {
-    margin-bottom: 1.5em;
-}
-
-.book-title {
-    font-family: "Michroma", sans-serif;
-    font-size: 1.1em;
-    font-weight: 400;
-    margin-bottom: 1em;
-}
-
-.book-title a {
-    color: inherit;
-    text-decoration: none;
-}
-
-.book-title a:hover {
-    color: var(--pico-primary);
-}
-
 .book-content {
     flex: 1;
     min-width: 0;
@@ -357,17 +326,25 @@ main code {
     margin-bottom: 0.5em;
 }
 
-/* Book TOC */
-.book-toc,
-.book-full-toc {
+/* Book TOC in main sidebar */
+.sidebar .book-toc {
     font-size: 0.9em;
 }
 
-.toc-item {
-    margin: 0.5em 0;
+.sidebar .book-toc .toc-title {
+    font-family: "Michroma", sans-serif;
+    font-size: 1em;
+    font-weight: 400;
+    padding: 0.5em 0;
+    margin-bottom: 0.5em;
+    color: var(--pico-primary);
 }
 
-.toc-link {
+.sidebar .book-toc .toc-item {
+    margin: 0.25em 0;
+}
+
+.sidebar .book-toc .toc-link {
     display: block;
     color: inherit;
     text-decoration: none;
@@ -375,47 +352,19 @@ main code {
     transition: color 0.2s;
 }
 
-.toc-link:hover {
+.sidebar .book-toc .toc-link:hover {
     color: var(--pico-primary);
 }
 
-.toc-link.active {
+.sidebar .book-toc .toc-link.active {
     color: var(--pico-primary);
     font-weight: 500;
 }
 
-.toc-title {
-    display: block;
-    padding: 0.5em 0;
-    font-family: "Michroma", sans-serif;
-    font-size: 1em;
-    font-weight: 400;
-}
-
-.toc-title.disabled {
-    color: var(--pico-muted-color);
-}
-
-.toc-group {
-    margin-left: 0;
-}
-
-.toc-group details {
-    margin-left: 0;
-}
-
-.toc-summary {
-    cursor: pointer;
-    list-style: none;
-}
-
-.toc-summary .toc-link {
-    display: inline;
-}
-
-.toc-children {
+.sidebar .book-toc .toc-children {
     margin-left: 1em;
     padding-left: 0.5em;
+    border-left: 2px solid var(--pico-muted-border-color);
 }
 
 /* Chapter navigation */

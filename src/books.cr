@@ -421,9 +421,10 @@ module Books
 
       page_template = Theme.template_path("page.tmpl")
       html = Render.apply_template(page_template, {
-        "content"     => content_html,
-        "title"       => page_title,
-        "breadcrumbs" => breadcrumbs,
+        "content"         => content_html,
+        "title"           => page_title,
+        "breadcrumbs"     => breadcrumbs,
+        "sidebar_content" => toc_html,
       })
 
       # Process HTML filters
