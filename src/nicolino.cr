@@ -20,6 +20,7 @@ require "./sitemap"
 require "./similarity"
 require "./taxonomies"
 require "./template"
+require "./theme_assets"
 require "croupier"
 require "live_reload"
 require "yaml"
@@ -42,6 +43,9 @@ def create_tasks
 
   # Load shortcodes to k/v store
   Sc.load_shortcodes
+
+  # Copy theme assets (always enabled)
+  ThemeAssets.enable
 
   # Enable features
   Assets.enable(features.includes?("assets"))
