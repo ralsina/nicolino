@@ -40,6 +40,7 @@ continuous_import:
 
 Templates should be placed in `templates/continuous_import/` directory and
 use Crinja (Jinja2-like) syntax. Available variables:
+
   - `{{ item.title }}` - The item title
   - `{{ item.link }}` - The item link
   - `{{ item.description }}` - The item description

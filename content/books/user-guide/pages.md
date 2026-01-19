@@ -1,5 +1,3 @@
-# Pages
-
 The Pages feature processes standalone markdown files as individual pages, without the blog post metadata and structure.
 
 ## How It Works
@@ -76,14 +74,13 @@ features:
 
 ## Example
 
-```markdown
----
+<pre><code class="language-yaml">---
 title: About
 ---
 
 # About Nicolino
 
 Nicolino is a fast static site generator written in Crystal.
-```
+</code></pre>
 
 This renders to `/about.html` with the site template wrapper.
