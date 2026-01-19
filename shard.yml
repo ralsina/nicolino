@@ -42,8 +42,8 @@ dependencies:
     github: ralsina/sixteen
   vips:
     github: naqvis/crystal-vips
-  pluto:
-    github: phenopolis/pluto
+  crimage:
+    github: naqvis/crimage
   stumpy_png:
     github: stumpycr/stumpy_png
   oplog:

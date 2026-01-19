@@ -68,10 +68,6 @@ shards:
     git: https://github.com/ralsina/oplog.git
     version: 0.1.1
 
-  pluto:
-    git: https://github.com/phenopolis/pluto.git
-    version: 1.0.1
-
   polydocopt:
     git: https://github.com/ralsina/polydocopt.git
     version: 0.1.1+git.commit.52edc8790d30e0b6d8fe941adaeb618e97cad30b
