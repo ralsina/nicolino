@@ -324,7 +324,7 @@ module Gallery
     Config.languages.keys.each do |lang|
       # Make output path language-specific to avoid conflicts
       lang_suffix = lang == "en" ? "" : ".#{lang}"
-      galleries_dir = prefix.empty? ? "galleries" : "#{prefix}/galleries"
+      galleries_dir = prefix.empty? ? "galleries" : prefix
       output_path = Path[Config.options(lang).output] / "#{galleries_dir}#{lang_suffix}" / "index.html"
 
       page_template = Theme.template_path("page.tmpl")
