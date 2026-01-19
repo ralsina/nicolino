@@ -50,7 +50,7 @@ On the other hand, Nicolino has an approach you may like, need or enjoy:
 
 ## So, How do I use it?
 
-Go read the CLI docs for [init](cli/init.html), [new](cli/new.html), and [build](cli/build.html) ... that should be enough.
+Go read [the Getting Started chapter](getting-started.html) and then maybe the CLI docs for [init](cli/init.html), [new](cli/new.html), and [build](cli/build.html) ... that should be plenty.
 
 ## Who can I complain to?
 
