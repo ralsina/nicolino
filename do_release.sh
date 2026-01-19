@@ -10,6 +10,7 @@ hace lint test
 hace static
 git add shard.yml
 git cliff --bump -o
+pre-commit run --all-files -v
 git commit -a -m "bump: Release v$VERSION"
 git tag "v$VERSION"
 git push --tags
