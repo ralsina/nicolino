@@ -1,13 +1,53 @@
+/* Set Pico CSS font variables globally to use Quicksand */
+:root {
+    --pico-font-family: "Quicksand", sans-serif;
+}
+
+/* Links inside headings should inherit heading color, not use link color */
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+    color: inherit;
+}
+
+h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover, h5 a:hover, h6 a:hover {
+    color: var(--pico-primary);
+}
+
+/* Language switcher button alignment */
+nav ul li details .language-switcher {
+    padding: 0 !important;
+    margin: 0 !important;
+    min-width: 2.5rem !important;
+    width: auto !important;
+    height: 2.25rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.2rem !important;
+}
+
+/* Ensure the details element doesn't add extra spacing */
+nav ul li details {
+    margin: 0 !important;
+    margin-bottom: 0 !important;
+    padding: 0 !important;
+}
+
+/* Align all nav items (but not the first/left ul) */
+nav > ul:last-child > li {
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Make definition list term names bold */
+dt {
+    font-weight: bold;
+}
+
 /* Collapsible breadcrumb in header */
 .breadcrumb {
     font-size: 0.9em;
     color: var(--pico-muted-color);
     display: inline-block;
-}
-
-/* Set Pico CSS font variables globally to use Quicksand */
-:root {
-    --pico-font-family: "Quicksand", sans-serif;
 }
 
 .breadcrumb a {
@@ -393,4 +433,84 @@ main code {
 .hljs-copy-button:hover,
 .hljs-copy-button:focus {
     transform: translateY(0); /* Slide down from top when hovered */
+}
+
+/* Search results styling */
+#search_results {
+    position: fixed;
+    top: 5rem;
+    right: 2rem;
+    max-width: 400px;
+    max-height: 70vh;
+    overflow-y: auto;
+    background: var(--pico-card-background-color, #fff);
+    border: 1px solid var(--pico-muted-border-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    display: none;
+}
+
+#search_results.searching::after {
+    content: "🔍";
+    display: block;
+    text-align: center;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+#search_results .search-results-list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+#search_results .search-results-list li {
+    margin: 0.5rem 0 !important;
+    padding: 0.5rem !important;
+    border-radius: 0.25rem !important;
+    transition: background-color 0.2s !important;
+    list-style: none !important;
+}
+
+#search_results .search-results-list li:hover {
+    background-color: var(--pico-muted-background-color, #f0f0f0) !important;
+    cursor: pointer;
+}
+
+[data-theme="dark"] #search_results .search-results-list li:hover {
+    background-color: var(--pico-muted-background-color, #2a2a2a) !important;
+}
+
+#search_results .search-results-list a {
+    text-decoration: none;
+    color: var(--pico-primary);
+    font-weight: 500;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#search_results .search-results-list li:hover a {
+    text-decoration: underline;
+}
+
+#search_results .no-results {
+    text-align: center;
+    color: var(--pico-muted-color);
+    margin: 0;
+}
+
+[data-theme="dark"] #search_results {
+    background: var(--pico-card-background-color, #1a1a1a);
+    border-color: var(--pico-muted-border-color, #333);
 }

@@ -1,4 +1,5 @@
 require "./utils"
+require "./theme"
 require "tartrazine"
 require "lexbor"
 
@@ -113,11 +114,14 @@ module Listings
   def self.render_index(listings : Array(Listing))
     base_path = Path[Config.options.output]
     output_path = (base_path / "listings" / "index.html").normalize.to_s
+    page_template = Theme.template_path("page.tmpl")
+    title_template = Theme.template_path("title.tmpl")
+    item_list_template = Theme.template_path("item_list.tmpl")
 
     Croupier::Task.new(
       id: "listings-index",
       output: output_path,
-      inputs: ["conf.yml", "kv://templates/item_list.tmpl", "kv://templates/title.tmpl", "kv://templates/page.tmpl"],
+      inputs: ["conf.yml", "kv://#{item_list_template}", "kv://#{title_template}", "kv://#{page_template}"],
       mergeable: false
     ) do
       Log.info { "👉 #{output_path}" }
@@ -126,7 +130,7 @@ module Listings
       breadcrumbs = [{name: "Home", link: "/"}, {name: "Code Listings", link: "/listings/"}] of NamedTuple(name: String, link: String)
 
       # Include title.tmpl which handles breadcrumbs
-      title_html = Templates.environment.get_template("templates/title.tmpl").render({
+      title_html = Templates.environment.get_template(title_template).render({
         "title"       => "Code Listings",
         "link"        => "/listings/",
         "breadcrumbs" => breadcrumbs,
@@ -142,14 +146,14 @@ module Listings
       }
 
       # Render the item list template
-      content = Templates.environment.get_template("templates/item_list.tmpl").render({
+      content = Templates.environment.get_template(item_list_template).render({
         "title"       => "Code Listings",
         "description" => "A collection of source code files with syntax highlighting.",
         "items"       => items,
       })
 
       # Apply to page template
-      html = Render.apply_template("templates/page.tmpl", {
+      html = Render.apply_template(page_template, {
         "content"     => title_html + content,
         "title"       => "Code Listings",
         "breadcrumbs" => breadcrumbs,
@@ -171,11 +175,14 @@ module Listings
     # Use full filename with extension for output to avoid conflicts
     output_filename = File.basename(relative_path) + ".html"
     output_path = (base_path / File.dirname(relative_path) / output_filename).normalize.to_s
+    page_template = Theme.template_path("page.tmpl")
+    title_template = Theme.template_path("title.tmpl")
+    listing_template = Theme.template_path("listing.tmpl")
 
     Croupier::Task.new(
       id: "listing:#{listing.source}",
       output: output_path,
-      inputs: listing.dependencies + ["kv://templates/listing.tmpl", "kv://templates/title.tmpl", "kv://templates/page.tmpl"],
+      inputs: listing.dependencies + ["kv://#{listing_template}", "kv://#{title_template}", "kv://#{page_template}"],
       mergeable: false
     ) do
       Log.info { "👉 #{output_path}" }
@@ -184,7 +191,7 @@ module Listings
       breadcrumbs = [{name: "Home", link: "/"}, {name: "Code Listings", link: "/listings/"}] of NamedTuple(name: String, link: String)
 
       # Include title.tmpl which handles breadcrumbs
-      title_html = Templates.environment.get_template("templates/title.tmpl").render({
+      title_html = Templates.environment.get_template(title_template).render({
         "title"       => listing.title,
         "link"        => "",
         "breadcrumbs" => breadcrumbs,
@@ -210,14 +217,14 @@ module Listings
       end
 
       # Render the listing template
-      rendered = Templates.environment.get_template("templates/listing.tmpl").render({
+      rendered = Templates.environment.get_template(listing_template).render({
         "title"       => listing.title,
         "code"        => highlighted,
         "raw_content" => HTML.escape(listing.content),
       })
 
       # Apply to page template
-      html = Render.apply_template("templates/page.tmpl", {
+      html = Render.apply_template(page_template, {
         "content"        => title_html + rendered,
         "title"          => listing.title,
         "no_highlightjs" => true,

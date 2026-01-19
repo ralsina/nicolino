@@ -1,6 +1,7 @@
 require "./books/summary_parser"
 require "./folder_indexes"
 require "./sc"
+require "./theme"
 require "json"
 require "shortcodes"
 require "toml"
@@ -348,13 +349,17 @@ module Books
   )
     output_path = Path[Config.options.output] / "books" / book.name / "#{entry.slug}.html"
 
+    page_template = Theme.template_path("page.tmpl")
+    title_template = Theme.template_path("title.tmpl")
+    book_chapter_template = Theme.template_path("book_chapter.tmpl")
+
     inputs = [
       source_file,
       summary_path,
       "conf.yml",
-      "kv://templates/page.tmpl",
-      "kv://templates/title.tmpl",
-    ] + Templates.get_deps("templates/book_chapter.tmpl")
+      "kv://#{page_template}",
+      "kv://#{title_template}",
+    ] + Templates.get_deps(book_chapter_template)
 
     Croupier::Task.new(
       id: "book/#{book.name}/#{entry.slug}",
@@ -380,7 +385,8 @@ module Books
       ] of NamedTuple(name: String, link: String)
 
       # Render chapter with book template
-      template = Templates.environment.get_template("templates/book_chapter.tmpl")
+      book_chapter_template = Theme.template_path("book_chapter.tmpl")
+      template = Templates.environment.get_template(book_chapter_template)
 
       toc_html = render_toc_html(book.chapters, entry, book.name)
 
@@ -402,7 +408,8 @@ module Books
       page_title = entry.formatted_number.empty? ? entry.title : "#{entry.formatted_number} #{entry.title}"
 
       # Include title.tmpl which handles breadcrumbs
-      title_html = Templates.environment.get_template("templates/title.tmpl").render({
+      title_template = Theme.template_path("title.tmpl")
+      title_html = Templates.environment.get_template(title_template).render({
         "title"       => page_title,
         "link"        => entry.link(book.name),
         "breadcrumbs" => breadcrumbs,
@@ -412,7 +419,8 @@ module Books
       # Combine title HTML with content
       content_html = title_html + html
 
-      html = Render.apply_template("templates/page.tmpl", {
+      page_template = Theme.template_path("page.tmpl")
+      html = Render.apply_template(page_template, {
         "content"     => content_html,
         "title"       => page_title,
         "breadcrumbs" => breadcrumbs,
@@ -575,12 +583,16 @@ module Books
   private def self.create_book_index_task(book : Book, book_dir : String)
     output_path = Path[Config.options.output] / "books" / book.name / "index.html"
 
+    page_template = Theme.template_path("page.tmpl")
+    title_template = Theme.template_path("title.tmpl")
+    book_index_template = Theme.template_path("book_index.tmpl")
+
     inputs = [
       File.join(book_dir, "SUMMARY.md"),
       "conf.yml",
-      "kv://templates/page.tmpl",
-      "kv://templates/title.tmpl",
-    ] + Templates.get_deps("templates/book_index.tmpl")
+      "kv://#{page_template}",
+      "kv://#{title_template}",
+    ] + Templates.get_deps(book_index_template)
 
     Croupier::Task.new(
       id: "book/#{book.name}/index",
@@ -598,14 +610,16 @@ module Books
       ] of NamedTuple(name: String, link: String)
 
       # Include title.tmpl which handles breadcrumbs
-      title_html = Templates.environment.get_template("templates/title.tmpl").render({
+      title_template = Theme.template_path("title.tmpl")
+      title_html = Templates.environment.get_template(title_template).render({
         "title"       => book.title,
         "link"        => "/books/#{book.name}/",
         "breadcrumbs" => breadcrumbs,
         "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
       })
 
-      template = Templates.environment.get_template("templates/book_index.tmpl")
+      book_index_template = Theme.template_path("book_index.tmpl")
+      template = Templates.environment.get_template(book_index_template)
 
       # Find first chapter with content for the "Next" button
       first_chapter_entry = find_first_chapter(book.chapters)
@@ -622,7 +636,8 @@ module Books
 
       content = title_html + template.render(ctx)
 
-      html = Render.apply_template("templates/page.tmpl", {
+      page_template = Theme.template_path("page.tmpl")
+      html = Render.apply_template(page_template, {
         "content"     => content,
         "title"       => book.title,
         "breadcrumbs" => breadcrumbs,
@@ -640,10 +655,14 @@ module Books
 
     output_path = Path[Config.options.output] / "books" / "index.html"
 
+    page_template = Theme.template_path("page.tmpl")
+    title_template = Theme.template_path("title.tmpl")
+    item_list_template = Theme.template_path("item_list.tmpl")
+
     Croupier::Task.new(
       id: "books/index",
       output: output_path.to_s,
-      inputs: ["conf.yml", "kv://templates/page.tmpl", "kv://templates/title.tmpl"] + Templates.get_deps("templates/item_list.tmpl"),
+      inputs: ["conf.yml", "kv://#{page_template}", "kv://#{title_template}"] + Templates.get_deps(item_list_template),
       mergeable: false
     ) do
       Log.info { "👉 #{output_path}" }
@@ -652,14 +671,16 @@ module Books
       breadcrumbs = [{name: "Home", link: "/"}, {name: "Books", link: "/books/"}] of NamedTuple(name: String, link: String)
 
       # Include title.tmpl which handles breadcrumbs
-      title_html = Templates.environment.get_template("templates/title.tmpl").render({
+      title_template = Theme.template_path("title.tmpl")
+      title_html = Templates.environment.get_template(title_template).render({
         "title"       => "Books",
         "link"        => "/books/",
         "breadcrumbs" => breadcrumbs,
         "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
       })
 
-      template = Templates.environment.get_template("templates/item_list.tmpl")
+      item_list_template = Theme.template_path("item_list.tmpl")
+      template = Templates.environment.get_template(item_list_template)
 
       items = books.map do |book|
         {
@@ -676,7 +697,8 @@ module Books
         "items"       => items,
       })
 
-      html = Render.apply_template("templates/page.tmpl", {
+      page_template = Theme.template_path("page.tmpl")
+      html = Render.apply_template(page_template, {
         "content"     => title_html + content,
         "title"       => "Books",
         "breadcrumbs" => breadcrumbs,

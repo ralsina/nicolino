@@ -90,19 +90,19 @@ DOC
   # Files that go in templates/
   class TemplateFiles < Expandable
     @@path = "templates"
-    bake_folder "templates", "."
+    bake_folder "../../themes/default/templates"
   end
 
   # Files that go in shortcodes/
   class ShortcodesFiles < Expandable
     @@path = "shortcodes"
-    bake_folder "shortcodes", "."
+    bake_folder "../../shortcodes"
   end
 
   # Files that go in assets/
   class AssetsFiles < Expandable
     @@path = "assets"
-    bake_folder "assets", "."
+    bake_folder "../../themes/default/assets"
   end
 
   # Files that go in the root of the site

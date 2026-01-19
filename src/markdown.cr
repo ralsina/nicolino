@@ -2,6 +2,7 @@ require "./html_filters"
 require "./sc"
 require "./similarity"
 require "./taxonomies"
+require "./theme"
 require "cr-discount"
 require "cronic"
 require "RSS"
@@ -251,7 +252,7 @@ module Markdown
     # Path for the `Templates::Template` this post should be rendered with
     def template(lang = nil)
       lang ||= Locale.language
-      @metadata[lang].fetch("template", "templates/post.tmpl").to_s
+      @metadata[lang].fetch("template", Theme.template_path("post.tmpl")).to_s
     end
 
     # Render the markdown HTML into the right template for the fragment
@@ -437,7 +438,8 @@ module Markdown
 
     # List of all files and kv store items this post uses
     def dependencies : Array(String)
-      result = ["conf.yml", "kv://templates/page.tmpl"]
+      page_template = Theme.template_path("page.tmpl")
+      result = ["conf.yml", "kv://#{page_template}"]
       result << source
       result << "kv://#{template}"
 
@@ -489,7 +491,7 @@ module Markdown
               "breadcrumbs"    => post.breadcrumbs(lang),
               "language_links" => post.language_links(lang),
             }
-            html = Render.apply_template("templates/page.tmpl", template_vars)
+            html = Render.apply_template(Theme.template_path("page.tmpl"), template_vars)
             doc = Lexbor::Parser.new(html)
             doc = HtmlFilters.make_links_relative(doc, post.link(lang))
             HtmlFilters.fix_code_classes(doc).to_html
@@ -523,10 +525,12 @@ module Markdown
   # Create an index page out of a list of posts, save in output
   def self.render_index(posts, output, title = nil, extra_inputs = [] of String, extra_feed = nil, lang = nil)
     lang ||= Locale.language
+    index_template = Theme.template_path("index.tmpl")
+    page_template = Theme.template_path("page.tmpl")
     inputs = [
       "conf.yml",
-      "kv://templates/index.tmpl",
-      "kv://templates/page.tmpl",
+      "kv://#{index_template}",
+      "kv://#{page_template}",
     ] + posts.map(&.source) + posts.map(&.template) + extra_inputs
     inputs = inputs.uniq
     Croupier::Task.new(
@@ -543,7 +547,7 @@ module Markdown
       has_more = sorted_posts.size > 100
       display_posts = sorted_posts.first(100)
 
-      content = Templates.environment.get_template("templates/index.tmpl").render(
+      content = Templates.environment.get_template(index_template).render(
         {
           "posts"    => display_posts.map(&.value(lang)),
           "has_more" => has_more,
@@ -553,7 +557,7 @@ module Markdown
       # Get alternate language versions of this index page
       language_links = calculate_index_language_links(output, lang)
 
-      html = Render.apply_template("templates/page.tmpl",
+      html = Render.apply_template(page_template,
         {
           "content"        => content,
           "title"          => title,

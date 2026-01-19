@@ -1,4 +1,5 @@
 require "./markdown"
+require "./theme"
 require "json"
 
 # Create automatic image galleries
@@ -52,7 +53,7 @@ module Gallery
     def load(lang = nil)
       lang ||= Locale.language
       super(lang)
-      @metadata[lang]["template"] = "templates/gallery.tmpl"
+      @metadata[lang]["template"] = Theme.template_path("gallery.tmpl")
     end
 
     # Generate hierarchical breadcrumbs showing full gallery path
@@ -244,6 +245,7 @@ module Gallery
     Config.languages.keys.each do |lang|
       all_galleries.each do |post|
         basedir = File.dirname(post.source)
+        page_template = Theme.template_path("page.tmpl")
         Croupier::Task.new(
           id: "gallery",
           output: post.output(lang),
@@ -251,7 +253,7 @@ module Gallery
             "conf.yml",
             post.source(lang),
             "kv://#{post.template(lang)}",
-            "kv://templates/page.tmpl",
+            "kv://#{page_template}",
           ] + post.@image_list.map { |i| "#{basedir}/#{i}" },
           mergeable: false) do
           # Need to refresh post contents in auto mode
@@ -263,7 +265,8 @@ module Gallery
             "breadcrumbs"    => post.breadcrumbs(lang),
             "language_links" => post.language_links(lang),
           }
-          html = Render.apply_template("templates/page.tmpl", template_context)
+          page_template = Theme.template_path("page.tmpl")
+          html = Render.apply_template(page_template, template_context)
           doc = Lexbor::Parser.new(html)
           doc = HtmlFilters.make_links_relative(doc, post.output(lang))
           doc.to_html
@@ -324,10 +327,13 @@ module Gallery
       galleries_dir = prefix.empty? ? "galleries" : "#{prefix}/galleries"
       output_path = Path[Config.options(lang).output] / "#{galleries_dir}#{lang_suffix}" / "index.html"
 
+      page_template = Theme.template_path("page.tmpl")
+      title_template = Theme.template_path("title.tmpl")
+
       Croupier::Task.new(
         id: "galleries_index",
         output: output_path.to_s,
-        inputs: ["conf.yml", "kv://templates/page.tmpl", "kv://templates/title.tmpl"],
+        inputs: ["conf.yml", "kv://#{page_template}", "kv://#{title_template}"],
         mergeable: false
       ) do
         Log.info { "👉 #{output_path}" }
@@ -337,7 +343,8 @@ module Gallery
         breadcrumbs = [{name: "Home", link: "/"}, {name: "Galleries", link: galleries_link}] of NamedTuple(name: String, link: String)
 
         # Include title.tmpl which handles breadcrumbs
-        title_html = Templates.environment.get_template("templates/title.tmpl").render({
+        title_template = Theme.template_path("title.tmpl")
+        title_html = Templates.environment.get_template(title_template).render({
           "title"       => "Galleries",
           "link"        => galleries_link,
           "breadcrumbs" => breadcrumbs,
@@ -353,13 +360,15 @@ module Gallery
         end
 
         # Render the item list template
-        content = Templates.environment.get_template("templates/item_list.tmpl").render({
+        item_list_template = Theme.template_path("item_list.tmpl")
+        content = Templates.environment.get_template(item_list_template).render({
           "title"       => "Galleries",
           "description" => "A collection of image galleries.",
           "items"       => items,
         })
 
-        html = Render.apply_template("templates/page.tmpl", {
+        page_template = Theme.template_path("page.tmpl")
+        html = Render.apply_template(page_template, {
           "content"     => title_html + content,
           "title"       => "Galleries",
           "breadcrumbs" => breadcrumbs,

@@ -1,4 +1,5 @@
 require "sixteen"
+require "./theme"
 
 module Base16
   extend self
@@ -10,10 +11,11 @@ module Base16
   end
 
   def self.render_base16
+    base16_template = Theme.template_path("base16.tmpl")
     Croupier::Task.new(
       id: "base16",
       output: (Path[Config.options.output] / "css" / "color_scheme.css").to_s,
-      inputs: ["conf.yml"] + Templates.get_deps("templates/base16.tmpl"),
+      inputs: ["conf.yml"] + Templates.get_deps(base16_template),
       mergeable: false
     ) do
       scheme = Config.get("site.color_scheme").as_s
@@ -28,7 +30,7 @@ module Base16
         "dark"  => dark_theme.context("_"),
       }
 
-      Templates.environment.get_template("templates/base16.tmpl").render(
+      Templates.environment.get_template(base16_template).render(
         color_context)
     end
   end

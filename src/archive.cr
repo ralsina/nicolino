@@ -1,4 +1,5 @@
 require "./markdown"
+require "./theme"
 require "./utils"
 require "lexbor"
 
@@ -69,13 +70,17 @@ module Archive
       lang_suffix = lang == "en" ? "" : ".#{lang}"
       output_path = (base_path / "archive#{lang_suffix}" / "index.html").normalize.to_s
 
+      archive_template = Theme.template_path("archive.tmpl")
+      title_template = Theme.template_path("title.tmpl")
+      page_template = Theme.template_path("page.tmpl")
+
       Croupier::Task.new(
         id: "archive",
         output: output_path,
         inputs: dated_posts.flat_map(&.dependencies) + [
-          "kv://templates/archive.tmpl",
-          "kv://templates/title.tmpl",
-          "kv://templates/page.tmpl",
+          "kv://#{archive_template}",
+          "kv://#{title_template}",
+          "kv://#{page_template}",
         ],
         mergeable: false
       ) do
@@ -86,7 +91,8 @@ module Archive
         breadcrumbs = [{name: "Home", link: "/"}, {name: "Archive", link: archive_link}] of NamedTuple(name: String, link: String)
 
         # Include title.tmpl which handles breadcrumbs
-        title_html = Templates.environment.get_template("templates/title.tmpl").render({
+        title_template = Theme.template_path("title.tmpl")
+        title_html = Templates.environment.get_template(title_template).render({
           "title"       => "Archive",
           "link"        => archive_link,
           "breadcrumbs" => breadcrumbs,
@@ -94,13 +100,15 @@ module Archive
         })
 
         # Render the archive template
-        rendered = Templates.environment.get_template("templates/archive.tmpl").render({
+        archive_template = Theme.template_path("archive.tmpl")
+        rendered = Templates.environment.get_template(archive_template).render({
           "years"       => years_data,
           "latest_year" => latest_year,
         })
 
         # Apply to page template
-        html = Render.apply_template("templates/page.tmpl", {
+        page_template = Theme.template_path("page.tmpl")
+        html = Render.apply_template(page_template, {
           "content"     => title_html + rendered,
           "title"       => "Archive",
           "breadcrumbs" => breadcrumbs,

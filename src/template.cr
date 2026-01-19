@@ -1,4 +1,5 @@
 require "crinja"
+require "./theme"
 
 module Templates
   extend self
@@ -46,12 +47,12 @@ module Templates
     end
   end
 
-  # Load templates from templates/ and put them in the k/v store
+  # Load templates from theme directory and put them in the k/v store
   def self.load_templates
     ensure_templates
     ensure_assets
     Log.debug { "Scanning Templates" }
-    Dir.glob("templates/*.tmpl").each do |template|
+    Dir.glob("#{Theme.templates_dir}/*.tmpl").each do |template|
       Croupier::Task.new(
         id: "template",
         inputs: [template] + get_deps(template),
@@ -66,10 +67,10 @@ module Templates
     end
   end
 
-  # Ensure all baked-in assets exist in the assets/ directory
+  # Ensure all baked-in assets exist in the theme assets/ directory
   # If any are missing, extract them from the baked filesystem
   def self.ensure_assets
-    assets_dir = Path["assets"]
+    assets_dir = Path[Theme.assets_dir]
     FileUtils.mkdir_p(assets_dir) unless Dir.exists?(assets_dir)
 
     begin
@@ -91,10 +92,10 @@ module Templates
     end
   end
 
-  # Ensure all baked-in templates exist in the templates/ directory
+  # Ensure all baked-in templates exist in the theme templates/ directory
   # If any are missing, extract them from the baked filesystem
   def self.ensure_templates
-    templates_dir = Path["templates"]
+    templates_dir = Path[Theme.templates_dir]
     FileUtils.mkdir_p(templates_dir) unless Dir.exists?(templates_dir)
 
     begin
@@ -163,10 +164,10 @@ module Templates
 
       # Get working directory - default to current dir
       work_dir = if args["cd"]?
-                    args["cd"].to_s
-                  else
-                    "."
-                  end
+                   args["cd"].to_s
+                 else
+                   "."
+                 end
 
       output = IO::Memory.new
       error = IO::Memory.new

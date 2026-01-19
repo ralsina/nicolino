@@ -1,4 +1,5 @@
 require "./utils"
+require "./theme"
 
 # FIXME: Get rid of the named tuples
 
@@ -125,6 +126,9 @@ module Taxonomies
         lang_suffix = lang == "en" ? "" : ".#{lang}"
         base_path = Path[Config.options(lang).output] / Path["#{@path[lang].chomp('/')}#{lang_suffix}"]
         output = (base_path / "index.html").to_s
+        page_template = Theme.template_path("page.tmpl")
+        title_template = Theme.template_path("title.tmpl")
+        taxonomy_template = Theme.template_path("taxonomy.tmpl")
 
         # Create breadcrumbs for taxonomy index
         taxonomy_link = Utils.path_to_link(
@@ -136,23 +140,23 @@ module Taxonomies
         ] of NamedTuple(name: String, link: String)
 
         # Include title.tmpl which handles breadcrumbs
-        title_html = Templates.environment.get_template("templates/title.tmpl").render({
+        title_html = Templates.environment.get_template(title_template).render({
           "title"       => @title[lang],
           "link"        => Utils.path_to_link(Path[Config.options(lang).output] / "#{@path[lang]}/"),
           "breadcrumbs" => breadcrumbs,
           "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
         })
 
-        rendered = Templates.environment.get_template("templates/taxonomy.tmpl").render({"taxonomy" => value(lang)})
+        rendered = Templates.environment.get_template(taxonomy_template).render({"taxonomy" => value(lang)})
 
         Croupier::Task.new(
           id: "taxonomy",
           output: output,
-          inputs: @posts.flat_map(&.dependencies) + ["kv://templates/taxonomy.tmpl", "kv://templates/title.tmpl"],
+          inputs: @posts.flat_map(&.dependencies) + ["kv://#{taxonomy_template}", "kv://#{title_template}"],
           mergeable: false
         ) do
           Log.info { "👉 #{output}" }
-          html = Render.apply_template("templates/page.tmpl",
+          html = Render.apply_template(page_template,
             {
               "content"     => title_html + rendered,
               "title"       => @title[lang],

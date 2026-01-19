@@ -29,6 +29,7 @@ module Config
     property language = "en"
     property verbosity = 3
     property continuous_import_templates = "user_templates"
+    property theme = "default"
   end
 
   @@options = Hash(String, Options).new

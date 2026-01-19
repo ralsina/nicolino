@@ -24,7 +24,8 @@ module Sc
     if sc.is_inline?
       Crinja.render(sc.data, context)
     else
-      template = Templates.environment.get_template("shortcodes/#{sc.name}.tmpl")
+      template_path = "shortcodes/#{sc.name}.tmpl"
+      template = Templates.environment.get_template(template_path)
       template.render(context)
     end
   rescue ex : Crinja::TemplateNotFoundError

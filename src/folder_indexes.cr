@@ -1,4 +1,5 @@
 require "./markdown"
+require "./theme"
 
 module FolderIndexes
   # Registry for feature modules to register their output folders
@@ -118,7 +119,8 @@ module FolderIndexes
         folder_posts = posts_by_prefix
         return "" if folder_posts.empty?
 
-        Templates.environment.get_template("templates/index.tmpl").render({
+        index_template = Theme.template_path("index.tmpl")
+        Templates.environment.get_template(index_template).render({
           "posts" => folder_posts.map(&.value),
         })
       else
@@ -126,7 +128,8 @@ module FolderIndexes
         contents = immediate_contents
 
         # Include title.tmpl which handles breadcrumbs
-        title_html = Templates.environment.get_template("templates/title.tmpl").render({
+        title_template = Theme.template_path("title.tmpl")
+        title_html = Templates.environment.get_template(title_template).render({
           "title"       => folder_title,
           "link"        => "/#{@output.to_s.sub(/\.html$/, "")}",
           "breadcrumbs" => breadcrumbs,
@@ -269,7 +272,8 @@ module FolderIndexes
         # All markdown posts are dependencies since we use the global registry
         all_posts = Markdown::File.posts.map(&.last.source)
 
-        inputs = ["kv://templates/folder_index.tmpl", "conf.yml"] + all_posts
+        folder_index_template = Theme.template_path("folder_index.tmpl")
+        inputs = ["kv://#{folder_index_template}", "conf.yml"] + all_posts
         # Add language suffix to output path
         output_path = index.@output.to_s.sub(/\.html$/, "#{lang_suffix}.html")
         output = (out_path / output_path).to_s
@@ -282,7 +286,8 @@ module FolderIndexes
           mergeable: false
         ) do
           Log.info { "👉 #{output}" }
-          html = Render.apply_template("templates/page.tmpl",
+          page_template = Theme.template_path("page.tmpl")
+          html = Render.apply_template(page_template,
             {"content" => index.rendered, "title" => index.folder_title, "breadcrumbs" => index.breadcrumbs})
           doc = Lexbor::Parser.new(html)
           doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))
