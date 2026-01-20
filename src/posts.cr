@@ -34,14 +34,26 @@ module Posts
     # Render posts with require_date = true
     Markdown.render(posts, require_date: true)
 
-    # Render RSS feed
-    rss_output = Path[Config.options.output] / "rss.xml"
-    site_title = Config.get("site.title").as_s
-    Markdown.render_rss(
-      posts[..10],
-      rss_output,
-      site_title,
-    )
+    # Render RSS feeds for each language
+    Config.languages.keys.each do |lang|
+      # Language suffix for non-English feeds
+      lang_suffix = lang == "en" ? "" : ".#{lang}"
+      rss_output = Path[Config.options(lang).output] / "rss#{lang_suffix}.xml"
+
+      # Get language-specific site title
+      site_title = begin
+        Config.languages[lang].as_h["site"].as_h["title"].as_s
+      rescue
+        Config.get("site.title").as_s
+      end
+
+      Markdown.render_rss(
+        posts,
+        rss_output,
+        site_title,
+        lang: lang,
+      )
+    end
 
     posts
   end

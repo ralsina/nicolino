@@ -25,7 +25,11 @@
   <meta name="description" content="{{ site_description }}" />
   <link rel="shortcut icon" href="/favicon.ico" />
   <link rel="canonical" href="{{ canonical_url }}" />
+  {% if main_feed %}
+  <link rel="alternate" type="application/rss+xml" href="{{ main_feed.link }}" title="{{ main_feed.title }}" />
+  {% else %}
   <link rel="alternate" type="application/rss+xml" href="/rss.xml" title="RSS Feed" />
+  {% endif %}
   {% if extra_feed %}
   <link rel="alternate" type="application/rss+xml" href="{{ extra_feed.link }}" title="{{ extra_feed.title }}" />
   {% endif %}

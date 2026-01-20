@@ -173,11 +173,12 @@ module Taxonomies
           title = Crinja.render(@term_title[lang], {
             "term" => term.value,
           })
-          # Render term RSS for each term
+          # Render term RSS for each term with language context
           Markdown.render_rss(
             term.@posts[..10],
             feed_path,
             title,
+            lang: lang,
           )
 
           # Render term index for each term
@@ -186,6 +187,7 @@ module Taxonomies
             (base_path / "#{Utils.slugify(term.@name)}/index.html").normalize.to_s,
             title,
             extra_feed: {link: Utils.path_to_link(feed_path), title: "#{title} RSS"},
+            main_feed: nil, # Taxonomy term pages don't get main feed
             lang: lang,
           )
         end

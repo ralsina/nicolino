@@ -523,7 +523,7 @@ module Markdown
   end
 
   # Create an index page out of a list of posts, save in output
-  def self.render_index(posts, output, title = nil, extra_inputs = [] of String, extra_feed = nil, lang = nil)
+  def self.render_index(posts, output, title = nil, extra_inputs = [] of String, extra_feed = nil, main_feed = nil, lang = nil)
     lang ||= Locale.language
     index_template = Theme.template_path("index.tmpl")
     page_template = Theme.template_path("page.tmpl")
@@ -563,6 +563,7 @@ module Markdown
           "title"          => title,
           "noindex"        => true,
           "extra_feed"     => extra_feed,
+          "main_feed"      => main_feed,
           "language_links" => language_links,
         })
       doc = Lexbor::Parser.new(html)
@@ -612,7 +613,8 @@ module Markdown
   end
 
   # Create a RSS file out of posts with title, save in output
-  def self.render_rss(posts, output, title)
+  def self.render_rss(posts, output, title, lang = nil)
+    lang ||= Locale.language
     inputs = ["conf.yml"] + posts.map(&.source)
 
     Croupier::Task.new(
@@ -625,9 +627,9 @@ module Markdown
       feed = RSS.new title: title
       posts.each do |post|
         feed.item(
-          title: post.title,
-          description: post.summary,
-          link: post.link,
+          title: post.title(lang),
+          description: post.summary(lang),
+          link: post.link(lang),
           pubDate: post.date.to_s,
         )
       end

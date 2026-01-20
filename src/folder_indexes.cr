@@ -264,7 +264,25 @@ module FolderIndexes
         output = (out_path / output_path).to_s
         title = index.@path.basename.to_s.capitalize
 
-        Markdown.render_index(folder_posts, output, title, lang: lang)
+        # Create RSS feed for this folder
+        feed_path = output.sub(/\.html$/, ".rss")
+        feed_title = "#{title} - RSS"
+
+        Markdown.render_rss(
+          folder_posts[..10],
+          feed_path,
+          feed_title,
+          lang: lang,
+        )
+
+        Markdown.render_index(
+          folder_posts,
+          output,
+          title,
+          extra_feed: {link: Utils.path_to_link(feed_path), title: feed_title},
+          main_feed: nil, # Folder indexes don't get main feed
+          lang: lang,
+        )
       end
 
       # Then, render other folders using simple template
