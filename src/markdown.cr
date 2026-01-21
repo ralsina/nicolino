@@ -679,7 +679,6 @@ module Markdown
       inputs: inputs,
       mergeable: false
     ) do
-      Log.info { "👉 #{output}" }
       feed = RSS.new title: title
       posts.each do |post|
         feed.item(

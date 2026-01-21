@@ -25,6 +25,12 @@ module Posts
     posts = Markdown.read_all(content_post_path)
     posts += HTML.read_all(content_post_path)
     posts += Pandoc.read_all(content_post_path) if features.includes?("pandoc")
+
+    # Load dates for all posts before sorting (dates are lazy-loaded)
+    posts.each do |post|
+      post.date  # Force date parsing
+    end
+
     posts.sort!
 
     Log.info { "✓ Found #{posts.size} post#{posts.size == 1 ? "" : "s"}" }
@@ -38,7 +44,7 @@ module Posts
     # Render posts with require_date = true and require_title = true
     Markdown.render(posts, require_date: true, require_title: true)
 
-    # Render RSS feeds for each language
+    # Render RSS feeds for each language (only 20 most recent posts)
     Config.languages.keys.each do |lang|
       # Language suffix for non-English feeds
       lang_suffix = lang == "en" ? "" : ".#{lang}"
@@ -51,8 +57,11 @@ module Posts
         Config.get("site.title").as_s
       end
 
+      # Limit RSS to 20 most recent posts
+      rss_posts = posts.first(20)
+
       Markdown.render_rss(
-        posts,
+        rss_posts,
         rss_output,
         site_title,
         lang: lang,
