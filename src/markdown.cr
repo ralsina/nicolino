@@ -519,11 +519,16 @@ module Markdown
   #
   # posts is an Array of `Markdown::File`
   # if require_date is true, posts *must* have a date
-  def self.render(posts, require_date = true)
+  # if require_title is true, posts *must* have a title
+  def self.render(posts, require_date = true, require_title = false)
     Config.languages.keys.each do |lang|
       posts.each do |post|
         if require_date && post.date == nil
           Log.error { "Error: #{post.source lang} has no date" }
+          next
+        end
+        if require_title && post.title(lang).empty?
+          Log.error { "Error: #{post.source lang} has no title" }
           next
         end
         Croupier::Task.new(

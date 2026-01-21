@@ -13,6 +13,8 @@ module Posts
   def self.enable(is_enabled : Bool, content_post_path : Path, feature_set : Set(Totem::Any)) : Array(Markdown::File)?
     return nil unless is_enabled
 
+    Log.info { "📖 Scanning for posts..." }
+
     # Note: Posts are already registered by nicolino new command,
     # but features can register additional types here if needed
 
@@ -25,14 +27,16 @@ module Posts
     posts += Pandoc.read_all(content_post_path) if features.includes?("pandoc")
     posts.sort!
 
+    Log.info { "✓ Found #{posts.size} post#{posts.size == 1 ? "" : "s"}" }
+
     # Calculate MinHash signatures for similarity feature
     # This must happen before rendering so related_posts are available
     if features.includes?("similarity")
       Similarity.create_tasks(posts)
     end
 
-    # Render posts with require_date = true
-    Markdown.render(posts, require_date: true)
+    # Render posts with require_date = true and require_title = true
+    Markdown.render(posts, require_date: true, require_title: true)
 
     # Render RSS feeds for each language
     Config.languages.keys.each do |lang|
