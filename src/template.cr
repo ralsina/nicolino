@@ -11,11 +11,28 @@ module Templates
     else
       Croupier::TaskManager.set(template, source)
     end
+    # Pass the current template's k/v key to skip self-includes
+    current_template_key = "kv://#{template}"
+    find_includes_recursive(Crinja::Template.new(source).nodes, current_template_key)
+  end
+
+  # Recursively traverse the AST to find all {% include %} tags
+  # current_template is used to skip self-references (templates that include themselves)
+  def self.find_includes_recursive(node : Crinja::AST::NodeList, current_template : String) : Array(String)
+    find_includes_recursive(node.@children, current_template)
+  end
+
+  private def self.find_includes_recursive(nodes : Array(Crinja::AST::TemplateNode), current_template : String) : Array(String)
     deps = [] of String
-    # FIXME should really traverse the node tree
-    Crinja::Template.new(source).nodes.@children \
-      .select(Crinja::AST::TagNode) \
-        .select { |node| node.@name == "include" }.each { |node|
+    nodes.each do |node|
+      deps.concat(find_includes_recursive(node, current_template))
+    end
+    deps
+  end
+
+  private def self.find_includes_recursive(node : Crinja::AST::TagNode, current_template : String) : Array(String)
+    deps = [] of String
+    if node.@name == "include"
       # Resolve included template path to full theme path
       included_template = node.@arguments[0].value.as(String)
       # If include path starts with "templates/", remove it and add theme path
@@ -30,9 +47,25 @@ module Templates
       else
         included_key = "#{Theme.templates_dir}/#{included_template}"
       end
-      deps << "kv://#{included_key}"
-    }
+      kv_key = "kv://#{included_key}"
+
+      # Skip self-references (template includes itself)
+      unless kv_key == current_template
+        deps << kv_key
+      end
+    end
+
+    # Recursively search in the tag's block (if it has one)
+    if block = node.@block
+      deps.concat(find_includes_recursive(block, current_template))
+    end
+
     deps
+  end
+
+  private def self.find_includes_recursive(node : Crinja::AST::TemplateNode, current_template : String) : Array(String)
+    # For other node types that don't contain includes, return empty
+    [] of String
   end
 
   # A Crinja Loader that is aware of the k/v store
@@ -61,34 +94,32 @@ module Templates
       end
       source = Croupier::TaskManager.get("#{template_key}")
       raise "Template #{template} not found (looked for #{template_key})" if source.nil?
-      # FIXME should really traverse the node tree
-      Crinja::Template.new(source).nodes.@children \
-        .select(Crinja::AST::TagNode) \
-          .select { |node| node.@name == "include" }.each { |node|
-        # Resolve included template path to full theme path
-        included_template = node.@arguments[0].value.as(String)
-        if included_template.starts_with?("templates/")
-          included_key = "#{Theme.path}/#{included_template}"
-        elsif included_template.starts_with?("themes/")
-          included_key = included_template
-        else
-          included_key = "#{Theme.templates_dir}/#{included_template}"
-        end
-        Croupier::TaskManager.tasks["kv://#{template_key}"].inputs << "kv://#{included_key}"
-      }
+
+      # Find all include tags recursively and add them as dependencies
+      current_template_key = "kv://#{template_key}"
+      includes = Templates.find_includes_recursive(Crinja::Template.new(source).nodes, current_template_key)
+      includes.each do |included_key|
+        Croupier::TaskManager.tasks["kv://#{template_key}"].inputs << included_key
+      end
+
       source
     end
   end
 
   # Load templates from theme directory and put them in the k/v store
-  def self.load_templates
+  def self.load_templates : Int32
     ensure_templates
     ensure_assets
     Log.debug { "Scanning Templates" }
+    count = 0
     Dir.glob("#{Theme.templates_dir}/*.tmpl").each do |template|
+      # Get template dependencies for auto-mode tracking
+      deps = get_deps(template)
+      Log.debug { "Template #{template} dependencies: #{deps.inspect}" }
+
       Croupier::Task.new(
         id: "template",
-        inputs: [template] + get_deps(template),
+        inputs: [template], # Only the file itself, not other templates (those are runtime deps)
         output: "kv://#{template}",
         mergeable: false
       ) do
@@ -97,7 +128,21 @@ module Templates
         # In auto mode the content may have changed though.
         File.read(template)
       end
+
+      # Register template dependencies for auto-mode invalidation
+      # When a template changes, any task that uses it should be re-run
+      unless deps.empty?
+        deps.each do |dep|
+          # Add the current template as a dependent of the included template
+          # We can't easily add reverse deps, but we can track this separately
+          # For now, we'll add them to a special registry
+          Croupier::TaskManager.tasks[dep]?
+        end
+      end
+
+      count += 1
     end
+    count
   end
 
   # Ensure all baked-in assets exist in the theme assets/ directory

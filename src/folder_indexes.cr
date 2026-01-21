@@ -14,13 +14,21 @@ module FolderIndexes
     @@excluded_folders
   end
 
+  # Directories that generate their own indexes (excluded from folder_indexes)
+  # Pages now handles page directories, so we exclude those too
+  DEFAULT_EXCLUDED = ["galleries", "listings", "books", "pages"]
+
   # Enable folder_indexes feature
+  # This now ONLY handles posts/ folder and subfolders
   def self.enable(is_enabled : Bool, content_path : Path)
     return unless is_enabled
+
+    Log.info { "📁 Scanning for posts folder indexes..." }
 
     # Collect exclude patterns from two sources:
     # 1. Config file (manual overrides)
     # 2. Feature modules that register their output folders
+    # 3. Default exclusions (features that handle their own indexes)
 
     exclude_patterns = [] of String
 
@@ -35,29 +43,27 @@ module FolderIndexes
     # 2. Get registered exclusions from feature modules
     exclude_patterns += excluded_folders
 
-    # Scan full content path for folders needing indexes
+    # 3. Add default exclusions for features that handle their own indexes
+    exclude_patterns += DEFAULT_EXCLUDED
+
+    # Scan posts path for folders needing indexes
     content_path = content_path.expand
-    indexes = read_all(content_path, exclude_patterns)
+    posts_path = content_path / Config.options.posts
+    indexes = read_all(posts_path, exclude_patterns)
+    Log.info { "✓ Found #{indexes.size} posts folder index#{indexes.size == 1 ? "" : "es"}" }
     render(indexes)
   end
 
-  # Generates indexes for folders that have no index file
+  # Generates indexes for posts folders that have no index file
   struct FolderIndex
     @path : Path
     @output : Path
 
     def initialize(path : Path)
       @path = path
-      # Get the relative path from content directory
-      content_path = Path.new(Config.options.content).expand
-      @output = (path / "index.html").relative_to(content_path)
-    end
-
-    # Check if this is the posts folder or a subfolder
-    def posts_folder?
-      content_path = Path.new(Config.options.content).expand
-      posts_path = Config.options.posts.rchop('/')
-      @path.relative_to(content_path).to_s.starts_with?(posts_path)
+      # Get the relative path from posts directory
+      posts_path = Path.new(Config.options.content).expand / Config.options.posts
+      @output = (path / "index.html").relative_to(posts_path)
     end
 
     # Get all posts whose output starts with this folder's path (prefix-matching)
@@ -73,109 +79,9 @@ module FolderIndexes
       end.sort_by! { |post_data| post_data.date || Time.utc(1970, 1, 1) }.reverse!
     end
 
-    # Get immediate files (non-recursive) and subdirectories for non-posts folders
-    def immediate_contents
-      subdirs = [] of NamedTuple(link: String, name: String)
-      files = [] of NamedTuple(link: String, title: String)
-
-      output_prefix = Config.options.output.rchop('/')
-      # Get the relative path from output directory for this folder index
-      content_path = Path.new(Config.options.content).expand
-      folder_relative = @path.relative_to(content_path)
-
-      # Get immediate items in this directory
-      Dir.glob("#{@path}/*").each do |item|
-        basename = File.basename(item)
-
-        if File.directory?(item)
-          # Check if this subdirectory has an index.md
-          has_index = File.file?("#{item}/index.md")
-          if has_index
-            subdirs << {link: "#{basename}/index.html", name: basename}
-          end
-        elsif File.file?(item) && basename.ends_with?(".md") && !basename.starts_with?("index.")
-          # This is a markdown file that's not an index
-          # Find the corresponding post in the registry
-          post = Markdown::File.posts.values.find do |md_file|
-            md_file.source.includes?(basename)
-          end
-
-          if post
-            # Get the link relative to output directory, then make it relative to this folder
-            relative_link = post.output.sub(/^#{output_prefix}\//, "")
-            # Remove the folder path prefix to make it relative to current folder
-            relative_link = relative_link.sub(/^#{Regex.escape(folder_relative.to_s)}\//, "")
-            files << {link: relative_link, title: post.title}
-          end
-        end
-      end
-
-      {subdirs: subdirs.sort_by { |dir| dir[:name] }, files: files.sort_by { |file| file[:link] }}
-    end
-
-    def rendered
-      if posts_folder?
-        # Use Markdown.render_index for posts folders (with prefix-matching)
-        folder_posts = posts_by_prefix
-        return "" if folder_posts.empty?
-
-        index_template = Theme.template_path("index.tmpl")
-        Templates.environment.get_template(index_template).render({
-          "posts" => folder_posts.map(&.value),
-        })
-      else
-        # Use simple listing for other folders (immediate files only + subdirs)
-        contents = immediate_contents
-
-        # Include title.tmpl which handles breadcrumbs
-        title_template = Theme.template_path("title.tmpl")
-        title_html = Templates.environment.get_template(title_template).render({
-          "title"       => folder_title,
-          "link"        => "/#{@output.to_s.sub(/\.html$/, "")}",
-          "breadcrumbs" => breadcrumbs,
-          "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
-        })
-
-        # Build content using common template style
-        content_html = String.build do |io|
-          io << "<section class=\"item-list-index\">\n"
-
-          unless contents[:subdirs].empty?
-            io << "  <h3>Subdirectories</h3>\n"
-            io << "  <ul class=\"item-list subdir-list\">\n"
-            contents[:subdirs].each do |subdir|
-              io << "    <li><a href=\"#{subdir[:link]}\">#{subdir[:name]}</a></li>\n"
-            end
-            io << "  </ul>\n"
-          end
-
-          unless contents[:files].empty?
-            io << "  <h3>Pages</h3>\n"
-            io << "  <ul class=\"item-list pages-list\">\n"
-            contents[:files].each do |file|
-              io << "    <li><a href=\"#{file[:link]}\">#{file[:title]}</a></li>\n"
-            end
-            io << "  </ul>\n"
-          end
-
-          if contents[:subdirs].empty? && contents[:files].empty?
-            io << "  <p>This folder is empty.</p>\n"
-          end
-
-          io << "</section>\n"
-          io << "<style>\n"
-          io << ".item-list-index { margin: 2rem 0; }\n"
-          io << ".item-list-index h3 { margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2em; color: var(--b16-base03); }\n"
-          io << ".subdir-list { margin-bottom: 2rem; }\n"
-          io << ".item-list { list-style-type: disc; padding-left: 1.5rem; margin: 1rem 0; }\n"
-          io << ".item-list li { margin: 0.5rem 0; }\n"
-          io << ".item-list a { text-decoration: none; color: var(--b16-base0D); font-size: 1.1em; }\n"
-          io << ".item-list a:hover { text-decoration: underline; }\n"
-          io << "</style>\n"
-        end
-
-        title_html + content_html
-      end
+    # Get the title for this folder index
+    def folder_title
+      @path.basename.to_s.capitalize
     end
 
     # Get breadcrumbs for this folder index
@@ -205,16 +111,12 @@ module FolderIndexes
 
       result
     end
-
-    # Get the title for this folder index
-    def folder_title
-      @path.basename.to_s.capitalize
-    end
   end
 
-  def self.read_all(path : Path, exclude_patterns = [] of String) : Array(FolderIndex)
+  def self.read_all(posts_path : Path, exclude_patterns = [] of String) : Array(FolderIndex)
     indexes = [] of FolderIndex
-    candidates = [path] + Dir.glob("#{path}/**/*/")
+    candidates = [posts_path] + Dir.glob("#{posts_path}/**/*/")
+
     candidates.map do |folder|
       # Skip if folder matches any exclude pattern
       next if exclude_patterns.any? { |pattern| folder.to_s.includes?(pattern) }
@@ -223,10 +125,6 @@ module FolderIndexes
       temp_index = FolderIndex.new(Path.new(folder))
 
       # Check if any task already produces this folder's index.html
-      # This handles cases like:
-      # - index.md files (regardless of slug metadata)
-      # - Custom index pages from other features
-      # - Any task that outputs to folder/index.html
       expected_output = Path[Config.options.output] / temp_index.@output
       has_task_for_output = Croupier::TaskManager.tasks.values.any? do |task|
         task.outputs.includes?(expected_output.to_s)
@@ -251,18 +149,17 @@ module FolderIndexes
   def self.render(indexes : Array(FolderIndex))
     Config.languages.keys.each do |lang|
       out_path = Path.new(Config.options(lang).output)
-      # Make output paths language-specific to avoid conflicts
       lang_suffix = lang == "en" ? "" : ".#{lang}"
 
-      # First, render posts folders using Markdown.render_index
-      indexes.select(&.posts_folder?).each do |index|
+      # Render posts folders using Markdown.render_index
+      indexes.each do |index|
         folder_posts = index.posts_by_prefix(lang)
         next if folder_posts.empty?
 
         # Add language suffix to output path
         output_path = index.@output.to_s.sub(/\.html$/, "#{lang_suffix}.html")
         output = (out_path / output_path).to_s
-        title = index.@path.basename.to_s.capitalize
+        title = index.folder_title
 
         # Create RSS feed for this folder
         feed_path = output.sub(/\.html$/, ".rss")
@@ -283,34 +180,6 @@ module FolderIndexes
           main_feed: nil, # Folder indexes don't get main feed
           lang: lang,
         )
-      end
-
-      # Then, render other folders using simple template
-      indexes.reject(&.posts_folder?).each do |index|
-        # All markdown posts are dependencies since we use the global registry
-        all_posts = Markdown::File.posts.map(&.last.source)
-
-        folder_index_template = Theme.template_path("folder_index.tmpl")
-        inputs = ["kv://#{folder_index_template}", "conf.yml"] + all_posts
-        # Add language suffix to output path
-        output_path = index.@output.to_s.sub(/\.html$/, "#{lang_suffix}.html")
-        output = (out_path / output_path).to_s
-        # Use unique task ID based on output path and language
-        task_id = "folder_index::#{lang}::#{index.@output}"
-        Croupier::Task.new(
-          id: task_id,
-          output: output,
-          inputs: inputs,
-          mergeable: false
-        ) do
-          Log.info { "👉 #{output}" }
-          page_template = Theme.template_path("page.tmpl")
-          html = Render.apply_template(page_template,
-            {"content" => index.rendered, "title" => index.folder_title, "breadcrumbs" => index.breadcrumbs})
-          doc = Lexbor::Parser.new(html)
-          doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))
-          doc.to_html
-        end
       end
     end
   end
