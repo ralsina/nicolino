@@ -25,6 +25,7 @@ module Markdown
     @title = Hash(String, String).new
     @toc = Hash(String, String).new
     @output = Hash(String, String).new
+    @taxonomy_terms = Hash(String, Hash(String, Array(String))).new
 
     # Register all Files by @source
     @@posts = Hash(String, File).new
@@ -98,6 +99,35 @@ module Markdown
       result
     end
 
+    # Parse all taxonomy terms from metadata once during load
+    # This avoids re-parsing for each taxonomy in Taxonomy.initialize
+    private def parse_taxonomy_terms(lang : String) : Nil
+      @taxonomy_terms[lang] = {} of String => Array(String)
+
+      # Get configured taxonomy names
+      tax_configs = Config.get("taxonomies").as_h?
+      return if tax_configs.nil?
+
+      tax_configs.each_key do |tax_name|
+        post_terms = @metadata[lang].fetch(tax_name, nil)
+        next if post_terms.nil?
+
+        terms = [] of String
+        begin
+          # Try YAML array format first: [tag1, tag2]
+          parsed = YAML.parse(post_terms)
+          if parsed.as_a?
+            terms = parsed.as_a.map(&.to_s).reject(&.empty?)
+          end
+        rescue ex
+          # Fallback to comma-separated format: tag1, tag2
+          terms = post_terms.split(",").map(&.to_s.strip).reject(&.empty?)
+        end
+
+        @taxonomy_terms[lang][tax_name] = terms unless terms.empty?
+      end
+    end
+
     def source(lang = nil)
       @sources[lang || Locale.language]
     end
@@ -130,6 +160,11 @@ module Markdown
       @shortcodes[lang || Locale.language]
     end
 
+    def taxonomy_terms(lang = nil)
+      lang ||= Locale.language
+      @taxonomy_terms.fetch(lang, {} of String => Array(String))
+    end
+
     def <=>(other : File)
       # The natural sort order is date descending
       if self.@date.nil? || other.@date.nil?
@@ -152,23 +187,39 @@ module Markdown
       Log.debug { "👉 #{source(lang)}" }
       contents = ::File.read(source(lang))
       begin
-        fragments = contents.split("---\n", 3)
-        # Metadata is required - must have --- separators
-        raise "Missing metadata separators. All posts must have metadata between '---' delimiters." unless fragments.size >= 3
-
-        _, raw_metadata, @text[lang] = fragments
+        # Metadata format: file must START with "---\n" to have metadata
+        # If it doesn't start with "---\n", treat entire file as content
+        if contents.starts_with?("---\n")
+          fragments = contents.split("---\n", 3)
+          # fragments = ["", "metadata", "content"]
+          _, raw_metadata, @text[lang] = fragments
+          if raw_metadata.nil? || raw_metadata.strip.empty?
+            @metadata[lang] = {} of String => String
+            @title[lang] = ""
+          else
+            parsed = YAML.parse(raw_metadata)
+            if parsed.as_h?
+              @metadata[lang] = parsed.as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
+            else
+              @metadata[lang] = {} of String => String
+            end
+            @title[lang] = metadata(lang).fetch("title", "").to_s
+          end
+        else
+          # No metadata - entire file is content
+          @metadata[lang] = {} of String => String
+          @title[lang] = ""
+          @text[lang] = contents
+        end
       rescue ex
         Log.error { "Error reading metadata in #{source(lang)}: #{ex}" }
         raise ex
       end
-      if raw_metadata.nil?
-        @metadata[lang] = {} of String => String
-        @title[lang] = ""
-      else
-        @metadata[lang] = YAML.parse(raw_metadata).as_h.map { |k, v| [k.as_s.downcase.strip, v.to_s] }.to_h
-        @title[lang] = metadata(lang)["title"].to_s
-      end
       @link[lang] = (Path.new ["/", @output[lang].split("/")[1..]]).to_s
+
+      # Parse taxonomy terms for this language once during load
+      parse_taxonomy_terms(lang)
+
       # Performance Note: usually parse takes ~.1 seconds to
       # parse 1000 short posts that have no shortcodes.
       @shortcodes[lang] = full_shortcodes_list(@text[lang])

@@ -21,7 +21,9 @@
 
   Used by: Markdown::File for rendering blog posts
 #}
+{% if title and title|length > 0 %}
 {% include "templates/title.tmpl" %}
+{% endif %}
 
 {% if date %}
 <div class="post-meta">

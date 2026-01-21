@@ -21,7 +21,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   {% if noindex %}
   <meta name="robots" content="noindex" />{% endif %}
-  <title>{{ site_title }}: {{ title }}</title>
+  <title>{{ site_title }}{% if title and title|length > 0 %}: {{ title }}{% endif %}</title>
   <meta name="description" content="{{ site_description }}" />
   <link rel="shortcut icon" href="/favicon.ico" />
   <link rel="canonical" href="{{ canonical_url }}" />
