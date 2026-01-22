@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.0] - 2026-01-22
+
+### 🚀 Features
+
+- Add creatable registry for nicolino new and improve docs
+- Add per-language RSS feeds and taxonomy/folder feeds
+- Add optional metadata and hide empty titles in templates
+- Require titles for posts
+- Add raw HTML reStructuredText support and site import scripts
+- Add script for backward-compatible HTML path symlinks
+- Use cached HTML for non-markdown posts/pages
+
+### 🐛 Bug Fixes
+
+- Restore Default theme text in footer
+- Improve book TOC alignment and make dt bold
+- Force date parsing before sorting and limit RSS to 20 posts
+- Preserve original filenames in post migration
+- Use correct Jinja2 raw syntax {{% raw %}}
+- Html files with frontmatter now render content properly
+- Avoid ambiguous requirement
+
+### 🚜 Refactor
+
+- Separate post and page folder index generation
+
+### 📚 Documentation
+
+- More docs
+- User intro fix
+- Fixes
+- Restore favicon
+
 ## [0.10.0] - 2026-01-19
 
 ### 🚀 Features
@@ -51,6 +84,10 @@ All notable changes to this project will be documented in this file.
 ### ◀️ Revert
 
 - Remove lanyon theme experiment
+
+### Bump
+
+- Release v0.10.0
 
 ## [0.9.0] - 2026-01-18
 
