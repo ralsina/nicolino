@@ -556,7 +556,9 @@ def main():
     print("\nNext steps:")
     print("1. Review conf.yml and adjust paths if needed")
     print("2. Run: cd myblog && ../bin/nicolino build")
-    print("3. Check the output/ directory for generated files")
+    print("3. Create compatibility symlinks for old HTML paths:")
+    print("   ../scripts/add_compat_symlinks.sh myblog/output")
+    print("4. Check the output/ directory for generated files")
     print("="*60 + "\n")
 
 
