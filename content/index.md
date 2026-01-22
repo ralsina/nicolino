@@ -24,11 +24,11 @@ So, Nicolino. Here are some reasons why I think it's worth using:
     it *does* run [this benchmark](https://www.zachleat.com/web/build-benchmark/) ... fast.
     How fast? Usually faster than [Hugo](https://gohugo.io).
 
-    Usually it will be even faster because Nicolino has incremental builds as its
+    It will often be even faster because Nicolino has incremental builds as its
     core. Everything is incrementally built. Changing your content will only
     trigger the minimal effort needed to keep your site up to date. Usually under a second.
 
-    In "auto mode" which rebuilds as needed while you edit, usually it's instant.
+    In "auto mode" which rebuilds as needed while you edit, it's normally instant.
 
     This whole site, including image galleries and all that builds from scratch in my machine
     in about .8 seconds ... so, fast.
