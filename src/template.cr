@@ -194,6 +194,31 @@ module Templates
     end
   end
 
+  # Ensure all baked-in shortcodes exist in the shortcodes/ directory
+  # If any are missing, extract them from the baked filesystem
+  def self.ensure_shortcodes
+    shortcodes_dir = Path["shortcodes"]
+    FileUtils.mkdir_p(shortcodes_dir) unless Dir.exists?(shortcodes_dir)
+
+    begin
+      # Check each baked shortcode file directly
+      Nicolino::ShortcodesFiles.files.each do |file|
+        shortcode_name = Path[file.path].basename.to_s
+        shortcode_path = shortcodes_dir / shortcode_name
+
+        unless File.exists?(shortcode_path)
+          Log.info { "Installing missing shortcode: #{shortcode_name}" }
+          file.rewind
+          File.write(shortcode_path, file.gets_to_end)
+        end
+      end
+    rescue ex
+      # If we can't access baked files (shouldn't happen), just log and continue
+      Log.debug { "Could not check for missing shortcodes: #{ex.message}" }
+    end
+  end
+
+
   # Thread-local environment cache
   class EnvCache
     @@envs = Hash(Fiber, Crinja).new
