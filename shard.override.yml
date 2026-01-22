@@ -1,0 +1,3 @@
+dependencies:
+  baked_file_system:
+    github: ralsina/baked_file_system
