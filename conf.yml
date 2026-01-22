@@ -5,14 +5,14 @@
 # as site_name (ex: site_title)
 site:
   title: "Nicolino"
-  description: "Nicolino: a static site generator"
+  description: "A static site generator"
   url: "https://nicolino.ralsina.me"
   footer: ""
   # These are used to generate a base16 color
   # scheme in CSS. The sixteen library automatically
   # finds the dark and light variants.
   # Also used for HighlightJS syntax highlighting.
-  color_scheme: "darcula"
+  color_scheme: "tokyo-night"
   # This is a list of items to show in the navigation bar.
   # In the default theme they are shown at the right of
   # the title.

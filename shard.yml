@@ -13,6 +13,7 @@ license: MIT
 dependencies:
   crinja:
     github: straight-shoota/crinja
+    branch: master
   RSS:
     github: ralsina/RSS.cr
     branch: master
