@@ -94,7 +94,7 @@ continuous_import:
     template: "nicolino_release.tmpl"
     output_folder: "posts/releases"
     format: "md"
-    tags: "releases, nicolino"
+    tags: "releases"
     metadata:
       title: "title"
       date: "published"
