@@ -97,7 +97,7 @@ This command:
 
 
 - Watches for file changes and rebuilds automatically
-- Runs a built-in HTTP server (usually at http://localhost:4000)
+- Runs a built-in HTTP server (at http://localhost:8080 by default)
 - Provides LiveReload so your browser refreshes automatically when files change
 - Only rebuilds what's needed, so it's fast even on large sites
 
