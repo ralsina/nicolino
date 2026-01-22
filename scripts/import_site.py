@@ -10,6 +10,8 @@ This script handles:
 - Files (static assets)
 - Listings (code listings with syntax highlighting)
 
+Uses cached HTML when available for non-markdown formats.
+
 Usage:
     cd /path/to/nicolino
     python3 scripts/import_site.py
@@ -36,6 +38,7 @@ SOURCE_IMAGES = SOURCE_DIR / "images"
 SOURCE_FILES = SOURCE_DIR / "files"
 SOURCE_LISTINGS = SOURCE_DIR / "listings"
 SOURCE_PYTUT = SOURCE_DIR / "pytut"
+SOURCE_CACHE = SOURCE_DIR / "cache"
 
 # Target directories (Nicolino site)
 TARGET_DIR = Path("myblog")
@@ -152,6 +155,44 @@ def convert_frontmatter_to_nicolino(metadata: dict, content: str) -> str:
     return "\n".join(frontmatter_lines) + content
 
 
+def get_cached_html(source_file: Path, is_es: bool = False) -> Optional[str]:
+    """Get cached HTML from Nikola cache if available.
+
+    Returns the HTML content wrapped in raw tags to prevent shortcode reprocessing,
+    or None if no cache exists.
+    """
+    # Build cache path
+    # pages/26.txt -> cache/pages/26.html
+    # pages/26.txt.es -> cache/pages/26.es.html
+    stem = source_file.stem  # e.g., "26" from "26.txt"
+
+    # Determine the cache subdirectory and filename
+    rel_path = source_file.relative_to(SOURCE_DIR)
+    cache_dir = SOURCE_CACHE / rel_path.parent
+
+    if is_es:
+        cache_file = cache_dir / f"{stem}.es.html"
+    else:
+        cache_file = cache_dir / f"{stem}.html"
+
+    if not cache_file.exists():
+        return None
+
+    # Read the cached HTML
+    try:
+        html_content = cache_file.read_text(encoding="utf-8")
+
+        # Wrap in raw shortcode tags to prevent reprocessing
+        # The cached HTML may have {{ shortcodes }} that were already processed
+        # We use {% raw %}...{% endraw %} to preserve them
+        wrapped = "{% raw %}\n" + html_content + "\n{% endraw %}"
+
+        return wrapped
+    except Exception as e:
+        print(f"    Warning: Could not read cache {cache_file}: {e}")
+        return None
+
+
 # =============================================================================
 # Posts Migration
 # =============================================================================
@@ -164,6 +205,9 @@ def process_post_file(source_file: Path, target_dir: Path) -> Optional[Path]:
     if source_file.is_dir():
         return None
 
+    # Check if this is a translation
+    is_es = source_file.name.endswith((".es.txt", ".es.md", ".es.rst", ".es.html"))
+
     content = source_file.read_text(encoding="utf-8", errors="ignore")
     metadata, body = parse_frontmatter(content)
 
@@ -171,12 +215,29 @@ def process_post_file(source_file: Path, target_dir: Path) -> Optional[Path]:
         print(f"  Warning: No frontmatter in {source_file.name}, skipping")
         return None
 
-    # Preserve original filename to maintain output paths
-    ext = determine_extension(source_file.name)
-    filename = source_file.stem + ext
+    # Check if we can use cached HTML (for non-markdown files)
+    cached_html = None
+    if not source_file.name.endswith(".md"):
+        cached_html = get_cached_html(source_file, is_es)
+        if cached_html:
+            print(f"    Using cached HTML from cache")
+            body = cached_html
 
+    # Preserve original filename to maintain output paths
+    # Change extension to .html if using cached content, .md for markdown
+    if cached_html:
+        # If we have cached HTML, save as .html file with HTML content
+        ext = ".html"
+    else:
+        ext = determine_extension(source_file.name)
+
+    filename = source_file.stem + ext
     target_file = target_dir / filename
+
+    # Convert frontmatter
     new_content = convert_frontmatter_to_nicolino(metadata, body)
+
+    # Write to target
     target_file.write_text(new_content, encoding="utf-8")
     return target_file
 
@@ -201,7 +262,7 @@ def migrate_posts():
         if not source_file.is_file():
             continue
 
-        is_es = source_file.name.endswith((".es.txt", ".es.md", ".es.rst"))
+        is_es = source_file.name.endswith((".es.txt", ".es.md", ".es.rst", ".es.html"))
 
         if is_es:
             target_file = process_post_file(source_file, TARGET_ES_POSTS)
@@ -233,6 +294,9 @@ def process_page_file(source_file: Path, target_dir: Path) -> Optional[Path]:
     if source_file.is_dir():
         return None
 
+    # Check if this is a translation
+    is_es = source_file.name.endswith((".es.txt", ".es.md", ".es.rst", ".es.html"))
+
     content = source_file.read_text(encoding="utf-8", errors="ignore")
     metadata, body = parse_frontmatter(content)
 
@@ -240,10 +304,22 @@ def process_page_file(source_file: Path, target_dir: Path) -> Optional[Path]:
         print(f"  Warning: No frontmatter in {source_file.name}, skipping")
         return None
 
-    slug = metadata.get("slug", "")
-    ext = determine_extension(source_file.name)
+    # Check if we can use cached HTML (for non-markdown files)
+    cached_html = None
+    if not source_file.name.endswith(".md"):
+        cached_html = get_cached_html(source_file, is_es)
+        if cached_html:
+            print(f"    Using cached HTML from cache")
+            body = cached_html
 
-    file_slug = sanitize_slug(slug)
+    # Preserve original filename
+    # Change extension to .html if using cached content, .md for markdown
+    if cached_html:
+        ext = ".html"
+    else:
+        ext = determine_extension(source_file.name)
+
+    file_slug = sanitize_slug(metadata.get("slug", ""))
     if not file_slug or file_slug == "untitled":
         file_slug = source_file.stem
 
@@ -275,7 +351,7 @@ def migrate_pages():
         if not source_file.is_file():
             continue
 
-        is_es = source_file.name.endswith((".es.txt", ".es.md", ".es.rst"))
+        is_es = source_file.name.endswith((".es.txt", ".es.md", ".es.rst", ".es.html"))
 
         if is_es:
             target_file = process_page_file(source_file, TARGET_ES_CONTENT)
@@ -514,7 +590,6 @@ def migrate_config():
             shutil.copy2(default_conf, target_conf)
             print(f"  Created: conf.yml")
 
-    # Note: User may need to manually adjust paths in conf.yml
     print("\n  Note: You may need to manually adjust paths in conf.yml")
 
 
