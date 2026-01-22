@@ -50,6 +50,7 @@ TARGET_GALLERIES = TARGET_CONTENT / "galleries"
 TARGET_IMAGES = TARGET_CONTENT / "images"
 TARGET_LISTINGS = TARGET_CONTENT / "listings"
 TARGET_PYTUT = TARGET_CONTENT / "pytut"
+TARGET_SHORTCODES = TARGET_DIR / "shortcodes"
 
 # =============================================================================
 # Utility Functions
@@ -74,6 +75,16 @@ def parse_frontmatter(content: str) -> Tuple[dict, str]:
         if ":" in line and not line.startswith("#"):
             key, value = line.split(":", 1)
             key = key.strip()
+            value = value.strip()
+
+            # Remove YAML anchors (&id001, etc.) and aliases (*id001)
+            # &id001 2023-07-30... -> 2023-07-30...
+            # *id001 -> skip (it's a reference, we'd need to resolve it)
+            value = re.sub(r'^&\S+\s+', '', value)
+            if value.startswith('*'):
+                # Skip aliases - we'd need to resolve them properly
+                continue
+
             value = value.strip().strip("'").strip('"')
             metadata[key] = value
 
@@ -85,7 +96,20 @@ def convert_nikola_date_to_nicolino(date_str: str) -> str:
     if not date_str:
         return "0000-00-00"
 
+    # Remove timezone abbreviations but keep numeric offsets
     date_str_clean = date_str.replace("UTC", "").replace("GMT", "").replace("T", " ").strip()
+
+    # Remove microseconds if present (they cause parsing issues with timezone)
+    # Format: 2023-07-30 19:25:38.468450+00:00 -> 2023-07-30 19:25:38+00:00
+    if "." in date_str_clean and "+" in date_str_clean:
+        # Split on the dot, find the + for timezone
+        parts = date_str_clean.split(".")
+        if len(parts) == 2:
+            # Reconstruct without microseconds: "2023-07-30 19:25:38+00:00"
+            before_usec = parts[0]
+            after_usec = parts[1]
+            tz_part = after_usec[after_usec.index("+"):] if "+" in after_usec else ""
+            date_str_clean = before_usec + tz_part
 
     formats_to_try = [
         "%Y-%m-%d %H:%M:%S%z",
@@ -198,12 +222,10 @@ def get_cached_html(source_file: Path, is_es: bool = False) -> Optional[str]:
     try:
         html_content = cache_file.read_text(encoding="utf-8")
 
-        # Wrap in raw shortcode tags to prevent reprocessing
-        # The cached HTML may have {{ shortcodes }} that were already processed
-        # We use {{% raw %}}...{{% /raw %}} to preserve them
-        wrapped = "{{% raw %}}\n" + html_content + "\n{{% /raw %}}"
-
-        return wrapped
+        # Return the cached HTML as-is
+        # The cached HTML is already processed by Nikola, so any
+        # Jinja2/shortcode syntax has already been rendered
+        return html_content
     except Exception as e:
         print(f"    Warning: Could not read cache {cache_file}: {e}")
         return None
@@ -600,6 +622,34 @@ def migrate_config():
 
 
 # =============================================================================
+# Shortcodes Migration
+# =============================================================================
+
+
+def migrate_shortcodes():
+    """Copy shortcodes directory to maintain compatibility."""
+    print("\n" + "="*60)
+    print("MIGRATING SHORTCODES")
+    print("="*60)
+
+    source_shortcodes = Path("shortcodes")
+    if not source_shortcodes.exists():
+        print(f"  Source directory not found: {source_shortcodes}")
+        return
+
+    TARGET_SHORTCODES.mkdir(parents=True, exist_ok=True)
+
+    processed = 0
+    for shortcode_file in source_shortcodes.glob("*.tmpl"):
+        target_file = TARGET_SHORTCODES / shortcode_file.name
+        shutil.copy2(shortcode_file, target_file)
+        processed += 1
+        print(f"  {shortcode_file.name}")
+
+    print(f"\n  Copied: {processed} shortcode files")
+
+
+# =============================================================================
 # Main Entry Point
 # =============================================================================
 
@@ -623,6 +673,7 @@ def main():
 
     # Run all migrations
     migrate_config()
+    migrate_shortcodes()
     migrate_posts()
     migrate_pages()
     migrate_galleries()
