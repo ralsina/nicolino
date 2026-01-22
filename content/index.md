@@ -5,7 +5,7 @@ title: Hi there, Welcome to Nicolino!
 {{% figure foo
     src="/nicolino.thumb.jpg"
     link="/nicolino.jpg"
-    alt="Nicolino"
+    alt="Nicolino Locche"
     caption="The real Nicolino"
 %}}
 
@@ -23,7 +23,7 @@ So, Nicolino. Here are some reasons why I think it's worth using:
 =It *is* fast=
     While benchmarks are not very important
     it *does* run [this benchmark](https://www.zachleat.com/web/build-benchmark/) ... fast.
-    How fast? Usually faster than Hugo.
+    How fast? Usually faster than [Hugo](https://gohugo.io).
 
     Usually it will be even faster because Nicolino has incremental builds as its
     core. Everything is incrementally built. Changing your content will only
@@ -67,12 +67,9 @@ So, Nicolino. Here are some reasons why I think it's worth using:
 
 I had written [Nikola](https://getnikola.com) in Python. As a toy I
 wrote [Nicoletta](https://github.com/ralsina/nicoletta) which is sort
-of the minimal viable static site generator. I ported it to Crystal.
-
-So, I had Nikola, Nicoletta, and I needed a name for the fast, small but
-not too small Crystal project I was starting.
-
-And you know who was deceptively fast and not very large?
+of the minimal viable static site generator. I ported it to Crystal. So, I had
+Nikola, Nicoletta, and I needed a name for the fast, small but not too small
+Crystal project I was starting. And you know who was deceptively fast and not very large?
 Nicolino Locche. So, Nicolino it is.
 
 Who? [This guy.](https://en.wikipedia.org/wiki/Nicolino_Locche)

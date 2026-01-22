@@ -111,8 +111,8 @@ features:
   - pages
   - pandoc
   - posts
-  - search
-  - similarity
   - sitemap
+  - search
   - taxonomies
+  - similarity
   - archive

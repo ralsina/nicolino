@@ -44,8 +44,7 @@ SOURCE_CACHE = SOURCE_DIR / "cache"
 TARGET_DIR = Path("myblog")
 TARGET_CONTENT = TARGET_DIR / "content"
 TARGET_POSTS = TARGET_CONTENT / "posts"
-TARGET_ES_POSTS = TARGET_CONTENT / "es" / "posts"
-TARGET_ES_CONTENT = TARGET_CONTENT / "es"
+TARGET_PAGES = TARGET_CONTENT / "pages"
 TARGET_GALLERIES = TARGET_CONTENT / "galleries"
 TARGET_IMAGES = TARGET_CONTENT / "images"
 TARGET_LISTINGS = TARGET_CONTENT / "listings"
@@ -145,9 +144,27 @@ def convert_frontmatter_to_nicolino(metadata: dict, content: str) -> str:
         f"date: {nicolino_date}",
     ]
 
+    # Process tags
     if tags:
         tags_clean = tags.replace("**", "").replace("*", "")
         frontmatter_lines.append(f'tags: [{tags_clean}]')
+
+    # For release posts, automatically add feature/minor tag based on content
+    # If the post contains "🚀 Features" section, it's a feature release
+    # Otherwise, it's a minor/patch release
+    if "release" in title.lower() and "🚀 Features" in content:
+        if not tags:
+            frontmatter_lines.append("tags: release, feature")
+        elif "feature" not in tags.lower():
+            # Append feature to existing tags
+            existing_tags = tags_clean.replace(", ", ",").split(",")
+            existing_tags.append("feature")
+            frontmatter_lines[-1] = f'tags: [{", ".join(existing_tags)}]'
+    elif "release" in title.lower() and tags and "🚀 Features" not in content:
+        if "minor" not in tags.lower():
+            existing_tags = tags_clean.replace(", ", ",").split(",")
+            existing_tags.append("minor")
+            frontmatter_lines[-1] = f'tags: [{", ".join(existing_tags)}]'
 
     frontmatter_lines.append("---")
     frontmatter_lines.append("")
@@ -253,7 +270,6 @@ def migrate_posts():
         return
 
     TARGET_POSTS.mkdir(parents=True, exist_ok=True)
-    TARGET_ES_POSTS.mkdir(parents=True, exist_ok=True)
 
     processed = 0
     skipped = 0
@@ -262,11 +278,7 @@ def migrate_posts():
         if not source_file.is_file():
             continue
 
-        is_es = source_file.name.endswith((".es.txt", ".es.md", ".es.rst", ".es.html"))
-
-        if is_es:
-            target_file = process_post_file(source_file, TARGET_ES_POSTS)
-        elif source_file.name.endswith((".txt", ".md", ".rst", ".html")):
+        if source_file.name.endswith((".txt", ".md", ".rst", ".html")):
             target_file = process_post_file(source_file, TARGET_POSTS)
         else:
             skipped += 1
@@ -341,8 +353,7 @@ def migrate_pages():
         print(f"  Source directory not found: {SOURCE_PAGES}")
         return
 
-    TARGET_CONTENT.mkdir(parents=True, exist_ok=True)
-    TARGET_ES_CONTENT.mkdir(parents=True, exist_ok=True)
+    TARGET_PAGES.mkdir(parents=True, exist_ok=True)
 
     processed = 0
     skipped = 0
@@ -351,12 +362,8 @@ def migrate_pages():
         if not source_file.is_file():
             continue
 
-        is_es = source_file.name.endswith((".es.txt", ".es.md", ".es.rst", ".es.html"))
-
-        if is_es:
-            target_file = process_page_file(source_file, TARGET_ES_CONTENT)
-        elif source_file.name.endswith((".txt", ".md", ".rst", ".html")):
-            target_file = process_page_file(source_file, TARGET_CONTENT)
+        if source_file.name.endswith((".txt", ".md", ".rst", ".html")):
+            target_file = process_page_file(source_file, TARGET_PAGES)
         else:
             skipped += 1
             continue
