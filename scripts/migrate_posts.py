@@ -174,15 +174,10 @@ def process_file(source_file: Path, target_dir: Path, is_translation: bool = Fal
         print(f"Warning: No frontmatter found in {source_file.name}, skipping")
         return None
 
-    # Get date and slug for filename
-    date_str = metadata.get("date", "")
-    slug = metadata.get("slug", "")
+    # Preserve original filename to maintain output paths
+    # Just change extension if needed
     ext = determine_extension(source_file.name)
-
-    # Create filename: YYYY-MM-DD-slug.ext
-    file_date = convert_nikola_date_to_nicolino(date_str)
-    file_slug = sanitize_slug(slug)
-    filename = f"{file_date}-{file_slug}{ext}"
+    filename = source_file.stem + ext
 
     target_file = target_dir / filename
 

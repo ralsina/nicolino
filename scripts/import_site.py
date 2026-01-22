@@ -171,13 +171,9 @@ def process_post_file(source_file: Path, target_dir: Path) -> Optional[Path]:
         print(f"  Warning: No frontmatter in {source_file.name}, skipping")
         return None
 
-    date_str = metadata.get("date", "")
-    slug = metadata.get("slug", "")
+    # Preserve original filename to maintain output paths
     ext = determine_extension(source_file.name)
-
-    file_date = convert_nikola_date_to_nicolino(date_str)
-    file_slug = sanitize_slug(slug)
-    filename = f"{file_date}-{file_slug}{ext}"
+    filename = source_file.stem + ext
 
     target_file = target_dir / filename
     new_content = convert_frontmatter_to_nicolino(metadata, body)
