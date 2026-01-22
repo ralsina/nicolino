@@ -58,7 +58,7 @@ TARGET_SHORTCODES = TARGET_DIR / "shortcodes"
 
 
 def parse_frontmatter(content: str) -> Tuple[dict, str]:
-    """Parse YAML frontmatter from content."""
+    """Parse YAML frontmatter from content using Python's yaml module."""
     if not content.startswith("---"):
         return {}, content
 
@@ -69,26 +69,36 @@ def parse_frontmatter(content: str) -> Tuple[dict, str]:
     frontmatter_text = parts[1]
     body = parts[2].lstrip()
 
-    metadata = {}
-    for line in frontmatter_text.strip().split("\n"):
-        line = line.strip()
-        if ":" in line and not line.startswith("#"):
-            key, value = line.split(":", 1)
-            key = key.strip()
-            value = value.strip()
+    try:
+        # Use Python's yaml module to properly parse YAML with anchors and aliases
+        metadata = yaml.safe_load(frontmatter_text) or {}
+    except Exception as e:
+        # Fallback to simple line-by-line parsing if yaml.safe_load fails
+        metadata = {}
+        for line in frontmatter_text.strip().split("\n"):
+            line = line.strip()
+            if ":" in line and not line.startswith("#"):
+                key, value = line.split(":", 1)
+                key = key.strip()
+                value = value.strip()
+                value = re.sub(r'^&\S+\s+', '', value)
+                if value.startswith('*'):
+                    continue
+                value = value.strip().strip("'").strip('"')
+                metadata[key] = value
 
-            # Remove YAML anchors (&id001, etc.) and aliases (*id001)
-            # &id001 2023-07-30... -> 2023-07-30...
-            # *id001 -> skip (it's a reference, we'd need to resolve it)
-            value = re.sub(r'^&\S+\s+', '', value)
-            if value.startswith('*'):
-                # Skip aliases - we'd need to resolve them properly
-                continue
+    # Convert all values to strings for consistency
+    str_metadata = {}
+    for key, value in metadata.items():
+        if value is None:
+            str_metadata[key] = ""
+        elif isinstance(value, datetime):
+            # Convert datetime objects to ISO format string
+            str_metadata[key] = value.strftime("%Y-%m-%d %H:%M:%S.%f%z")
+        else:
+            str_metadata[key] = str(value)
 
-            value = value.strip().strip("'").strip('"')
-            metadata[key] = value
-
-    return metadata, body
+    return str_metadata, body
 
 
 def convert_nikola_date_to_nicolino(date_str: str) -> str:
