@@ -184,8 +184,8 @@ def get_cached_html(source_file: Path, is_es: bool = False) -> Optional[str]:
 
         # Wrap in raw shortcode tags to prevent reprocessing
         # The cached HTML may have {{ shortcodes }} that were already processed
-        # We use {% raw %}...{% endraw %} to preserve them
-        wrapped = "{% raw %}\n" + html_content + "\n{% endraw %}"
+        # We use {{% raw %}}...{{% /raw %}} to preserve them
+        wrapped = "{{% raw %}}\n" + html_content + "\n{{% /raw %}}"
 
         return wrapped
     except Exception as e:
