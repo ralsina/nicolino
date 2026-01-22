@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.0] - 2026-01-22
+
+### 🚀 Features
+
+- Auto-install missing shortcodes from baked filesystem
+- Use whitespace-trim comments in templates
+
+### 🐛 Bug Fixes
+
+- Remove redundant templates
+- Use proper YAML serializer in import script
+- Avoid asset conflict
+- Improve import script date parsing and shortcode handling
+- Use yaml.safe_load for proper frontmatter parsing
+- Simplify date conversion to extract date from datetime strings
+
+### 🚜 Refactor
+
+- Convert archive data structures from nested hashes to proper records
+
+### 📚 Documentation
+
+- Tag fixes
+- Updated frontpage
+- Updated frontpage
+- Updated frontpage
+
+### ⚡ Performance
+
+- Add lightweight_value to taxonomy rendering to avoid rendering posts
+
 ## [0.11.1] - 2026-01-22
 
 ### 🐛 Bug Fixes
@@ -17,6 +48,10 @@ All notable changes to this project will be documented in this file.
 - Add blank lines above lists in getting-started.md
 - Fix auto mode port number (8080 not 4000)
 - Updates and fixes in release import template
+
+### Bump
+
+- Release v0.11.1
 
 ## [0.11.0] - 2026-01-22
 
