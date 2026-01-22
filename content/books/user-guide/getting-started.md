@@ -86,25 +86,19 @@ nicolino serve --port 3000
 
 ## Live Auto-Rebuild Mode
 
-For automatic rebuilding when files change, use auto mode:
+For automatic rebuilding when files change with live browser reload, use auto mode:
 
 ```bash
 nicolino auto
 ```
 
-This watches for file changes and rebuilds automatically. Nicolino only rebuilds what's needed, so it's fast even on large sites.
+This command:
+- Watches for file changes and rebuilds automatically
+- Runs a built-in HTTP server (usually at http://localhost:4000)
+- Provides LiveReload so your browser refreshes automatically when files change
+- Only rebuilds what's needed, so it's fast even on large sites
 
-You can combine auto mode with the serve command in two terminals:
-
-```bash
-# Terminal 1: Watch for changes and rebuild
-nicolino auto
-
-# Terminal 2: Serve the site
-nicolino serve
-```
-
-This gives you live reload - edit a file, save, and refresh your browser to see changes.
+Just run it and open your browser. Edit files, save, and see changes immediately without manual refresh.
 
 ## Deploying Your Site
 
