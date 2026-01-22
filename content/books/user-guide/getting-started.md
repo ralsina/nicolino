@@ -35,6 +35,7 @@ cd my-site
 
 This creates a [basic site structure](directory-layout.md) with:
 
+
 - `conf.yml` - Site configuration
 - `content/` - Empty directories for your content
 - Sample configuration to get you started
@@ -93,6 +94,8 @@ nicolino auto
 ```
 
 This command:
+
+
 - Watches for file changes and rebuilds automatically
 - Runs a built-in HTTP server (usually at http://localhost:4000)
 - Provides LiveReload so your browser refreshes automatically when files change
@@ -106,6 +109,7 @@ Once you're happy with your site, the `output/` directory contains everything yo
 
 Because Nicolino generates static files, you can host your site anywhere:
 
+
 - GitHub Pages
 - Netlify
 - Vercel
@@ -115,6 +119,7 @@ Because Nicolino generates static files, you can host your site anywhere:
 ## Next Steps
 
 Now that you have a site running:
+
 
 1. Read about the [Directory Layout](directory-layout.md) to understand the structure
 2. Check the [Configuration](configuration.md) chapter to customize your site
