@@ -28,7 +28,7 @@ module Posts
 
     # Load dates for all posts before sorting (dates are lazy-loaded)
     posts.each do |post|
-      post.date  # Force date parsing
+      post.date # Force date parsing
     end
 
     posts.sort!

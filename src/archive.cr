@@ -12,7 +12,10 @@ module Archive
   # Enable archive feature if posts are available
   def self.enable(is_enabled : Bool, posts : Array(Markdown::File))
     return unless is_enabled
+
+    Log.info { "📅 Building archive..." }
     render(posts)
+    Log.info { "✓ Archive queued" }
   end
 
   def self.render(posts : Array(Markdown::File))

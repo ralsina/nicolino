@@ -4,7 +4,10 @@ module Assets
   # Enable assets feature if enabled
   def self.enable(is_enabled : Bool)
     return unless is_enabled
+
+    Log.info { "📦 Copying assets..." }
     render
+    Log.info { "✓ Assets queued" }
   end
 
   # Copy assets from user assets/ to output/

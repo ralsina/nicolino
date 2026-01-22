@@ -186,7 +186,7 @@ module Pages
           unless file
             file = Markdown::File.posts.values.find do |md_file|
               md_file.@sources.values.includes?(item_path) ||
-              md_file.@sources.values.includes?(item_relative)
+                md_file.@sources.values.includes?(item_relative)
             end
           end
 

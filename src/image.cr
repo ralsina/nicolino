@@ -5,7 +5,9 @@ module Image
   def self.enable(is_enabled : Bool, content_path : Path)
     return unless is_enabled
 
+    Log.info { "🖼️  Processing images..." }
     images = read_all(content_path)
+    Log.info { "✓ Found #{images.size} image#{images.size == 1 ? "" : "s"}" }
     render(images)
   end
 

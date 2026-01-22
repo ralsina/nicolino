@@ -11,7 +11,10 @@ module Sitemap
 
   def self.enable(is_enabled : Bool)
     return unless is_enabled
+
+    Log.info { "🗺️  Building sitemap..." }
     render
+    Log.info { "✓ Sitemap queued" }
   end
 
   def self.noindex?(path)

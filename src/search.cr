@@ -18,7 +18,10 @@ module Search
 
   def self.enable(is_enabled : Bool)
     return unless is_enabled
+
+    Log.info { "🔍 Building search index..." }
     render
+    Log.info { "✓ Search index queued" }
   end
 
   def self.render

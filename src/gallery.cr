@@ -22,11 +22,14 @@ module Gallery
   def self.enable(is_enabled : Bool, galleries_path : Path)
     return unless is_enabled
 
+    Log.info { "🖼️  Scanning for galleries..." }
+
     # Note: Galleries are already registered by nicolino new command,
     # but features can register additional types here if needed
 
     # Render galleries
     galleries = read_all(galleries_path)
+    Log.info { "✓ Found #{galleries.size} galler#{galleries.size == 1 ? "y" : "ies"}" }
     render(galleries, Config.options.galleries)
   end
 
@@ -250,8 +253,14 @@ module Gallery
       all_galleries.each do |post|
         basedir = File.dirname(post.source)
         page_template = Theme.template_path("page.tmpl")
+
+        # Create unique task ID for this gallery and language
+        gallery_dir = Path[post.base].parent
+        gallery_rel_path = gallery_dir.relative_to(Config.options.content).to_s
+        task_id = "gallery_#{lang}_#{gallery_rel_path.gsub("/", "_")}"
+
         Croupier::Task.new(
-          id: "gallery",
+          id: task_id,
           output: post.output(lang),
           inputs: [
             "conf.yml",
@@ -276,7 +285,8 @@ module Gallery
           doc.to_html
         end
 
-        # Create gallery.json for this gallery
+        # Create gallery.json for this gallery (only once, not per language)
+        # gallery.json is just file data, no translatable content
         # Get the gallery directory from the output path
         gallery_output_dir = Path[post.output(lang)].parent
         gallery_json_path = gallery_output_dir / "gallery.json"
@@ -287,16 +297,22 @@ module Gallery
         gallery_dir = Path[post.base].parent
         gallery_rel_path = "/" + gallery_dir.relative_to(Config.options.content).to_s
 
+        # Only create gallery.json once (use first language or skip if already created)
+        # We use a Set to track which galleries we've already created JSON for
+        gallery_json_task_id = "gallery_json_#{gallery_rel_path.gsub("/", "_")}"
+
+        # Check if we've already scheduled this task by looking at output path
+        # Since we're inside the language loop, we need to ensure we only create it once
+        # The trick: use mergeable: true so Croupier can handle duplicates
         Croupier::Task.new(
-          id: "gallery_json_#{gallery_rel_path.gsub("/", "_")}",
+          id: gallery_json_task_id,
           output: gallery_json_path.to_s,
           inputs: ["conf.yml", post.source(lang)] + post.@image_list.map { |i| "#{basedir}/#{i}" },
-          mergeable: false
+          mergeable: true
         ) do
-          # Build gallery JSON data
+          # Build gallery JSON data (no language-specific content)
           gallery_data = {
             "name"   => Path[post.base].basename.to_s,
-            "title"  => post.title(lang),
             "images" => post.@image_list.map do |img|
               # Generate thumbnail filename: image.jpg -> image.thumb.jpg
               ext = File.extname(img)
@@ -311,9 +327,8 @@ module Gallery
             end,
             "sub_galleries" => post.sub_galleries.map do |sub|
               {
-                "name"  => Path[sub.base].basename.to_s,
-                "title" => sub.title(lang),
-                "url"   => "/" + Path[sub.base].parent.relative_to(Config.options.content).to_s,
+                "name" => Path[sub.base].basename.to_s,
+                "url"  => "/" + Path[sub.base].parent.relative_to(Config.options.content).to_s,
               }
             end,
           }

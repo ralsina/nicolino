@@ -38,11 +38,59 @@ module Pandoc
     end
 
     def _compile(input, toc = false, format = "rst")
-      input = IO::Memory.new(input)
+      # Check if this is a raw HTML reStructuredText file
+      # These files start with ".. raw:: html" after the front matter
+      stripped = input.strip
+      if stripped.starts_with?(".. raw:: html")
+        extract_raw_html(input)
+      else
+        compile_with_pandoc(input, format)
+      end
+    end
+
+    # Extract HTML from reStructuredText raw::html directive
+    private def extract_raw_html(input)
+      lines = input.lines
+      html_lines = [] of String
+      in_html = false
+      started_collecting = false
+
+      lines.each do |line|
+        if line.strip == ".. raw:: html"
+          in_html = true
+          next
+        end
+
+        next unless in_html
+
+        # Skip blank lines before HTML starts
+        next if line.strip.empty? && !started_collecting
+
+        # Stop if we hit a deindent (end of raw block)
+        if started_collecting && !line.starts_with?(" ") && !line.strip.empty?
+          break
+        end
+
+        started_collecting = true
+        # Remove the indentation (4 spaces is standard for rst directives)
+        if line.starts_with?("    ")
+          html_lines << line[4..]
+        else
+          html_lines << line
+        end
+      end
+
+      html_content = html_lines.join("\n")
+      [html_content, ""]
+    end
+
+    # Compile using pandoc for normal rst files
+    private def compile_with_pandoc(input, format)
+      input_io = IO::Memory.new(input)
       output = IO::Memory.new
       Process.run("pandoc",
         args: ["-f", format, "-t", "html"],
-        input: input,
+        input: input_io,
         output: output)
       [output.to_s, ""]
     end

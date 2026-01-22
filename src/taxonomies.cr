@@ -10,6 +10,8 @@ module Taxonomies
   def self.enable(is_enabled : Bool, posts : Array(Markdown::File))
     return unless is_enabled
 
+    Log.info { "🏷️  Processing taxonomies..." }
+
     Config.taxonomies.map do |k, v|
       Log.debug { "Scanning taxonomy: #{k}" }
       Taxonomy.new(
@@ -20,6 +22,8 @@ module Taxonomies
         posts
       ).render
     end
+
+    Log.info { "✓ Taxonomies queued" }
   end
 
   # Register output folder to exclude from folder_indexes
@@ -82,18 +86,12 @@ module Taxonomies
       @posts : Array(Markdown::File),
     )
       @posts.each do |post|
-        # Get metadata for the current locale language
-        post_metadata = post.metadata
-        post_terms = post_metadata.fetch(@name, nil)
+        # Get pre-parsed taxonomy terms for this post
+        post_taxonomies = post.taxonomy_terms
+        post_terms = post_taxonomies.fetch(@name, nil)
         next if post_terms.nil?
-        begin
-          post_terms = YAML.parse(post_terms).as_a.map(&.to_s).reject(&.empty?)
-        rescue ex
-          # Alternative form tags: foo, bar
-          post_terms = post_metadata[@name] \
-            .split(",").map(&.to_s.strip).reject(&.empty?)
-        end
-        post_terms.as(Array(String)).each do |term|
+
+        post_terms.each do |term|
           term = term.strip
           if !@terms.has_key?(term)
             @terms[term] = Term.new(term, self)
