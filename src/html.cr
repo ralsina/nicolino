@@ -12,6 +12,7 @@ module HTML
       @html[lang] = HtmlFilters.fix_code_classes(doc).to_html
       # HTML files don't have TOC generation yet, set to empty string
       @toc[lang] = ""
+      @html[lang]
     end
   end
 
