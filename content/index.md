@@ -31,7 +31,7 @@ So, Nicolino. Here are some reasons why I think it's worth using:
     This whole site, including image galleries and all that builds from scratch in my machine
     in about .8 seconds ... so, fast.
 
-=It *has* features
+=It *has* features=
     Multilingual feeds and pages and posts, separate feeds and pages for any way you want to
     categorize your content ([tags?](/tags) author? color? whatever.) It supports
     [simple image galleries](/galleries), presents [code](/listings) nicely, it even has 90%
