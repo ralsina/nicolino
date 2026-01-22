@@ -6,6 +6,68 @@ require "lexbor"
 module Archive
   include Utils
 
+  # Individual post entry in archive
+  record ArchivePost,
+    title : String,
+    link : String,
+    date : String do
+    def self.from_post(post : Markdown::File) : self
+      post_date = post.date.as(Time)
+      new(
+        title: post.title,
+        link: post.link,
+        date: post_date.to_s("%Y-%m-%d")
+      )
+    end
+
+    def to_h : Hash(String, String)
+      {
+        "title" => title,
+        "link"  => link,
+        "date"  => date,
+      }
+    end
+  end
+
+  # Month containing posts
+  record ArchiveMonth,
+    name : String,
+    posts : Array(ArchivePost) do
+    def self.create(year : Int32, month : Int32, posts : Array(Markdown::File)) : self
+      month_name = "#{year}-#{month.to_s.rjust(2, '0')}"
+      archive_posts = posts.map { |post| ArchivePost.from_post(post) }
+      new(name: month_name, posts: archive_posts)
+    end
+
+    def to_h : Hash(String, String | Array(Hash(String, String)))
+      {
+        "name"  => name,
+        "posts" => posts.map(&.to_h),
+      }
+    end
+  end
+
+  # Year containing months
+  record ArchiveYear,
+    year : String,
+    months : Array(ArchiveMonth) do
+    def self.create(year : Int32, months_data : Hash(String, Array(Markdown::File))) : self
+      sorted_months = months_data.keys.sort!.reverse!
+      archive_months = sorted_months.map do |month_key|
+        month_num = month_key.split("-")[1].to_i
+        ArchiveMonth.create(year, month_num, months_data[month_key])
+      end
+      new(year: year.to_s, months: archive_months)
+    end
+
+    def to_h : Hash(String, String | Array(Hash(String, String | Array(Hash(String, String)))))
+      {
+        "year"   => year,
+        "months" => months.map(&.to_h),
+      }
+    end
+  end
+
   # Register output folder to exclude from folder_indexes
   FolderIndexes.register_exclude("archive/")
 
@@ -28,43 +90,27 @@ module Archive
       return
     end
 
-    # Group posts by year and month
-    years_hash = Hash(Int32, Hash(String, Array(Hash(String, String)))).new
+    # Group posts by year and month using proper structures
+    years_data = Hash(Int32, Hash(String, Array(Markdown::File))).new
 
     dated_posts.each do |post|
       post_date = post.date.as(Time)
       year = post_date.year
-      month = post_date.to_s("%Y-%m")
+      month_key = post_date.to_s("%Y-%m")
 
-      years_hash[year] ||= Hash(String, Array(Hash(String, String))).new
-      years_hash[year][month] ||= [] of Hash(String, String)
-
-      years_hash[year][month] << {
-        "title" => post.title,
-        "link"  => post.link,
-        "date"  => post_date.to_s("%Y-%m-%d"),
-      }
+      years_data[year] ||= Hash(String, Array(Markdown::File)).new
+      years_data[year][month_key] ||= [] of Markdown::File
+      years_data[year][month_key] << post
     end
 
-    # Sort years in descending order (newest first)
-    sorted_years = years_hash.keys.sort!.reverse!
+    # Create ArchiveYear records
+    sorted_years = years_data.keys.sort!.reverse!
+    archive_years = sorted_years.map do |year|
+      ArchiveYear.create(year, years_data[year])
+    end
 
     # Get the latest year for the default open state
     latest_year = sorted_years.first?.try(&.to_s) || ""
-
-    # Build the data structure for the template
-    years_data = sorted_years.map do |year|
-      months = years_hash[year].keys.sort!.reverse!
-      {
-        "year"   => year.to_s,
-        "months" => months.map do |month|
-          {
-            "name"  => month,
-            "posts" => years_hash[year][month],
-          }
-        end,
-      }
-    end
 
     # Generate archive for each language
     Config.languages.keys.each do |lang|
@@ -105,7 +151,7 @@ module Archive
         # Render the archive template
         archive_template = Theme.template_path("archive.tmpl")
         rendered = Templates.environment.get_template(archive_template).render({
-          "years"       => years_data,
+          "years"       => archive_years.map(&.to_h),
           "latest_year" => latest_year,
         })
 
