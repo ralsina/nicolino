@@ -93,8 +93,8 @@ def parse_frontmatter(content: str) -> Tuple[dict, str]:
         if value is None:
             str_metadata[key] = ""
         elif isinstance(value, datetime):
-            # Convert datetime objects to ISO format string
-            str_metadata[key] = value.strftime("%Y-%m-%d %H:%M:%S.%f%z")
+            # For datetime objects, just extract the date
+            str_metadata[key] = value.strftime("%Y-%m-%d %H:%M:%S")
         else:
             str_metadata[key] = str(value)
 
@@ -106,20 +106,17 @@ def convert_nikola_date_to_nicolino(date_str: str) -> str:
     if not date_str:
         return "0000-00-00"
 
-    # Remove timezone abbreviations but keep numeric offsets
+    # If date_str is from YAML datetime parsing, it's in format "YYYY-MM-DD HH:MM:SS"
+    # Just extract the date part
+    if " " in date_str:
+        return date_str.split()[0]
+
+    # Fallback: try various date formats
     date_str_clean = date_str.replace("UTC", "").replace("GMT", "").replace("T", " ").strip()
 
-    # Remove microseconds if present (they cause parsing issues with timezone)
-    # Format: 2023-07-30 19:25:38.468450+00:00 -> 2023-07-30 19:25:38+00:00
-    if "." in date_str_clean and "+" in date_str_clean:
-        # Split on the dot, find the + for timezone
-        parts = date_str_clean.split(".")
-        if len(parts) == 2:
-            # Reconstruct without microseconds: "2023-07-30 19:25:38+00:00"
-            before_usec = parts[0]
-            after_usec = parts[1]
-            tz_part = after_usec[after_usec.index("+"):] if "+" in after_usec else ""
-            date_str_clean = before_usec + tz_part
+    # Remove microseconds if present
+    if "." in date_str_clean:
+        date_str_clean = date_str_clean.split(".")[0]
 
     formats_to_try = [
         "%Y-%m-%d %H:%M:%S%z",
