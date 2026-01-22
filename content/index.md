@@ -1,7 +1,6 @@
 ---
 title: Hi there, Welcome to Nicolino!
 ---
-
 {{% figure foo
     src="/nicolino.thumb.jpg"
     link="/nicolino.jpg"
@@ -67,7 +66,7 @@ So, Nicolino. Here are some reasons why I think it's worth using:
 
 I had written [Nikola](https://getnikola.com) in Python. As a toy I
 wrote [Nicoletta](https://github.com/ralsina/nicoletta) which is sort
-of the minimal viable static site generator. I ported it to Crystal. So, I had
+of the minimal viable static site generator. I [ported it to Crystal](https://ralsina.me/weblog/posts/learning-crystal-by-implementing-a-static-site-generator.html). So, I had
 Nikola, Nicoletta, and I needed a name for the fast, small but not too small
 Crystal project I was starting. And you know who was deceptively fast and not very large?
 Nicolino Locche. So, Nicolino it is.

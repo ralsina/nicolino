@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.1] - 2026-01-22
+
+### 🐛 Bug Fixes
+
+- Handle single-string taxonomy values like "tags: release"
+- Properly split comma-separated taxonomy values
+- Folder_indexes now properly excludes directories with index.md
+
+### 📚 Documentation
+
+- Updated frontpage
+- Fix getting-started - auto mode already includes HTTP server
+- Add blank lines above lists in getting-started.md
+- Fix auto mode port number (8080 not 4000)
+- Updates and fixes in release import template
+
 ## [0.11.0] - 2026-01-22
 
 ### 🚀 Features
@@ -34,6 +50,10 @@ All notable changes to this project will be documented in this file.
 - User intro fix
 - Fixes
 - Restore favicon
+
+### Bump
+
+- Release v0.11.0
 
 ## [0.10.0] - 2026-01-19
 
