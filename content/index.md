@@ -9,76 +9,58 @@ title: Hi there, Welcome to Nicolino!
     caption="The real Nicolino"
 %}}
 
-# So, what is this?
-Nicolino is a simple, fast and lightweight static site generator written in [Crystal](https://crystal-lang.org). Yes, yes, I know,
-all the static site generators are simple, fast and lightweight.
+# What is Nicolino?
+Nicolino is a simple, fast and lightweight static site generator written in [Crystal](https://crystal-lang.org).
 
-# Should You use it?
-
-Oh Jesus, probably not? It *is* good enough that *I* am using it
-for new sites, but it's probably not good enough for a regular
-user.
-
-# Why?
+# Why is Nicolino?
 
 I have written [a large, very flexible, static site generator in Python](https://getnikola.com),
-and I wanted to see what would happen if I made very different
-decisions when writing the same sort of software.
+and while it has done a nice job for **14 years** I wanted to see if I could
+do a *better* one by making different decisions based on those 14 years.
 
-So, instead of leveraging the huge Python ecosystem of libraries,
-I wrote the core of Nicolino from scratch, using only the standard
-library and a few choice dependencies.
-
-# What's good about it?
+So, Nicolino. Here are some reasons why I think it's worth using:
 
 =It *is* fast=
-    While benchmarks probably mean nothing since Nicolino is quite incomplete
-    it *does* run [this benchmark](https://www.zachleat.com/web/build-benchmark/) ... ok.
+    While benchmarks are not very important
+    it *does* run [this benchmark](https://www.zachleat.com/web/build-benchmark/) ... fast.
+    How fast? Usually faster than Hugo.
 
-    One thing the benchmark doesn't reflect is that Nicolino is
-    *much faster than that* in normal use, when it's not doing a
-    full build.
+    Usually it will be even faster because Nicolino has incremental builds as its
+    core. Everything is incrementally built. Changing your content will only
+    trigger the minimal effort needed to keep your site up to date. Usually under a second.
 
-    If you add a file or modify an existing page, Nicolino will
-    only build the pages that depend on that file.
+    This whole site, including image galleries and all that builds from scratch in my machine
+    in about .8 seconds ... so, fast.
+
+=It *has* features
+    Multilingual feeds and pages and posts, separate feeds and pages for any way you want to
+    categorize your content ([tags?](/tags) author? color? whatever.) It supports
+    [simple image galleries](/galleries), presents [code](/listings) nicely, it even has 90%
+    of an implementation of mdbook in it, so it can do [books](/books). It will automatically
+    resize images and present them nicely (see Nicolino above), it supports Hugo-compatible
+    [shortcodes](/books/user-guide/shortcodes.html) so you can do fancy things markdown
+    frowns upon and much more.
+
+    Yes, you can just put code anywhere:
+
+    ```python
+    def foo():
+        print("bar")
+    ```
+
+    I intend Nicolino to be *enough* for most uses so you don't need to use multiple tools.
 
 =It *is* simple=
-    Again, this is in part an artifact of Nicolino not being finished yet,
-    but it is also a design goal. Nicolino is meant to be simple to use,
-    and simple to hack.
+    Part of the simplicity comes from it being *very* opinionated.
 
-    Part of the simplicity comes from it being *very* opinionated. It
-    supports only markdown. The templates are Crinja (a lot like Jinja)
-    the config is a single YAML file, and so on.
+    * It supports only markdown, HTML and trusts pandoc to *slowly* handle anything else.
+    * The templates are Crinja (a lot like Jinja)
+    * The config is a single YAML file, and so on.
 
-=It *is* lightweight=
-    I intend to keep it below 2000 lines of code. It currently has around 1900.
+    If you want something super extensible, look at [Nikola](https://getnikola.com) instead.
 
-# Features (So far)
-
-* Pages compiled from markdown (like this one)
-* Many other input formats via [pandoc](https://pandoc.org/)
-* Blog posts compiled from markdown, with index page (see [/posts](/posts) )
-* RSS feed of latest posts (see [/rss.xml](/rss.xml) )
-* Taxonomies (like [tags](/tags), author, etc.) with their own indexes and feeds
-* Images are resized and thumbnailed (see [nicolino.jpg](/nicolino.jpg) and [nicolino.thumb.jpg](/nicolino.thumb.jpg) )
-* Jinja-like [templates](/templates.html)
-* VenoBox based lightbox for images (click on Nicolino above)
-* PicoCSS based theme (needs work, of course)
-* `serve` mode, so you can see what the site looks like
-* `auto` mode, which rebuilds while you edit and automatically reloads
-  the pages in the browser
-* [Shortcodes](/books/user-guide/shortcodes.html) somewhat compatible with Nikola and Hugo
-* Incremental builds, so it only rebuilds what's needed
-* Image galleries (see [our sample galleries.](/galleries/) )
-* Code listings with syntax highlighting and line numbers (see [listings](/listings/) )
-* Optional table of contents in posts/pages
-* Code blocks with syntax highlighting using [HighlightJS](https://highlightjs.org/)
-
-```python
-def foo():
-    print("bar")
-```
+    It's one binary. You don't need anything else. Keep in mind that the binary provided in the releases is not ideal. It's meant to work on any Linux x86 system but it also is slower,
+    specially when it comes to image processing.
 
 
 # Why the name?
