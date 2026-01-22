@@ -142,7 +142,11 @@ module Pages
 
     # Get the output path for this index
     def output : Path
-      @path.relative_to(@content_path) / "index.html"
+      rel = @path.relative_to(@content_path)
+      # When path equals content_path, relative_to returns "."
+      # We need empty string instead so we get "index.html" not "./index.html"
+      rel = Path.new("") if rel.to_s == "."
+      rel / "index.html"
     end
 
     # Get the title for this folder index

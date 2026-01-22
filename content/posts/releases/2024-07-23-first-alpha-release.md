@@ -1,7 +1,7 @@
 ---
 title: "First Alpha Release"
 date: 2024-07-23 12:22:12 +0000
-tags: releases, nicolino
+tags: release
 lang: en
 ---
 ## First Alpha Release

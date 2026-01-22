@@ -63,7 +63,10 @@ module FolderIndexes
       @path = path
       # Get the relative path from posts directory
       posts_path = Path.new(Config.options.content).expand / Config.options.posts
-      @output = (path / "index.html").relative_to(posts_path)
+      rel = (path / "index.html").relative_to(posts_path)
+      # When path equals posts_path, relative_to returns "./index.html"
+      # We need "index.html" without the leading "./"
+      @output = Path.new(rel.to_s.gsub(/^\.\//, ""))
     end
 
     # Get all posts whose output starts with this folder's path (prefix-matching)
