@@ -218,7 +218,6 @@ module Templates
     end
   end
 
-
   # Thread-local environment cache
   class EnvCache
     @@envs = Hash(Fiber, Crinja).new
