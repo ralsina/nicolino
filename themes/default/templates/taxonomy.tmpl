@@ -1,4 +1,4 @@
-{#
+{#-
   taxonomy.tmpl - Taxonomy index template
 
   Renders a simple list of taxonomy terms (e.g., tags, categories):
@@ -8,7 +8,7 @@
   - taxonomy: Taxonomy object with terms array
 
   Used by: Taxonomy feature for taxonomy index pages (e.g., /tags/)
-#}
+-#}
 <ul>
     {% for term in taxonomy.terms %}
     <li><a href="{{term.name}}/index.html">{{term.name}}</a></li>

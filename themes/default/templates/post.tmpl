@@ -1,4 +1,4 @@
-{#
+{#-
   post.tmpl - Blog post/article content template
 
   Renders a blog post with:
@@ -20,7 +20,7 @@
   - related_posts: Array of related post links (optional)
 
   Used by: Markdown::File for rendering blog posts
-#}
+-#}
 {% if title and title|length > 0 %}
 {% include "templates/title.tmpl" %}
 {% endif %}
