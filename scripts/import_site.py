@@ -21,6 +21,7 @@ import os
 import re
 import shutil
 import subprocess
+import yaml
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Tuple, List
@@ -138,38 +139,36 @@ def convert_frontmatter_to_nicolino(metadata: dict, content: str) -> str:
 
     nicolino_date = convert_nikola_date_to_nicolino(date_str)
 
-    frontmatter_lines = [
-        "---",
-        f'title: "{title}"',
-        f"date: {nicolino_date}",
-    ]
+    # Build frontmatter dictionary
+    frontmatter_dict = {
+        "title": title,
+        "date": nicolino_date,
+    }
 
     # Process tags
     if tags:
         tags_clean = tags.replace("**", "").replace("*", "")
-        frontmatter_lines.append(f'tags: [{tags_clean}]')
+        # Parse tags - could be array format "[tag1, tag2]" or comma-separated "tag1, tag2"
+        if tags_clean.startswith("["):
+            # YAML array format
+            try:
+                parsed_tags = yaml.safe_load(tags_clean)
+                if isinstance(parsed_tags, list):
+                    frontmatter_dict["tags"] = parsed_tags
+                else:
+                    frontmatter_dict["tags"] = [tags_clean]
+            except:
+                frontmatter_dict["tags"] = [tags_clean]
+        else:
+            # Comma-separated format
+            frontmatter_dict["tags"] = [t.strip() for t in tags_clean.split(",")]
 
-    # For release posts, automatically add feature/minor tag based on content
-    # If the post contains "🚀 Features" section, it's a feature release
-    # Otherwise, it's a minor/patch release
-    if "release" in title.lower() and "🚀 Features" in content:
-        if not tags:
-            frontmatter_lines.append("tags: release, feature")
-        elif "feature" not in tags.lower():
-            # Append feature to existing tags
-            existing_tags = tags_clean.replace(", ", ",").split(",")
-            existing_tags.append("feature")
-            frontmatter_lines[-1] = f'tags: [{", ".join(existing_tags)}]'
-    elif "release" in title.lower() and tags and "🚀 Features" not in content:
-        if "minor" not in tags.lower():
-            existing_tags = tags_clean.replace(", ", ",").split(",")
-            existing_tags.append("minor")
-            frontmatter_lines[-1] = f'tags: [{", ".join(existing_tags)}]'
+    # Convert to YAML frontmatter
+    yaml_frontmatter = yaml.dump(frontmatter_dict, default_flow_style=False, sort_keys=False)
+    # Remove trailing ... that yaml.dump adds
+    yaml_frontmatter = yaml_frontmatter.rstrip("...\n").rstrip()
 
-    frontmatter_lines.append("---")
-    frontmatter_lines.append("")
-
-    return "\n".join(frontmatter_lines) + content
+    return f"---\n{yaml_frontmatter}\n---\n\n{content}"
 
 
 def get_cached_html(source_file: Path, is_es: bool = False) -> Optional[str]:
