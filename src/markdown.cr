@@ -119,11 +119,18 @@ module Markdown
           if parsed.as_a?
             terms = parsed.as_a.map(&.to_s).reject(&.empty?)
           elsif parsed.as_s?
-            # Single string value (not an array) - treat as a single tag
-            terms = [parsed.as_s] unless parsed.as_s.empty?
+            # String value - could be single tag or comma-separated
+            str_val = parsed.as_s
+            if str_val.includes?(",")
+              # Comma-separated: "tag1, tag2"
+              terms = str_val.split(",").map(&.to_s.strip).reject(&.empty?)
+            else
+              # Single tag
+              terms = [str_val] unless str_val.empty?
+            end
           end
         rescue ex
-          # Fallback to comma-separated format: tag1, tag2
+          # Fallback to treating raw value as comma-separated
           terms = post_terms.split(",").map(&.to_s.strip).reject(&.empty?)
         end
 
