@@ -118,6 +118,9 @@ module Markdown
           parsed = YAML.parse(post_terms)
           if parsed.as_a?
             terms = parsed.as_a.map(&.to_s).reject(&.empty?)
+          elsif parsed.as_s?
+            # Single string value (not an array) - treat as a single tag
+            terms = [parsed.as_s] unless parsed.as_s.empty?
           end
         rescue ex
           # Fallback to comma-separated format: tag1, tag2
