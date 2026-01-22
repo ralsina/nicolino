@@ -28,7 +28,7 @@ DOC
 
         FileUtils.mkdir_p(path)
         Dir.cd path do
-          [TemplateFiles, ShortcodesFiles, AssetsFiles, RootFiles].each do |klass|
+          [TemplateFiles, ShortcodesFiles, RootFiles].each do |klass|
             klass.expand
           end
           FileUtils.mkdir_p("content/posts")
@@ -99,8 +99,8 @@ DOC
     bake_folder "../../shortcodes"
   end
 
-  # Files that go in assets/
-  class AssetsFiles < Expandable
+  # Theme assets for auto-installation (NOT copied to user's assets/ during init)
+  class ThemeAssetsFiles < Expandable
     @@path = "assets"
     bake_folder "../../themes/default/assets"
   end

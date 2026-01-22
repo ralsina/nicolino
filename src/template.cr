@@ -153,7 +153,7 @@ module Templates
 
     begin
       # Get list of baked-in asset files
-      Nicolino::AssetsFiles.files.each do |file|
+      Nicolino::ThemeAssetsFiles.files.each do |file|
         # Get the relative path from assets/
         asset_path = Path[assets_dir, file.path[1..]].normalize
 
