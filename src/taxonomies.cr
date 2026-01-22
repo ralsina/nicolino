@@ -57,6 +57,13 @@ module Taxonomies
       }
     end
 
+    # Lightweight value for taxonomy templates (doesn't render posts)
+    def lightweight_value
+      {
+        "name" => @name,
+      }
+    end
+
     def link(lang = nil)
       lang ||= Locale.language
       {
@@ -109,6 +116,14 @@ module Taxonomies
       }
     end
 
+    # Lightweight value for taxonomy templates (doesn't render posts)
+    def lightweight_value(lang)
+      {
+        "name"  => @name,
+        "terms" => @terms.values.map(&.lightweight_value),
+      }
+    end
+
     def link(lang = nil)
       lang ||= Locale.language
       # FIXME localize link
@@ -145,7 +160,7 @@ module Taxonomies
           "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
         })
 
-        rendered = Templates.environment.get_template(taxonomy_template).render({"taxonomy" => value(lang)})
+        rendered = Templates.environment.get_template(taxonomy_template).render({"taxonomy" => lightweight_value(lang)})
 
         Croupier::Task.new(
           id: "taxonomy",
@@ -169,7 +184,7 @@ module Taxonomies
           term.@posts.sort!
           feed_path = (base_path / "#{Utils.slugify(term.@name)}/index.rss").normalize.to_s
           title = Crinja.render(@term_title[lang], {
-            "term" => term.value,
+            "term" => term.lightweight_value,
           })
           # Render term RSS for each term with language context
           Markdown.render_rss(
