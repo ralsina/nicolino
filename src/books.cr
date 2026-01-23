@@ -7,6 +7,41 @@ require "shortcodes"
 require "toml"
 
 module Books
+  # Navigation link structure for book chapters
+  record NavigationLink,
+    title : String,
+    link : String do
+    def to_h : Hash(String, String)
+      {
+        "title" => title,
+        "link"  => link,
+      }
+    end
+  end
+
+  # Navigation structure containing previous/next/up links
+  record Navigation,
+    previous : NavigationLink?,
+    next_link : NavigationLink? do
+    def to_h : Hash(String, Hash(String, String)?)
+      prev_hash = nil
+      next_hash = nil
+
+      if prev_nav = previous
+        prev_hash = prev_nav.to_h
+      end
+
+      if next_nav = next_link
+        next_hash = next_nav.to_h
+      end
+
+      {
+        "prev" => prev_hash,
+        "next" => next_hash,
+      }
+    end
+  end
+
   # Configuration from book.toml (mdbook compatibility)
   #
   # Supported sections from mdbook spec:
@@ -400,7 +435,7 @@ module Books
           "link"             => entry.link(book.name),
         },
         "book"       => book.to_context,
-        "navigation" => nav,
+        "navigation" => nav.to_h,
         "toc_html"   => toc_html,
       }
 
@@ -438,32 +473,28 @@ module Books
     end
   end
 
-  # Build navigation hash for a chapter
+  # Build navigation structure for a chapter
   private def self.build_navigation(
     entry : ChapterEntry,
     flat_chapters : Array(ChapterEntry),
     book : Book,
     book_name : String,
-  ) : Hash(String, Hash(String, String)?)
+  ) : Navigation
     idx = flat_chapters.index(entry)
 
     prev_entry = flat_chapters[idx - 1]? if idx && idx > 0
     next_entry = flat_chapters[idx + 1]? if idx
 
     # For the first chapter, use the book index as the previous link
-    if idx == 0
-      prev_nav = {
-        "title" => book.title,
-        "link"  => "/books/#{book_name}/",
-      }
-    else
-      prev_nav = prev_entry ? nav_hash_for_entry(prev_entry, book_name) : nil
-    end
+    prev_link = if idx == 0
+                  NavigationLink.new(title: book.title, link: "/books/#{book_name}/")
+                else
+                  prev_entry ? nav_link_for_entry(prev_entry, book_name) : nil
+                end
 
-    {
-      "prev" => prev_nav,
-      "next" => next_entry ? nav_hash_for_entry(next_entry, book_name) : nil,
-    }
+    next_link = next_entry ? nav_link_for_entry(next_entry, book_name) : nil
+
+    Navigation.new(previous: prev_link, next_link: next_link)
   end
 
   # Find parent chapter in hierarchy (searches the full chapter tree, not just flat list)
@@ -497,8 +528,8 @@ module Books
     nil
   end
 
-  # Create navigation hash for a chapter entry
-  private def self.nav_hash_for_entry(entry : ChapterEntry, book_name : String) : Hash(String, String)
+  # Create navigation link for a chapter entry
+  private def self.nav_link_for_entry(entry : ChapterEntry, book_name : String) : NavigationLink
     entry_title = entry.title
     entry_link = entry.link(book_name)
 
@@ -512,10 +543,7 @@ module Books
       end
     end
 
-    {
-      "title" => entry_title,
-      "link"  => entry_link,
-    }
+    NavigationLink.new(title: entry_title, link: entry_link)
   end
 
   # Render TOC as HTML string - avoids recursive template includes
