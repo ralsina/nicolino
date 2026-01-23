@@ -58,34 +58,124 @@ TARGET_SHORTCODES = TARGET_DIR / "shortcodes"
 
 
 def parse_frontmatter(content: str) -> Tuple[dict, str]:
-    """Parse YAML frontmatter from content using Python's yaml module."""
-    if not content.startswith("---"):
-        return {}, content
+    """Parse YAML or Nikola RST-style frontmatter from content."""
+    metadata = {}
+    body = content
 
-    parts = content.split("---", 2)
-    if len(parts) < 3:
-        return {}, content
+    # Try YAML frontmatter first
+    if content.startswith("---"):
+        parts = content.split("---", 2)
+        if len(parts) >= 3:
+            frontmatter_text = parts[1]
+            body = parts[2].lstrip()
 
-    frontmatter_text = parts[1]
-    body = parts[2].lstrip()
+            try:
+                # Use Python's yaml module to properly parse YAML with anchors and aliases
+                metadata = yaml.safe_load(frontmatter_text) or {}
+            except Exception as e:
+                # Fallback to simple line-by-line parsing if yaml.safe_load fails
+                metadata = {}
+                for line in frontmatter_text.strip().split("\n"):
+                    line = line.strip()
+                    if ":" in line and not line.startswith("#"):
+                        key, value = line.split(":", 1)
+                        key = key.strip()
+                        value = value.strip()
+                        value = re.sub(r'^&\S+\s+', '', value)
+                        if value.startswith('*'):
+                            continue
+                        value = value.strip().strip("'").strip('"')
+                        metadata[key] = value
 
-    try:
-        # Use Python's yaml module to properly parse YAML with anchors and aliases
-        metadata = yaml.safe_load(frontmatter_text) or {}
-    except Exception as e:
-        # Fallback to simple line-by-line parsing if yaml.safe_load fails
-        metadata = {}
-        for line in frontmatter_text.strip().split("\n"):
-            line = line.strip()
-            if ":" in line and not line.startswith("#"):
+            # Clean up any remaining RST-style metadata fragments from the body
+            # (some files have both YAML and old RST metadata)
+            body_lines = []
+            skip_remaining_metadata = False
+            for line in body.split("\n"):
+                stripped = line.strip()
+                # Check if we hit a metadata-like line (starts with ".. " and has ":" or is just "..")
+                # Also check for the HTML comment closing that sometimes wraps old metadata
+                if stripped == "-->" or (stripped.startswith(".. ") and (":" in stripped or len(stripped) <= 3)):
+                    skip_remaining_metadata = True
+                    continue
+                # Once we see a non-metadata line, include everything after
+                if skip_remaining_metadata:
+                    if stripped and not stripped.startswith(".. ") and stripped != "-->":
+                        skip_remaining_metadata = False
+                        body_lines.append(line)
+                    # Continue skipping while we're in metadata mode
+                    continue
+                body_lines.append(line)
+            body = "\n".join(body_lines).lstrip()
+    else:
+        # Try Nikola RST-style metadata (.. key: value)
+        # Format: <!-- .. key: value --> or just .. key: value
+        lines = content.split("\n")
+        metadata_started = False
+        metadata_lines = []
+        body_start = 0
+
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+            # Check for HTML comment start with Nikola metadata
+            if stripped == "<!--":
+                metadata_started = True
+                continue
+            # Check for metadata line
+            if metadata_started:
+                if stripped.startswith(".. "):
+                    # Check if this is the end of metadata (empty line or closing comment)
+                    if stripped == "..":
+                        # Just ".. " on its own might be end of metadata
+                        if metadata_lines:
+                            body_start = i + 1
+                            break
+                    elif stripped == "-->":
+                        # End of HTML comment, metadata ends
+                        body_start = i + 1
+                        break
+                    elif ":" in stripped:
+                        # This is a metadata line like ".. title: Something"
+                        metadata_lines.append(stripped)
+                        continue
+                    else:
+                        # Line starting with ".. " but not a metadata line
+                        # This could be content like ".. code-block::" etc.
+                        body_start = i
+                        break
+                elif stripped == "-->":
+                    # End of HTML comment without blank line before
+                    body_start = i + 1
+                    break
+                else:
+                    # Non-metadata line while in metadata section
+                    body_start = i
+                    break
+            # Not in metadata yet, but check if we find a ".. " line (metadata without HTML comment)
+            elif stripped.startswith(".. ") and ":" in stripped:
+                metadata_started = True
+                metadata_lines.append(stripped)
+                continue
+            # Found a non-metadata line before metadata started
+            elif stripped:
+                body_start = i
+                break
+
+        # Parse the metadata lines
+        for line in metadata_lines:
+            if line == "-->" or line == "..":
+                continue
+            if line.startswith(".. ") and ":" in line:
+                # Remove ".. " prefix and parse key: value
+                line = line[3:]  # Remove ".. "
                 key, value = line.split(":", 1)
                 key = key.strip()
                 value = value.strip()
-                value = re.sub(r'^&\S+\s+', '', value)
-                if value.startswith('*'):
-                    continue
-                value = value.strip().strip("'").strip('"')
+                # Remove surrounding quotes if present
+                value = value.strip("'").strip('"')
                 metadata[key] = value
+
+        body = "\n".join(lines[body_start:])
 
     # Convert all values to strings for consistency
     str_metadata = {}
@@ -166,7 +256,31 @@ def convert_frontmatter_to_nicolino(metadata: dict, content: str) -> str:
     """Convert Nikola frontmatter to Nicolino format."""
     title = metadata.get("title", "Untitled")
     date_str = metadata.get("date", "")
+
+    # Merge tags and category fields (some posts have tags in category due to human error)
     tags = metadata.get("tags", "")
+    category = metadata.get("category", "")
+
+    # Split and merge tags from both fields, removing duplicates
+    all_tags = []
+    if tags:
+        if isinstance(tags, list):
+            all_tags.extend(tags)
+        else:
+            all_tags.extend([t.strip() for t in str(tags).split(",") if t.strip()])
+    if category and category != "":
+        if isinstance(category, list):
+            all_tags.extend(category)
+        else:
+            all_tags.extend([t.strip() for t in str(category).split(",") if t.strip()])
+
+    # Remove duplicates while preserving order
+    seen = set()
+    unique_tags = []
+    for tag in all_tags:
+        if tag not in seen:
+            seen.add(tag)
+            unique_tags.append(tag)
 
     nicolino_date = convert_nikola_date_to_nicolino(date_str)
 
@@ -176,23 +290,9 @@ def convert_frontmatter_to_nicolino(metadata: dict, content: str) -> str:
         "date": nicolino_date,
     }
 
-    # Process tags
-    if tags:
-        tags_clean = tags.replace("**", "").replace("*", "")
-        # Parse tags - could be array format "[tag1, tag2]" or comma-separated "tag1, tag2"
-        if tags_clean.startswith("["):
-            # YAML array format
-            try:
-                parsed_tags = yaml.safe_load(tags_clean)
-                if isinstance(parsed_tags, list):
-                    frontmatter_dict["tags"] = parsed_tags
-                else:
-                    frontmatter_dict["tags"] = [tags_clean]
-            except:
-                frontmatter_dict["tags"] = [tags_clean]
-        else:
-            # Comma-separated format
-            frontmatter_dict["tags"] = [t.strip() for t in tags_clean.split(",")]
+    # Add merged tags if any exist
+    if unique_tags:
+        frontmatter_dict["tags"] = unique_tags
 
     # Convert to YAML frontmatter
     yaml_frontmatter = yaml.dump(frontmatter_dict, default_flow_style=False, sort_keys=False)
@@ -211,14 +311,17 @@ def get_cached_html(source_file: Path, is_es: bool = False) -> Optional[str]:
     # Build cache path
     # pages/26.txt -> cache/pages/26.html
     # pages/26.txt.es -> cache/pages/26.es.html
-    stem = source_file.stem  # e.g., "26" from "26.txt"
+    # Note: For .es.txt files, the stem is "filename.es" but we want "filename.es.html"
+    # So we use the stem directly without adding .es again
+    stem = source_file.stem  # e.g., "26.es" from "26.es.txt" or "26" from "26.txt"
 
     # Determine the cache subdirectory and filename
     rel_path = source_file.relative_to(SOURCE_DIR)
     cache_dir = SOURCE_CACHE / rel_path.parent
 
     if is_es:
-        cache_file = cache_dir / f"{stem}.es.html"
+        # For .es files, stem is already "filename.es", just add .html
+        cache_file = cache_dir / f"{stem}.html"
     else:
         cache_file = cache_dir / f"{stem}.html"
 
@@ -229,10 +332,9 @@ def get_cached_html(source_file: Path, is_es: bool = False) -> Optional[str]:
     try:
         html_content = cache_file.read_text(encoding="utf-8")
 
-        # Return the cached HTML as-is
-        # The cached HTML is already processed by Nikola, so any
-        # Jinja2/shortcode syntax has already been rendered
-        return html_content
+        # Wrap in raw tags to prevent shortcode reprocessing
+        # The cached HTML is already processed by Nikola
+        return f"{{% raw %}}\n{html_content}\n{{% /raw %}}"
     except Exception as e:
         print(f"    Warning: Could not read cache {cache_file}: {e}")
         return None
