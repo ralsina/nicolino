@@ -146,9 +146,9 @@ class FeatureTask < Croupier::Task
   )
     # Wrap the block to track timing
     wrapped_block = ->do
-      start_time = Time.monotonic
+      start_time = Time.instant
       result = block.call
-      elapsed = Time.monotonic - start_time
+      elapsed = Time.instant - start_time
 
       # Record timing for this feature
       FeatureTiming.record_task(@feature_name, elapsed)

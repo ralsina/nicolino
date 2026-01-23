@@ -32,9 +32,9 @@ VERSION = {{ `shards version #{__DIR__}`.chomp.stringify }}
 
 # Helper to time feature enable calls
 def time_feature_enable(name : String, &)
-  start = Time.monotonic
+  start = Time.instant
   result = yield
-  elapsed = Time.monotonic - start
+  elapsed = Time.instant - start
   FeatureTiming.record_enable(name, elapsed)
   result
 end
@@ -114,7 +114,7 @@ def run(
   # Run tasks for real
   Log.info { "Running tasks..." }
   Log.info { "[DEBUG] About to call run_tasks with #{Croupier::TaskManager.tasks.size} tasks" }
-  start_time = Time.monotonic
+  start_time = Time.instant
   Croupier::TaskManager.run_tasks(
     targets: arguments,
     parallel: parallel,
@@ -122,7 +122,7 @@ def run(
     dry_run: dry_run,
     run_all: run_all,
   )
-  elapsed = (Time.monotonic - start_time).total_milliseconds
+  elapsed = (Time.instant - start_time).total_milliseconds
   Log.info { "[DEBUG] run_tasks took #{elapsed}ms" }
 
   # Generate feature timing report

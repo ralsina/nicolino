@@ -24,9 +24,9 @@ module Sitemap
   def self.render
     # TODO: support robot exclusion
     # TODO: support alternates for locations
-    start = Time.monotonic
+    start = Time.instant
     inputs = Croupier::TaskManager.tasks.keys.select(&.ends_with?(".html"))
-    Log.info { "🗺️ Sitemap: collected #{inputs.size} inputs in #{(Time.monotonic - start).total_milliseconds}ms" }
+    Log.info { "🗺️ Sitemap: collected #{inputs.size} inputs in #{(Time.instant - start).total_milliseconds}ms" }
 
     FeatureTask.new(
       feature_name: "sitemap",

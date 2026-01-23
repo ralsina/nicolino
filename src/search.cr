@@ -25,9 +25,9 @@ module Search
   end
 
   def self.render
-    start = Time.monotonic
+    start = Time.instant
     inputs = Croupier::TaskManager.tasks.keys.select(&.to_s.ends_with?(".html"))
-    Log.info { "🔍 Search: collected #{inputs.size} inputs in #{(Time.monotonic - start).total_milliseconds}ms" }
+    Log.info { "🔍 Search: collected #{inputs.size} inputs in #{(Time.instant - start).total_milliseconds}ms" }
     FeatureTask.new(
       feature_name: "search",
       id: "search",

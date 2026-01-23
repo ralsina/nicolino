@@ -26,10 +26,22 @@ module Posts
     posts += Pandoc.read_all(content_post_path) if features.includes?("pandoc")
 
     # Load dates for all posts before sorting (dates are lazy-loaded)
+    # Use parallel processing to speed up date parsing (4 workers)
     t1 = Time.instant
-    posts.each do |post|
-      post.date # Force date parsing
+    num_workers = 4
+    channel = Channel(Markdown::File).new
+    posts_per_worker = (posts.size / num_workers).ceil.to_i
+
+    num_workers.times do
+      spawn do
+        while post = channel.receive?
+          post.date
+        end
+      end
     end
+
+    posts.each { |post| channel.send(post) }
+    num_workers.times { channel.close }
     t2 = Time.instant
 
     posts.sort!

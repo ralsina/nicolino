@@ -53,6 +53,10 @@ shards:
     git: https://github.com/ralsina/kiwi.git
     version: 0.1.0+git.commit.65059b87771238593a28b2b8b9fdf77d8e2b9e89
 
+  leveldb:
+    git: https://github.com/crystal-community/leveldb.git
+    version: 0.2.0
+
   lexbor:
     git: https://github.com/kostya/lexbor.git
     version: 3.4.2
@@ -97,17 +101,9 @@ shards:
     git: https://github.com/stumpycr/stumpy_png.git
     version: 5.0.1
 
-  tablo:
-    git: https://github.com/hutou/tablo.git
-    version: 1.0.2
-
   tartrazine:
     git: https://github.com/ralsina/tartrazine.git
     version: 0.20.1
-
-  textseg:
-    git: https://github.com/naqvis/uni_text_seg.git
-    version: 0.1.3
 
   toml:
     git: https://github.com/manastech/crystal-toml.git
@@ -116,10 +112,6 @@ shards:
   totem:
     git: https://github.com/icyleaf/totem.git
     version: 0.7.0
-
-  uniwidth:
-    git: https://github.com/naqvis/uni_char_width.git
-    version: 0.1.3
 
   vips:
     git: https://github.com/naqvis/crystal-vips.git

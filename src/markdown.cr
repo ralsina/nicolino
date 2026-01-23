@@ -1,5 +1,4 @@
 require "./html_filters"
-require "./post_dates"
 require "./sc"
 require "./similarity"
 require "./taxonomies"
@@ -280,14 +279,7 @@ module Markdown
       # Return cached value if already loaded
       return @date if !@date.nil?
 
-      # Try to load from kv store cache first
-      source_path = source
-      if PostDates.cached?(source_path)
-        @date = PostDates.get_date(source_path)
-        return @date
-      end
-
-      # Parse from frontmatter (expensive)
+      # Parse from frontmatter
       t = metadata.fetch("date", nil)
       if t != nil
         begin
@@ -318,9 +310,6 @@ module Markdown
           end
         end
       end
-
-      # Store in cache for future runs (only if parsing succeeded)
-      PostDates.set_date(source_path, @date) unless @date.nil?
       @date
     end
 
