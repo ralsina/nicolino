@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.0] - 2026-01-23
+
+### 🚀 Features
+
+- Add per-feature timing breakdown with task counts and averages
+
+### 🐛 Bug Fixes
+
+- Improve site import script handling
+
+### 🚜 Refactor
+
+- Convert books navigation from nested hashes to proper records
+- Convert similarity results from mixed-type hashes to typed records
+- Extract RSS module, defer date/title loading to task execution
+
+### ⚡ Performance
+
+- Add similarity caching, fix language filtering, improve timing reports
+- Parallelize post date loading, remove PostDates module, fix Time.monotonic deprecations
+
+### Build
+
+- Not-release
+
 ## [0.12.0] - 2026-01-22
 
 ### 🚀 Features
@@ -32,6 +57,10 @@ All notable changes to this project will be documented in this file.
 ### ⚡ Performance
 
 - Add lightweight_value to taxonomy rendering to avoid rendering posts
+
+### Bump
+
+- Release v0.12.0
 
 ## [0.11.1] - 2026-01-22
 

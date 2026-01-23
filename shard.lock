@@ -5,10 +5,6 @@ shards:
     git: https://github.com/ralsina/rss.cr.git
     version: 0.1.1+git.commit.6f74fb4f3d312babe4f9cebec4a97cf4330023a5
 
-  ameba:
-    git: https://github.com/crystal-ameba/ameba.git
-    version: 1.6.4
-
   baked_file_system: # Overridden
     git: https://github.com/ralsina/baked_file_system.git
     version: 0.10.0+git.commit.beb373124c7a235cfb9cd94e36849d8168eaa04b
@@ -52,10 +48,6 @@ shards:
   kiwi:
     git: https://github.com/ralsina/kiwi.git
     version: 0.1.0+git.commit.65059b87771238593a28b2b8b9fdf77d8e2b9e89
-
-  leveldb:
-    git: https://github.com/crystal-community/leveldb.git
-    version: 0.2.0
 
   lexbor:
     git: https://github.com/kostya/lexbor.git
