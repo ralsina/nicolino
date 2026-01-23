@@ -15,7 +15,8 @@ module Assets
     Dir.glob("assets/**/*").each do |src|
       next if File.directory?(src)
       dest = Path[Config.options.output] / Path[Path[src].parts[1..]]
-      Croupier::Task.new(
+      FeatureTask.new(
+        feature_name: "assets",
         id: "assets",
         output: dest.to_s,
         inputs: [src],

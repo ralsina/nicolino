@@ -398,7 +398,8 @@ module Books
       "kv://#{title_template}",
     ] + Templates.get_deps(book_chapter_template)
 
-    Croupier::Task.new(
+    FeatureTask.new(
+      feature_name: "books",
       id: "book/#{book.name}/#{entry.slug}",
       output: output_path.to_s,
       inputs: inputs,
@@ -625,7 +626,8 @@ module Books
       "kv://#{title_template}",
     ] + Templates.get_deps(book_index_template)
 
-    Croupier::Task.new(
+    FeatureTask.new(
+      feature_name: "books",
       id: "book/#{book.name}/index",
       output: output_path.to_s,
       inputs: inputs,
@@ -690,7 +692,8 @@ module Books
     title_template = Theme.template_path("title.tmpl")
     item_list_template = Theme.template_path("item_list.tmpl")
 
-    Croupier::Task.new(
+    FeatureTask.new(
+      feature_name: "books",
       id: "books/index",
       output: output_path.to_s,
       inputs: ["conf.yml", "kv://#{page_template}", "kv://#{title_template}"] + Templates.get_deps(item_list_template),

@@ -61,25 +61,42 @@ module FolderIndexes
 
     def initialize(path : Path)
       @path = path
-      # Get the relative path from posts directory
-      posts_path = Path.new(Config.options.content).expand / Config.options.posts
-      rel = (path / "index.html").relative_to(posts_path)
-      # When path equals posts_path, relative_to returns "./index.html"
-      # We need "index.html" without the leading "./"
-      @output = Path.new(rel.to_s.gsub(/^\.\//, ""))
+      # Get the relative path from content directory
+      # This gives us "posts/index.html" for posts/ and "posts/foo/index.html" for posts/foo/
+      content_path = Path.new(Config.options.content).expand
+      rel = (path / "index.html").relative_to(content_path)
+      @output = rel
     end
 
     # Get all posts whose output starts with this folder's path (prefix-matching)
     def posts_by_prefix(lang : String? = nil)
       lang ||= Locale.language
       content_path = Path.new(Config.options.content).expand
-      output_prefix = Config.options.output.rchop('/')
-      output_folder = "#{output_prefix}/#{@path.relative_to(content_path)}"
+      posts_dir = Config.options.posts.rstrip('/')
+
+      # Calculate the output folder path for this folder index
+      # The output path for posts is always "output/posts/..." regardless of content structure
+      # We need to find the relative path from posts/ directory to this folder
+      rel_from_posts = @path.relative_to(content_path / posts_dir)
+
+      # Build the output prefix for matching
+      # For posts/ itself: output_prefix = "output/posts/"
+      # For posts/foo/: output_prefix = "output/posts/foo/"
+      # For posts/foo/bar/: output_prefix = "output/posts/foo/bar/"
+      if rel_from_posts.to_s == "." || rel_from_posts.to_s == ""
+        # This is the posts/ directory itself
+        output_prefix = "output/#{posts_dir}/"
+      else
+        # This is a subfolder of posts/
+        output_prefix = "output/#{posts_dir}/#{rel_from_posts}/"
+      end
 
       # Find all posts whose output path starts with this folder
-      Markdown::File.posts.values.select do |post|
-        post.output(lang).starts_with?(output_folder)
+      matching_posts = Markdown::File.posts.values.select do |post|
+        post.output(lang).starts_with?(output_prefix)
       end.sort_by! { |post_data| post_data.date || Time.utc(1970, 1, 1) }.reverse!
+
+      matching_posts
     end
 
     # Get the title for this folder index

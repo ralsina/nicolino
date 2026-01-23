@@ -49,7 +49,8 @@ module Sc
     Log.debug { "Scanning shortcodes" }
     count = 0
     Dir.glob("shortcodes/*.tmpl").each do |template|
-      Croupier::Task.new(
+      FeatureTask.new(
+        feature_name: "shortcodes",
         id: "shortcode",
         inputs: [template],
         output: "kv://#{template}",

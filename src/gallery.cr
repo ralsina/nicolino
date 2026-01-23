@@ -259,7 +259,8 @@ module Gallery
         gallery_rel_path = gallery_dir.relative_to(Config.options.content).to_s
         task_id = "gallery_#{lang}_#{gallery_rel_path.gsub("/", "_")}"
 
-        Croupier::Task.new(
+        FeatureTask.new(
+          feature_name: "galleries",
           id: task_id,
           output: post.output(lang),
           inputs: [
@@ -304,7 +305,8 @@ module Gallery
         # Check if we've already scheduled this task by looking at output path
         # Since we're inside the language loop, we need to ensure we only create it once
         # The trick: use mergeable: true so Croupier can handle duplicates
-        Croupier::Task.new(
+        FeatureTask.new(
+          feature_name: "galleries",
           id: gallery_json_task_id,
           output: gallery_json_path.to_s,
           inputs: ["conf.yml", post.source(lang)] + post.@image_list.map { |i| "#{basedir}/#{i}" },
@@ -349,7 +351,8 @@ module Gallery
       page_template = Theme.template_path("page.tmpl")
       title_template = Theme.template_path("title.tmpl")
 
-      Croupier::Task.new(
+      FeatureTask.new(
+        feature_name: "galleries",
         id: "galleries_index",
         output: output_path.to_s,
         inputs: ["conf.yml", "kv://#{page_template}", "kv://#{title_template}"],

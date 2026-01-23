@@ -123,7 +123,8 @@ module Archive
       title_template = Theme.template_path("title.tmpl")
       page_template = Theme.template_path("page.tmpl")
 
-      Croupier::Task.new(
+      FeatureTask.new(
+        feature_name: "archive",
         id: "archive",
         output: output_path,
         inputs: dated_posts.flat_map(&.dependencies) + [

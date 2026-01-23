@@ -28,7 +28,8 @@ module Sitemap
     inputs = Croupier::TaskManager.tasks.keys.select(&.ends_with?(".html"))
     Log.info { "🗺️ Sitemap: collected #{inputs.size} inputs in #{(Time.monotonic - start).total_milliseconds}ms" }
 
-    Croupier::Task.new(
+    FeatureTask.new(
+      feature_name: "sitemap",
       id: "sitemap",
       output: output = (Path[Config.options.output] / "sitemap.xml").to_s,
       inputs: inputs,

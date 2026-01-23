@@ -12,7 +12,8 @@ module Base16
 
   def self.render_base16
     base16_template = Theme.template_path("base16.tmpl")
-    Croupier::Task.new(
+    FeatureTask.new(
+      feature_name: "base16",
       id: "base16",
       output: (Path[Config.options.output] / "css" / "color_scheme.css").to_s,
       inputs: ["conf.yml"] + Templates.get_deps(base16_template),

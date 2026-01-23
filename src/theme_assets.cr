@@ -14,7 +14,8 @@ module ThemeAssets
       next if File.directory?(src)
       # Skip "themes/default/assets" parts to get relative path
       dest = Path[Config.options.output] / Path[Path[src].parts[3..]]
-      Croupier::Task.new(
+      FeatureTask.new(
+        feature_name: "theme_assets",
         id: "theme_assets",
         output: dest.to_s,
         inputs: [src],

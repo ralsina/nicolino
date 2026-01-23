@@ -117,7 +117,8 @@ module Templates
       deps = get_deps(template)
       Log.debug { "Template #{template} dependencies: #{deps.inspect}" }
 
-      Croupier::Task.new(
+      FeatureTask.new(
+        feature_name: "templates",
         id: "template",
         inputs: [template], # Only the file itself, not other templates (those are runtime deps)
         output: "kv://#{template}",

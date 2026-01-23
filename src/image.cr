@@ -28,7 +28,8 @@ module Image
     def render(prefix = "")
       src = @path.to_s
       dest = Path[Config.options.output] / prefix / Path[@path.parts[1..]]
-      Croupier::Task.new(
+      FeatureTask.new(
+        feature_name: "images",
         id: "image",
         output: dest.to_s,
         inputs: ["conf.yml", src],
@@ -39,7 +40,8 @@ module Image
         nil
       end
       thumb_dest = Path[dest.parent, dest.stem + ".thumb" + dest.extension]
-      Croupier::Task.new(
+      FeatureTask.new(
+        feature_name: "images",
         id: "thumb",
         output: thumb_dest.to_s,
         inputs: ["conf.yml", src],

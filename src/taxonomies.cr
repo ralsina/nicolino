@@ -162,7 +162,8 @@ module Taxonomies
 
         rendered = Templates.environment.get_template(taxonomy_template).render({"taxonomy" => lightweight_value(lang)})
 
-        Croupier::Task.new(
+        FeatureTask.new(
+          feature_name: "taxonomies",
           id: "taxonomy",
           output: output,
           inputs: @posts.flat_map(&.dependencies) + ["kv://#{taxonomy_template}", "kv://#{title_template}"],

@@ -3,6 +3,7 @@ require "./archive"
 require "./creatable"
 require "./commands/*"
 require "./base16"
+require "./feature_timing"
 require "./books"
 require "./config"
 require "./gallery"
@@ -28,6 +29,15 @@ require "live_reload"
 require "yaml"
 
 VERSION = {{ `shards version #{__DIR__}`.chomp.stringify }}
+
+# Helper to time feature enable calls
+def time_feature_enable(name : String, &)
+  start = Time.monotonic
+  result = yield
+  elapsed = Time.monotonic - start
+  FeatureTiming.record_enable(name, elapsed)
+  result
+end
 
 def create_tasks
   # Load config file
@@ -61,24 +71,24 @@ def create_tasks
 
   # Enable features
   Log.info { "🚀 Enabling features..." }
-  Assets.enable(features.includes?("assets"))
-  Base16.enable(features.includes?("base16"))
+  time_feature_enable("assets") { Assets.enable(features.includes?("assets")) }
+  time_feature_enable("base16") { Base16.enable(features.includes?("base16")) }
 
   # Posts must be enabled before taxonomies, archive, and similarity
-  posts = Posts.enable(features.includes?("posts"), content_post_path, features)
+  posts = time_feature_enable("posts") { Posts.enable(features.includes?("posts"), content_post_path, features) }
 
-  Taxonomies.enable(features.includes?("taxonomies"), posts) if posts
-  Similarity.enable(features.includes?("similarity"), posts) if posts
-  Archive.enable(features.includes?("archive"), posts) if posts
+  time_feature_enable("taxonomies") { Taxonomies.enable(features.includes?("taxonomies"), posts) } if posts
+  time_feature_enable("similarity") { Similarity.enable(features.includes?("similarity"), posts) } if posts
+  time_feature_enable("archive") { Archive.enable(features.includes?("archive"), posts) } if posts
 
-  Gallery.enable(features.includes?("galleries"), galleries_path)
-  Pages.enable(features.includes?("pages"), content_path, features)
-  Image.enable(features.includes?("images"), content_path)
-  Listings.enable(features.includes?("listings"), content_path)
-  Books.enable(features.includes?("books"))
-  Sitemap.enable(features.includes?("sitemap"))
-  Search.enable(features.includes?("search"))
-  FolderIndexes.enable(features.includes?("folder_indexes"), content_path)
+  time_feature_enable("galleries") { Gallery.enable(features.includes?("galleries"), galleries_path) }
+  time_feature_enable("pages") { Pages.enable(features.includes?("pages"), content_path, features) }
+  time_feature_enable("images") { Image.enable(features.includes?("images"), content_path) }
+  time_feature_enable("listings") { Listings.enable(features.includes?("listings"), content_path) }
+  time_feature_enable("books") { Books.enable(features.includes?("books")) }
+  time_feature_enable("sitemap") { Sitemap.enable(features.includes?("sitemap")) }
+  time_feature_enable("search") { Search.enable(features.includes?("search")) }
+  time_feature_enable("folder_indexes") { FolderIndexes.enable(features.includes?("folder_indexes"), content_path) }
 end
 
 def run(
@@ -114,6 +124,10 @@ def run(
   )
   elapsed = (Time.monotonic - start_time).total_milliseconds
   Log.info { "[DEBUG] run_tasks took #{elapsed}ms" }
+
+  # Generate feature timing report
+  FeatureTiming.report
+
   Log.info { "🏁 Done!" }
   0
 end

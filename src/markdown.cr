@@ -543,7 +543,8 @@ module Markdown
           Log.error { "Error: #{post.source lang} has no title" }
           next
         end
-        Croupier::Task.new(
+        FeatureTask.new(
+          feature_name: "posts",
           id: "markdown",
           output: post.output(lang),
           inputs: post.dependencies,
@@ -601,7 +602,8 @@ module Markdown
       "kv://#{page_template}",
     ] + posts.map(&.source) + posts.map(&.template) + extra_inputs
     inputs = inputs.uniq
-    Croupier::Task.new(
+    FeatureTask.new(
+      feature_name: "posts",
       id: "index",
       output: output.to_s,
       inputs: inputs,
@@ -685,7 +687,8 @@ module Markdown
     lang ||= Locale.language
     inputs = ["conf.yml"] + posts.map(&.source)
 
-    Croupier::Task.new(
+    FeatureTask.new(
+      feature_name: "posts",
       id: "rss",
       output: output.to_s,
       inputs: inputs,

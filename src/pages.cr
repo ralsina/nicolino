@@ -114,7 +114,8 @@ module Pages
 
         # Use unique task ID based on output path and language
         task_id = "page_folder_index::#{lang}::#{index.output}"
-        Croupier::Task.new(
+        FeatureTask.new(
+          feature_name: "pages",
           id: task_id,
           output: output,
           inputs: inputs,

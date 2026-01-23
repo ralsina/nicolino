@@ -91,7 +91,8 @@ module Listings
   def self.render_css
     output_path = Path[Config.options.output] / "css" / "listings.css"
 
-    Croupier::Task.new(
+    FeatureTask.new(
+      feature_name: "listings",
       id: "listings-css",
       output: output_path.to_s,
       inputs: ["conf.yml"],
@@ -118,7 +119,8 @@ module Listings
     title_template = Theme.template_path("title.tmpl")
     item_list_template = Theme.template_path("item_list.tmpl")
 
-    Croupier::Task.new(
+    FeatureTask.new(
+      feature_name: "listings",
       id: "listings-index",
       output: output_path,
       inputs: ["conf.yml", "kv://#{item_list_template}", "kv://#{title_template}", "kv://#{page_template}"],
@@ -179,7 +181,8 @@ module Listings
     title_template = Theme.template_path("title.tmpl")
     listing_template = Theme.template_path("listing.tmpl")
 
-    Croupier::Task.new(
+    FeatureTask.new(
+      feature_name: "listings",
       id: "listing:#{listing.source}",
       output: output_path,
       inputs: listing.dependencies + ["kv://#{listing_template}", "kv://#{title_template}", "kv://#{page_template}"],

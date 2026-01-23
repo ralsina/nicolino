@@ -14,7 +14,6 @@ module Similarity
     link : String,
     title : String,
     score : Float64 do
-
     def to_h : Hash(String, String | Float64)
       {
         "link"  => link,
@@ -278,7 +277,8 @@ module Similarity
       posts.each do |post|
         safe_link = post.link(lang).gsub("/", "_")
         # Create a task to calculate and store the signature for this post
-        Croupier::Task.new(
+        FeatureTask.new(
+          feature_name: "similarity",
           id: "similarity/#{safe_link}",
           output: "kv://similarity/signatures/#{lang}/#{safe_link}.json",
           inputs: [post.source(lang)],
@@ -294,7 +294,8 @@ module Similarity
       # This depends on all signature tasks
       signature_keys = posts.map { |post| "kv://similarity/signatures/#{lang}/#{post.link(lang).gsub("/", "_")}.json" }
 
-      Croupier::Task.new(
+      FeatureTask.new(
+        feature_name: "similarity",
         id: "similarity_index_#{lang}",
         output: "kv://similarity/index/#{lang}",
         inputs: signature_keys,
