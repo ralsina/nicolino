@@ -145,7 +145,7 @@ class FeatureTask < Croupier::Task
     &block : Croupier::TaskProc
   )
     # Wrap the block to track timing
-    wrapped_block = ->do
+    wrapped_block = -> do
       start_time = Time.instant
       result = block.call
       elapsed = Time.instant - start_time
