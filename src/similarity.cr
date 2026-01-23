@@ -9,6 +9,21 @@
 # small signatures that estimate Jaccard similarity.
 
 module Similarity
+  # Related post with similarity score
+  record RelatedPost,
+    link : String,
+    title : String,
+    score : Float64 do
+
+    def to_h : Hash(String, String | Float64)
+      {
+        "link"  => link,
+        "title" => title,
+        "score" => score,
+      }
+    end
+  end
+
   # Enable similarity feature (actual work is done in Posts.create_tasks)
   def self.enable(is_enabled : Bool, posts : Array(Markdown::File))
     # Similarity tasks are created by Posts.enable() before rendering
@@ -231,29 +246,28 @@ module Similarity
 
   # Find related posts for a given post
   #
-  # Returns an array of tuples containing [post_link, post_title, similarity_score]
-  # sorted by similarity score in descending order
-  def self.find_related(post : Markdown::File, lang : String, limit : Int32 = 5) : Array(Hash(String, String | Float64))
+  # Returns an array of RelatedPost objects sorted by similarity score in descending order
+  def self.find_related(post : Markdown::File, lang : String, limit : Int32 = 5) : Array(RelatedPost)
     signature = get_signature(post.link(lang), lang)
-    return [] of Hash(String, String | Float64) if signature.nil?
+    return [] of RelatedPost if signature.nil?
 
     all_signatures = get_all_signatures(lang)
-    return [] of Hash(String, String | Float64) if all_signatures.empty?
+    return [] of RelatedPost if all_signatures.empty?
 
     # Calculate similarities and filter out the post itself
     similarities = all_signatures.compact_map do |sig|
       next nil if sig.post_link == signature.post_link
 
       score = jaccard_similarity(signature, sig)
-      {
-        "link"  => sig.post_link,
-        "title" => sig.post_title,
-        "score" => score,
-      }
+      RelatedPost.new(
+        link: sig.post_link,
+        title: sig.post_title,
+        score: score
+      )
     end
 
     # Sort by similarity score (descending) and take top N
-    similarities.sort_by { |item| -item["score"].as(Float64) }[0...limit] || [] of Hash(String, String | Float64)
+    similarities.sort_by { |item| -item.score }[0...limit] || [] of RelatedPost
   end
 
   # Create tasks to calculate and store signatures for all posts

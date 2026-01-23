@@ -491,7 +491,9 @@ module Markdown
       # Only try to find related posts if signatures exist
       # This avoids errors during initial build or when signatures aren't ready
       begin
-        Similarity.find_related(self, lang, 5)
+        related_posts = Similarity.find_related(self, lang, 5)
+        # Convert to hash for template compatibility
+        related_posts.map(&.to_h)
       rescue
         [] of Hash(String, String | Float64)
       end
