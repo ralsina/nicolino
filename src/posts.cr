@@ -17,7 +17,6 @@ module Posts
 
     # Note: Posts are already registered by nicolino new command,
     # but features can register additional types here if needed
-
     # Convert Totem::Any set to string set for easier use
     features = feature_set.map(&.as_s).to_set
 
@@ -27,11 +26,14 @@ module Posts
     posts += Pandoc.read_all(content_post_path) if features.includes?("pandoc")
 
     # Load dates for all posts before sorting (dates are lazy-loaded)
+    t1 = Time.instant
     posts.each do |post|
       post.date # Force date parsing
     end
+    t2 = Time.instant
 
     posts.sort!
+    t3 = Time.instant
 
     Log.info { "✓ Found #{posts.size} post#{posts.size == 1 ? "" : "s"}" }
 
@@ -67,6 +69,9 @@ module Posts
         lang: lang,
       )
     end
+    pp! Time.instant - t3
+    pp! t3 - t2
+    pp! t2 - t1
 
     posts
   end

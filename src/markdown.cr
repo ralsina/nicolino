@@ -1,4 +1,5 @@
 require "./html_filters"
+require "./post_dates"
 require "./sc"
 require "./similarity"
 require "./taxonomies"
@@ -276,7 +277,17 @@ module Markdown
     end
 
     def date : Time | Nil
+      # Return cached value if already loaded
       return @date if !@date.nil?
+
+      # Try to load from kv store cache first
+      source_path = source
+      if PostDates.cached?(source_path)
+        @date = PostDates.get_date(source_path)
+        return @date
+      end
+
+      # Parse from frontmatter (expensive)
       t = metadata.fetch("date", nil)
       if t != nil
         begin
@@ -307,6 +318,9 @@ module Markdown
           end
         end
       end
+
+      # Store in cache for future runs (only if parsing succeeded)
+      PostDates.set_date(source_path, @date) unless @date.nil?
       @date
     end
 
@@ -592,7 +606,16 @@ module Markdown
   end
 
   # Create an index page out of a list of posts, save in output
-  def self.render_index(posts, output, title = nil, extra_inputs = [] of String, extra_feed = nil, main_feed = nil, lang = nil)
+  def self.render_index(
+    posts,
+    output,
+    title = nil,
+    extra_inputs = [] of String,
+    extra_feed = nil,
+    main_feed = nil,
+    lang = nil,
+    feature_name = "posts",
+  )
     lang ||= Locale.language
     index_template = Theme.template_path("index.tmpl")
     page_template = Theme.template_path("page.tmpl")
@@ -603,7 +626,7 @@ module Markdown
     ] + posts.map(&.source) + posts.map(&.template) + extra_inputs
     inputs = inputs.uniq
     FeatureTask.new(
-      feature_name: "posts",
+      feature_name: feature_name,
       id: "index",
       output: output.to_s,
       inputs: inputs,
@@ -683,12 +706,12 @@ module Markdown
   end
 
   # Create a RSS file out of posts with title, save in output
-  def self.render_rss(posts, output, title, lang = nil)
+  def self.render_rss(posts, output, title, lang = nil, feature_name = "posts")
     lang ||= Locale.language
     inputs = ["conf.yml"] + posts.map(&.source)
 
     FeatureTask.new(
-      feature_name: "posts",
+      feature_name: feature_name,
       id: "rss",
       output: output.to_s,
       inputs: inputs,

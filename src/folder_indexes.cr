@@ -190,6 +190,7 @@ module FolderIndexes
           feed_path,
           feed_title,
           lang: lang,
+          feature_name: "folder_indexes",
         )
 
         Markdown.render_index(
@@ -199,6 +200,7 @@ module FolderIndexes
           extra_feed: {link: Utils.path_to_link(feed_path), title: feed_title},
           main_feed: nil, # Folder indexes don't get main feed
           lang: lang,
+          feature_name: "folder_indexes",
         )
       end
     end

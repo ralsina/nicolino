@@ -32,7 +32,26 @@ module FeatureTiming
   def self.report
     return if @@enable_timings.empty? && @@task_timings.empty?
 
-    all_features = (@@enable_timings.keys + @@task_timings.keys).uniq.sort!
+    # Build feature data and sort by total time (descending)
+    feature_data = (@@enable_timings.keys + @@task_timings.keys).uniq.map do |feature|
+      enable_time = @@enable_timings[feature]? || Time::Span.zero
+      task_time = @@task_timings[feature]? || Time::Span.zero
+      task_count = @@task_counts[feature]? || 0
+      feature_total = enable_time + task_time
+      avg_time = task_count > 0 ? task_time / task_count : Time::Span.zero
+
+      {
+        name:   feature,
+        total:  feature_total,
+        enable: enable_time,
+        tasks:  task_time,
+        count:  task_count,
+        avg:    avg_time,
+      }
+    end
+
+    # Sort by total time descending
+    feature_data.sort_by! { |feature_data_item| -feature_data_item[:total].total_milliseconds }
 
     total_time = Time::Span.zero
     total_tasks = 0
@@ -40,17 +59,18 @@ module FeatureTiming
     # Build table data with header
     table_data = [["Feature", "Total", "Enable", "Tasks", "Count", "Avg"]]
 
-    all_features.each do |feature|
-      enable_time = @@enable_timings[feature]? || Time::Span.zero
-      task_time = @@task_timings[feature]? || Time::Span.zero
-      task_count = @@task_counts[feature]? || 0
-      feature_total = enable_time + task_time
-      total_time += feature_total
-      total_tasks += task_count
+    feature_data.each do |data|
+      total_time += data[:total]
+      total_tasks += data[:count]
 
-      avg_time = task_count > 0 ? task_time / task_count : Time::Span.zero
-
-      table_data << [feature, format_ms(feature_total), format_ms(enable_time), format_ms(task_time), task_count.to_s, format_ms(avg_time)]
+      table_data << [
+        data[:name],
+        format_ms(data[:total]),
+        format_ms(data[:enable]),
+        format_ms(data[:tasks]),
+        data[:count].to_s,
+        format_ms(data[:avg]),
+      ]
     end
 
     # Add total row

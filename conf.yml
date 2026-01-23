@@ -114,5 +114,5 @@ features:
   - sitemap
   - search
   - taxonomies
-  - similarity
+  # - similarity  # Disabled by default - makes builds significantly slower
   - archive

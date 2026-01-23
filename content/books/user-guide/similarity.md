@@ -9,16 +9,24 @@ This feature implements a lightweight document similarity system that:
 - Finds related posts based on Jaccard similarity estimation
 - Returns the top 5 most similar posts for each article
 
+## Performance Warning
+
+**This feature is disabled by default because it makes builds significantly slower.**
+
+The similarity calculation requires comparing each post against all other posts, which is computationally expensive. For sites with many posts, enabling this feature can substantially increase build time.
+
+The current implementation includes caching to avoid redundant calculations, but the initial computation for each post still requires O(N) comparisons where N is the number of posts. Consider whether the "related posts" functionality provides enough value to justify the build time cost for your use case.
+
 ## Enabling the Feature
 
-The similarity feature is **disabled by default**. To enable it, add `similarity` to the features list in your `conf.yml`:
+To enable the similarity feature, add `similarity` to the features list in your `conf.yml`:
 
 ```yaml
 features:
   - assets
   - base16
   - posts
-  - similarity  # Add this line
+  - similarity  # Add this line - will make builds slower!
   - taxonomies
 ```
 
@@ -48,17 +56,24 @@ MinHash allows us to estimate this efficiently by comparing signature elements:
 - Count how many of the 128 hash values match between two signatures
 - Divide by 128 to get the similarity score (0.0 to 1.0)
 
-### Performance
+### Performance Characteristics
 
-The MinHash approach reduces similarity computation from **O(n²)** to **O(n)**:
+The MinHash approach reduces similarity computation from **O(n²)** to **O(n)** per post:
 
-- **Traditional**: Compare every post with every other post
-- **MinHash**: Each post has a fixed-size signature, comparison is O(1)
+- **Traditional**: Compare every post with every other post (N² total)
+- **MinHash**: Each post has a fixed-size signature, comparison is O(1), but still O(N) per post
 
 For a site with 1000 posts:
 
-- Traditional: ~500,000 comparisons
-- MinHash: ~5,000 comparisons (only for candidates)
+- Traditional approach: ~500,000 comparisons
+- MinHash approach: ~1,000,000 comparisons (1000 posts × 1000 comparisons each)
+
+The implementation includes caching:
+- Signatures are loaded once per language and cached
+- Related posts results are cached per post/language/limit combination
+- Subsequent calls for the same post return immediately from cache
+
+However, the first render of each post still requires computing similarities against all other posts.
 
 ## Using in Templates
 
@@ -128,6 +143,15 @@ Each signature is approximately 512 bytes (128 × 4-byte integers).
 4. An index is built with all post links
 5. When rendering posts, `related_posts()` queries the kv store for similar posts
 
+### Caching
+
+The implementation uses two levels of caching:
+
+1. **Signature cache**: All signatures for a language are loaded once and cached
+2. **Results cache**: Related posts results are cached per post/language/limit combination
+
+This means that while the first render of each post is expensive, subsequent renders are fast.
+
 ### Error Handling
 
 The feature gracefully handles edge cases:
@@ -144,10 +168,11 @@ The feature gracefully handles edge cases:
 
 ## Limitations
 
-- The feature only works with posts that have text content (not pure images/galleries)
-- Very short posts may not find good matches
-- The algorithm is language-agnostic but works best with space-separated languages
-- Similarity is based on lexical overlap, not semantic meaning
+- **Build time**: Significantly increases build time for sites with many posts
+- **Content-based**: Only works with posts that have text content (not pure images/galleries)
+- **Short posts**: Very short posts may not find good matches
+- **Language**: The algorithm is language-agnostic but works best with space-separated languages
+- **Lexical similarity**: Based on word overlap, not semantic meaning
 
 ## Future Enhancements
 
@@ -158,3 +183,4 @@ Potential improvements for future versions:
 - **Semantic embeddings**: Use vector embeddings for semantic similarity
 - **Configurable result count**: Allow users to set how many related posts to show
 - **Similarity threshold**: Only show posts above a minimum similarity score
+- **Pre-computation**: Compute and store all similarity pairs during build instead of at render time

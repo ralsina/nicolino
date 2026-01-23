@@ -33,19 +33,63 @@ module Similarity
   class_property num_permutations : Int32 = 128
   class_property ngram_size : Int32 = 3
 
+  # Cache for all signatures across all languages
+  @@all_signatures_cache : Hash(String, Array(Signature)) | Nil = nil
+
+  # Cache for computed related posts results
+  @@related_posts_cache : Hash(String, Array(RelatedPost)) | Nil = nil
+
+  # Get all signatures from the kv store with caching
+  def self.get_all_signatures(lang : String) : Array(Signature)
+    # Initialize cache if needed
+    sig_cache = @@all_signatures_cache ||= Hash(String, Array(Signature)).new
+
+    # Return cached value if available
+    if cached = sig_cache[lang]?
+      return cached
+    end
+
+    signatures = [] of Signature
+
+    # Iterate through all keys in the kv store
+    # Note: This requires the kv store to support iteration
+    # For now, we'll store an index of all post links
+    index_key = "similarity/index/#{lang}"
+    index_data = Croupier::TaskManager.get(index_key)
+    return signatures if index_data.nil?
+
+    post_links = JSON.parse(index_data).as_a.map(&.as_s)
+    post_links.each do |link|
+      sig = get_signature(link, lang)
+      signatures << sig if sig
+    end
+
+    # Cache the result
+    sig_cache[lang] = signatures
+    signatures
+  end
+
+  # Clear the signatures cache (useful for testing or rebuilds)
+  def self.clear_cache : Nil
+    @@all_signatures_cache = nil
+    @@related_posts_cache = nil
+  end
+
   # A MinHash signature for a document
   struct Signature
     property post_link : String
     property post_title : String
+    property post_base : String # The base identifier (without extension) to track same post in different languages
     property hash_values : Array(Int32)
 
-    def initialize(@post_link : String, @post_title : String, @hash_values : Array(Int32))
+    def initialize(@post_link : String, @post_title : String, @hash_values : Array(Int32), @post_base : String)
     end
 
     def to_json(json : JSON::Builder)
       json.object do
         json.field "post_link", @post_link
         json.field "post_title", @post_title
+        json.field "post_base", @post_base
         json.field "hash_values", @hash_values
       end
     end
@@ -53,6 +97,7 @@ module Similarity
     def self.from_json(json : JSON::PullParser) : self
       post_link = ""
       post_title = ""
+      post_base = ""
       hash_values = [] of Int32
 
       json.on_key! "post_link" do
@@ -61,13 +106,16 @@ module Similarity
       json.on_key! "post_title" do
         post_title = json.read_string
       end
+      json.on_key! "post_base" do
+        post_base = json.read_string
+      end
       json.on_key! "hash_values" do
         json.read_array do
           hash_values << json.read_int
         end
       end
 
-      new(post_link, post_title, hash_values)
+      new(post_link, post_title, hash_values, post_base)
     end
   end
 
@@ -182,10 +230,20 @@ module Similarity
     text = extract_post_text(post, lang)
     hash_values = calculate_signature(text)
 
+    # Derive base from link by removing language suffix and extension
+    # e.g., "/posts/foo.es.html" -> "posts/foo", "/posts/foo.html" -> "posts/foo"
+    link = post.link(lang)
+    # Remove leading slash, then .es.html or .html suffix, ensure posts/ prefix
+    post_base = link.rchop('/')
+      .gsub(/\.es\.html$/, String.new)
+      .gsub(/\.html$/, String.new)
+      .gsub(/^posts\//, "posts/")
+
     Signature.new(
       post_link: post.link(lang),
       post_title: post.title(lang) || "",
-      hash_values: hash_values
+      hash_values: hash_values,
+      post_base: post_base
     )
   end
 
@@ -197,6 +255,7 @@ module Similarity
     data = {
       "post_link"   => signature.post_link,
       "post_title"  => signature.post_title,
+      "post_base"   => signature.post_base,
       "hash_values" => signature.hash_values,
     }
     Croupier::TaskManager.set("similarity/signatures/#{lang}/#{safe_link}.json", data.to_json)
@@ -213,28 +272,9 @@ module Similarity
     Signature.new(
       post_link: parsed["post_link"].as_s,
       post_title: parsed["post_title"].as_s,
-      hash_values: parsed["hash_values"].as_a.map(&.as_i.to_i32)
+      hash_values: parsed["hash_values"].as_a.map(&.as_i.to_i32),
+      post_base: parsed["post_base"].as_s
     )
-  end
-
-  # Get all signatures from the kv store
-  def self.get_all_signatures(lang : String) : Array(Signature)
-    signatures = [] of Signature
-
-    # Iterate through all keys in the kv store
-    # Note: This requires the kv store to support iteration
-    # For now, we'll store an index of all post links
-    index_key = "similarity/index/#{lang}"
-    index_data = Croupier::TaskManager.get(index_key)
-    return signatures if index_data.nil?
-
-    post_links = JSON.parse(index_data).as_a.map(&.as_s)
-    post_links.each do |link|
-      sig = get_signature(link, lang)
-      signatures << sig if sig
-    end
-
-    signatures
   end
 
   # Store the index of all post links
@@ -246,16 +286,30 @@ module Similarity
   # Find related posts for a given post
   #
   # Returns an array of RelatedPost objects sorted by similarity score in descending order
+  # Filters out duplicates (same post in different languages), preferring the target language
+  # Results are cached for performance
   def self.find_related(post : Markdown::File, lang : String, limit : Int32 = 5) : Array(RelatedPost)
     signature = get_signature(post.link(lang), lang)
     return [] of RelatedPost if signature.nil?
 
-    all_signatures = get_all_signatures(lang)
+    # Check cache first
+    cache_key = "#{signature.post_link}|#{lang}|#{limit}"
+    related_cache = @@related_posts_cache ||= Hash(String, Array(RelatedPost)).new
+
+    if cached = related_cache[cache_key]?
+      return cached
+    end
+
+    # Collect all signatures from all languages to handle duplicates across languages
+    all_signatures = [] of Signature
+    Config.languages.keys.each do |current_lang|
+      all_signatures.concat(get_all_signatures(current_lang))
+    end
     return [] of RelatedPost if all_signatures.empty?
 
-    # Calculate similarities and filter out the post itself
+    # Calculate similarities, filtering out the post itself
     similarities = all_signatures.compact_map do |sig|
-      next nil if sig.post_link == signature.post_link
+      next nil if sig.post_base == signature.post_base
 
       score = jaccard_similarity(signature, sig)
       RelatedPost.new(
@@ -265,8 +319,42 @@ module Similarity
       )
     end
 
-    # Sort by similarity score (descending) and take top N
-    similarities.sort_by { |item| -item.score }[0...limit] || [] of RelatedPost
+    # Group by post_base to handle duplicates, preferring target language
+    by_base = Hash(String, RelatedPost).new
+    similarities.each do |item|
+      base = signature_from_link(item.link).post_base
+      existing = by_base[base]?
+
+      # Prefer target language, or higher score
+      if existing.nil?
+        by_base[base] = item
+      else
+        existing_in_lang = existing.link.includes?(".#{lang}.html")
+        item_in_lang = item.link.includes?(".#{lang}.html")
+
+        if item_in_lang && !existing_in_lang
+          by_base[base] = item
+        elsif item.score > existing.score
+          by_base[base] = item
+        end
+      end
+    end
+
+    # Get unique posts, sort by score, and take top N
+    result = by_base.values.sort_by! { |item| -item.score }[0...limit] || [] of RelatedPost
+
+    # Cache the result
+    related_cache[cache_key] = result
+    result
+  end
+
+  # Helper to get signature from a link (for extracting base)
+  private def self.signature_from_link(link : String) : Signature
+    base = link.rchop('/')
+      .gsub(/\.es\.html$/, String.new)
+      .gsub(/\.html$/, String.new)
+      .gsub(/^posts\//, "posts/")
+    Signature.new(post_link: link, post_title: "", hash_values: [] of Int32, post_base: base)
   end
 
   # Create tasks to calculate and store signatures for all posts
