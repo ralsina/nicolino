@@ -6,6 +6,7 @@ require "./html"
 require "./pandoc"
 require "./similarity"
 require "./creatable"
+require "./rss"
 
 module Posts
   # Enable posts feature and return array of posts for dependent features
@@ -24,28 +25,6 @@ module Posts
     posts = Markdown.read_all(content_post_path)
     posts += HTML.read_all(content_post_path)
     posts += Pandoc.read_all(content_post_path) if features.includes?("pandoc")
-
-    # Load dates for all posts before sorting (dates are lazy-loaded)
-    # Use parallel processing to speed up date parsing (4 workers)
-    t1 = Time.instant
-    num_workers = 4
-    channel = Channel(Markdown::File).new
-    posts_per_worker = (posts.size / num_workers).ceil.to_i
-
-    num_workers.times do
-      spawn do
-        while post = channel.receive?
-          post.date
-        end
-      end
-    end
-
-    posts.each { |post| channel.send(post) }
-    num_workers.times { channel.close }
-    t2 = Time.instant
-
-    posts.sort!
-    t3 = Time.instant
 
     Log.info { "✓ Found #{posts.size} post#{posts.size == 1 ? "" : "s"}" }
 
@@ -71,20 +50,14 @@ module Posts
         Config.get("site.title").as_s
       end
 
-      # Limit RSS to 20 most recent posts
-      rss_posts = posts.first(20)
-
-      Markdown.render_rss(
-        rss_posts,
+      # RSS task now depends on post source files instead of rendered HTML
+      RSSFeed.render(
+        posts,
         rss_output,
         site_title,
         lang: lang,
       )
     end
-    pp! Time.instant - t3
-    pp! t3 - t2
-    pp! t2 - t1
-
     posts
   end
 end

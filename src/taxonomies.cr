@@ -1,4 +1,5 @@
 require "./utils"
+require "./rss"
 require "./theme"
 
 # FIXME: Get rid of the named tuples
@@ -182,14 +183,13 @@ module Taxonomies
         end
 
         @terms.values.each do |term|
-          term.@posts.sort!
           feed_path = (base_path / "#{Utils.slugify(term.@name)}/index.rss").normalize.to_s
           title = Crinja.render(@term_title[lang], {
             "term" => term.lightweight_value,
           })
           # Render term RSS for each term with language context
-          Markdown.render_rss(
-            term.@posts[..10],
+          RSSFeed.render(
+            term.@posts,
             feed_path,
             title,
             lang: lang,

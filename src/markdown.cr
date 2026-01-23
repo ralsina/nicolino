@@ -538,14 +538,6 @@ module Markdown
   def self.render(posts, require_date = true, require_title = false)
     Config.languages.keys.each do |lang|
       posts.each do |post|
-        if require_date && post.date == nil
-          Log.error { "Error: #{post.source lang} has no date" }
-          next
-        end
-        if require_title && post.title(lang).empty?
-          Log.error { "Error: #{post.source lang} has no title" }
-          next
-        end
         FeatureTask.new(
           feature_name: "posts",
           id: "markdown",
@@ -553,6 +545,16 @@ module Markdown
           inputs: post.dependencies,
           mergeable: false
         ) do
+          # Validate requirements during task execution
+          if require_date && post.date == nil
+            Log.error { "Error: #{post.source lang} has no date" }
+            next
+          end
+          if require_title && post.title(lang).empty?
+            Log.error { "Error: #{post.source lang} has no title" }
+            next
+          end
+
           begin
             # Need to refresh post contents
             post.load lang if Croupier::TaskManager.auto_mode?
@@ -692,31 +694,6 @@ module Markdown
     end
 
     result
-  end
-
-  # Create a RSS file out of posts with title, save in output
-  def self.render_rss(posts, output, title, lang = nil, feature_name = "posts")
-    lang ||= Locale.language
-    inputs = ["conf.yml"] + posts.map(&.source)
-
-    FeatureTask.new(
-      feature_name: feature_name,
-      id: "rss",
-      output: output.to_s,
-      inputs: inputs,
-      mergeable: false
-    ) do
-      feed = RSS.new title: title
-      posts.each do |post|
-        feed.item(
-          title: post.title(lang),
-          description: post.summary(lang),
-          link: post.link(lang),
-          pubDate: post.date.to_s,
-        )
-      end
-      feed.xml indent: true
-    end
   end
 
   # Parse all markdown posts in a path and build Markdown::File

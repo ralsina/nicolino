@@ -81,43 +81,15 @@ module Archive
   end
 
   def self.render(posts : Array(Markdown::File))
-    # Filter posts that have dates
-    dated_posts = posts.select { |post| !post.date.nil? }
-
-    # If no posts with dates, don't generate archive
-    if dated_posts.empty?
-      Log.info { "No posts with dates found, skipping archive generation" }
-      return
-    end
-
-    # Group posts by year and month using proper structures
-    years_data = Hash(Int32, Hash(String, Array(Markdown::File))).new
-
-    dated_posts.each do |post|
-      post_date = post.date.as(Time)
-      year = post_date.year
-      month_key = post_date.to_s("%Y-%m")
-
-      years_data[year] ||= Hash(String, Array(Markdown::File)).new
-      years_data[year][month_key] ||= [] of Markdown::File
-      years_data[year][month_key] << post
-    end
-
-    # Create ArchiveYear records
-    sorted_years = years_data.keys.sort!.reverse!
-    archive_years = sorted_years.map do |year|
-      ArchiveYear.create(year, years_data[year])
-    end
-
-    # Get the latest year for the default open state
-    latest_year = sorted_years.first?.try(&.to_s) || ""
-
     # Generate archive for each language
     Config.languages.keys.each do |lang|
       base_path = Path[Config.options(lang).output]
       # Make output path language-specific to avoid conflicts
       lang_suffix = lang == "en" ? "" : ".#{lang}"
       output_path = (base_path / "archive#{lang_suffix}" / "index.html").normalize.to_s
+
+      # Collect all dependencies from all posts (no eager date loading)
+      all_dependencies = posts.flat_map(&.dependencies)
 
       archive_template = Theme.template_path("archive.tmpl")
       title_template = Theme.template_path("title.tmpl")
@@ -127,13 +99,44 @@ module Archive
         feature_name: "archive",
         id: "archive",
         output: output_path,
-        inputs: dated_posts.flat_map(&.dependencies) + [
+        inputs: all_dependencies + [
           "kv://#{archive_template}",
           "kv://#{title_template}",
           "kv://#{page_template}",
         ],
         mergeable: false
       ) do
+        # Filter posts that have dates (done during task execution)
+        dated_posts = posts.select { |post| !post.date.nil? }
+
+        # If no posts with dates, don't generate archive
+        if dated_posts.empty?
+          Log.info { "No posts with dates found, skipping archive generation" }
+          next
+        end
+
+        # Group posts by year and month using proper structures
+        years_data = Hash(Int32, Hash(String, Array(Markdown::File))).new
+
+        dated_posts.each do |post|
+          post_date = post.date.as(Time)
+          year = post_date.year
+          month_key = post_date.to_s("%Y-%m")
+
+          years_data[year] ||= Hash(String, Array(Markdown::File)).new
+          years_data[year][month_key] ||= [] of Markdown::File
+          years_data[year][month_key] << post
+        end
+
+        # Create ArchiveYear records
+        sorted_years = years_data.keys.sort!.reverse!
+        archive_years = sorted_years.map do |year|
+          ArchiveYear.create(year, years_data[year])
+        end
+
+        # Get the latest year for the default open state
+        latest_year = sorted_years.first?.try(&.to_s) || ""
+
         Log.info { "👉 #{output_path}" }
 
         # Create breadcrumbs for archive

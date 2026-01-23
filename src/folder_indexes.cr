@@ -1,4 +1,5 @@
 require "./markdown"
+require "./rss"
 require "./theme"
 
 module FolderIndexes
@@ -185,8 +186,8 @@ module FolderIndexes
         feed_path = output.sub(/\.html$/, ".rss")
         feed_title = "#{title} - RSS"
 
-        Markdown.render_rss(
-          folder_posts[..10],
+        RSSFeed.render(
+          folder_posts,
           feed_path,
           feed_title,
           lang: lang,
