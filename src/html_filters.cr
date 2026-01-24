@@ -3,33 +3,66 @@
 module HtmlFilters
   @@html_filters_mutex = Mutex.new
 
-  # Downgrade all headers by n levels (h1 -> h3 if n=2)
+  # Shift headers so the highest level is n (n=2 means h1->h3, h2->h4, etc.)
+  # If n=2 and doc has h3 as the highest, then h3->h2, h4->h3, etc.
   def self.downgrade_headers(doc, n = 2)
-    (1..(6 - n)).each do |i|
-      i = 6 - n - i + 1
+    # Find the minimum heading level in the document
+    min_level = 6
+    (1..6).each do |i|
       headers = doc.nodes("h#{i}").to_a
-      headers.each do |node|
-        downgraded = doc.create_node("h#{i + n}")
-        # Copy attributes
-        if node.attributes.has_key? "class"
-          downgraded["class"] = node.attributes["class"]
-        end
-        node.each_attribute do |key_slice, value_slice|
-          key = String.new(key_slice)
-          next if key == "class"
-          value = value_slice ? String.new(value_slice) : nil
-          downgraded[key] = value
-        end
-        # Move children directly (faster than inner_html which parses HTML)
-        node.children.each do |child|
-          downgraded.append_child(child)
-        end
-        node.insert_before(downgraded)
-      end
-      headers.each do |node|
-        node.remove!
+      unless headers.empty?
+        min_level = i
+        break
       end
     end
+
+    # Calculate shift amount
+    # We want: min_level + shift = n, so shift = n - min_level
+    # shift can be positive (downgrade: h1->h2, h2->h3) or negative (upgrade: h3->h2, h4->h3)
+    shift = n - min_level
+
+    # If shift is 0, no change needed
+    return doc if shift == 0
+
+    # Collect all headers first, before any modifications
+    # Store as array of {level, node} tuples
+    headers_to_shift = [] of Tuple(Int32, Lexbor::Node)
+    (1..6).each do |level|
+      doc.nodes("h#{level}").each do |node|
+        headers_to_shift << {level, node}
+      end
+    end
+
+    # Process each header
+    headers_to_shift.each do |original_level, node|
+      new_level = original_level + shift
+      next if new_level > 6 # Don't create h7+
+      next if new_level < 1 # Don't create h0 or negative levels
+
+      # Create new heading element
+      new_heading = doc.create_node("h#{new_level}")
+
+      # Copy attributes
+      if node.attributes.has_key? "class"
+        new_heading["class"] = node.attributes["class"]
+      end
+      node.each_attribute do |key_slice, value_slice|
+        key = String.new(key_slice)
+        next if key == "class"
+        value = value_slice ? String.new(value_slice) : nil
+        new_heading[key] = value
+      end
+
+      # Move children
+      node.children.each do |child|
+        new_heading.append_child(child)
+      end
+
+      # Replace old heading with new one
+      node.insert_before(new_heading)
+      node.remove!
+    end
+
     doc
   end
 
