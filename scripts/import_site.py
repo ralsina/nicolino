@@ -38,7 +38,6 @@ SOURCE_GALLERIES = SOURCE_DIR / "galleries"
 SOURCE_IMAGES = SOURCE_DIR / "images"
 SOURCE_FILES = SOURCE_DIR / "files"
 SOURCE_LISTINGS = SOURCE_DIR / "listings"
-SOURCE_PYTUT = SOURCE_DIR / "pytut"
 SOURCE_CACHE = SOURCE_DIR / "cache"
 
 # Target directories (Nicolino site)
@@ -49,7 +48,6 @@ TARGET_PAGES = TARGET_CONTENT / "pages"
 TARGET_GALLERIES = TARGET_CONTENT / "galleries"
 TARGET_IMAGES = TARGET_CONTENT / "images"
 TARGET_LISTINGS = TARGET_CONTENT / "listings"
-TARGET_PYTUT = TARGET_CONTENT / "pytut"
 TARGET_SHORTCODES = TARGET_DIR / "shortcodes"
 
 # =============================================================================
@@ -680,35 +678,6 @@ def migrate_listings():
 
 
 # =============================================================================
-# Python Tutorial Migration
-# =============================================================================
-
-
-def migrate_pytut():
-    """Migrate Python tutorial."""
-    print("\n" + "="*60)
-    print("MIGRATING PYTHON TUTORIAL")
-    print("="*60)
-
-    if not SOURCE_PYTUT.exists():
-        print(f"  Source directory not found: {SOURCE_PYTUT}")
-        return
-
-    TARGET_PYTUT.mkdir(parents=True, exist_ok=True)
-
-    # Copy tutorial files, excluding sphinx output
-    processed = 0
-    for tut_file in SOURCE_PYTUT.glob("*.txt"):
-        if "sphinx-out" not in str(tut_file):
-            target_file = TARGET_PYTUT / tut_file.name
-            shutil.copy2(tut_file, target_file)
-            processed += 1
-            print(f"  {tut_file.name}")
-
-    print(f"\n  Copied: {processed} tutorial files")
-
-
-# =============================================================================
 # Configuration Migration
 # =============================================================================
 
@@ -789,7 +758,6 @@ def main():
     migrate_images()
     migrate_files()
     migrate_listings()
-    migrate_pytut()
 
     print("\n" + "="*60)
     print("IMPORT COMPLETE!")
