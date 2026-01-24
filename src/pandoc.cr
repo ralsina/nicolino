@@ -1,4 +1,5 @@
 require "./markdown"
+require "./toc"
 require "lexbor"
 
 module Pandoc
@@ -16,28 +17,27 @@ module Pandoc
   class File < Markdown::File
     def html(lang = nil)
       lang ||= Locale.language
-      # FIXME: Figure out how to extract TOC
       ext = Path[source].extension
       format = Config.options.formats[ext]
-      result, toc_content = compile(
-        replace_shortcodes(lang),
-        metadata(lang).fetch("toc", nil) != nil,
-        format: format)
+      result = compile(replace_shortcodes(lang), format)
       doc = Lexbor::Parser.new(result)
       doc = HtmlFilters.downgrade_headers(doc)
       doc = HtmlFilters.make_links_relative(doc, link)
-      @html[lang] = HtmlFilters.fix_code_classes(doc).to_html
-      @toc[lang] = toc_content
+      html_with_classes = HtmlFilters.fix_code_classes(doc).to_html
+
+      # Extract TOC and add anchors to headings
+      @html[lang], @toc[lang] = Toc.extract_and_annotate(html_with_classes)
+      @html[lang]
     end
 
     # Use a memoized compile method because pandoc is so slow
-    @cache_compile = {} of {String, Bool, String} => Array(String)
+    @cache_compile = {} of {String, String} => String
 
-    def compile(input, toc = false, format = "rst")
-      @cache_compile[{input, toc, format}] ||= _compile(input, toc, format)
+    def compile(input, format = "rst")
+      @cache_compile[{input, format}] ||= _compile(input, format)
     end
 
-    def _compile(input, toc = false, format = "rst")
+    def _compile(input, format = "rst")
       # Check if this is a raw HTML reStructuredText file
       # These files start with ".. raw:: html" after the front matter
       stripped = input.strip
@@ -80,8 +80,7 @@ module Pandoc
         end
       end
 
-      html_content = html_lines.join("\n")
-      [html_content, ""]
+      html_lines.join("\n")
     end
 
     # Compile using pandoc for normal rst files
@@ -92,7 +91,7 @@ module Pandoc
         args: ["-f", format, "-t", "html"],
         input: input_io,
         output: output)
-      [output.to_s, ""]
+      output.to_s
     end
   end
 

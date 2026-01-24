@@ -1,4 +1,5 @@
 require "./markdown"
+require "./toc"
 
 module HTML
   # Posts written directly in HTML
@@ -9,9 +10,10 @@ module HTML
       doc = Lexbor::Parser.new(result)
       doc = HtmlFilters.downgrade_headers(doc)
       doc = HtmlFilters.make_links_relative(doc, link)
-      @html[lang] = HtmlFilters.fix_code_classes(doc).to_html
-      # HTML files don't have TOC generation yet, set to empty string
-      @toc[lang] = ""
+      html_with_classes = HtmlFilters.fix_code_classes(doc).to_html
+
+      # Extract TOC and add anchors to headings
+      @html[lang], @toc[lang] = Toc.extract_and_annotate(html_with_classes)
       @html[lang]
     end
   end

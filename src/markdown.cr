@@ -336,7 +336,6 @@ module Markdown
         Log.error { Shortcodes.nice_error(e, text) }
       end
 
-      # FIXME: context needs stuff
       context = Crinja::Context.new
 
       # Build output efficiently using IO::Memory instead of string concatenation
