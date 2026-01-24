@@ -332,7 +332,7 @@ def get_cached_html(source_file: Path, is_es: bool = False) -> Optional[str]:
 
         # Wrap in raw tags to prevent shortcode reprocessing
         # The cached HTML is already processed by Nikola
-        return f"{{% raw %}}\n{html_content}\n{{% /raw %}}"
+        return "{{% raw %}}\n" + html_content + "\n{{% /raw %}}"
     except Exception as e:
         print(f"    Warning: Could not read cache {cache_file}: {e}")
         return None
