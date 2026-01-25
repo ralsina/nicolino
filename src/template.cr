@@ -108,8 +108,7 @@ module Templates
 
   # Load templates from theme directory and put them in the k/v store
   def self.load_templates : Int32
-    ensure_templates
-    ensure_assets
+    ensure_theme
     Log.debug { "Scanning Templates" }
     count = 0
     Dir.glob("#{Theme.templates_dir}/*.tmpl").each do |template|
@@ -146,52 +145,28 @@ module Templates
     count
   end
 
-  # Ensure all baked-in assets exist in the theme assets/ directory
+  # Ensure all baked-in theme files exist in the themes/default/ directory
   # If any are missing, extract them from the baked filesystem
-  def self.ensure_assets
-    assets_dir = Path[Theme.assets_dir]
-    FileUtils.mkdir_p(assets_dir) unless Dir.exists?(assets_dir)
+  def self.ensure_theme
+    theme_dir = Path[Theme.path]
+    FileUtils.mkdir_p(theme_dir) unless Dir.exists?(theme_dir)
 
     begin
-      # Get list of baked-in asset files
-      Nicolino::ThemeAssetsFiles.files.each do |file|
-        # Get the relative path from assets/
-        asset_path = Path[assets_dir, file.path[1..]].normalize
+      # Get list of baked-in theme files
+      Nicolino::ThemeFiles.files.each do |file|
+        # Get the relative path from themes/default/
+        theme_path = Path[theme_dir, file.path[1..]].normalize
 
         # Check if file exists
-        unless File.exists?(asset_path)
-          Log.info { "Installing missing asset: #{asset_path}" }
-          FileUtils.mkdir_p(File.dirname(asset_path))
+        unless File.exists?(theme_path)
+          Log.info { "Installing missing theme file: #{theme_path}" }
+          FileUtils.mkdir_p(File.dirname(theme_path))
           file.rewind
-          File.write(asset_path, file.gets_to_end)
+          File.write(theme_path, file.gets_to_end)
         end
       end
     rescue ex
-      Log.debug { "Could not check for missing assets: #{ex.message}" }
-    end
-  end
-
-  # Ensure all baked-in templates exist in the theme templates/ directory
-  # If any are missing, extract them from the baked filesystem
-  def self.ensure_templates
-    templates_dir = Path[Theme.templates_dir]
-    FileUtils.mkdir_p(templates_dir) unless Dir.exists?(templates_dir)
-
-    begin
-      # Check each baked template file directly
-      Nicolino::TemplateFiles.files.each do |file|
-        template_name = Path[file.path].basename.to_s
-        template_path = templates_dir / template_name
-
-        unless File.exists?(template_path)
-          Log.info { "Installing missing template: #{template_name}" }
-          file.rewind
-          File.write(template_path, file.gets_to_end)
-        end
-      end
-    rescue ex
-      # If we can't access baked files (shouldn't happen), just log and continue
-      Log.debug { "Could not check for missing templates: #{ex.message}" }
+      Log.debug { "Could not check for missing theme files: #{ex.message}" }
     end
   end
 
