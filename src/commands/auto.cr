@@ -31,6 +31,14 @@ DOC
         Croupier::TaskManager.fast_mode = fast_mode
         arguments = @options.fetch("TARGET", [] of String).as(Array(String))
 
+        # Set up hook to reload config before tasks run
+        Croupier::TaskManager.before_run_hook = ->(modified_files : Set(String)) {
+          if modified_files.includes?(Config.config_path)
+            Log.info { "Config file changed, reloading..." }
+            Config.reload
+          end
+        }
+
         # Now run in auto mode
         Log.info { "Running in auto mode, press Ctrl+C to stop" }
         # Launch HTTP server
@@ -62,12 +70,6 @@ DOC
           inputs: Croupier::TaskManager.tasks.keys,
           mergeable: false
         ) do
-          # Reload config if config file was modified
-          if Croupier::TaskManager.modified.includes?(Config.config_path)
-            Log.info { "Config file changed, reloading..." }
-            Config.reload
-          end
-
           modified = Set(String).new
           style_css_changed = false
           Croupier::TaskManager.modified.each do |path|

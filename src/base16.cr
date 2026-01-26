@@ -23,6 +23,7 @@ module Base16
       no_save: true,
       mergeable: false
     ) do
+      Log.info { "base16 task running..." }
       scheme = Config.get("site.color_scheme").as_s
 
       # Always use dark_variant and light_variant to ensure proper variant resolution

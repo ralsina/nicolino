@@ -47,6 +47,7 @@ module Config
   @@options = Hash(String, Options).new
   @@taxonomies = Taxonomies.new
   @@fonts : Fonts | Nil = nil
+  @@config_file_path : String = "conf.yml"
 
   def self.get(key)
     self.config.get(key)
@@ -54,6 +55,7 @@ module Config
 
   def self.config(path = "conf.yml")
     if @@config.@config_paths.empty?
+      @@config_file_path = path
       @@config = Totem.from_file path
       @@config.set_default("features",
         ["assets",
@@ -173,14 +175,18 @@ module Config
 
   # Get the actual config file path being used
   def self.config_path : String
-    @@config.@config_paths.empty? ? "conf.yml" : @@config.@config_paths.first
+    @@config_file_path
   end
 
   # Reload the config file from disk
   def self.reload
     path = config_path
     Log.info { "Reloading config from #{path}" }
-    @@config = Totem.from_file path
+    # Create a new Totem instance to reset config_paths
+    # This will cause config() to re-apply all defaults
+    @@config = Totem.new
+    # Load the config again, which will trigger default setup
+    Config.config(path)
     # Reset cached values
     @@fonts = nil
     @@options = Hash(String, Options).new
