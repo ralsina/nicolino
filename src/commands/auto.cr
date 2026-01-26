@@ -63,16 +63,29 @@ DOC
           mergeable: false
         ) do
           modified = Set(String).new
+          style_css_changed = false
           Croupier::TaskManager.modified.each do |path|
             next if path.lchop? "kv://"
             Croupier::TaskManager.depends_on(path).each do |dep|
               next unless dep.lchop? "output/"
-              modified << Utils.path_to_link(dep)
+              link = Utils.path_to_link(dep)
+              # Check if style.css changed - this requires full page reload
+              # because fonts, color schemes, or @import rules may have changed
+              style_css_changed = true if link == "/css/style.css"
+              modified << link
             end
           end
-          modified.each do |path|
-            Log.info { "LiveReload: #{path}" }
-            live_reload.send_reload(path: path, liveCSS: path.ends_with?(".css"))
+
+          # If style.css changed, force reload all pages by not specifying a path
+          # This causes the browser to do a full page reload instead of live CSS reload
+          if style_css_changed
+            Log.info { "LiveReload: style.css changed, forcing full page reload" }
+            live_reload.send_reload(path: "", liveCSS: false)
+          else
+            modified.each do |path|
+              Log.info { "LiveReload: #{path}" }
+              live_reload.send_reload(path: path, liveCSS: path.ends_with?(".css"))
+            end
           end
         end
 
