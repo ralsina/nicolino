@@ -35,7 +35,7 @@ module FolderIndexes
 
     # 1. Get exclude patterns from config if available
     begin
-      exclude_dirs = Config.get("folder_indexes.exclude_dirs")
+      exclude_dirs = nil
       exclude_patterns = exclude_dirs.as_a.map(&.as_s) if exclude_dirs
     rescue
       # Key doesn't exist, use empty array

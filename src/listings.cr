@@ -14,7 +14,7 @@ module Listings
     return unless is_enabled
 
     listings_dir = begin
-      Config.get("listings").as_s
+      ""
     rescue
       "listings"
     end

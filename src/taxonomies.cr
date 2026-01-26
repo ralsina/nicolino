@@ -29,16 +29,8 @@ module Taxonomies
 
   # Register output folder to exclude from folder_indexes
   # Default is "tags/" but can be configured
-  begin
-    tax_config = Config.get("taxonomies")
-    if tax_config.as_h?
-      tax_config.as_h.each do |name, config|
-        location = config.as_h?.try(&.["location"]?.try(&.as_s)) || "#{name}/"
-        FolderIndexes.register_exclude(location)
-      end
-    end
-  rescue
-    # No taxonomies configured, skip registration
+  Config.taxonomies.each do |name, taxonomy|
+    FolderIndexes.register_exclude(taxonomy.location)
   end
 
   # A Taxonomy Term, which is one of the classifications
@@ -69,7 +61,7 @@ module Taxonomies
       lang ||= Locale.language
       {
         name: @name,
-        link: Utils.path_to_link Path[Config.options(lang).output] / "#{@taxonomy.@path[lang]}/#{Utils.slugify(@name)}/index.html",
+        link: Utils.path_to_link Path[Config.options(lang).output] / "#{@taxonomy.@path}/#{Utils.slugify(@name)}/index.html",
       }
     end
   end
@@ -81,10 +73,11 @@ module Taxonomies
 
     @terms = Hash(String, Term).new
     @posts = Array(Markdown::File).new
-    @title = Hash(String, String).new
-    @term_title = Hash(String, String).new
-    @path = Hash(String, String).new
     @name : String
+
+    property title : String
+    property term_title : String
+    property path : String
 
     def initialize(
       @name,
@@ -128,7 +121,7 @@ module Taxonomies
     def link(lang = nil)
       lang ||= Locale.language
       # FIXME localize link
-      {name: @title[lang], link: Utils.path_to_link Path[Config.options(lang).output] / "#{@path[lang]}/index.html"}
+      {name: @title, link: Utils.path_to_link Path[Config.options(lang).output] / "#{@path}/index.html"}
     end
 
     def render
@@ -138,7 +131,7 @@ module Taxonomies
         # For example: tags/ for en and es/ for other languages
         # Only add language suffix if not the default language
         lang_suffix = lang == "en" ? "" : ".#{lang}"
-        base_path = Path[Config.options(lang).output] / Path["#{@path[lang].chomp('/')}#{lang_suffix}"]
+        base_path = Path[Config.options(lang).output] / Path["#{@path.chomp('/')}#{lang_suffix}"]
         output = (base_path / "index.html").to_s
         page_template = Theme.template_path("page.tmpl")
         title_template = Theme.template_path("title.tmpl")
@@ -146,17 +139,17 @@ module Taxonomies
 
         # Create breadcrumbs for taxonomy index
         taxonomy_link = Utils.path_to_link(
-          Path[Config.options(lang).output] / "#{@path[lang].chomp('/')}#{lang_suffix}/"
+          Path[Config.options(lang).output] / "#{@path.chomp('/')}#{lang_suffix}/"
         )
         breadcrumbs = [
           {name: "Home", link: "/"},
-          {name: @title[lang], link: taxonomy_link},
+          {name: @title, link: taxonomy_link},
         ] of NamedTuple(name: String, link: String)
 
         # Include title.tmpl which handles breadcrumbs
         title_html = Templates.environment.get_template(title_template).render({
-          "title"       => @title[lang],
-          "link"        => Utils.path_to_link(Path[Config.options(lang).output] / "#{@path[lang]}/"),
+          "title"       => @title,
+          "link"        => Utils.path_to_link(Path[Config.options(lang).output] / "#{@path}/"),
           "breadcrumbs" => breadcrumbs,
           "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
         })
@@ -174,7 +167,7 @@ module Taxonomies
           html = Render.apply_template(page_template,
             {
               "content"     => title_html + rendered,
-              "title"       => @title[lang],
+              "title"       => @title,
               "breadcrumbs" => breadcrumbs,
             })
           doc = Lexbor::Parser.new(html)
@@ -184,7 +177,7 @@ module Taxonomies
 
         @terms.values.each do |term|
           feed_path = (base_path / "#{Utils.slugify(term.@name)}/index.rss").normalize.to_s
-          title = Crinja.render(@term_title[lang], {
+          title = Crinja.render(@term_title, {
             "term" => term.lightweight_value,
           })
           # Render term RSS for each term with language context

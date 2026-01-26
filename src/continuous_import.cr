@@ -463,7 +463,7 @@ module ContinuousImport
 
   # Import all configured feeds
   def self.import_all
-    ci_value = Config.get("continuous_import")
+    ci_value = nil
     return unless ci_value
 
     feeds = ci_value.as_h

@@ -105,7 +105,7 @@ module Markdown
       @taxonomy_terms[lang] = {} of String => Array(String)
 
       # Get configured taxonomy names
-      tax_configs = Config.get("taxonomies").as_h?
+      tax_configs = Config.taxonomies
       return if tax_configs.nil?
 
       tax_configs.each_key do |tax_name|
@@ -487,7 +487,7 @@ module Markdown
     # Get related posts based on similarity
     def related_posts(lang = nil)
       lang ||= Locale.language
-      features = Config.get("features").as_a.map(&.as_s)
+      features = Config.features
       return [] of Hash(String, String | Float64) unless features.includes?("similarity")
 
       # Only try to find related posts if signatures exist
@@ -520,7 +520,7 @@ module Markdown
       result += shortcodes.reject(&.is_inline?).map { |scode| "kv://shortcodes/#{scode.name}.tmpl" }
 
       # Add similarity index as dependency if feature is enabled
-      features = Config.get("features").as_a.map(&.as_s)
+      features = Config.features
       if features.includes?("similarity")
         result << "kv://similarity/index/en"
       end
@@ -681,7 +681,7 @@ module Markdown
       # Check if the alternate file would exist (by checking if it's in a known location)
       # For now, we'll assume it exists if the path pattern matches
       site_title = begin
-        Config.languages[other_lang].as_h["site"].as_h["title"].as_s
+        Config[other_lang].title
       rescue
         other_lang.upcase
       end

@@ -42,7 +42,7 @@ end
 def create_tasks
   # Load config file
   Log.info { "⚙️  Loading configuration..." }
-  features = Set.new(Config.get("features").as_a)
+  features = Config.features_set
 
   content_path = Path[Config.options.content]
   content_post_path = content_path / Config.options.posts

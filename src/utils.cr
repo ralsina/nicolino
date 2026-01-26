@@ -24,18 +24,12 @@ module Utils
 
   # Filter out files from directories that correspond to disabled features
   def self.should_skip_file?(base_path : Path) : Bool
-    begin
-      features = Config.get("features")
-    rescue
-      return false
-    end
-
-    enabled_features = features.as_a
-    content_path = Config.options.content
+    enabled_features = Config.features
+    content_path = Config.content
 
     # Skip gallery directories when galleries feature is disabled
     if !enabled_features.includes?("galleries")
-      galleries_path = Path[content_path] / Config.options.galleries
+      galleries_path = Path[content_path] / Config.galleries
       return true if base_path.to_s.starts_with?(galleries_path.to_s)
     end
 

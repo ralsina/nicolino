@@ -1,11 +1,12 @@
-require "totem"
+require "yaml"
 
 module Config
-  @@config = Totem.new
+  @@config_file_path : String = "conf.yml"
+  @@default_lang : String = "en"
 
   # Font description in config
   struct Font
-    include JSON::Serializable
+    include YAML::Serializable
 
     property family : String
     property source : String
@@ -15,162 +16,303 @@ module Config
 
   alias Fonts = Array(Font)
 
-  # Taxonomy description in config
+  # Taxonomy description in config - per language
   struct Taxonomy
-    include JSON::Serializable
+    include YAML::Serializable
 
-    property title : Hash(String, String)
-    property term_title : Hash(String, String)
-    property location : Hash(String, String)
+    property title : String
+    property term_title : String
+    property location : String
   end
 
   alias Taxonomies = Hash(String, Taxonomy)
 
-  # Options for Nicolino output
-  struct Options
-    include JSON::Serializable
-    property image_large = 4096
-    property image_thumb = 1024
-    property formats = {} of String => String
-    property date_output_format = "%Y-%m-%d %H:%M"
-    property output = "output/"
-    property content = "content/"
-    property posts = "posts/"
-    property galleries = "galleries/"
-    property locale = "en_US.UTF-8"
-    property language = "en"
-    property verbosity = 3
-    property continuous_import_templates = "user_templates"
-    property theme = "default"
+  # Full configuration from conf.yml
+  struct ConfigFile
+    include YAML::Serializable
+
+    property site : SiteConfig
+    property taxonomies : Taxonomies = Taxonomies.new
+    property features : Array(String) = [] of String
   end
 
-  @@options = Hash(String, Options).new
-  @@taxonomies = Taxonomies.new
-  @@fonts : Fonts | Nil = nil
-  @@config_file_path : String = "conf.yml"
+  # Site configuration section from conf.yml
+  struct SiteConfig
+    include YAML::Serializable
 
+    # Site metadata
+    property title : String = "Nicolino"
+    property description : String = "A Nicolino Site"
+    property url : String = "https://example.com"
+    property footer : String = "Powered by Nicolino"
+
+    # Paths
+    property output : String = "output/"
+    property content : String = "content/"
+    property posts : String = "posts/"
+    property galleries : String = "galleries/"
+
+    # Theme
+    property theme : String = "default"
+    property color_scheme : String = "default"
+    property fonts : Fonts = Fonts.new
+
+    # Image settings
+    property image_large : Int32 = 1920
+    property image_thumb : Int32 = 640
+
+    # Formats
+    property formats : Hash(String, String) = {} of String => String
+
+    # Locale
+    property language : String = "en"
+    property locale : String = "en_US.UTF-8"
+    property date_output_format : String = "%Y-%m-%d %H:%M"
+
+    # Other
+    property verbosity : Int32 = 3
+    property continuous_import_templates : String = "user_templates"
+  end
+
+  # Per-language configuration
+  class LangConfig
+    property title : String
+    property description : String
+    property url : String
+    property footer : String
+    property output : String
+    property content : String
+    property posts : String
+    property galleries : String
+    property theme : String
+    property color_scheme : String
+    property fonts : Fonts
+    property image_large : Int32
+    property image_thumb : Int32
+    property formats : Hash(String, String)
+    property locale : String
+    property date_output_format : String
+    property verbosity : Int32
+    property continuous_import_templates : String
+    property taxonomies : Taxonomies
+
+    def initialize(
+      @title = "Nicolino",
+      @description = "A Nicolino Site",
+      @url = "https://example.com",
+      @footer = "Powered by Nicolino",
+      @output = "output/",
+      @content = "content/",
+      @posts = "posts/",
+      @galleries = "galleries/",
+      @theme = "default",
+      @color_scheme = "default",
+      @fonts = Fonts.new,
+      @image_large = 1920,
+      @image_thumb = 640,
+      @formats = {} of String => String,
+      @locale = "en_US.UTF-8",
+      @date_output_format = "%Y-%m-%d %H:%M",
+      @verbosity = 3,
+      @continuous_import_templates = "user_templates",
+      @taxonomies = Taxonomies.new
+    )
+    end
+  end
+
+  # Store all loaded language configs
+  @@lang_configs = Hash(String, LangConfig).new
+  @@features : Array(String) = [] of String
+  @@loaded : Bool = false
+
+  # Ensure config is loaded before accessing
+  private def self.ensure_loaded
+    return if @@loaded
+    config
+  end
+
+  # Get the raw config for legacy access
   def self.get(key)
-    self.config.get(key)
+    # For now, return nil - we'll remove this API
+    nil
   end
 
+  # Load config from conf.yml
   def self.config(path = "conf.yml")
-    if @@config.@config_paths.empty?
-      @@config_file_path = path
-      @@config = Totem.from_file path
-      @@config.set_default("features",
-        ["assets",
-         "posts",
-         "pages",
-         "pandoc",
-         "taxonomies",
-         "images",
-         "galleries",
-         "sitemap",
-         "search",
-         "base16"])
-      @@config.set_default("taxonomies", {
-        "tags" => {
-          "title"      => "🏷Tags",
-          "term_title" => "Posts tagged {{term.name}}",
-          "location"   => "tags/",
-        },
-      })
-      @@config.set_default("site.fonts", [
-        {
-          "family"  => "Quicksand",
-          "source"  => "google",
-          "weights" => [400, 600, 700],
-          "role"    => "sans-serif",
-        },
-        {
-          "family"  => "Sono",
-          "source"  => "google",
-          "weights" => [400],
-          "role"    => "monospace",
-        },
-        {
-          "family"  => "Comfortaa",
-          "source"  => "google",
-          "weights" => [400, 700],
-          "role"    => "display",
-        },
-      ])
-      @@config.set_default("site.color_scheme", "default")
-      @@config.set_default("languages", {"en" => Hash(String, String).new})
+    @@config_file_path = path
 
-      # Ensure "en" is always in languages if other languages are configured
-      # This allows users to add additional languages without explicitly defining "en"
-      configured_langs = @@config.get("languages").as_h
-      if !configured_langs.empty? && !configured_langs.has_key?("en")
-        # Merge "en" with existing languages
-        merged_langs = configured_langs.merge({"en" => Hash(String, String).new})
-        @@config.set("languages", merged_langs)
+    # Read and parse conf.yml
+    config_data = ConfigFile.from_yaml(File.read(path))
+
+    # Store default language
+    @@default_lang = config_data.site.language
+
+    # Build LangConfig for default language from SiteConfig + Taxonomies
+    site = config_data.site
+    lang_config = LangConfig.new(
+      title: site.title,
+      description: site.description,
+      url: site.url,
+      footer: site.footer,
+      output: site.output,
+      content: site.content,
+      posts: site.posts,
+      galleries: site.galleries,
+      theme: site.theme,
+      color_scheme: site.color_scheme,
+      fonts: site.fonts,
+      image_large: site.image_large,
+      image_thumb: site.image_thumb,
+      formats: site.formats,
+      locale: site.locale,
+      date_output_format: site.date_output_format,
+      verbosity: site.verbosity,
+      continuous_import_templates: site.continuous_import_templates,
+      taxonomies: config_data.taxonomies
+    )
+
+    @@lang_configs[@@default_lang] = lang_config
+    @@features = config_data.features
+
+    # Set default features if empty
+    if @@features.empty?
+      @@features = ["assets", "posts", "pages", "pandoc", "taxonomies",
+                    "images", "galleries", "sitemap", "search", "base16"]
+    end
+
+    # Set default taxonomies if empty
+    if @@lang_configs[@@default_lang].taxonomies.empty?
+      default_taxonomy_yaml = %(
+title: "🏷Tags"
+term_title: "Posts tagged {{term.name}}"
+location: "tags/"
+)
+      @@lang_configs[@@default_lang].taxonomies = {
+        "tags" => Taxonomy.from_yaml(default_taxonomy_yaml)
+      }
+    end
+  end
+
+  # Load or get cached LangConfig for a specific language
+  def self.[](lang : String) : LangConfig
+    ensure_loaded
+    unless @@lang_configs.has_key?(lang)
+      if lang == @@default_lang
+        # Should have been loaded already
+        raise "Default language config not loaded. Call Config.config() first."
+      else
+        # TODO: Load from conf.LANG.yml for overrides
+        # For now, just use default config
+        @@lang_configs[lang] = @@lang_configs[@@default_lang]
       end
     end
-    @@config
+    @@lang_configs[lang]
+  end
+
+  # Alias for default language - forward commonly used properties
+  def self.title : String
+    self[@@default_lang].title
+  end
+
+  def self.description : String
+    self[@@default_lang].description
+  end
+
+  def self.url : String
+    self[@@default_lang].url
+  end
+
+  def self.footer : String
+    self[@@default_lang].footer
+  end
+
+  def self.output : String
+    self[@@default_lang].output
+  end
+
+  def self.content : String
+    self[@@default_lang].content
+  end
+
+  def self.posts : String
+    self[@@default_lang].posts
+  end
+
+  def self.galleries : String
+    self[@@default_lang].galleries
+  end
+
+  def self.theme : String
+    self[@@default_lang].theme
+  end
+
+  def self.color_scheme : String
+    self[@@default_lang].color_scheme
+  end
+
+  def self.fonts : Fonts
+    self[@@default_lang].fonts
+  end
+
+  def self.image_large : Int32
+    self[@@default_lang].image_large
+  end
+
+  def self.image_thumb : Int32
+    self[@@default_lang].image_thumb
+  end
+
+  def self.formats : Hash(String, String)
+    self[@@default_lang].formats
+  end
+
+  def self.locale : String
+    self[@@default_lang].locale
+  end
+
+  def self.date_output_format : String
+    self[@@default_lang].date_output_format
+  end
+
+  def self.verbosity : Int32
+    self[@@default_lang].verbosity
+  end
+
+  def self.continuous_import_templates : String
+    self[@@default_lang].continuous_import_templates
   end
 
   def self.taxonomies : Taxonomies
-    if @@taxonomies.empty?
-      @@taxonomies = Taxonomies.new
-
-      Config.languages.keys.each do |lang|
-        @@config.set_default("languages.#{lang}.taxonomies", @@config.get("taxonomies"))
-      end
-
-      # This is the master taxonomy list
-      config.get("taxonomies").as_h.keys.each do |k|
-        # For each, collect the taxonomy in all languages
-        # This is a pain to do but keeps the config file nicer
-        title = Config.languages.keys.map do |lang|
-          [lang, config.get("languages.#{lang}.taxonomies.#{k}.title").as_s]
-        end.to_h
-        term_title = Config.languages.keys.map do |lang|
-          [lang, config.get("languages.#{lang}.taxonomies.#{k}.term_title").as_s]
-        end.to_h
-        location = Config.languages.keys.map do |lang|
-          [lang, config.get("languages.#{lang}.taxonomies.#{k}.location").as_s]
-        end.to_h
-
-        @@config.set("_taxonomies.#{k}", {
-          "title"      => title,
-          "term_title" => term_title,
-          "location"   => location,
-        })
-        @@taxonomies[k] = @@config.mapping(Taxonomy, "_taxonomies.#{k}")
-      end
-    end
-    @@taxonomies
+    ensure_loaded
+    self[@@default_lang].taxonomies
   end
 
-  # Return fonts configured in site.fonts
-  def self.fonts : Fonts
-    if @@fonts.nil?
-      fonts_config = config.get("site.fonts")
-      if fonts_config.as_a?
-        @@fonts = fonts_config.as_a.map do |font_data|
-          Font.from_json(font_data.to_json)
-        end
-      else
-        @@fonts = Fonts.new
-      end
-    end
-    @@fonts.as(Fonts)
+  # Get features list
+  def self.features : Array(String)
+    ensure_loaded
+    @@features
   end
 
-  # Return options per language
-  def self.options(lang = nil) : Options
-    lang ||= Locale.language
-    if @@options.fetch(lang, nil).nil?
-      config.set_default("languages.#{lang}.options", config.get("options"))
-      @@options[lang] = config.mapping(Options, "languages.#{lang}.options")
-    end
-
-    @@options[lang].as(Options)
+  # Get features as a Set of Totem::Any for legacy compatibility
+  def self.features_set : Set(Totem::Any)
+    ensure_loaded
+    @@features.map { |f| Totem::Any.new(f) }.to_set
   end
 
+  # Legacy: Config.options(lang) - map to Config[lang]
+  def self.options(lang = nil)
+    lang ||= @@default_lang
+    self[lang]
+  end
+
+  # Legacy: Config.languages - return hash with default language only
   def self.languages
-    config.get("languages").as_h
+    {@@default_lang => Hash(String, String).new}
+  end
+
+  # Get the default language
+  def self.language : String
+    @@default_lang
   end
 
   # Get the actual config file path being used
@@ -182,13 +324,10 @@ module Config
   def self.reload
     path = config_path
     Log.info { "Reloading config from #{path}" }
-    # Create a new Totem instance to reset config_paths
-    # This will cause config() to re-apply all defaults
-    @@config = Totem.new
-    # Load the config again, which will trigger default setup
+    # Clear cached configs
+    @@lang_configs.clear
+    @@features.clear
+    # Load again
     Config.config(path)
-    # Reset cached values
-    @@fonts = nil
-    @@options = Hash(String, Options).new
   end
 end

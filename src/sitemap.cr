@@ -53,7 +53,7 @@ module Sitemap
             end_idx = Math.min(start_idx + chunk_size, inputs.size)
             chunk_data = inputs[start_idx...end_idx]
 
-            base = URI.parse(Config.get("site.url").as_s)
+            base = URI.parse(Config.url)
             chunk_xml = String.build do |str|
               chunk_data.each do |input|
                 next if noindex?(input)

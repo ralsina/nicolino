@@ -21,9 +21,9 @@ Options:
 DOC
 
       def run : Int32
-        features = Set.new(Config.get("features").as_a)
-        content_path = Path[Config.options.content]
-        content_post_path = content_path / Config.options.posts
+        features = Set.new(Config.features)
+        content_path = Path[Config.content]
+        content_post_path = content_path / Config.posts
 
         error_count = 0
         if features.includes? "posts"

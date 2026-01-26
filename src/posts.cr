@@ -41,14 +41,10 @@ module Posts
     Config.languages.keys.each do |lang|
       # Language suffix for non-English feeds
       lang_suffix = lang == "en" ? "" : ".#{lang}"
-      rss_output = Path[Config.options(lang).output] / "rss#{lang_suffix}.xml"
+      rss_output = Path[Config[lang].output] / "rss#{lang_suffix}.xml"
 
       # Get language-specific site title
-      site_title = begin
-        Config.languages[lang].as_h["site"].as_h["title"].as_s
-      rescue
-        Config.get("site.title").as_s
-      end
+      site_title = Config[lang].title
 
       # RSS task now depends on post source files instead of rendered HTML
       RSSFeed.render(

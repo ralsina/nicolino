@@ -10,10 +10,12 @@ module Render
     context.map { |k, v|
       ctx[k] = Crinja::Value.new(v)
     }
-    # Add all config keys to context without clobbering
-    Config.get("site").as_h.map { |k, v|
-      ctx["site_#{k}"] = Crinja::Value.new((v.as_a?.try &.map(&.as_s)) || v.as_s?)
-    }
+    # Add site config values to context
+    lang_config = Config[Config.language]
+    ctx["site_title"] = Crinja::Value.new(lang_config.title)
+    ctx["site_description"] = Crinja::Value.new(lang_config.description)
+    ctx["site_url"] = Crinja::Value.new(lang_config.url)
+    ctx["site_footer"] = Crinja::Value.new(lang_config.footer)
     Templates.environment.get_template(template).render(ctx)
   end
 end
