@@ -67,7 +67,7 @@ language: "en"
 
 # What extensions you want associated with what pandoc format.
 # For more details: https://pandoc.org/MANUAL.html#option--from
-formats:
+pandoc_formats:
   .rst: rst
   .txt: rst
 

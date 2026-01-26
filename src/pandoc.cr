@@ -18,7 +18,7 @@ module Pandoc
     def html(lang = nil)
       lang ||= Locale.language
       ext = Path[source].extension
-      format = Config.options.formats[ext]
+      format = Config.options.pandoc_formats[ext]
       result = compile(replace_shortcodes(lang), format)
       doc = Lexbor::Parser.new(result)
       doc = HtmlFilters.downgrade_headers(doc)
@@ -100,7 +100,7 @@ module Pandoc
   def self.read_all(path)
     Log.debug { "Reading pandoc files from #{path}" }
     posts = [] of File
-    Config.options.formats.keys.each do |ext|
+    Config.options.pandoc_formats.keys.each do |ext|
       all_sources = Utils.find_all(path, ext[1..])
       all_sources.map do |base, sources|
         begin

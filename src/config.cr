@@ -47,7 +47,7 @@ module Config
     property fonts : Fonts = Fonts.new
     property image_large : Int32 = 1920
     property image_thumb : Int32 = 640
-    property formats : Hash(String, String) = {} of String => String
+    property pandoc_formats : Hash(String, String) = {} of String => String
     property language : String = "en"
     property locale : String = "en_US.UTF-8"
     property date_output_format : String = "%Y-%m-%d %H:%M"
@@ -83,7 +83,7 @@ module Config
     # NOT translatable
     property image_large : Int32 = 1920
     property image_thumb : Int32 = 640
-    property formats : Hash(String, String) = {} of String => String
+    property pandoc_formats : Hash(String, String) = {} of String => String
 
     # Locale/Language settings
     property language : String = "en"
@@ -109,7 +109,7 @@ module Config
       @fonts = Fonts.new
       @image_large = 1920
       @image_thumb = 640
-      @formats = {} of String => String
+      @pandoc_formats = {} of String => String
       @language = "en"
       @locale = "en_US.UTF-8"
       @date_output_format = "%Y-%m-%d %H:%M"
@@ -179,7 +179,7 @@ module Config
     @@global_config.fonts = config_data.fonts
     @@global_config.image_large = config_data.image_large
     @@global_config.image_thumb = config_data.image_thumb
-    @@global_config.formats = config_data.formats
+    @@global_config.pandoc_formats = config_data.pandoc_formats
     @@global_config.language = config_data.language
     @@global_config.locale = config_data.locale
     @@global_config.date_output_format = config_data.date_output_format
@@ -318,7 +318,7 @@ location: "tags/"
 
   def self.formats : Hash(String, String)
     ensure_loaded
-    @@global_config.formats
+    @@global_config.pandoc_formats
   end
 
   def self.locale : String
@@ -392,7 +392,7 @@ location: "tags/"
     property theme : String
     property color_scheme : String
     property fonts : Fonts
-    property formats : Hash(String, String)
+    property pandoc_formats : Hash(String, String)
     property continuous_import_templates : String
     property image_large : Int32
     property image_thumb : Int32
@@ -407,7 +407,7 @@ location: "tags/"
       @theme = @global.theme
       @color_scheme = @global.color_scheme
       @fonts = @global.fonts
-      @formats = @global.formats
+      @pandoc_formats = @global.pandoc_formats
       @continuous_import_templates = @global.continuous_import_templates
       @image_large = @global.image_large
       @image_thumb = @global.image_thumb
