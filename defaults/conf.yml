@@ -1,6 +1,9 @@
 # Configuration for Nicolino.
 
 # Site metadata (translatable)
+# These fields can be overridden per language by creating a conf.LANG.yml file
+# For example: conf.es.yml with Spanish overrides for title, description, etc.
+# Only include the fields you want to override - others will use these defaults.
 title: "Nicolino"
 description: "Nicolino: a static site generator"
 url: "https://nicolino.ralsina.me"
