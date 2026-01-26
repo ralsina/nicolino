@@ -1,12 +1,12 @@
-The Images feature processes individual images with automatic optimization and responsive size generation.
+The Images feature processes individual images with automatic optimization and size generation.
 
 ## How It Works
 
 Place images in your content directory, and Nicolino will:
 
 1. Optimize images for web
-2. Generate multiple sizes for responsive design
-3. Create appropriate HTML `<img>` tags with `srcset` attributes
+2. Generate thumbnail and large versions
+3. Copy processed images to the output directory
 
 ## Directory Structure
 
@@ -25,10 +25,19 @@ content/
 
 ## Image Processing
 
-Images are processed to generate multiple sizes:
+Images are processed to generate two sizes:
 
-- **Thumbnail** - Small version for previews (default: 1024px max dimension)
-- **Large** - Full/high-resolution version (default: 4096px max dimension)
+- **Thumbnail** - Smaller version (default: 640px max dimension)
+- **Large** - Full/high-resolution version (default: 1920px max dimension)
+
+For example, `content/images/photo.jpg` generates:
+
+```
+output/
+  images/
+    photo.jpg      # Large version (1920px)
+    photo.thumb.jpg # Thumbnail version (640px)
+```
 
 ## Usage in Markdown
 
@@ -38,13 +47,10 @@ Reference images in your markdown content:
 ![Alt text](/images/photo.jpg)
 ```
 
-The rendered HTML includes responsive `srcset`:
+Note: You need to manually reference the thumbnail version if you want to use it:
 
-```html
-<img src="/images/photo.jpg"
-     srcset="/images/photo.thumb.jpg 1024w,
-             /images/photo.jpg 4096w"
-     alt="Alt text">
+```markdown
+![Alt text](/images/photo.thumb.jpg)
 ```
 
 ## Configuration
@@ -58,8 +64,8 @@ features:
 
 **Image size options:**
 ```yaml
-image_large: 4096   # Max dimension for large images
-image_thumb: 1024   # Max dimension for thumbnails
+image_large: 1920   # Max dimension for large images (default)
+image_thumb: 640    # Max dimension for thumbnails (default)
 ```
 
 ## Supported Formats
@@ -72,12 +78,14 @@ image_thumb: 1024   # Max dimension for thumbnails
 
 ## Image Paths
 
-Images maintain their directory structure:
+Images maintain their directory structure from content/ to output/:
 
 ```
 content/
   images/
     logo.png
+    posts/
+      hero.jpg
 ```
 
 Becomes:
@@ -85,8 +93,11 @@ Becomes:
 ```
 output/
   images/
-    logo.png
-    logo.thumb.png
+    logo.png         # Large version
+    logo.thumb.png   # Thumbnail version
+    posts/
+      hero.jpg       # Large version
+      hero.thumb.jpg # Thumbnail version
 ```
 
 ## Optimization
