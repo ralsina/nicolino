@@ -170,4 +170,9 @@ module Config
   def self.languages
     config.get("languages").as_h
   end
+
+  # Get the actual config file path being used
+  def self.config_path : String
+    @@config.@config_paths.empty? ? "conf.yml" : @@config.@config_paths.first
+  end
 end

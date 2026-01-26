@@ -18,7 +18,7 @@ module Base16
       feature_name: "base16",
       id: "base16",
       output: (Path[Config.options.output] / "css" / "style.css").to_s,
-      inputs: ["conf.yml"] + Templates.get_deps(base16_template),
+      inputs: [Config.config_path] + Templates.get_deps(base16_template),
       mergeable: false
     ) do
       scheme = Config.get("site.color_scheme").as_s
