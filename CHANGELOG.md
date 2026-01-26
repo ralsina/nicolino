@@ -2,6 +2,53 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.14.0] - 2026-01-26
+
+### 🚀 Features
+
+- Add TOC extraction for HTML and Pandoc posts
+- Add theme delivery system
+- Add font configuration system and color scheme improvements
+- Add color_scheme and fonts to default config template
+- Add logging when base16 generates style.css
+- Add multilingual support with per-language config overrides
+- Make locale and date_output_format overridable per-language
+- Restore nav_items configuration option
+
+### 🐛 Bug Fixes
+
+- Rewrite downgrade_headers to shift so highest heading is H2
+- Remove pytut folder handling from import script
+- Use double braces for raw tags in import script
+- Force full page reload when style.css changes in auto mode
+- Force full page reload for all HTML pages when style.css changes
+- Watch actual config file for style.css regeneration
+- Reload config when conf.yml changes in auto mode
+- Reload config before tasks run in auto mode
+- Allow partial language overrides in conf.LANG.yml
+- Use localStorage instead of cookies for theme preference
+
+### 🚜 Refactor
+
+- Consolidate theme baking into single ThemeFiles
+- Simpler config system with YAML::Serializable
+- Rewrite config system using YAML::Serializable
+- Rename 'formats' to 'pandoc_formats' for clarity
+
+### 📚 Documentation
+
+- Add comment about language overrides in conf.yml template
+- Reorganize conf.yml with clear translatable/non-translatable sections
+- Add demo video to auto mode documentation
+- Added auto mode video
+- Update configuration.md to new flat config format
+- Fix misleading font defaults documentation
+- Fix misleading images.md documentation
+
+### 🎨 Styling
+
+- Add blank lines above list items in configuration.md
+
 ## [0.13.0] - 2026-01-23
 
 ### 🚀 Features
@@ -26,6 +73,10 @@ All notable changes to this project will be documented in this file.
 ### Build
 
 - Not-release
+
+### Bump
+
+- Release v0.13.0
 
 ## [0.12.0] - 2026-01-22
 

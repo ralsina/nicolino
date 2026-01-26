@@ -146,7 +146,7 @@ module Config
       @nav_items = NavItems.new,
       @date_output_format = "%Y-%m-%d %H:%M",
       @locale = "en_US.UTF-8",
-      @taxonomies = Taxonomies.new
+      @taxonomies = Taxonomies.new,
     )
     end
   end
