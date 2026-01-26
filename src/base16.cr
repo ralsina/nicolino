@@ -14,11 +14,13 @@ module Base16
 
   def self.render_base16
     base16_template = Theme.template_path("base16.tmpl")
+    output_path = (Path[Config.options.output] / "css" / "style.css").to_s
     FeatureTask.new(
       feature_name: "base16",
       id: "base16",
-      output: (Path[Config.options.output] / "css" / "style.css").to_s,
+      output: output_path,
       inputs: [Config.config_path] + Templates.get_deps(base16_template),
+      no_save: true,
       mergeable: false
     ) do
       scheme = Config.get("site.color_scheme").as_s
@@ -48,7 +50,17 @@ module Base16
         "font_heading"     => font_stacks["heading"],
       }
 
-      Templates.environment.get_template(base16_template).render(context)
+      content = Templates.environment.get_template(base16_template).render(context)
+
+      # Write the output file
+      Dir.mkdir_p(File.dirname(output_path))
+      File.write(output_path, content)
+
+      # Log the output file
+      Log.info { "👉 #{output_path}" }
+
+      # Return the path so croupier knows we wrote it
+      output_path
     end
   end
 
