@@ -31,4 +31,5 @@ Documentation for the Nicolino static site generator.
   - [serve](cli/serve.md)
   - [validate](cli/validate.md)
 - [Themes](themes.md)
+  - [Color Schemes and Fonts](color-schemes-and-fonts.md)
   - [Templates](templates.md)

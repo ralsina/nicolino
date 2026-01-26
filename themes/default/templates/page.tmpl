@@ -33,11 +33,6 @@
   {% if extra_feed %}
   <link rel="alternate" type="application/rss+xml" href="{{ extra_feed.link }}" title="{{ extra_feed.title }}" />
   {% endif %}
-  <!-- Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap"
-    rel="stylesheet">
   <!-- Pico CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.colors.min.css" />
@@ -55,7 +50,7 @@
   <!-- Theme styles -->
   <link rel="stylesheet" href="/css/theme.css" />
   <!-- Base16 color scheme (light/dark themes) -->
-  <link rel="stylesheet" href="/css/color_scheme.css" />
+  <link rel="stylesheet" href="/css/style.css" />
   <!-- Custom style (loaded last for user overrides) -->
   <link rel="stylesheet" href="/css/custom.css" />
   {% if listings_css %}

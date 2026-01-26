@@ -1,13 +1,19 @@
+/* Use display font for headings */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+}
+
+/* Use display font for definition list terms */
+dt {
+    font-family: var(--font-display);
+    font-weight: bold;
+}
+
 /* Collapsible breadcrumb in header */
 .breadcrumb {
     font-size: 0.9em;
     color: var(--pico-muted-color);
     display: inline-block;
-}
-
-/* Set Pico CSS font variables globally to use Quicksand */
-:root {
-    --pico-font-family: "Quicksand", sans-serif;
 }
 
 .breadcrumb a {
@@ -175,6 +181,7 @@
 }
 
 .book-title {
+    font-family: var(--font-display);
     font-size: 1.2em;
     font-weight: 600;
     margin-bottom: 1em;
@@ -199,6 +206,7 @@
 
 .chapter-number {
     display: block;
+    font-family: var(--font-display);
     font-size: 0.9em;
     color: var(--pico-muted-color);
     margin-bottom: 0.5em;
@@ -235,6 +243,7 @@
 
 .toc-title {
     display: block;
+    font-family: var(--font-display);
     padding: 0.25em 0.5em;
     font-weight: 600;
 }

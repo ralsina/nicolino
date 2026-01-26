@@ -1,17 +1,12 @@
-/* Minimal theme - Clean typography with Michroma headers and sidebar navigation */
+/* Minimal theme - Clean typography with sidebar navigation */
 
 :root {
-    --pico-font-family: "Inter", system-ui, -apple-system, sans-serif;
-    --pico-font-family-sans-serif: "Inter", system-ui, -apple-system, sans-serif;
-    --pico-font-family-monospace: "JetBrains Mono", "Fira Code", "SF Mono", Consolas, monospace;
     --sidebar-width: 280px;
 }
 
-/* Use Michroma for all headings */
+/* Use display font for headings */
 h1, h2, h3, h4, h5, h6 {
-    font-family: "Michroma", sans-serif;
-    font-weight: 400;
-    letter-spacing: 0.02em;
+    font-family: var(--font-display);
 }
 
 /* Tighter line height for headings */
@@ -219,7 +214,7 @@ body.sidebar-open .footer {
 
 /* Definition lists */
 dt {
-    font-family: "Michroma", sans-serif;
+    font-family: var(--font-display);
     font-weight: bold;
     font-size: 0.95em;
     letter-spacing: 0.02em;
@@ -319,6 +314,7 @@ main code {
 
 .chapter-number {
     display: block;
+    font-family: var(--font-display);
     font-size: 0.8em;
     color: var(--pico-muted-color);
     text-transform: uppercase;
@@ -332,7 +328,7 @@ main code {
 }
 
 .sidebar .book-toc .toc-title {
-    font-family: "Michroma", sans-serif;
+    font-family: var(--font-display);
     font-size: 1em;
     font-weight: 400;
     padding: 0.5em 0;

@@ -1,17 +1,39 @@
 {#-
-  base16.tmpl - Base16 color scheme CSS template
+  base16.tmpl - Base16 color scheme and font CSS template
 
-  Generates CSS variables for Base16 color schemes:
+  Generates CSS for Base16 color schemes and fonts:
   - Pico CSS theme variables for dark and light modes
   - Base16 palette colors (base00-base0F) for custom styles
   - Theme switcher integration
+  - Google Fonts imports (if configured)
+  - Font stack CSS custom properties
 
   Variables:
   - dark: Dark theme object with scheme_name, scheme_author, color hex values
   - light: Light theme object with scheme_name, scheme_author, color hex values
+  - google_fonts_url: Google Fonts import URL (optional)
+  - font_sans: Sans-serif font stack CSS
+  - font_mono: Monospace font stack CSS
+  - font_display: Display font stack CSS
+  - font_heading: Heading font stack CSS (same as display)
 
-  Used by: Base16 feature for output/css/color_scheme.css
+  Used by: Base16 feature for output/css/style.css
 -#}
+
+/* Font configuration */
+{% if google_fonts_url %}
+@import url("https://fonts.googleapis.com/css2?{{ google_fonts_url }}&display=swap");
+{% endif %}
+
+/* Font stacks as CSS custom properties */
+:root {
+    --pico-font-family: {{ font_sans }};
+    --pico-font-family-sans-serif: {{ font_sans }};
+    --pico-font-family-monospace: {{ font_mono }};
+    --font-display: {{ font_display }};
+    --font-heading: {{ font_heading }};
+}
+
 /* Base16 color scheme integration for Nicolino
    Generated from: {{dark.scheme_name}} (dark) and {{light.scheme_name}} (light)
    Authors: {{dark.scheme_author}} / {{light.scheme_author}} */
