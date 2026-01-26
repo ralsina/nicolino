@@ -8,6 +8,23 @@ site:
   description: "Nicolino: a static site generator"
   url: "https://nicolino.ralsina.me"
   footer: "Default Nicolino Theme"
+  # Color scheme from https://sixteen.ralsina.me/
+  color_scheme: "default"
+  # Font configuration
+  # Fonts are loaded from Google Fonts automatically when source: google
+  fonts:
+    - family: Quicksand
+      source: google
+      weights: [400, 600, 700]
+      role: sans-serif
+    - family: Sono
+      source: google
+      weights: [400]
+      role: monospace
+    - family: Comfortaa
+      source: google
+      weights: [400, 700]
+      role: display
 # Some options affecting output
 options:
   # Format HTML nicely. Makes it larger but easier to read
