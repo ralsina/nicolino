@@ -5,74 +5,75 @@ Nicolino is configured through a single `conf.yml` file in your project root. Th
 A minimal configuration file looks like this:
 
 ```yaml
-site:
-  title: "My Site"
-  description: "A site built with Nicolino"
-  url: "https://example.com"
+# Site metadata
+title: "My Site"
+description: "A site built with Nicolino"
+url: "https://example.com"
+footer: "© 2025 Me"
 
-options:
-  theme: "minimal"
-  output: "output/"
-  content: "content/"
+# Theme
+theme: "default"
 
+# Paths
+output: "output/"
+content: "content/"
+posts: "posts/"
+galleries: "galleries/"
+
+# Features
 features:
   - posts
   - pages
 ```
 
-## Site Settings
+## Translatable Settings
 
-The `site` section contains metadata about your site that's available in templates as `site.*` variables:
+These fields can be overridden per language by creating a `conf.LANG.yml` file (e.g., `conf.es.yml`). Only include the fields you want to override - others will use these defaults.
+
+**Site Metadata:**
+- `title` - Site title
+- `description` - Site description
+- `url` - Site URL (used for feeds, sitemap)
+- `footer` - Footer text
+
+**Localization:**
+- `date_output_format` - Date format (strftime format)
+- `locale` - System locale
+
+**Taxonomies:**
+- Classification systems for your content (tags, categories, etc.)
+- See [Taxonomies](taxonomies.md) for details
+
+## Non-Translatable Settings
+
+**Theme:**
+- `theme` - Theme to use (default or custom in `themes/`)
+- `color_scheme` - Base16 color scheme for syntax highlighting
+
+**Paths:**
+- `output` - Output directory
+- `content` - Content directory
+- `posts` - Posts subdirectory within content/
+- `galleries` - Galleries subdirectory within content/
+
+**Image Processing:**
+- `image_large` - Max width for large images (default: 1920)
+- `image_thumb` - Max width for thumbnails (default: 640)
+
+**Language:**
+- `language` - Default language code (default: "en")
+
+**Pandoc Format Associations:**
+- `pandoc_formats` - Maps file extensions to Pandoc formats
 
 ```yaml
-site:
-  title: "My Site"              # Site title (available as site.title)
-  description: "Site description" # Site description
-  url: "https://example.com"    # Site URL (used for feeds, sitemap)
-  footer: "© 2025 Me"           # Optional footer text
-  color_scheme: "darcula"       # Base16 color scheme for syntax highlighting
-
-  # Navigation items shown in the theme's nav bar
-  nav_items:
-    - "<a href='/about'>About</a>"
-    - "<a href='/contact'>Contact</a>"
+pandoc_formats:
+  .rst: rst
+  .txt: rst
 ```
 
-## Options
-
-The `options` section controls site behavior:
-
-```yaml
-options:
-  # Theme selection
-  theme: "minimal"              # Theme to use (default, minimal, or custom)
-
-  # Output formatting
-  pretty_html: true             # Format HTML for readability
-
-  # Image processing
-  image_large: 1920             # Max width for large images
-  image_thumb: 640              # Max width for thumbnails
-
-  # Paths
-  output: "output/"             # Output directory
-  content: "content/"           # Content directory
-  posts: "posts/"               # Posts subdirectory within content/
-  galleries: "galleries/"       # Galleries subdirectory within content/
-
-  # Localization
-  date_output_format: "%B %e, %Y"  # Date format (strftime format)
-  locale: "en_US.UTF-8"         # System locale
-  language: "en"                # Default language code
-
-  # Pandoc format associations
-  formats:
-    .rst: rst                   # File extension -> Pandoc format
-    .txt: rst
-
-  # Verbosity (0=fatal, 1=errors, 2=warnings, 3=info, 4=debug, 5=trace)
-  verbosity: 3
-```
+**Logging:**
+- `verbosity` - Output verbosity (0=fatal, 1=errors, 2=warnings, 3=info, 4=debug, 5=trace)
 
 ## Features
 
@@ -91,27 +92,9 @@ features:
   - pandoc          # Pandoc document conversion
   - posts           # Blog posts with RSS
   - search          # Site search index
-  - similarity      # "Similar posts" feature
   - sitemap         # XML sitemap generation
   - taxonomies      # Tags, categories, etc.
   - archive         # Post archive by date
-```
-
-## Taxonomies
-
-Configure classification systems for your content:
-
-```yaml
-taxonomies:
-  tags:
-    title: "🏷 Tags"
-    term_title: "Posts tagged {{term.name}}"
-    location: "tags/"
-
-  categories:
-    title: "Categories"
-    term_title: "Posts in {{term.name}}"
-    location: "categories/"
 ```
 
 ## Folder Indexes
@@ -120,27 +103,25 @@ Configure which directories should not have auto-generated index pages:
 
 ```yaml
 folder_indexes:
-  exclude_dirs:
-    - "books/"
-    - "galleries/"
-    - "tags/"
+  exclude_dirs: []
 ```
 
-## Languages
+Most features (galleries, listings, tags, archive) automatically register their output folders. Use this only for custom exclusions.
 
-For multilingual sites, override settings per language:
+## Multilingual Sites
 
+For multilingual sites, create `conf.LANG.yml` files to override settings per language:
+
+**conf.es.yml** (Spanish overrides):
 ```yaml
-languages:
-  es:
-    site:
-      title: "Mi Sitio"
-      description: "Descripción del sitio"
-    options:
-      date_output_format: "%e de %B, %Y"
-      locale: "es_ES.UTF-8"
-      language: "es"
+title: "Mi Sitio"
+description: "Descripción del sitio"
+footer: "© 2025. Todos los derechos reservados."
+locale: "es_ES.UTF-8"
+date_output_format: "%e de %B, %Y"
 ```
+
+Only include the translatable settings you want to override. Paths, theme, and other non-translatable settings remain the same across all languages.
 
 ## Continuous Import
 
@@ -160,40 +141,52 @@ continuous_import:
       date: "published"
 ```
 
+See [Continuous Import](cli/continuous_import.md) for details.
+
 ## Complete Example
 
 ```yaml
-site:
-  title: "My Awesome Blog"
-  description: "Yet another blog about technology"
-  url: "https://example.com"
-  footer: "© 2025. All rights reserved."
-  color_scheme: "darcula"
-  nav_items:
-    - "<a href='/about'>About</a>"
-    - "<a href='/archive'>Archive</a>"
-    - "<a href='/tags'>Tags</a>"
+# Site metadata
+title: "My Awesome Blog"
+description: "Yet another blog about technology"
+url: "https://example.com"
+footer: "© 2025. All rights reserved."
 
-options:
-  theme: "minimal"
-  pretty_html: true
-  image_large: 1920
-  image_thumb: 640
-  output: "output/"
-  content: "content/"
-  posts: "posts/"
-  galleries: "galleries/"
-  date_output_format: "%B %e, %Y"
-  locale: "en_US.UTF-8"
-  language: "en"
-  verbosity: 3
+# Theme
+theme: "default"
+color_scheme: "default"
 
+# Paths
+output: "output/"
+content: "content/"
+posts: "posts/"
+galleries: "galleries/"
+
+# Image processing
+image_large: 1920
+image_thumb: 640
+
+# Localization
+language: "en"
+date_output_format: "%B %e, %Y"
+locale: "en_US.UTF-8"
+
+# Pandoc format associations
+pandoc_formats:
+  .rst: rst
+  .txt: rst
+
+# Logging
+verbosity: 3
+
+# Taxonomies
 taxonomies:
   tags:
     title: "Tags"
     term_title: "Posts tagged {{term.name}}"
     location: "tags/"
 
+# Features
 features:
   - assets
   - base16
@@ -203,9 +196,10 @@ features:
   - images
   - listings
   - pages
+  - pandoc
   - posts
-  - search
   - sitemap
+  - search
   - taxonomies
   - archive
 ```
