@@ -62,6 +62,12 @@ DOC
           inputs: Croupier::TaskManager.tasks.keys,
           mergeable: false
         ) do
+          # Reload config if config file was modified
+          if Croupier::TaskManager.modified.includes?(Config.config_path)
+            Log.info { "Config file changed, reloading..." }
+            Config.reload
+          end
+
           modified = Set(String).new
           style_css_changed = false
           Croupier::TaskManager.modified.each do |path|

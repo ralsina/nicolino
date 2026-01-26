@@ -175,4 +175,13 @@ module Config
   def self.config_path : String
     @@config.@config_paths.empty? ? "conf.yml" : @@config.@config_paths.first
   end
+
+  # Reload the config file from disk
+  def self.reload
+    path = config_path
+    @@config = Totem.from_file path
+    # Reset cached values
+    @@fonts = nil
+    @@options = Hash(String, Options).new
+  end
 end
