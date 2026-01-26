@@ -179,6 +179,7 @@ module Config
   # Reload the config file from disk
   def self.reload
     path = config_path
+    Log.info { "Reloading config from #{path}" }
     @@config = Totem.from_file path
     # Reset cached values
     @@fonts = nil
