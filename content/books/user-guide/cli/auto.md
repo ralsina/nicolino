@@ -11,3 +11,9 @@ Run forever automatically rebuilding the site.
 This command will run the site in auto mode, monitoring
 files for changes and triggering rebuilds. Also, if you
 have a page open in a browser, it will trigger a reload.
+
+## Demo
+
+A quick demonstration of `nicolino auto` in action:
+
+[![nicolino auto demo](https://youtu.be/PK1hPHz_J1M?si=_ACkzq2Zg_PyUtCk)]
