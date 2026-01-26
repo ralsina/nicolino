@@ -11,6 +11,11 @@ description: "A site built with Nicolino"
 url: "https://example.com"
 footer: "© 2025 Me"
 
+# Navigation items (shown in theme's nav bar)
+nav_items:
+  - "<a href='/about'>About</a>"
+  - "<a href='/contact'>Contact</a>"
+
 # Theme
 theme: "default"
 
@@ -36,6 +41,7 @@ These fields can be overridden per language by creating a `conf.LANG.yml` file (
 - `description` - Site description
 - `url` - Site URL (used for feeds, sitemap)
 - `footer` - Footer text
+- `nav_items` - Navigation items shown in the theme's nav bar (list of HTML strings)
 
 **Localization:**
 
@@ -160,6 +166,12 @@ title: "My Awesome Blog"
 description: "Yet another blog about technology"
 url: "https://example.com"
 footer: "© 2025. All rights reserved."
+
+# Navigation items (shown in theme's nav bar)
+nav_items:
+  - "<a href='/about'>About</a>"
+  - "<a href='/archive'>Archive</a>"
+  - "<a href='/tags'>Tags</a>"
 
 # Theme
 theme: "default"

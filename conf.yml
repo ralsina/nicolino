@@ -13,6 +13,11 @@ description: "A static site generator"
 url: "https://nicolino.ralsina.me"
 footer: ""
 
+# Navigation items shown in the theme's nav bar
+nav_items:
+  - "<span role='button' class='outline'><a href='/books/'>Docs</a></span>"
+  - "<span role='button' class='outline'><a href='https://github.com/ralsina/nicolino'>GitHub</a></span>"
+
 # Localization options
 date_output_format: "%B %e, %Y"
 locale: "en_US.UTF-8"

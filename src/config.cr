@@ -15,6 +15,7 @@ module Config
   end
 
   alias Fonts = Array(Font)
+  alias NavItems = Array(String)
 
   # Taxonomy description in config - translatable
   struct Taxonomy
@@ -36,6 +37,7 @@ module Config
     property description : String = "A Nicolino Site"
     property url : String = "https://example.com"
     property footer : String = "Powered by Nicolino"
+    property nav_items : NavItems = NavItems.new
 
     # NOT translatable
     property output : String = "output/"
@@ -68,6 +70,7 @@ module Config
     property description : String = "A Nicolino Site"
     property footer : String = "Powered by Nicolino"
     property url : String = "https://example.com"
+    property nav_items : NavItems = NavItems.new
 
     # NOT translatable
     property output : String = "output/"
@@ -100,6 +103,7 @@ module Config
       @description = "A Nicolino Site"
       @footer = "Powered by Nicolino"
       @url = "https://example.com"
+      @nav_items = NavItems.new
       @output = "output/"
       @content = "content/"
       @posts = "posts/"
@@ -127,6 +131,7 @@ module Config
     property description : String = "A Nicolino Site"
     property footer : String = "Powered by Nicolino"
     property url : String = "https://example.com"
+    property nav_items : NavItems = NavItems.new
     property date_output_format : String = "%Y-%m-%d %H:%M"
     property locale : String = "en_US.UTF-8"
 
@@ -138,6 +143,7 @@ module Config
       @description = "A Nicolino Site",
       @footer = "Powered by Nicolino",
       @url = "https://example.com",
+      @nav_items = NavItems.new,
       @date_output_format = "%Y-%m-%d %H:%M",
       @locale = "en_US.UTF-8",
       @taxonomies = Taxonomies.new
@@ -170,6 +176,7 @@ module Config
     @@global_config.description = config_data.description
     @@global_config.url = config_data.url
     @@global_config.footer = config_data.footer
+    @@global_config.nav_items = config_data.nav_items
     @@global_config.output = config_data.output
     @@global_config.content = config_data.content
     @@global_config.posts = config_data.posts
@@ -195,6 +202,7 @@ module Config
       description: @@global_config.description,
       footer: @@global_config.footer,
       url: @@global_config.url,
+      nav_items: @@global_config.nav_items,
       date_output_format: @@global_config.date_output_format,
       locale: @@global_config.locale,
       taxonomies: config_data.taxonomies
@@ -255,6 +263,7 @@ location: "tags/"
           description: lang_override.description,
           footer: lang_override.footer,
           url: lang_override.url,
+          nav_items: lang_override.nav_items,
           date_output_format: lang_override.date_output_format,
           locale: lang_override.locale,
           taxonomies: lang_override.taxonomies.empty? ? base_config.taxonomies : lang_override.taxonomies
