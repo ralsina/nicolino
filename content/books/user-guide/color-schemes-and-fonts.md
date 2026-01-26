@@ -1,14 +1,16 @@
 Nicolino provides built-in support for customizing the color scheme and fonts of your site through simple configuration options. This allows you to personalize your site's appearance without creating a custom theme.
 
+{{% youtube id="PK1hPHz_J1M" %}}
+
 ## Color Schemes
 
-Color schemes are based on the [Base16](https://base16-project.org/) standard, which provides consistent color palettes with both dark and light variants.
+Color schemes are based on the [Tinted Theming](https://github.com/tinted-theming) project, which provides consistent color palettes with both dark and light variants via [Sixteen](https://sixteen.ralsina.me/).
 
 ### Built-in Schemes
 
-Nicolino includes all official Base16 color schemes. Some popular options:
+Nicolino includes hundreds of color schemes. Some popular options:
 
-- `default` - Default Base16 (Atelier Cave Light / Atelier Cave)
+- `default` - Default blue theme
 - `tokyo-night` - Tokyo Night theme
 - `nord` - Nord color scheme
 - `dracula` - Dracula theme
@@ -23,9 +25,7 @@ For a complete list of available schemes, see [sixteen.ralsina.me](https://sixte
 Add the `color_scheme` option to your `conf.yml`:
 
 ```yaml
-site:
-  title: My Site
-  color_scheme: tokyo-night
+color_scheme: tokyo-night
 ```
 
 The scheme will automatically generate:
@@ -83,35 +83,28 @@ The generated `style.css` includes CSS custom properties for all Base16 colors t
 
 Nicolino supports configuring custom fonts through the `fonts` option in `conf.yml`. You can use any font family from Google Fonts or specify local fonts.
 
-### Default Fonts
-
-By default, Nicolino uses these Google Fonts:
-
-- **Quicksand** (400, 600, 700) - Sans-serif body text
-- **Sono** (400) - Monospace code
-- **Comfortaa** (400, 700) - Display/headings
+**Note:** If you don't specify a `fonts` section in your `conf.yml`, Nicolino will use browser default fonts (no custom fonts are loaded).
 
 ### Font Configuration
 
-Fonts are configured as an array in `conf.yml`:
+Fonts are configured as an array in `conf.yml`. For example, to use Quicksand, Sono, and Comfortaa:
 
 ```yaml
-site:
-  fonts:
-    - family: Quicksand
-      source: google
-      weights: [400, 600, 700]
-      role: sans-serif
+fonts:
+  - family: Quicksand
+    source: google
+    weights: [400, 600, 700]
+    role: sans-serif
 
-    - family: Sono
-      source: google
-      weights: [400]
-      role: monospace
+  - family: Sono
+    source: google
+    weights: [400]
+    role: monospace
 
-    - family: Comfortaa
-      source: google
-      weights: [400, 700]
-      role: display
+  - family: Comfortaa
+    source: google
+    weights: [400, 700]
+    role: display
 ```
 
 ### Font Roles
@@ -127,22 +120,21 @@ Each font has a `role` that determines where it's used:
 To use Google Fonts, set `source: google` and specify the font family name and weights:
 
 ```yaml
-site:
-  fonts:
-    - family: Inter
-      source: google
-      weights: [400, 500, 600, 700]
-      role: sans-serif
+fonts:
+  - family: Inter
+    source: google
+    weights: [400, 500, 600, 700]
+    role: sans-serif
 
-    - family: Fira Code
-      source: google
-      weights: [400, 500]
-      role: monospace
+  - family: Fira Code
+    source: google
+    weights: [400, 500]
+    role: monospace
 
-    - family: Montserrat
-      source: google
-      weights: [700, 800]
-      role: display
+  - family: Montserrat
+    source: google
+    weights: [700, 800]
+    role: display
 ```
 
 Nicolino will automatically:
@@ -156,11 +148,10 @@ Nicolino will automatically:
 For self-hosted fonts, omit the `source` field or set it to any value other than `google`:
 
 ```yaml
-site:
-  fonts:
-    - family: "My Custom Font"
-      weights: [400, 700]
-      role: sans-serif
+fonts:
+  - family: "My Custom Font"
+    weights: [400, 700]
+    role: sans-serif
 ```
 
 You'll need to add the `@font-face` declarations in your `assets/custom.css`:
@@ -192,26 +183,25 @@ Not all fonts support all weights. Check your font's documentation for available
 Here's a complete `conf.yml` with color scheme and font configuration:
 
 ```yaml
-site:
-  title: My Awesome Site
-  description: A blog about technology and design
-  color_scheme: tokyo-night
+title: My Awesome Site
+description: A blog about technology and design
+color_scheme: tokyo-night
 
-  fonts:
-    - family: Inter
-      source: google
-      weights: [400, 500, 600, 700]
-      role: sans-serif
+fonts:
+  - family: Inter
+    source: google
+    weights: [400, 500, 600, 700]
+    role: sans-serif
 
-    - family: JetBrains Mono
-      source: google
-      weights: [400, 500]
-      role: monospace
+  - family: JetBrains Mono
+    source: google
+    weights: [400, 500]
+    role: monospace
 
-    - family: Space Grotesk
-      source: google
-      weights: [700]
-      role: display
+  - family: Space Grotesk
+    source: google
+    weights: [700]
+    role: display
 
 features:
   - base16
@@ -228,7 +218,7 @@ The `base16` feature generates `output/css/style.css` which includes:
 2. **Font family variables** - CSS custom properties for each font role
 3. **Pico CSS theme variables** - Dark and light mode color schemes
 4. **Base16 palette colors** - All 16 palette colors as CSS variables
-5. **Syntax highlighting** - Highlight.js theme colors for code blocks
+5. **Syntax highlighting** - Prism.js theme colors for code blocks generated from the base16 colors
 
 The CSS is loaded in this order in `page.tmpl`:
 

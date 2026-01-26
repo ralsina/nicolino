@@ -43,7 +43,7 @@ output/galleries/
 
 ## Gallery Content
 
-Add a `description.md` file to provide gallery introduction:
+Add a `index.md` file to provide gallery introduction:
 
 <pre><code class="language-yaml">---
 title: My Photo Gallery
@@ -58,7 +58,7 @@ Place this in the gallery directory:
 
 ```
 content/galleries/my-gallery/
-  description.md
+  index.md
   image1.jpg
   image2.jpg
 ```
