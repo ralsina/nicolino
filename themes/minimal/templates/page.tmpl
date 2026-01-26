@@ -110,25 +110,29 @@
       <!-- Theme Switcher -->
       <div class="sidebar-section">
         <label>
-          <input type="checkbox" id="switch_theme" name="switch" role="switch" value="1" _="
-              def setTheme()
-                get the closest <html/>
-                if cookies['isLight'] is 'true'
-                  set its @data-theme to 'light'
-                  set cookies['isLight'] to true
-                  set my @checked to false
-                else
-                  set its @data-theme to 'dark'
-                  set cookies['isLight'] to false
-                  set my @checked to true
-              end
-              init setTheme() end
-              on change
-                set cookies['isLight'] to (cookies['isLight'] is not 'true')
-                setTheme()
-            " />
+          <input type="checkbox" id="switch_theme" name="switch" role="switch" value="1" />
           Dark Mode
         </label>
+        <script>
+          (function() {
+            const html = document.documentElement;
+            const toggle = document.getElementById('switch_theme');
+
+            function setTheme() {
+              const isLight = localStorage.getItem('isLight') === 'true';
+              html.setAttribute('data-theme', isLight ? 'light' : 'dark');
+              toggle.checked = !isLight;
+            }
+
+            setTheme();
+
+            toggle.addEventListener('change', function() {
+              const isLight = toggle.checked === false;
+              localStorage.setItem('isLight', isLight ? 'true' : 'false');
+              setTheme();
+            });
+          })();
+        </script>
       </div>
     </div>
   </aside>
