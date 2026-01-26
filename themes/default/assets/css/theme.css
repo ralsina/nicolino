@@ -222,30 +222,27 @@ dt {
     margin: 0.25em 0;
 }
 
-.toc-link {
+.toc-link,
+.toc-title {
     display: block;
+    font-family: var(--font-display);
     color: inherit;
     text-decoration: none;
     padding: 0.25em 0.5em;
     border-radius: 4px;
     transition: background 0.2s;
+    line-height: 1.5;
+    min-height: 1.5em;
 }
 
-.toc-link:hover {
+.toc-link:hover,
+.toc-title:not(.disabled):hover {
     background: var(--pico-secondary-hover-background);
-    text-decoration: none;
 }
 
 .toc-link.active {
     background: var(--pico-secondary-background);
     font-weight: 500;
-}
-
-.toc-title {
-    display: block;
-    font-family: var(--font-display);
-    padding: 0.25em 0.5em;
-    font-weight: 600;
 }
 
 .toc-title.disabled {
@@ -256,13 +253,16 @@ dt {
     margin-left: 0;
 }
 
-.toc-group details {
-    margin-left: 0;
+details.toc-group {
+    margin: 0 !important;
+    padding: 0;
 }
 
 .toc-summary {
     cursor: pointer;
     list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
     align-items: center;
     gap: 0.5em;
@@ -271,7 +271,6 @@ dt {
 .toc-summary .toc-link,
 .toc-summary .toc-title {
     flex: 1;
-    min-width: 0;
 }
 
 /* Position the details marker properly */
@@ -285,6 +284,7 @@ dt {
 
 .toc-children {
     margin-left: 1em;
+    margin-bottom: 0;
     padding-left: 0.5em;
     border-left: 2px solid var(--pico-muted-border-color);
 }

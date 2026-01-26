@@ -109,3 +109,18 @@ features:
   - taxonomies
   # - similarity  # Disabled by default - makes builds significantly slower
   - archive
+
+
+fonts:
+  - family: Quicksand
+    source: google
+    weights: [400, 600, 700]
+    role: sans-serif
+  - family: Sono
+    source: google
+    weights: [400]
+    role: monospace
+  - family: Comfortaa
+    source: google
+    weights: [400, 700]
+    role: display
