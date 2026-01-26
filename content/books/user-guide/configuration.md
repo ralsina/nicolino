@@ -31,39 +31,47 @@ features:
 These fields can be overridden per language by creating a `conf.LANG.yml` file (e.g., `conf.es.yml`). Only include the fields you want to override - others will use these defaults.
 
 **Site Metadata:**
+
 - `title` - Site title
 - `description` - Site description
 - `url` - Site URL (used for feeds, sitemap)
 - `footer` - Footer text
 
 **Localization:**
+
 - `date_output_format` - Date format (strftime format)
 - `locale` - System locale
 
 **Taxonomies:**
+
 - Classification systems for your content (tags, categories, etc.)
 - See [Taxonomies](taxonomies.md) for details
 
 ## Non-Translatable Settings
 
 **Theme:**
+
 - `theme` - Theme to use (default or custom in `themes/`)
 - `color_scheme` - Base16 color scheme for syntax highlighting
 
 **Paths:**
+
 - `output` - Output directory
 - `content` - Content directory
 - `posts` - Posts subdirectory within content/
 - `galleries` - Galleries subdirectory within content/
 
 **Image Processing:**
+
 - `image_large` - Max width for large images (default: 1920)
 - `image_thumb` - Max width for thumbnails (default: 640)
 
 **Language:**
+
 - `language` - Default language code (default: "en")
 
 **Pandoc Format Associations:**
+
 - `pandoc_formats` - Maps file extensions to Pandoc formats
 
 ```yaml
@@ -73,6 +81,7 @@ pandoc_formats:
 ```
 
 **Logging:**
+
 - `verbosity` - Output verbosity (0=fatal, 1=errors, 2=warnings, 3=info, 4=debug, 5=trace)
 
 ## Features
