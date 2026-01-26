@@ -128,6 +128,7 @@ module Config
     property footer : String = "Powered by Nicolino"
     property url : String = "https://example.com"
     property date_output_format : String = "%Y-%m-%d %H:%M"
+    property locale : String = "en_US.UTF-8"
 
     # Translatable taxonomies
     property taxonomies : Taxonomies = Taxonomies.new
@@ -138,6 +139,7 @@ module Config
       @footer = "Powered by Nicolino",
       @url = "https://example.com",
       @date_output_format = "%Y-%m-%d %H:%M",
+      @locale = "en_US.UTF-8",
       @taxonomies = Taxonomies.new
     )
     end
@@ -194,6 +196,7 @@ module Config
       footer: @@global_config.footer,
       url: @@global_config.url,
       date_output_format: @@global_config.date_output_format,
+      locale: @@global_config.locale,
       taxonomies: config_data.taxonomies
     )
 
@@ -253,6 +256,7 @@ location: "tags/"
           footer: lang_override.footer,
           url: lang_override.url,
           date_output_format: lang_override.date_output_format,
+          locale: lang_override.locale,
           taxonomies: lang_override.taxonomies.empty? ? base_config.taxonomies : lang_override.taxonomies
         )
       rescue ex : Exception
@@ -318,8 +322,7 @@ location: "tags/"
   end
 
   def self.locale : String
-    ensure_loaded
-    @@global_config.locale
+    self[@@default_lang].locale
   end
 
   def self.verbosity : Int32
@@ -399,7 +402,7 @@ location: "tags/"
       @content = @global.content
       @posts = @global.posts
       @galleries = @global.galleries
-      @locale = @global.locale
+      @locale = @lang_config.locale
       @date_output_format = @lang_config.date_output_format
       @theme = @global.theme
       @color_scheme = @global.color_scheme
