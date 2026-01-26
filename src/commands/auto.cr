@@ -33,10 +33,9 @@ DOC
 
         # Set up hook to reload config before tasks run
         Croupier::TaskManager.before_run_hook = ->(modified_files : Set(String)) {
-          if modified_files.includes?(Config.config_path)
-            Log.info { "Config file changed, reloading..." }
-            Config.reload
-          end
+          return unless modified_files.includes?(Config.config_path)
+          Log.info { "Config file changed, reloading..." }
+          Config.reload
         }
 
         # Now run in auto mode

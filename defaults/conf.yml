@@ -1,75 +1,62 @@
 # Configuration for Nicolino.
-# Commented parts are the same as the defaults
 
-# Some site options. These are available in templates
-# as site_name (ex: site_title)
-site:
-  title: "Nicolino"
-  description: "Nicolino: a static site generator"
-  url: "https://nicolino.ralsina.me"
-  footer: "Default Nicolino Theme"
-  # Color scheme from https://sixteen.ralsina.me/
-  color_scheme: "default"
-  # Font configuration
-  # Fonts are loaded from Google Fonts automatically when source: google
-  fonts:
-    - family: Quicksand
-      source: google
-      weights: [400, 600, 700]
-      role: sans-serif
-    - family: Sono
-      source: google
-      weights: [400]
-      role: monospace
-    - family: Comfortaa
-      source: google
-      weights: [400, 700]
-      role: display
-# Some options affecting output
-options:
-  # Format HTML nicely. Makes it larger but easier to read
-  # and understand.
-  pretty_html: true
-  # Image sizes for output
-  image_large: 1920
-  image_thumb: 640
-  # Where to write the output
-  output: "output/"
-  # Where the content is located
-  content: "content/"
-  # Where posts are located within content/
-  posts: "posts/"
-  # Where galleries are located within content/
-  galleries: "galleries/"
-  # Default localization options.
-  # If you want more than one language look at the laguages section
-  date_output_format: "%Y-%m-%d %H:%M"
-  locale: "en_US.UTF-8"
-  language: "en"
-  # What extensions you want associated with what pandoc format.
-  # For more details: https://pandoc.org/MANUAL.html#option--from
-  formats:
-    .rst: rst
-    .txt: rst
-  # How verbose should output be by default.
-  # 0: fatal (same as -q flag)
-  # 1: errors
-  # 2: warnings
-  # 3: info
-  # 4: debug
-  # 5: trace
-  verbosity: 3
+# Site metadata (translatable)
+title: "Nicolino"
+description: "Nicolino: a static site generator"
+url: "https://nicolino.ralsina.me"
+footer: "Default Nicolino Theme"
 
-# Options for languages if you have more than one.
-# Each language key can contain all or part of this config file's structure,
-# which will be overlayed on the default config.
-# For example, these are some overrides that would work for Spanish
-# in a site where the default language is English
-#
-# IMPORTANT: do NOT override the `content` path here.`
-#
-# languages:
-#   en:
+# Color scheme from https://sixteen.ralsina.me/
+color_scheme: "default"
+
+# Font configuration
+# Fonts are loaded from Google Fonts automatically when source: google
+fonts:
+  - family: Quicksand
+    source: google
+    weights: [400, 600, 700]
+    role: sans-serif
+  - family: Sono
+    source: google
+    weights: [400]
+    role: monospace
+  - family: Comfortaa
+    source: google
+    weights: [400, 700]
+    role: display
+
+# Output options
+output: "output/"
+content: "content/"
+posts: "posts/"
+galleries: "galleries/"
+
+# Image sizes for output
+image_large: 1920
+image_thumb: 640
+
+# Localization options
+date_output_format: "%Y-%m-%d %H:%M"
+locale: "en_US.UTF-8"
+language: "en"
+
+# What extensions you want associated with what pandoc format.
+# For more details: https://pandoc.org/MANUAL.html#option--from
+formats:
+  .rst: rst
+  .txt: rst
+
+# How verbose should output be by default.
+# 0: fatal (same as -q flag)
+# 1: errors
+# 2: warnings
+# 3: info
+# 4: debug
+# 5: trace
+verbosity: 3
+
+# Templates for continuous import feature
+continuous_import_templates: "user_templates"
 
 # Taxonomies are ways to classify your content.
 # For example, by tags, or by author.

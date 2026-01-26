@@ -22,15 +22,11 @@ module Taxonomies
         v.location,
         posts
       ).render
+      # Register output folder to exclude from folder_indexes
+      FolderIndexes.register_exclude(v.location)
     end
 
     Log.info { "✓ Taxonomies queued" }
-  end
-
-  # Register output folder to exclude from folder_indexes
-  # Default is "tags/" but can be configured
-  Config.taxonomies.each do |name, taxonomy|
-    FolderIndexes.register_exclude(taxonomy.location)
   end
 
   # A Taxonomy Term, which is one of the classifications

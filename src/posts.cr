@@ -41,7 +41,7 @@ module Posts
     Config.languages.keys.each do |lang|
       # Language suffix for non-English feeds
       lang_suffix = lang == "en" ? "" : ".#{lang}"
-      rss_output = Path[Config[lang].output] / "rss#{lang_suffix}.xml"
+      rss_output = Path[Config.output] / "rss#{lang_suffix}.xml"
 
       # Get language-specific site title
       site_title = Config[lang].title

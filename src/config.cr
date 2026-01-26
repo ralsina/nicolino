@@ -16,7 +16,7 @@ module Config
 
   alias Fonts = Array(Font)
 
-  # Taxonomy description in config - per language
+  # Taxonomy description in config - translatable
   struct Taxonomy
     include YAML::Serializable
 
@@ -27,94 +27,117 @@ module Config
 
   alias Taxonomies = Hash(String, Taxonomy)
 
-  # Full configuration from conf.yml
+  # Global configuration from conf.yml (NOT translatable)
   struct ConfigFile
     include YAML::Serializable
 
-    property site : SiteConfig
-    property taxonomies : Taxonomies = Taxonomies.new
-    property features : Array(String) = [] of String
-  end
-
-  # Site configuration section from conf.yml
-  struct SiteConfig
-    include YAML::Serializable
-
-    # Site metadata
+    # Translatable properties (also in SiteConfig, but read into LangConfig)
     property title : String = "Nicolino"
     property description : String = "A Nicolino Site"
     property url : String = "https://example.com"
     property footer : String = "Powered by Nicolino"
 
-    # Paths
+    # NOT translatable
+    property output : String = "output/"
+    property content : String = "content/"
+    property posts : String = "posts/"
+    property galleries : String = "galleries/"
+    property theme : String = "default"
+    property color_scheme : String = "default"
+    property fonts : Fonts = Fonts.new
+    property image_large : Int32 = 1920
+    property image_thumb : Int32 = 640
+    property formats : Hash(String, String) = {} of String => String
+    property language : String = "en"
+    property locale : String = "en_US.UTF-8"
+    property date_output_format : String = "%Y-%m-%d %H:%M"
+    property verbosity : Int32 = 3
+    property continuous_import_templates : String = "user_templates"
+
+    # Taxonomies and features
+    property taxonomies : Taxonomies = Taxonomies.new
+    property features : Array(String) = [] of String
+  end
+
+  # Site configuration section from conf.yml (NOT translatable)
+  struct SiteConfig
+    include YAML::Serializable
+
+    # Translatable - will be in LangConfig
+    property title : String = "Nicolino"
+    property description : String = "A Nicolino Site"
+    property footer : String = "Powered by Nicolino"
+    property url : String = "https://example.com"
+
+    # NOT translatable
     property output : String = "output/"
     property content : String = "content/"
     property posts : String = "posts/"
     property galleries : String = "galleries/"
 
-    # Theme
+    # NOT translatable
     property theme : String = "default"
     property color_scheme : String = "default"
     property fonts : Fonts = Fonts.new
 
-    # Image settings
+    # NOT translatable
     property image_large : Int32 = 1920
     property image_thumb : Int32 = 640
-
-    # Formats
     property formats : Hash(String, String) = {} of String => String
 
-    # Locale
+    # Locale/Language settings
     property language : String = "en"
     property locale : String = "en_US.UTF-8"
     property date_output_format : String = "%Y-%m-%d %H:%M"
 
-    # Other
+    # NOT translatable
     property verbosity : Int32 = 3
     property continuous_import_templates : String = "user_templates"
+
+    # Default constructor for class variable initialization
+    def initialize
+      @title = "Nicolino"
+      @description = "A Nicolino Site"
+      @footer = "Powered by Nicolino"
+      @url = "https://example.com"
+      @output = "output/"
+      @content = "content/"
+      @posts = "posts/"
+      @galleries = "galleries/"
+      @theme = "default"
+      @color_scheme = "default"
+      @fonts = Fonts.new
+      @image_large = 1920
+      @image_thumb = 640
+      @formats = {} of String => String
+      @language = "en"
+      @locale = "en_US.UTF-8"
+      @date_output_format = "%Y-%m-%d %H:%M"
+      @verbosity = 3
+      @continuous_import_templates = "user_templates"
+    end
   end
 
-  # Per-language configuration
+  # Translatable configuration - can be overridden by conf.LANG.yml
   class LangConfig
+    include YAML::Serializable
+
+    # Translatable properties
     property title : String
     property description : String
-    property url : String
     property footer : String
-    property output : String
-    property content : String
-    property posts : String
-    property galleries : String
-    property theme : String
-    property color_scheme : String
-    property fonts : Fonts
-    property image_large : Int32
-    property image_thumb : Int32
-    property formats : Hash(String, String)
-    property locale : String
+    property url : String
     property date_output_format : String
-    property verbosity : Int32
-    property continuous_import_templates : String
-    property taxonomies : Taxonomies
+
+    # Translatable taxonomies
+    property taxonomies : Taxonomies = Taxonomies.new
 
     def initialize(
       @title = "Nicolino",
       @description = "A Nicolino Site",
-      @url = "https://example.com",
       @footer = "Powered by Nicolino",
-      @output = "output/",
-      @content = "content/",
-      @posts = "posts/",
-      @galleries = "galleries/",
-      @theme = "default",
-      @color_scheme = "default",
-      @fonts = Fonts.new,
-      @image_large = 1920,
-      @image_thumb = 640,
-      @formats = {} of String => String,
-      @locale = "en_US.UTF-8",
+      @url = "https://example.com",
       @date_output_format = "%Y-%m-%d %H:%M",
-      @verbosity = 3,
-      @continuous_import_templates = "user_templates",
       @taxonomies = Taxonomies.new
     )
     end
@@ -122,18 +145,13 @@ module Config
 
   # Store all loaded language configs
   @@lang_configs = Hash(String, LangConfig).new
+  @@global_config : SiteConfig = SiteConfig.new
   @@features : Array(String) = [] of String
   @@loaded : Bool = false
 
-  # Ensure config is loaded before accessing
-  private def self.ensure_loaded
-    return if @@loaded
-    config
-  end
-
-  # Get the raw config for legacy access
+  # Get the raw config for legacy access (TODO: remove)
   def self.get(key)
-    # For now, return nil - we'll remove this API
+    ensure_loaded
     nil
   end
 
@@ -144,35 +162,44 @@ module Config
     # Read and parse conf.yml
     config_data = ConfigFile.from_yaml(File.read(path))
 
-    # Store default language
-    @@default_lang = config_data.site.language
+    # Store global config (convert ConfigFile to SiteConfig)
+    @@global_config = SiteConfig.new
+    @@global_config.title = config_data.title
+    @@global_config.description = config_data.description
+    @@global_config.url = config_data.url
+    @@global_config.footer = config_data.footer
+    @@global_config.output = config_data.output
+    @@global_config.content = config_data.content
+    @@global_config.posts = config_data.posts
+    @@global_config.galleries = config_data.galleries
+    @@global_config.theme = config_data.theme
+    @@global_config.color_scheme = config_data.color_scheme
+    @@global_config.fonts = config_data.fonts
+    @@global_config.image_large = config_data.image_large
+    @@global_config.image_thumb = config_data.image_thumb
+    @@global_config.formats = config_data.formats
+    @@global_config.language = config_data.language
+    @@global_config.locale = config_data.locale
+    @@global_config.date_output_format = config_data.date_output_format
+    @@global_config.verbosity = config_data.verbosity
+    @@global_config.continuous_import_templates = config_data.continuous_import_templates
 
-    # Build LangConfig for default language from SiteConfig + Taxonomies
-    site = config_data.site
+    # Store default language
+    @@default_lang = @@global_config.language
+
+    # Build LangConfig for default language from translatable parts
     lang_config = LangConfig.new(
-      title: site.title,
-      description: site.description,
-      url: site.url,
-      footer: site.footer,
-      output: site.output,
-      content: site.content,
-      posts: site.posts,
-      galleries: site.galleries,
-      theme: site.theme,
-      color_scheme: site.color_scheme,
-      fonts: site.fonts,
-      image_large: site.image_large,
-      image_thumb: site.image_thumb,
-      formats: site.formats,
-      locale: site.locale,
-      date_output_format: site.date_output_format,
-      verbosity: site.verbosity,
-      continuous_import_templates: site.continuous_import_templates,
+      title: @@global_config.title,
+      description: @@global_config.description,
+      footer: @@global_config.footer,
+      url: @@global_config.url,
+      date_output_format: @@global_config.date_output_format,
       taxonomies: config_data.taxonomies
     )
 
     @@lang_configs[@@default_lang] = lang_config
     @@features = config_data.features
+    @@loaded = true
 
     # Set default features if empty
     if @@features.empty?
@@ -181,35 +208,114 @@ module Config
     end
 
     # Set default taxonomies if empty
-    if @@lang_configs[@@default_lang].taxonomies.empty?
-      default_taxonomy_yaml = %(
+    return unless @@lang_configs[@@default_lang].taxonomies.empty?
+    default_taxonomy_yaml = %(
 title: "🏷Tags"
 term_title: "Posts tagged {{term.name}}"
 location: "tags/"
 )
-      @@lang_configs[@@default_lang].taxonomies = {
-        "tags" => Taxonomy.from_yaml(default_taxonomy_yaml)
-      }
-    end
+    @@lang_configs[@@default_lang].taxonomies = {
+      "tags" => Taxonomy.from_yaml(default_taxonomy_yaml),
+    }
+  end
+
+  # Ensure config is loaded before accessing
+  private def self.ensure_loaded
+    return if @@loaded
+    config
   end
 
   # Load or get cached LangConfig for a specific language
   def self.[](lang : String) : LangConfig
     ensure_loaded
     unless @@lang_configs.has_key?(lang)
-      if lang == @@default_lang
-        # Should have been loaded already
-        raise "Default language config not loaded. Call Config.config() first."
-      else
-        # TODO: Load from conf.LANG.yml for overrides
-        # For now, just use default config
-        @@lang_configs[lang] = @@lang_configs[@@default_lang]
-      end
+      raise "Default language config not loaded." if lang == @@default_lang
+      # Load from conf.LANG.yml for overrides
+      # For now, just use default config
+      @@lang_configs[lang] = @@lang_configs[@@default_lang]
     end
     @@lang_configs[lang]
   end
 
-  # Alias for default language - forward commonly used properties
+  # ===== Global (non-translatable) accessors =====
+
+  def self.output : String
+    ensure_loaded
+    @@global_config.output
+  end
+
+  def self.content : String
+    ensure_loaded
+    @@global_config.content
+  end
+
+  def self.posts : String
+    ensure_loaded
+    @@global_config.posts
+  end
+
+  def self.galleries : String
+    ensure_loaded
+    @@global_config.galleries
+  end
+
+  def self.theme : String
+    ensure_loaded
+    @@global_config.theme
+  end
+
+  def self.color_scheme : String
+    ensure_loaded
+    @@global_config.color_scheme
+  end
+
+  def self.fonts : Fonts
+    ensure_loaded
+    @@global_config.fonts
+  end
+
+  def self.image_large : Int32
+    ensure_loaded
+    @@global_config.image_large
+  end
+
+  def self.image_thumb : Int32
+    ensure_loaded
+    @@global_config.image_thumb
+  end
+
+  def self.formats : Hash(String, String)
+    ensure_loaded
+    @@global_config.formats
+  end
+
+  def self.locale : String
+    ensure_loaded
+    @@global_config.locale
+  end
+
+  def self.verbosity : Int32
+    ensure_loaded
+    @@global_config.verbosity
+  end
+
+  def self.continuous_import_templates : String
+    ensure_loaded
+    @@global_config.continuous_import_templates
+  end
+
+  def self.language : String
+    ensure_loaded
+    @@global_config.language
+  end
+
+  def self.url : String
+    # URL is translatable (could have different domain per language)
+    self[@@default_lang].url rescue "https://example.com"
+  end
+
+  # ===== Translatable accessors (forward to default language) =====
+
   def self.title : String
     self[@@default_lang].title
   end
@@ -218,101 +324,74 @@ location: "tags/"
     self[@@default_lang].description
   end
 
-  def self.url : String
-    self[@@default_lang].url
-  end
-
   def self.footer : String
     self[@@default_lang].footer
-  end
-
-  def self.output : String
-    self[@@default_lang].output
-  end
-
-  def self.content : String
-    self[@@default_lang].content
-  end
-
-  def self.posts : String
-    self[@@default_lang].posts
-  end
-
-  def self.galleries : String
-    self[@@default_lang].galleries
-  end
-
-  def self.theme : String
-    self[@@default_lang].theme
-  end
-
-  def self.color_scheme : String
-    self[@@default_lang].color_scheme
-  end
-
-  def self.fonts : Fonts
-    self[@@default_lang].fonts
-  end
-
-  def self.image_large : Int32
-    self[@@default_lang].image_large
-  end
-
-  def self.image_thumb : Int32
-    self[@@default_lang].image_thumb
-  end
-
-  def self.formats : Hash(String, String)
-    self[@@default_lang].formats
-  end
-
-  def self.locale : String
-    self[@@default_lang].locale
   end
 
   def self.date_output_format : String
     self[@@default_lang].date_output_format
   end
 
-  def self.verbosity : Int32
-    self[@@default_lang].verbosity
-  end
-
-  def self.continuous_import_templates : String
-    self[@@default_lang].continuous_import_templates
-  end
-
   def self.taxonomies : Taxonomies
-    ensure_loaded
     self[@@default_lang].taxonomies
   end
 
-  # Get features list
+  # ===== Features =====
+
   def self.features : Array(String)
     ensure_loaded
     @@features
   end
 
-  # Get features as a Set of Totem::Any for legacy compatibility
   def self.features_set : Set(Totem::Any)
     ensure_loaded
-    @@features.map { |f| Totem::Any.new(f) }.to_set
+    @@features.map { |feature| Totem::Any.new(feature) }.to_set
   end
 
-  # Legacy: Config.options(lang) - map to Config[lang]
+  # ===== Legacy compatibility =====
+
+  # Legacy: Config.options(lang) - map to Config[lang] wrapped
+  class OptionsWrapper
+    property output : String
+    property content : String
+    property posts : String
+    property galleries : String
+    property locale : String
+    property date_output_format : String
+    property theme : String
+    property color_scheme : String
+    property fonts : Fonts
+    property formats : Hash(String, String)
+    property continuous_import_templates : String
+    property image_large : Int32
+    property image_thumb : Int32
+
+    def initialize(@lang_config : LangConfig, @global : SiteConfig)
+      @output = @global.output
+      @content = @global.content
+      @posts = @global.posts
+      @galleries = @global.galleries
+      @locale = @global.locale
+      @date_output_format = @lang_config.date_output_format
+      @theme = @global.theme
+      @color_scheme = @global.color_scheme
+      @fonts = @global.fonts
+      @formats = @global.formats
+      @continuous_import_templates = @global.continuous_import_templates
+      @image_large = @global.image_large
+      @image_thumb = @global.image_thumb
+    end
+  end
+
   def self.options(lang = nil)
     lang ||= @@default_lang
-    self[lang]
+    OptionsWrapper.new(self[lang], @@global_config)
   end
 
   # Legacy: Config.languages - return hash with default language only
   def self.languages
+    ensure_loaded
     {@@default_lang => Hash(String, String).new}
-  end
-
-  # Get the default language
-  def self.language : String
-    @@default_lang
   end
 
   # Get the actual config file path being used
@@ -326,7 +405,7 @@ location: "tags/"
     Log.info { "Reloading config from #{path}" }
     # Clear cached configs
     @@lang_configs.clear
-    @@features.clear
+    @@loaded = false
     # Load again
     Config.config(path)
   end
