@@ -165,7 +165,7 @@ module Archive
           "content"     => title_html + rendered,
           "title"       => "Archive",
           "breadcrumbs" => breadcrumbs,
-        })
+        }, lang)
 
         # Process with HTML filters
         doc = Lexbor::Parser.new(html)

@@ -165,7 +165,7 @@ module Taxonomies
               "content"     => title_html + rendered,
               "title"       => @title,
               "breadcrumbs" => breadcrumbs,
-            })
+            }, lang)
           doc = Lexbor::Parser.new(html)
           doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))
           HtmlFilters.fix_code_classes(doc).to_html

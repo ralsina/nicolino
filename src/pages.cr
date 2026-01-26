@@ -124,7 +124,7 @@ module Pages
           Log.info { "👉 #{output}" }
           page_template = Theme.template_path("page.tmpl")
           html = Render.apply_template(page_template,
-            {"content" => index.rendered, "title" => index.title, "breadcrumbs" => index.breadcrumbs})
+            {"content" => index.rendered, "title" => index.title, "breadcrumbs" => index.breadcrumbs}, lang)
           doc = Lexbor::Parser.new(html)
           doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))
           doc.to_html

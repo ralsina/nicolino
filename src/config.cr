@@ -231,10 +231,38 @@ location: "tags/"
     unless @@lang_configs.has_key?(lang)
       raise "Default language config not loaded." if lang == @@default_lang
       # Load from conf.LANG.yml for overrides
-      # For now, just use default config
-      @@lang_configs[lang] = @@lang_configs[@@default_lang]
+      @@lang_configs[lang] = load_lang_config(lang)
     end
     @@lang_configs[lang]
+  end
+
+  # Load language-specific config from conf.LANG.yml
+  private def self.load_lang_config(lang : String) : LangConfig
+    lang_config_path = "conf.#{lang}.yml"
+
+    if File.exists?(lang_config_path)
+      begin
+        lang_override = LangConfig.from_yaml(File.read(lang_config_path))
+        # Start with default config as base
+        base_config = @@lang_configs[@@default_lang]
+
+        # Merge: use override values if present, otherwise use base
+        LangConfig.new(
+          title: lang_override.title,
+          description: lang_override.description,
+          footer: lang_override.footer,
+          url: lang_override.url,
+          date_output_format: lang_override.date_output_format,
+          taxonomies: lang_override.taxonomies.empty? ? base_config.taxonomies : lang_override.taxonomies
+        )
+      rescue ex : Exception
+        Log.warn { "Failed to load #{lang_config_path}: #{ex.message}, using default config" }
+        @@lang_configs[@@default_lang]
+      end
+    else
+      # No override file, use default config
+      @@lang_configs[@@default_lang]
+    end
   end
 
   # ===== Global (non-translatable) accessors =====
@@ -388,10 +416,21 @@ location: "tags/"
     OptionsWrapper.new(self[lang], @@global_config)
   end
 
-  # Legacy: Config.languages - return hash with default language only
+  # Get all available languages by scanning for conf.LANG.yml files
   def self.languages
     ensure_loaded
-    {@@default_lang => Hash(String, String).new}
+    lang_hash = {@@default_lang => Hash(String, String).new}
+
+    # Scan for conf.LANG.yml files
+    Dir.glob("conf.*.yml").each do |file|
+      # Extract language code from conf.LANG.yml
+      if match = file.match(/^conf\.([a-z]{2})\.yml$/)
+        lang = match[1]
+        lang_hash[lang] = Hash(String, String).new
+      end
+    end
+
+    lang_hash
   end
 
   # Get the actual config file path being used

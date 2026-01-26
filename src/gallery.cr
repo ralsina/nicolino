@@ -280,7 +280,7 @@ module Gallery
             "language_links" => post.language_links(lang),
           }
           page_template = Theme.template_path("page.tmpl")
-          html = Render.apply_template(page_template, template_context)
+          html = Render.apply_template(page_template, template_context, lang)
           doc = Lexbor::Parser.new(html)
           doc = HtmlFilters.make_links_relative(doc, post.output(lang))
           doc.to_html
@@ -394,7 +394,7 @@ module Gallery
           "content"     => title_html + content,
           "title"       => "Galleries",
           "breadcrumbs" => breadcrumbs,
-        })
+        }, lang)
         doc = Lexbor::Parser.new(html)
         doc = HtmlFilters.make_links_relative(doc, output_path.to_s)
         doc.to_html

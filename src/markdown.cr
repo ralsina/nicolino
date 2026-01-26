@@ -564,7 +564,7 @@ module Markdown
               "breadcrumbs"    => post.breadcrumbs(lang),
               "language_links" => post.language_links(lang),
             }
-            html = Render.apply_template(Theme.template_path("page.tmpl"), template_vars)
+            html = Render.apply_template(Theme.template_path("page.tmpl"), template_vars, lang)
             doc = Lexbor::Parser.new(html)
             doc = HtmlFilters.make_links_relative(doc, post.link(lang))
             HtmlFilters.fix_code_classes(doc).to_html
@@ -617,7 +617,7 @@ module Markdown
     inputs = inputs.uniq
     FeatureTask.new(
       feature_name: feature_name,
-      id: "index",
+      id: "index_#{lang}",
       output: output.to_s,
       inputs: inputs,
       mergeable: false
@@ -648,7 +648,8 @@ module Markdown
           "extra_feed"     => extra_feed,
           "main_feed"      => main_feed,
           "language_links" => language_links,
-        })
+        },
+        lang)
       doc = Lexbor::Parser.new(html)
       doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))
       HtmlFilters.fix_code_classes(doc).to_html
