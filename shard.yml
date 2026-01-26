@@ -48,8 +48,6 @@ dependencies:
     github: naqvis/crystal-vips
   crimage:
     github: naqvis/crimage
-  stumpy_png:
-    github: stumpycr/stumpy_png
   oplog:
     github: ralsina/oplog
   polydocopt:
