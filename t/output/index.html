@@ -1,0 +1,138 @@
+<!DOCTYPE html><html lang="en" data-theme="dark"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Nicolino: Content</title>
+  <meta name="description" content="Nicolino: a static site generator">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="canonical" href="">
+
+  <link rel="alternate" type="application/rss+xml" href="/rss.xml" title="RSS Feed">
+
+
+  <!-- Pico CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.colors.min.css">
+  <!-- Lightbox -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.js"></script>
+  <script src="https://unpkg.com/hyperscript.org@0.9.9"></script>
+  <script src="https://cdn.jsdelivr.net/npm/minisearch@6.1.0/dist/umd/index.min.js"></script>
+
+  <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
+  <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/languages/django.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlightjs-copy@1.0.3/dist/highlightjs-copy.min.css">
+  <script src="https://unpkg.com/highlightjs-copy@1.0.3/dist/highlightjs-copy.min.js"></script>
+
+  <!-- Theme styles -->
+  <link rel="stylesheet" href="/css/theme.css">
+  <!-- Base16 color scheme (light/dark themes) -->
+  <link rel="stylesheet" href="/css/style.css">
+  <!-- Custom style (loaded last for user overrides) -->
+  <link rel="stylesheet" href="/css/custom.css">
+
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="container">
+    <nav>
+      <ul>
+        <li>
+          <h1><a href="https://nicolino.ralsina.me">Nicolino</a></h1>
+          <p>» Nicolino: a static site generator</p>
+        </li>
+      </ul>
+      <ul>
+        <li>
+          <input type="search" id="search" placeholder="Search..." style="width: 2em">
+        </li>
+
+        <li>
+          <label>
+          <input type="checkbox" id="switch_theme" name="switch" role="switch" value="1" _="
+              def setTheme()
+                get the closest &lt;html/&gt;
+                if cookies['isLight'] is 'true'
+                  set its @data-theme to 'light'
+                  set cookies['isLight'] to true
+                  set my @checked to false
+                else
+                  set its @data-theme to 'dark'
+                  set cookies['isLight'] to false
+                  set my @checked to true
+              end
+              init setTheme() end
+              on change
+                set cookies['isLight'] to (cookies['isLight'] is not 'true')
+                setTheme()
+            ">
+
+<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-28 346-160H160v-186L28-480l132-134v-186h186l134-132 134 132h186v186l132 134-132 134v186H614L480-28Zm0-252q83 0 141.5-58.5T680-480q0-83-58.5-141.5T480-680v400Zm0 140 100-100h140v-140l100-100-100-100v-140H580L480-820 380-720H240v140L140-480l100 100v140h140l100 100Zm0-340Z"></path></svg>
+            </label>
+        </li>
+
+      </ul>
+    </nav>
+  </header>
+  <div id="search_results"></div>
+  <!-- /Header -->
+
+  <!-- Main -->
+  <main class="container">
+    <h1 class="primary">
+
+  <nav aria-label="breadcrumb" class="breadcrumb">
+
+
+      <a href="/" class="breadcrumb-collapsed">Home</a>
+
+      <span class="breadcrumb-sep breadcrumb-sep-last"> » </span>
+      <a href="/index.html" class="">Content</a>
+
+  </nav>
+
+</h1>
+
+<section class="item-list-index">
+  <p>This folder is empty.</p>
+</section>
+<style>
+.item-list-index { margin: 2rem 0; }
+.item-list-index h3 { margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2em; color: var(--b16-base03); }
+.subdir-list { margin-bottom: 2rem; }
+.item-list { list-style-type: disc; padding-left: 1.5rem; margin: 1rem 0; }
+.item-list li { margin: 0.5rem 0; }
+.item-list a { text-decoration: none; color: var(--b16-base0D); font-size: 1.1em; }
+.item-list a:hover { text-decoration: underline; }
+</style>
+
+  </main>
+  <!-- /Main -->
+
+  <!-- Footer -->
+  <footer class="container">
+    <small>Default Nicolino ThemeDefault theme</small> 👈 👉
+    <small>Built with <a href="https://picocss.com">Pico</a></small>
+  </footer>
+  <!-- /Footer -->
+
+  <!-- Theme switcher -->
+  <!-- <script src="/js/theme-switcher.js"></script> -->
+  <script>
+    new VenoBox({
+      selector: "div.lightbox div a, div.lightbox p a, figure.lightbox a",
+      spinner: "fold",
+      numeration: true,
+      share: true,
+      maxWidth: "80%",
+    });
+
+    hljs.highlightAll();
+    hljs.addPlugin(new CopyButtonPlugin());
+
+  </script>
+  <script src="/search.js"></script>
+
+
+</body></html>

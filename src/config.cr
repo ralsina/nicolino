@@ -122,12 +122,12 @@ module Config
   class LangConfig
     include YAML::Serializable
 
-    # Translatable properties
-    property title : String
-    property description : String
-    property footer : String
-    property url : String
-    property date_output_format : String
+    # Translatable properties - with defaults for partial overrides
+    property title : String = "Nicolino"
+    property description : String = "A Nicolino Site"
+    property footer : String = "Powered by Nicolino"
+    property url : String = "https://example.com"
+    property date_output_format : String = "%Y-%m-%d %H:%M"
 
     # Translatable taxonomies
     property taxonomies : Taxonomies = Taxonomies.new
@@ -246,7 +246,7 @@ location: "tags/"
         # Start with default config as base
         base_config = @@lang_configs[@@default_lang]
 
-        # Merge: use override values if present, otherwise use base
+        # Merge: use override values, falling back to base for any unset values
         LangConfig.new(
           title: lang_override.title,
           description: lang_override.description,
