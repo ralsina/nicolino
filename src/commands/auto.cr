@@ -76,11 +76,26 @@ DOC
             end
           end
 
-          # If style.css changed, force reload all pages by not specifying a path
-          # This causes the browser to do a full page reload instead of live CSS reload
+          # If style.css changed, force reload all HTML pages
+          # We need to reload all HTML pages because they all include style.css
+          # and the changes (fonts, @import) require full page refresh
           if style_css_changed
-            Log.info { "LiveReload: style.css changed, forcing full page reload" }
-            live_reload.send_reload(path: "", liveCSS: false)
+            # Find all HTML files in output
+            html_pages = modified.select(&.ends_with?(".html"))
+            if html_pages.empty?
+              # If no HTML pages were directly modified, search for all HTML outputs
+              Croupier::TaskManager.tasks.each do |_, task|
+                html_output = task.outputs.find(&.ends_with?(".html"))
+                if html_output
+                  html_pages << Utils.path_to_link(html_output)
+                end
+              end
+            end
+            Log.info { "LiveReload: style.css changed, forcing full page reload for #{html_pages.size} pages" }
+            html_pages.each do |page|
+              Log.info { "LiveReload: #{page}" }
+              live_reload.send_reload(path: page, liveCSS: false)
+            end
           else
             modified.each do |path|
               Log.info { "LiveReload: #{path}" }
