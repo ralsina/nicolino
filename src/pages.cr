@@ -22,7 +22,7 @@ module Pages
     # Note: Pages are already registered by nicolino new command,
     # but features can register additional types here if needed
 
-    # Convert Totem::Any set to string set for easier use
+    # Convert YAML::Any set to string set for easier use
     features = feature_set.map(&.as_s).to_set
 
     # Read pages from multiple sources

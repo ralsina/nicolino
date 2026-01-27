@@ -29,7 +29,7 @@ module ContinuousImport
                    @metadata = {} of String => YAML::Any)
     end
 
-    # Load from config (YAML::Any from Totem)
+    # Load from config (YAML::Any from config)
     def self.from_any(any) : self
       # Handle urls - can be array or single string
       urls_val = any["urls"]
