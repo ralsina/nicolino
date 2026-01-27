@@ -161,11 +161,12 @@ dt {
     top: 1em;
     max-height: calc(100vh - 2em);
     overflow-y: auto;
+    overflow-x: hidden;
     transition: width 0.3s ease;
 }
 
 .book-sidebar.collapsed {
-    width: 40px;
+    width: 50px;
 }
 
 .book-sidebar.collapsed .book-title,
