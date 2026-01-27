@@ -6,8 +6,8 @@ title: Nicolino
 {{% tag h1 %}}# Nicolino{{%/tag%}}
 {{% tag p %}}A simple, fast, and lightweight static site generator{{%/tag%}}
 {{% tag div class="hero-actions" %}}
-{{% tag a href="/books/user-guide/" role="button" class="outline primary" %}}Get Started{{%/tag%}}
-{{% tag a href="https://github.com/ralsina/nicolino" role="button" class="outline" %}}GitHub{{%/tag%}}
+{{% tag a href="/books/user-guide/" class="outline primary" role="button" %}}Get Started{{%/tag%}}
+{{% tag a href="https://github.com/ralsina/nicolino" class="outline" role="button" %}}GitHub{{%/tag%}}
 {{%/tag%}}
 {{%/tag%}}
 
@@ -47,7 +47,7 @@ Built-in i18n with per-language feeds, pages, and posts. Translatable configs an
 {{% tag h2 %}}Ready to build your site?{{%/tag%}}
 {{% tag p %}}Get started in minutes with just a few commands.{{%/tag%}}
 {{% tag div class="cta-actions" %}}
-{{% tag a href="/books/user-guide/getting-started.html" role="button" class="primary" %}}Read the Guide{{%/tag%}}
+{{% tag a href="/books/user-guide/getting-started.html" class="primary" role="button" %}}Read the Guide{{%/tag%}}
 {{% tag a href="https://github.com/ralsina/nicolino/releases" role="button" %}}Download{{%/tag%}}
 {{%/tag%}}
 {{%/tag%}}
