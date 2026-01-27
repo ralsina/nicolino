@@ -16,7 +16,7 @@ footer: "Built Using Nicolino 🥊 Default Theme 🥊 Ashes Color Scheme"
 # Navigation items shown in the theme's nav bar
 nav_items:
   - "<span role='button' class='outline'><a href='/books/'>Docs</a></span>"
-  - "<span role='button' class='outline'><a href='https://github.com/ralsina/nicolino'>GitHub</a></span>"
+  - "<span role='button' class='outline'><a href='/posts/'>News</a></span>"
 
 # Localization options
 date_output_format: "%B %e, %Y"
