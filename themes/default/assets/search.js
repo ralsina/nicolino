@@ -62,18 +62,34 @@ document.addEventListener("DOMContentLoaded", function () {
       searchResults.style.display = "block";
 
       if (results.length > 0) {
-        // Create results list
-        let html = '<ul class="search-results-list">';
+        // Create modal with results list
+        let html = `<dialog open>
+          <article class="search-modal">
+            <header>
+              <button aria-label="Close" rel="prev" onclick="this.closest('dialog').remove()"></button>
+              <h3>Search Results for "${query}"</h3>
+            </header>
+            <ul class="search-results-list">`;
         results.forEach((result) => {
           const doc = documents.find((d) => d.id === result.id);
           if (doc) {
             html += `<li><a href="${doc.url}"><strong>${doc.title}</strong></a></li>`;
           }
         });
-        html += "</ul>";
+        html += `</ul>
+          </article>
+        </dialog>`;
         searchResults.innerHTML = html;
       } else {
-        searchResults.innerHTML = '<p class="no-results">No results found</p>';
+        searchResults.innerHTML = `<dialog open>
+          <article class="search-modal">
+            <header>
+              <button aria-label="Close" rel="prev" onclick="this.closest('dialog').remove()"></button>
+              <h3>Search Results for "${query}"</h3>
+            </header>
+            <p>No results found</p>
+          </article>
+        </dialog>`;
       }
     }
   });
