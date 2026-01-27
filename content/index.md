@@ -3,9 +3,9 @@
     <h2 style="color: var(--b16-base0D);">A <i>good</i> static site generator.</h2>
 
   <div class="hero-actions">
-      <span class="primary contrast" role="button">Get Started</span>
-      <span role="button" class="contrast">GitHub</span>
-      <a href="/books/user-guide/getting-started.html" class="contrast" role="button">Read the Guide</a>
+      <a href="/books/user-guide/getting-started.html" class="primary contrast" role="button">Get Started</span>
+      <a href="https://github.com/ralsina/nicolino" role="button" class="contrast">GitHub</span>
+      <a href="/books/user-guide/" class="contrast" role="button">Read the Guide</a>
   </div>
 </section>
 

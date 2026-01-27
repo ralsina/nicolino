@@ -3,7 +3,7 @@ require "http"
 require "uri"
 require "crinja"
 require "log"
-require "totem"
+# require "totem"
 
 # Continuous Import module
 #
@@ -21,12 +21,12 @@ module ContinuousImport
     property tags : String
     property skip_titles : Array(String)
     property start_at : String?
-    property metadata : Hash(String, Totem::Any)
+    property metadata : Hash(String, YAML::Any)
 
     def initialize(@urls, @template, @output_folder, @format = "md",
                    @source_extension = nil, @lang = "en", @tags = "",
                    @skip_titles = [] of String, @start_at = nil,
-                   @metadata = {} of String => Totem::Any)
+                   @metadata = {} of String => YAML::Any)
     end
 
     # Load from config (YAML::Any from Totem)
@@ -55,7 +55,7 @@ module ContinuousImport
 
       start_at = any["start_at"]?.try(&.as_s)
 
-      metadata = {} of String => Totem::Any
+      metadata = {} of String => YAML::Any
       if meta_val = any["metadata"]?
         if meta_val.responds_to?(:as_h)
           meta_val.as_h.each do |k, v|
@@ -463,10 +463,10 @@ module ContinuousImport
 
   # Import all configured feeds
   def self.import_all
-    ci_value = nil
-    return unless ci_value
+    ci_value = Config.options.continuous_import
+    return unless ci_value && !ci_value.empty?
 
-    feeds = ci_value.as_h
+    feeds = ci_value
     templates_dir = Config.options.continuous_import_templates
 
     feeds.each do |name, cfg|

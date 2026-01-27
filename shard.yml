@@ -31,8 +31,6 @@ dependencies:
     branch: main
   shortcodes:
     github: ralsina/shortcodes
-  totem:
-    github: icyleaf/totem
   tartrazine:
     github: ralsina/tartrazine
   cronic:

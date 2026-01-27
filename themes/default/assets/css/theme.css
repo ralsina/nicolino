@@ -3,6 +3,21 @@ h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
 }
 
+/* Tighter spacing for header title and subtitle */
+header nav > ul:first-child h1 {
+    margin-bottom: 0.25rem;
+}
+
+header nav > ul:first-child p {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* Remove top padding from main container */
+main.container {
+    padding-top: 0;
+}
+
 /* Use display font for definition list terms */
 dt {
     font-family: var(--font-display);

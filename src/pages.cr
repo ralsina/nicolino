@@ -16,7 +16,7 @@ module Pages
   # Enable pages feature
   # Render pages last because it's a catchall and will find gallery
   # posts, blog posts, etc.
-  def self.enable(is_enabled : Bool, content_path : Path, feature_set : Set(Totem::Any))
+  def self.enable(is_enabled : Bool, content_path : Path, feature_set : Set(YAML::Any))
     return unless is_enabled
 
     # Note: Pages are already registered by nicolino new command,
