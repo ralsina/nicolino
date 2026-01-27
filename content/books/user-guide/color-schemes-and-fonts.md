@@ -114,6 +114,7 @@ Each font has a `role` that determines where it's used:
 - **sans-serif** - Body text and general content
 - **monospace** - Code blocks and technical content
 - **display** - Headings, titles, navigation elements
+- **emoji** - Emoji characters (default system emoji fonts)
 
 ### Using Google Fonts
 
@@ -135,6 +136,16 @@ fonts:
     source: google
     weights: [700, 800]
     role: display
+```
+
+You can also specify a custom emoji font:
+
+```yaml
+fonts:
+  - family: "Noto Color Emoji"
+    source: google
+    weights: [400]
+    role: emoji
 ```
 
 Nicolino will automatically:

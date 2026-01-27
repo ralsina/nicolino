@@ -16,6 +16,7 @@
   - font_mono: Monospace font stack CSS
   - font_display: Display font stack CSS
   - font_heading: Heading font stack CSS (same as display)
+  - font_emoji: Emoji font stack CSS
 
   Used by: Base16 feature for output/css/style.css
 -#}
@@ -470,6 +471,7 @@ pre code.hljs,
     --pico-font-family: {{ font_sans }};
     --pico-font-family-sans-serif: {{ font_sans }};
     --pico-font-family-monospace: {{ font_mono }};
+    --pico-font-family-emoji: {{ font_emoji }};
     --font-display: {{ font_display }};
     --font-heading: {{ font_heading }};
 }

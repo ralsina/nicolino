@@ -49,6 +49,7 @@ module Base16
         "font_mono"        => font_stacks["mono"],
         "font_display"     => font_stacks["display"],
         "font_heading"     => font_stacks["heading"],
+        "font_emoji"       => font_stacks["emoji"],
       }
 
       content = Templates.environment.get_template(base16_template).render(context)
@@ -71,6 +72,7 @@ module Base16
       "mono"    => "'Fira Code', 'SF Mono', Consolas, monospace",
       "display" => "\"Inter\", system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif",
       "heading" => "\"Inter\", system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif",
+      "emoji"   => "\"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\", sans-serif",
     }
 
     fonts.each do |font|
@@ -83,6 +85,16 @@ module Base16
       when "display"
         stacks["display"] = "\"#{font.family}\", sans-serif"
         stacks["heading"] = "\"#{font.family}\", sans-serif"
+      when "emoji"
+        # Check if this is a monochrome emoji font (doesn't contain "Color" in the name)
+        if font.family.includes?("Color")
+          # Color emoji font - include color emoji fallbacks
+          stacks["emoji"] = "\"#{font.family}\", \"Apple Color Emoji\", " \
+                            "\"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\", sans-serif"
+        else
+          # Monochrome emoji font - use sans-serif fallback instead of color emoji fonts
+          stacks["emoji"] = "\"#{font.family}\", sans-serif"
+        end
       end
     end
 

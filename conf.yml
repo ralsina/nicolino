@@ -11,7 +11,7 @@
 title: "Nicolino"
 description: "A static site generator"
 url: "https://nicolino.ralsina.me"
-footer: "Foo"
+footer: "Built Using Nicolino / Default Theme"
 
 # Navigation items shown in the theme's nav bar
 nav_items:
@@ -124,3 +124,7 @@ fonts:
     source: google
     weights: [400, 700]
     role: display
+  - family: "Noto Emoji"
+    source: google
+    weights: [400]
+    role: emoji
