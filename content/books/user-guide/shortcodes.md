@@ -275,3 +275,80 @@ If a command fails, an error message will be included in the output:
 ```
 
 You can style this with CSS to make errors visible during development.
+
+
+## Card
+
+Create styled card components for displaying content. Cards are useful for feature highlights, statistics, or any content that needs visual grouping.
+
+### Usage
+
+```django
+{{< raw >}}
+{{% card %}}
+### ⚡ Fast
+
+Built for speed with incremental builds. Usually builds in under a second.
+{{% /card %}}
+{{< /raw >}}
+```
+
+{{% card %}}
+### ⚡ Fast
+
+Built for speed with incremental builds. Usually builds in under a second.
+{{% /card %}}
+
+### Arguments
+
+- `class` (optional) - Additional CSS classes to add to the card
+- `id` (optional) - CSS ID for the card
+
+### Examples
+
+Card with custom class:
+
+```django
+{{< raw >}}
+{{% card class="highlight" %}}
+This card has a custom class.
+{{% /card %}}
+{{< /raw >}}
+```
+
+
+## Hero
+
+Create hero sections with centered content and optional background styling.
+
+### Usage
+
+```django
+{{< raw >}}
+{{% hero section %}}
+# Welcome to My Site
+
+This is a hero section with a large heading.
+{{% /hero %}}
+{{< /raw >}}
+```
+
+### Arguments
+
+- `id` (optional) - CSS ID for the hero element
+
+The first positional argument specifies the HTML tag to use (default: `div`).
+
+### Examples
+
+Hero as a section:
+
+```django
+{{< raw >}}
+{{% hero section %}}
+## Welcome
+
+This is a hero section.
+{{% /hero %}}
+{{< /raw >}}
+```
