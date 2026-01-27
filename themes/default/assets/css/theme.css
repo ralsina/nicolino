@@ -23,6 +23,17 @@ footer.container {
     text-align: center;
 }
 
+/* Expanding search input */
+.search-input {
+    width: 2em !important;
+    transition: width 0.3s ease;
+}
+
+.search-input:hover,
+.search-input:focus {
+    width: 12em !important;
+}
+
 /* Use display font for definition list terms */
 dt {
     font-family: var(--font-display);
