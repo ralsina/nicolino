@@ -18,6 +18,11 @@ main.container {
     padding-top: 0;
 }
 
+/* Center footer */
+footer.container {
+    text-align: center;
+}
+
 /* Use display font for definition list terms */
 dt {
     font-family: var(--font-display);
