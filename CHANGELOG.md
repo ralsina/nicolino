@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.15.0] - 2026-01-27
+
+### 🚀 Features
+
+- Add emoji font role support
+- Add hero and card shortcodes with new index page
+- Improve tag shortcode to support role and id attributes
+- Display search results in a proper modal dialog
+
+### 🐛 Bug Fixes
+
+- Hero shortcode syntax
+
+### 📚 Documentation
+
+- Rewrite developer configuration guide for new config schema
+- Revamped site
+- Updated shortcodes
+
+### 🎨 Styling
+
+- Improve book TOC look
+- Remove hardcoded footer text from themes
+
 ## [0.14.0] - 2026-01-26
 
 ### 🚀 Features
@@ -48,6 +72,10 @@ All notable changes to this project will be documented in this file.
 ### 🎨 Styling
 
 - Add blank lines above list items in configuration.md
+
+### Bump
+
+- Release v0.14.0
 
 ## [0.13.0] - 2026-01-23
 
