@@ -11,7 +11,7 @@
 title: "Nicolino"
 description: "A static site generator"
 url: "https://nicolino.ralsina.me"
-footer: ""
+footer: "Foo"
 
 # Navigation items shown in the theme's nav bar
 nav_items:
