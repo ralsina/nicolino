@@ -1,3 +1,3 @@
-<{{args.0}} class="card"{{#if args.id}} id="{{args.id}}"{{/if}}{{#if args.class}} {{args.class}}{{/if}}>
+<div class="card"{% if args.id %} id="{{args.id}}"{% endif %}{% if args.class and args.class != "card" %} {{args.class}}{% endif %}>
   {{inner}}
-</{{args.0}}>
+</div>

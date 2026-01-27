@@ -39,7 +39,7 @@ taxonomies:
 # ============================================================================
 
 # Color scheme from https://sixteen.ralsina.me/
-color_scheme: "chalk"
+color_scheme: "ashes"
 
 # Theme to use (themes/<theme>/templates and assets)
 theme: "default"
