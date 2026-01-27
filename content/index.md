@@ -1,78 +1,53 @@
 ---
-title: Hi there, Welcome to Nicolino!
+title: Nicolino
 ---
-{{% figure foo
-    src="/nicolino.thumb.jpg"
-    link="/nicolino.jpg"
-    alt="Nicolino Locche"
-    caption="The real Nicolino"
-%}}
 
-# What is Nicolino?
-Nicolino is a simple, fast and lightweight static site generator written in [Crystal](https://crystal-lang.org).
+{{% tag section class="hero-section" %}}
+{{% tag h1 %}}# Nicolino{{%/tag%}}
+{{% tag p %}}A simple, fast, and lightweight static site generator{{%/tag%}}
+{{% tag div class="hero-actions" %}}
+{{% tag a href="/books/user-guide/" role="button" class="outline primary" %}}Get Started{{%/tag%}}
+{{% tag a href="https://github.com/ralsina/nicolino" role="button" class="outline" %}}GitHub{{%/tag%}}
+{{%/tag%}}
+{{%/tag%}}
 
-# Why is Nicolino?
+{{% tag section class="features-section" %}}
+{{% tag h2 %}}Why Nicolino?{{%/tag%}}
 
-I have written [a large, very flexible, static site generator in Python](https://getnikola.com),
-and while it has done a nice job for **14 years** I wanted to see if I could
-do a *better* one by making different decisions based on those 14 years.
+{{% tag div class="grid" %}}
 
-So, Nicolino. Here are some reasons why I think it's worth using:
+{{% tag div class="card" %}}
+### ⚡ Fast
 
-=It *is* fast=
-    While benchmarks are not very important
-    it *does* run [this benchmark](https://www.zachleat.com/web/build-benchmark/) ... fast.
-    How fast? Usually faster than [Hugo](https://gohugo.io).
+Built for speed with incremental builds. Usually builds in under a second, and "auto mode" rebuilds instantly as you edit.
+{{%/tag%}}
 
-    It will often be even faster because Nicolino has incremental builds as its
-    core. Everything is incrementally built. Changing your content will only
-    trigger the minimal effort needed to keep your site up to date. Usually under a second.
+{{% tag div class="card" %}}
+### 📦 Feature-Rich
 
-    In "auto mode" which rebuilds as needed while you edit, it's normally instant.
+Posts, pages, galleries, taxonomies, books, search, sitemaps, and more. Everything you need in one tool.
+{{%/tag%}}
 
-    This whole site, including image galleries and all that builds from scratch in my machine
-    in about .8 seconds ... so, fast.
+{{% tag div class="card" %}}
+### 🎯 Simple
 
-=It *has* features=
-    Multilingual feeds and pages and posts, separate feeds and pages for any way you want to
-    categorize your content ([tags?](/tags) author? color? whatever.) It supports
-    [simple image galleries](/galleries), presents [code](/listings) nicely, it even has 90%
-    of an implementation of mdbook in it, so it can do [books](/books). It will automatically
-    resize images and present them nicely (see Nicolino above), it supports Hugo-compatible
-    [shortcodes](/books/user-guide/shortcodes.html) so you can do fancy things markdown
-    frowns upon and much more.
+Single YAML config, Markdown + Pandoc content, Jinja2-like templates. Easy to learn and use.
+{{%/tag%}}
 
-    Yes, you can just put code anywhere:
+{{% tag div class="card" %}}
+### 🌍 Multilingual
 
-    ```python
-    def foo():
-        print("bar")
-    ```
+Built-in i18n with per-language feeds, pages, and posts. Translatable configs and taxonomies.
+{{%/tag%}}
 
-    I intend Nicolino to be *enough* for most uses so you don't need to use multiple tools.
+{{%/tag%}}
+{{%/tag%}}
 
-=It *is* simple=
-    Part of the simplicity comes from it being *very* opinionated.
-
-    * It supports only markdown, HTML and trusts pandoc to *slowly* handle anything else.
-    * The templates are Crinja (a lot like Jinja)
-    * The config is a single YAML file, and so on.
-
-    If you want something super extensible, look at [Nikola](https://getnikola.com) instead.
-
-    It's one binary. You don't need anything else. Keep in mind that the binary provided in the releases is not ideal. It's meant to work on any Linux x86 system but it also is slower,
-    specially when it comes to image processing.
-
-
-# Why the name?
-
-I had written [Nikola](https://getnikola.com) in Python. As a toy I
-wrote [Nicoletta](https://github.com/ralsina/nicoletta) which is sort
-of the minimal viable static site generator. I [ported it to Crystal](https://ralsina.me/weblog/posts/learning-crystal-by-implementing-a-static-site-generator.html). So, I had
-Nikola, Nicoletta, and I needed a name for the fast, small but not too small
-Crystal project I was starting. And you know who was deceptively fast and not very large?
-Nicolino Locche. So, Nicolino it is.
-
-Who? [This guy.](https://en.wikipedia.org/wiki/Nicolino_Locche)
-
-<iframe width="100%" height="315" src="https://www.youtube.com/embed/gDQltEznD9Q" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+{{% tag section class="cta-section" %}}
+{{% tag h2 %}}Ready to build your site?{{%/tag%}}
+{{% tag p %}}Get started in minutes with just a few commands.{{%/tag%}}
+{{% tag div class="cta-actions" %}}
+{{% tag a href="/books/user-guide/getting-started.html" role="button" class="primary" %}}Read the Guide{{%/tag%}}
+{{% tag a href="https://github.com/ralsina/nicolino/releases" role="button" %}}Download{{%/tag%}}
+{{%/tag%}}
+{{%/tag%}}
