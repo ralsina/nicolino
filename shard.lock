@@ -73,10 +73,6 @@ shards:
     git: https://github.com/ralsina/polydocopt.git
     version: 0.1.1+git.commit.52edc8790d30e0b6d8fe941adaeb618e97cad30b
 
-  popcorn:
-    git: https://github.com/icyleaf/popcorn.git
-    version: 0.3.0
-
   progress_bar:
     git: https://github.com/mgomes/progress_bar.git
     version: 1.0.1+git.commit.aa5ebab89d31167208387640db06d3964ec7922b
@@ -96,10 +92,6 @@ shards:
   toml:
     git: https://github.com/manastech/crystal-toml.git
     version: 0.8.1
-
-  totem:
-    git: https://github.com/icyleaf/totem.git
-    version: 0.7.0
 
   vips:
     git: https://github.com/naqvis/crystal-vips.git

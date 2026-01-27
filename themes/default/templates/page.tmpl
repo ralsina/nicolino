@@ -85,31 +85,38 @@
         </li>
         {% endif %}
         <li>
-          <label>
-          <input type="checkbox" id="switch_theme" name="switch" role="switch" value="1" />
+          <button id="theme_toggle" aria-label="Toggle theme" class="primary">
+            <svg id="sun_icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none; vertical-align: middle;"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            <svg id="moon_icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block; vertical-align: middle;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
           <script>
             (function() {
               const html = document.documentElement;
-              const toggle = document.getElementById('switch_theme');
+              const toggle = document.getElementById('theme_toggle');
+              const sunIcon = document.getElementById('sun_icon');
+              const moonIcon = document.getElementById('moon_icon');
 
               function setTheme() {
                 const isLight = localStorage.getItem('isLight') === 'true';
                 html.setAttribute('data-theme', isLight ? 'light' : 'dark');
-                toggle.checked = !isLight;
+                if (isLight) {
+                  sunIcon.style.display = 'none';
+                  moonIcon.style.display = 'block';
+                } else {
+                  sunIcon.style.display = 'block';
+                  moonIcon.style.display = 'none';
+                }
               }
 
               setTheme();
 
-              toggle.addEventListener('change', function() {
-                const isLight = toggle.checked === false;
-                localStorage.setItem('isLight', isLight ? 'true' : 'false');
+              toggle.addEventListener('click', function() {
+                const isLight = html.getAttribute('data-theme') === 'light';
+                localStorage.setItem('isLight', isLight ? 'false' : 'true');
                 setTheme();
               });
             })();
           </script>
-
-<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-28 346-160H160v-186L28-480l132-134v-186h186l134-132 134 132h186v186l132 134-132 134v186H614L480-28Zm0-252q83 0 141.5-58.5T680-480q0-83-58.5-141.5T480-680v400Zm0 140 100-100h140v-140l100-100-100-100v-140H580L480-820 380-720H240v140L140-480l100 100v140h140l100 100Zm0-340Z"/></svg>
-            </label>
         </li>
         {% for item in site_nav_items %}
         <li>{{item}}</li>
