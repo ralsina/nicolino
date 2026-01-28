@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.17.0] - 2026-01-28
+
+### 🚀 Features
+
+- Make shortcode errors fail tasks and timing debug-only
+
+### 🐛 Bug Fixes
+
+- Remove empty paragraphs from Discount's section tag wrapping
+
+### 📚 Documentation
+
+- Fix misleading book feature description
+
 ## [0.16.0] - 2026-01-28
 
 ### 🚀 Features
@@ -24,6 +38,10 @@ All notable changes to this project will be documented in this file.
 
 - Shortcodes examples improvements
 - Add features page and improve index navigation
+
+### Bump
+
+- Release v0.16.0
 
 ## [0.15.0] - 2026-01-27
 
