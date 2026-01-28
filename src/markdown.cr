@@ -332,12 +332,12 @@ module Markdown
 
       sc_list = Shortcodes.parse(text)
       return text if sc_list.shortcodes.empty?
-      sc_list.errors.each do |e|
-        # TODO: show actual error
-        Log.error { Shortcodes.nice_error(e, text) }
+      unless sc_list.errors.empty?
+        sc_list.errors.each do |e|
+          Log.error { Shortcodes.nice_error(e, text) }
+        end
+        raise "Shortcode parsing failed with #{sc_list.errors.size} error(s)"
       end
-
-      context = Crinja::Context.new
 
       # Build output efficiently using IO::Memory instead of string concatenation
       output = IO::Memory.new
@@ -357,8 +357,10 @@ module Markdown
           output << before_text
         end
 
-        # Append the rendered shortcode
-        middle = Sc.render_sc(scode, context)
+        # Create a context with the environment's global context as parent
+        # This ensures access to filters, macros, and other global features
+        shortcode_context = Crinja::Context.new(Templates.environment.context)
+        middle = Sc.render_sc(scode, shortcode_context)
         output << middle
 
         last_pos = scode.position + scode.whole.size

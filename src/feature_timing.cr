@@ -76,9 +76,9 @@ module FeatureTiming
     # Add total row
     table_data << ["Total", format_ms(total_time), "", "", total_tasks.to_s, ""]
 
-    Log.info { "" }
-    Log.info { "Feature Timing Breakdown:" }
-    Log.info { "" }
+    Log.debug { "" }
+    Log.debug { "Feature Timing Breakdown:" }
+    Log.debug { "" }
 
     # Calculate column widths
     col_widths = [20, 12, 12, 12, 8, 12]
@@ -88,20 +88,20 @@ module FeatureTiming
     border_header = "├" + col_widths.map { |width| "─" * width }.join("┼") + "┤"
     border_bottom = "└" + col_widths.map { |width| "─" * width }.join("┴") + "┘"
 
-    Log.info { border_top }
+    Log.debug { border_top }
 
     table_data.each_with_index do |row, idx|
       if idx == 0
         # Header row
         formatted = row.each_with_index.map { |cell, i| cell.to_s.ljust(col_widths[i]) }.join("│")
-        Log.info { "│#{formatted}│" }
-        Log.info { border_header }
+        Log.debug { "│#{formatted}│" }
+        Log.debug { border_header }
       elsif row[0] == "Total"
         # Total row separator
-        Log.info { border_header }
+        Log.debug { border_header }
         formatted = row.each_with_index.map { |cell, i| cell.to_s.ljust(col_widths[i]) }.join("│")
-        Log.info { "│#{formatted}│" }
-        Log.info { border_bottom }
+        Log.debug { "│#{formatted}│" }
+        Log.debug { border_bottom }
       else
         # Data row - right-align numeric columns
         formatted = [
@@ -112,11 +112,11 @@ module FeatureTiming
           row[4].to_s.rjust(col_widths[4]),
           row[5].to_s.rjust(col_widths[5]),
         ].join("│")
-        Log.info { "│#{formatted}│" }
+        Log.debug { "│#{formatted}│" }
       end
     end
 
-    Log.info { "" }
+    Log.debug { "" }
   end
 
   private def self.format_ms(span : Time::Span) : String
