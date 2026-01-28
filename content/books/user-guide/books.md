@@ -165,7 +165,7 @@ Book pages include:
 
 - **Responsive sidebar** - Collapsible on mobile
 - **Active chapter highlighting** - Current chapter is marked
-- **Smooth navigation** - Animated transitions
+- **Smooth navigation** - Easy chapter-to-chapter movement
 - **Theme support** - Dark/light mode compatible
 
 ## Per-Language Books
