@@ -187,7 +187,11 @@ module Listings
       Log.info { "👉 #{output_path}" }
 
       # Create breadcrumbs for listing page
-      breadcrumbs = [{name: "Home", link: "/"}, {name: "Listings", link: "/listings/"}, {name: listing.title, link: ""}] of NamedTuple(name: String, link: String)
+      breadcrumbs = [
+        {name: "Home", link: "/"},
+        {name: "Listings", link: "/listings/"},
+        {name: listing.title, link: ""},
+      ] of NamedTuple(name: String, link: String)
 
       # Include title.tmpl which handles breadcrumbs
       title_html = Templates.environment.get_template(title_template).render({
