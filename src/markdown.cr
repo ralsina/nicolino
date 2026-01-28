@@ -272,6 +272,7 @@ module Markdown
       # 4000 short posts. Calling each filter is much faster.
       doc = Lexbor::Parser.new(@html[lang])
       doc = HtmlFilters.downgrade_headers(doc)
+      doc = HtmlFilters.remove_empty_paragraphs(doc)
       @html[lang] = HtmlFilters.fix_code_classes(doc).to_html
     end
 

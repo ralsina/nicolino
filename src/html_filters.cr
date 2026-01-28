@@ -110,6 +110,19 @@ module HtmlFilters
     end
   end
 
+  # Remove empty paragraph tags
+  def self.remove_empty_paragraphs(doc)
+    # Collect nodes first, then remove to avoid modifying during iteration
+    empty_paragraphs = [] of Lexbor::Node
+    doc.nodes("p").each do |node|
+      # Remove if empty or only whitespace
+      text = node.inner_text.strip
+      empty_paragraphs << node if text.empty?
+    end
+    empty_paragraphs.each(&.remove!)
+    doc
+  end
+
   # Post-process HTML to add language- prefix to code blocks
   def self.fix_code_classes(doc)
     doc.css("pre code").each do |node|

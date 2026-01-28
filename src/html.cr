@@ -9,6 +9,7 @@ module HTML
       result = replace_shortcodes(lang)
       doc = Lexbor::Parser.new(result)
       doc = HtmlFilters.downgrade_headers(doc)
+      doc = HtmlFilters.remove_empty_paragraphs(doc)
       doc = HtmlFilters.make_links_relative(doc, link)
       html_with_classes = HtmlFilters.fix_code_classes(doc).to_html
 
