@@ -36,9 +36,8 @@
   <!-- Pico CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.colors.min.css" />
-  <!-- Lightbox -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.js"></script>
+  <!-- PhotoSwipe -->
+  <link rel="stylesheet" href="https://unpkg.com/photoswipe@5.4.4/dist/photoswipe.css" />
   <script src="https://unpkg.com/hyperscript.org@0.9.9"></script>
   <script src="https://cdn.jsdelivr.net/npm/minisearch@6.1.0/dist/umd/index.min.js"></script>
   {% if not no_highlightjs %}
@@ -141,14 +140,21 @@
 
   <!-- Theme switcher -->
   <!-- <script src="/js/theme-switcher.js"></script> -->
-  <script>
-    new VenoBox({
-      selector: "div.lightbox div a, div.lightbox p a, figure.lightbox a",
-      spinner: "fold",
-      numeration: true,
-      share: true,
-      maxWidth: "80%",
+  <!-- PhotoSwipe -->
+  <script type="module">
+    import PhotoSwipeLightbox from 'https://unpkg.com/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.js';
+    import PhotoSwipe from 'https://unpkg.com/photoswipe@5.4.4/dist/photoswipe.esm.js';
+
+    const lightbox = new PhotoSwipeLightbox({
+      gallery: '.gallery',
+      children: 'a',
+      pswpModule: PhotoSwipe,
+      bgOpacity: 0.9,
+      padding: { top: 50, bottom: 50, left: 50, right: 50 },
     });
+    lightbox.init();
+  </script>
+  <script>
     {% if not no_highlightjs %}
     hljs.highlightAll();
     hljs.addPlugin(new CopyButtonPlugin());

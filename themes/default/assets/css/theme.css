@@ -158,6 +158,25 @@ dt {
     border-radius: 4px;
 }
 
+/* Hero section (shortcode) */
+.hero {
+    padding: 2rem;
+    margin: 2rem 0;
+    background: var(--b16-base01);
+    border-radius: 1em;
+    border: 1px solid var(--b16-base02);
+}
+
+.hero h1:first-child,
+.hero h2:first-child,
+.hero h3:first-child {
+    margin-top: 0;
+}
+
+.hero p:last-child {
+    margin-bottom: 0;
+}
+
 /* Book layout */
 .book-layout {
     display: flex;
@@ -453,4 +472,105 @@ main code {
 .hljs-copy-button:hover,
 .hljs-copy-button:focus {
     transform: translateY(0); /* Slide down from top when hovered */
+}
+
+/* PhotoSwipe Gallery */
+.pswp-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.pswp-gallery a {
+    display: block;
+    border-radius: var(--pico-border-radius);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pswp-gallery a:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.pswp-gallery img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Responsive gallery */
+@media (max-width: 768px) {
+    .pswp-gallery {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .pswp-gallery img {
+        height: 150px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .pswp-gallery {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+
+    .pswp-gallery img {
+        height: 250px;
+    }
+}
+
+/* Gallery Swiper Carousel */
+.gallery-swiper {
+    margin: 2rem 0;
+    padding: 1rem 0;
+}
+
+.gallery-swiper .swiper-slide {
+    height: auto;
+}
+
+.gallery-swiper .gallery-slide-link {
+    display: block;
+    border-radius: var(--pico-border-radius);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gallery-swiper .gallery-slide-link:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.gallery-swiper img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Swiper navigation button styling to match theme */
+.gallery-swiper .swiper-button-prev,
+.gallery-swiper .swiper-button-next {
+    color: var(--pico-primary);
+    transition: color 0.2s ease;
+}
+
+.gallery-swiper .swiper-button-prev:hover,
+.gallery-swiper .swiper-button-next:hover {
+    color: var(--pico-primary-hover);
+}
+
+/* Swiper pagination */
+.gallery-swiper .swiper-pagination-bullet {
+    background: var(--pico-muted-color);
+    opacity: 0.5;
+}
+
+.gallery-swiper .swiper-pagination-bullet-active {
+    background: var(--pico-primary);
+    opacity: 1;
 }

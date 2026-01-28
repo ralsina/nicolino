@@ -180,7 +180,7 @@ You can also specify custom width and height:
 
 ## Gallery
 
-Embed image galleries directly in your content. The gallery loads images from the gallery's `gallery.json` file and displays them in a responsive grid with lightbox functionality. Example:
+Embed image galleries directly in your content. The gallery loads images from the gallery's `gallery.json` file and displays them in a responsive carousel with lightbox functionality. Example:
 
 ```django
 {{< raw >}}
@@ -188,7 +188,7 @@ Embed image galleries directly in your content. The gallery loads images from th
 {{< /raw >}}
 ```
 
-This renders a grid of thumbnail images. Users can click thumbnails to view full-size images in a lightbox.
+This renders a carousel of thumbnail images. Users can click thumbnails to view full-size images in a lightbox.
 
 {{< gallery name="fancy-turning" >}}
 
@@ -352,3 +352,9 @@ This is a hero section.
 {{% /hero %}}
 {{< /raw >}}
 ```
+
+{{% hero section %}}
+## Welcome
+
+This is a hero section.
+{{% /hero %}}
