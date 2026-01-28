@@ -14,12 +14,15 @@
   Used by: Markdown.render_index for generating index pages
 -#}
 {% for post in posts %}
-<section>
+<article class="card">
     <h2><a href="{{post.link}}">{{post.title}}</a></h2>
-    date: {{post.date}}
+    <small>{{post.date}}</small>
     <hr>
     {{post.summary}}
-</section>
+    {% if post.has_teaser %}
+    <p><a href="{{post.link}}">Read more…</a></p>
+    {% endif %}
+</article>
 {% endfor %}
 
 {% if has_more %}

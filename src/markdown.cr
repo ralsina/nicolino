@@ -393,6 +393,13 @@ module Markdown
       end
     end
 
+    # Check if this post has a teaser (uses <!--more--> or summary metadata)
+    def has_teaser?(lang = nil)
+      lang ||= Locale.language
+      return true if metadata(lang).has_key?("summary")
+      html(lang).includes?("<!--more-->")
+    end
+
     # What to show as breadcrumbs for this post
     def breadcrumbs(lang = nil)
       lang ||= Locale.language
@@ -465,6 +472,7 @@ module Markdown
         "show_updated"   => show_updated?(lang),
         "related_posts"  => related_posts(lang),
         "language_links" => language_links(lang),
+        "has_teaser"     => has_teaser?(lang),
       }
     end
 
