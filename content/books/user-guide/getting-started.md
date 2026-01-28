@@ -2,12 +2,35 @@ Let's get you up and running with Nicolino.
 
 ## Installing Nicolino
 
-Clone the Nicolino repository and build it:
+### If you use Arch, BTW
+
+Use your favourite AUR helper to install Nicolino:
+
+```bash
+yay -S nicolino
+```
+
+### From Binary
+
+Download the latest release from the [GitHub releases page](https://github.com/ralsina/nicolino/releases/latest), or use the handy install script:
+
+```bash
+curl -L https://nicolino.ralsina.me/install.sh | sh
+```
+
+{{% admonition note %}}
+The binary from the release page is statically linked, so it should work on any Linux distribution. It is also, however, *much* slower than the source build.
+{{% /admonition %}}
+
+### From Source
+
+Clone the Nicolino repository and build it (use --release if you want it to be
+faster but it takes *a lot longer to build*):
 
 ```bash
 git clone https://github.com/ralsina/nicolino.git
 cd nicolino
-shards build
+shards build --release
 ```
 
 The compiled binary will be at `./bin/nicolino`. To use `nicolino` from anywhere, copy it to a directory in your PATH:
@@ -35,7 +58,6 @@ cd my-site
 
 This creates a [basic site structure](directory-layout.md) with:
 
-
 - `conf.yml` - Site configuration
 - `content/` - Empty directories for your content
 - Sample configuration to get you started
@@ -46,13 +68,13 @@ Use the `nicolino new` command to create new content:
 
 ```bash
 # Create a new blog post
-nicolino new post "My First Post"
+nicolino new content/posts/first-post.md
 
 # Create a new gallery
-nicolino new gallery "vacation-photos"
+nicolino new content/galleries/vacation-photos
 
 # Create a new page
-nicolino new page "about"
+nicolino new content/about.md
 ```
 
 See the [CLI reference](cli/new.html) for all available content types.
