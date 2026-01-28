@@ -23,6 +23,7 @@ module ContinuousImport
     property skip_titles : Array(String)
     property start_at : String?
     property metadata : Hash(String, YAML::Any)
+    property feed_format : String?
     property pocketbase_collection : String?
     property pocketbase_filter : String?
 
@@ -30,7 +31,8 @@ module ContinuousImport
                    @source_extension = nil, @lang = "en", @tags = "",
                    @skip_titles = [] of String, @start_at = nil,
                    @metadata = {} of String => YAML::Any,
-                   @pocketbase_collection = nil, @pocketbase_filter = nil)
+                   @feed_format = nil, @pocketbase_collection = nil,
+                   @pocketbase_filter = nil)
     end
 
     # Load from config (YAML::Any from config)
@@ -59,6 +61,8 @@ module ContinuousImport
 
       start_at = any["start_at"]?.try(&.as_s)
 
+      feed_format = any["feed_format"]?.try(&.as_s)
+
       pocketbase_collection = any["pocketbase_collection"]?.try(&.as_s)
       pocketbase_filter = any["pocketbase_filter"]?.try(&.as_s)
 
@@ -73,7 +77,7 @@ module ContinuousImport
 
       new(urls, template, output_folder, format, source_extension,
         lang, tags, skip_titles, start_at, metadata,
-        pocketbase_collection, pocketbase_filter)
+        feed_format, pocketbase_collection, pocketbase_filter)
     end
 
     # Get the actual file extension to use
@@ -81,9 +85,9 @@ module ContinuousImport
       @source_extension || ".#{@format}"
     end
 
-    # Check if this is a Pocketbase config
-    def pocketbase?
-      !@pocketbase_collection.nil?
+    # Check if this is a JSON/Pocketbase feed
+    def json_feed?
+      @feed_format == "json"
     end
   end
 
@@ -172,9 +176,17 @@ module ContinuousImport
 
   # Build Pocketbase API URL
   private def self.build_pocketbase_url(url : String, collection : String, filter : String?) : String
-    api_url = "#{url.rstrip('/')}/api/collections/#{collection}/records"
+    # If URL already contains the API path, use it as-is
+    # Otherwise build the full API URL
+    if url.includes?("/api/collections/")
+      api_url = url.rstrip('/')
+    else
+      api_url = "#{url.rstrip('/')}/api/collections/#{collection}/records"
+    end
+
     if filter
-      api_url += "?filter=#{URI.encode_path_segment(filter)}"
+      separator = api_url.includes?('?') ? '&' : '?'
+      api_url += "#{separator}filter=#{URI.encode_path_segment(filter)}"
     end
     api_url
   end
@@ -487,12 +499,12 @@ module ContinuousImport
       .to_set
   end
 
-  # Fetch all items from all configured URLs or Pocketbase
+  # Fetch all items from all configured URLs
   private def self.fetch_all_feed_items(config : FeedConfig) : Array(FeedItem)
     all_items = [] of FeedItem
 
-    if config.pocketbase?
-      # Fetch from Pocketbase
+    if config.json_feed?
+      # Fetch from JSON/Pocketbase
       collection = config.pocketbase_collection
       filter = config.pocketbase_filter
       if collection
