@@ -265,6 +265,16 @@ dt {
     color: var(--b16-base0B);
 }
 
+/* Cards with bottom-aligned actions */
+.grid .card {
+    display: flex;
+    flex-direction: column;
+}
+
+.grid .card > *:last-child {
+    margin-top: auto;
+}
+
 /* Book layout */
 .book-layout {
     display: flex;

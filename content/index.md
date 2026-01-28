@@ -19,7 +19,7 @@ Built for speed with incremental builds. Usually builds in under a second, and "
 {{% /card %}}
 
 {{% card %}}
-### 📦 Feature-Rich
+### <a href="/features.html" style="text-decoration: none;">📦 Feature-Rich ➚</a>
 
 Posts, pages, galleries, taxonomies, books, search, sitemaps, and more. Everything you need in one tool.
 {{% /card %}}
