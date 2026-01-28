@@ -350,7 +350,10 @@ module Markdown
 
         # Append text before this shortcode
         if scode.position > last_pos
-          output << text[last_pos...scode.position]
+          before_text = text[last_pos...scode.position]
+          # Ensure at most ONE trailing newline
+          before_text = before_text.gsub(/(\r?\n)\s*\z/, "\n")
+          output << before_text
         end
 
         # Append the rendered shortcode
@@ -362,7 +365,10 @@ module Markdown
 
       # Append remaining text after last shortcode
       if last_pos < text.size
-        output << text[last_pos..]
+        after_text = text[last_pos..]
+        # Ensure at most ONE leading newline (strip extra, keep one if exists)
+        after_text = after_text.gsub(/\A\s*(\r?\n)/, "\\1")
+        output << after_text
       end
 
       output.to_s

@@ -39,6 +39,67 @@ you pass:
 
 Positional arguments (without names) are passed as `args.0`, `args.1`, etc.
 
+## Admonition
+
+Admonitions are callout boxes for highlighting important information like notes, warnings, tips, and more.
+
+### Usage
+
+```django
+{{< raw >}}
+{{% admonition type="warning" %}}
+This is important! Pay attention.
+{{% /admonition %}}
+{{< /raw >}}
+```
+
+### Arguments
+
+- `type` (required) - Admonition type: `note`, `warning`, `tip`, `danger`, `info`, or `success`
+- `title` (optional) - Custom title (defaults to type name)
+
+### Available Types
+
+Here are examples of each type:
+
+{{% admonition type="note" %}}
+This is a note.
+{{% /admonition %}}
+
+{{% admonition type="warning" %}}
+Be careful! This is a warning.
+{{% /admonition %}}
+
+{{% admonition type="tip" %}}
+Here's a helpful tip!
+{{% /admonition %}}
+
+{{% admonition type="danger" %}}
+Danger! Critical warning.
+{{% /admonition %}}
+
+{{% admonition type="info" %}}
+Additional information.
+{{% /admonition %}}
+
+{{% admonition type="success" %}}
+Operation completed successfully!
+{{% /admonition %}}
+
+### Custom Title
+
+You can override the default title:
+
+```django
+{{% admonition type="warning" title="Custom Warning" %}}
+This has a custom title instead of "Warning".
+{{% /admonition %}}
+```
+
+{{% admonition type="warning" title="Custom Warning" %}}
+This has a custom title instead of "Warning".
+{{% /admonition %}}
+
 ## Paired Shortcodes
 
 Paired shortcodes have content between
@@ -109,8 +170,9 @@ This is inside two divs
 {{< /tag >}}{{% /tag %}}
 ```
 
-> **Note:** Shortcodes may introduce newlines at some point, that's not easy to avoid and should not be a problem in most cases.
-
+{{% admonition type="note" %}}
+Shortcodes may introduce newlines at some point, that's not easy to avoid and should not be a problem in most cases.
+{{% /admonition %}}
 
 # Included Shortcodes
 

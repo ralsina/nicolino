@@ -177,6 +177,94 @@ dt {
     margin-bottom: 0;
 }
 
+/* Admonitions */
+.admonition {
+    padding: 1rem 1.25rem;
+    margin: 1.5em 0;
+    border-radius: var(--pico-border-radius);
+    border-left: 4px solid;
+    background: var(--pico-card-background-color);
+}
+
+.admonition-title {
+    font-weight: 600;
+    font-family: var(--font-display);
+    margin-bottom: 0.75rem;
+    font-size: 1.1em;
+}
+
+.admonition-content {
+    margin: 0;
+}
+
+.admonition-content > *:first-child {
+    margin-top: 0;
+}
+
+.admonition-content > *:last-child {
+    margin-bottom: 0;
+}
+
+/* Note - blue/cyan */
+.admonition-note {
+    border-left-color: var(--b16-base0D);
+    background: rgba(from var(--b16-base0D) r g b / 0.05);
+}
+
+.admonition-note .admonition-title {
+    color: var(--b16-base0D);
+}
+
+/* Warning - orange */
+.admonition-warning {
+    border-left-color: var(--b16-base0E);
+    background: rgba(from var(--b16-base0E) r g b / 0.05);
+}
+
+.admonition-warning .admonition-title {
+    color: var(--b16-base0E);
+}
+
+/* Tip - green */
+.admonition-tip {
+    border-left-color: var(--b16-base0B);
+    background: rgba(from var(--b16-base0B) r g b / 0.05);
+}
+
+.admonition-tip .admonition-title {
+    color: var(--b16-base0B);
+}
+
+/* Danger - red */
+.admonition-danger {
+    border-left-color: var(--b16-base08);
+    background: rgba(from var(--b16-base08) r g b / 0.05);
+}
+
+.admonition-danger .admonition-title {
+    color: var(--b16-base08);
+}
+
+/* Info - teal/cyan */
+.admonition-info {
+    border-left-color: var(--b16-base0C);
+    background: rgba(from var(--b16-base0C) r g b / 0.05);
+}
+
+.admonition-info .admonition-title {
+    color: var(--b16-base0C);
+}
+
+/* Success - green */
+.admonition-success {
+    border-left-color: var(--b16-base0B);
+    background: rgba(from var(--b16-base0B) r g b / 0.05);
+}
+
+.admonition-success .admonition-title {
+    color: var(--b16-base0B);
+}
+
 /* Book layout */
 .book-layout {
     display: flex;
