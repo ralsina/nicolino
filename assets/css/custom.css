@@ -109,3 +109,8 @@ It loads after theme.css so you can override it.*/
     gap: 1rem;
     justify-content: center;
 }
+
+div.warning {
+    background-color: var(--b16-base02);
+    border: 3px solid red;
+}

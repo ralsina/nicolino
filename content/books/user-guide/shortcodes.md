@@ -66,9 +66,16 @@ A shortcode can be `inline` so it doesn't require a separate template file. For 
 
 ```django
 {{< raw >}}
-{{< foo.inline "this will be in title case" >}}{{ args.0 | title}}{{< /foo.inline >}}
+{{< foo.inline "this will be in title case" >}}
+{{ args.0 | title}}
+{{< /foo.inline >}}
 {{< /raw >}}
-{{< foo.inline "this will be in title case" >}}{{ args.0 | title}}{{< /foo.inline >}}
+```
+
+```plaintext
+{{< foo.inline "this will be in title case" >}}
+{{ args.0 | title }}
+{{< /foo.inline >}}
 ```
 
 Inline shortcodes can be handy for one-off cases when you *need* some templating logic
@@ -90,19 +97,19 @@ For example, you can nest two `tag` shortcodes:
 
 ```django
 {{< raw >}}
-{{% tag div class="outer" %}}
-{{< tag div class="inner" >}}
+{{% tag div class="outer" %}}{{< tag div class="inner" >}}
 This is inside two divs
-{{< /tag >}}
-{{% /tag %}}
+{{< /tag >}}{{% /tag %}}
 {{< /raw >}}
-
-{{% tag div class="outer" %}}
-{{< tag div class="inner" >}}
-This is inside two divs
-{{< /tag >}}
-{{% /tag %}}
 ```
+
+```plaintext
+{{% tag div class="outer" %}}{{< tag div class="inner" >}}
+This is inside two divs
+{{< /tag >}}{{% /tag %}}
+```
+
+> **Note:** Shortcodes may introduce newlines at some point, that's not easy to avoid and should not be a problem in most cases.
 
 
 # Included Shortcodes
@@ -122,6 +129,13 @@ Support for the `<figure>` tag. Example
 {{< /raw >}}
 ```
 
+{{% figure foo
+    src="/nicolino.thumb.jpg"
+    link="/nicolino.jpg"
+    alt="Nicolino"
+    caption="The real Nicolino"
+%}}
+
 ## Raw
 
 Used when you want to show content that looks like shortcodes or to
@@ -133,7 +147,8 @@ avoid processing markdown in a piece of text. Example:
 This is **passed** as-is
 {{< /raw >}}
 {{< /raw >}}
-
+```
+```plaintext
 {{< raw >}}
 This is **passed** as-is
 {{< /raw >}}
@@ -222,12 +237,12 @@ Show current git commit:
 
 ```django
 {{< raw >}}
-Current commit: {{% shell command="git log -1 --format=%h" %}}
+Current: {{% shell command="git log -1 --format=%h" %}}
 {{< /raw >}}
 ```
 
 ```plaintext
-Current commit: {{% shell command="git log -1 --format=%h" %}}
+Current: {{% shell command="git log -1 --format=%h" %}}
 ```
 
 Show current date:
@@ -271,7 +286,7 @@ Run command in specific directory:
 If a command fails, an error message will be included in the output:
 
 ```html
-<span class="shell-error">Command failed: [error details]</span>
+<span class="shell-error">Command failed: [errors]</span>
 ```
 
 You can style this with CSS to make errors visible during development.
@@ -288,7 +303,8 @@ Create styled card components for displaying content. Cards are useful for featu
 {{% card %}}
 ### ⚡ Fast
 
-Built for speed with incremental builds. Usually builds in under a second.
+Built for speed with incremental builds.
+Usually builds in under a second.
 {{% /card %}}
 {{< /raw >}}
 ```
@@ -296,7 +312,8 @@ Built for speed with incremental builds. Usually builds in under a second.
 {{% card %}}
 ### ⚡ Fast
 
-Built for speed with incremental builds. Usually builds in under a second.
+Built for speed with incremental builds.
+Usually builds in under a second.
 {{% /card %}}
 
 ### Arguments
@@ -310,11 +327,15 @@ Card with custom class:
 
 ```django
 {{< raw >}}
-{{% card class="highlight" %}}
-This card has a custom class.
+{{% card div class="warning" %}}
+This card has a custom class
 {{% /card %}}
 {{< /raw >}}
 ```
+
+{{% card div class="warning" %}}
+This card has a custom class
+{{% /card %}}
 
 
 ## Hero
