@@ -82,6 +82,16 @@ cp "$TEMP_DIR/nicolino" "$INSTALL_DIR/nicolino"
 if command -v nicolino &> /dev/null; then
     echo -e "${GREEN}✓ Successfully installed nicolino!${NC}"
     "$INSTALL_DIR/nicolino" --version
+    echo ""
+    echo -e "${YELLOW}⚠️  Performance Warning:${NC}"
+    echo "This binary is built without optimizations for faster compilation."
+    echo "Some tasks like image processing may be significantly slower."
+    echo ""
+    echo "For optimal performance, build from source:"
+    echo "  git clone https://github.com/ralsina/nicolino"
+    echo "  cd nicolino"
+    echo "  shards build"
+    echo "  cp ./bin/nicolino ~/.local/bin/"
 else
     echo -e "${YELLOW}Warning: $INSTALL_DIR may not be in your PATH${NC}"
     echo "Add the following to your ~/.bashrc or ~/.zshrc:"
