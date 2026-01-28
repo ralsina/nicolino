@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.16.0] - 2026-01-28
+
+### 🚀 Features
+
+- Add sun/moon theme toggle button
+- Add expanding search input on hover
+- Add PhotoSwipe gallery and fix shortcode indentation
+- Add admonition shortcode with base16 styling
+
+### 🐛 Bug Fixes
+
+- Remove Totem dependency and fix import command
+- Prevent horizontal scrollbar and fix collapsed sidebar width
+- Reduce whitespace in tag shortcode output
+- Buggy card shortcode
+- Restore listings feature after config flattening
+- Listing issues
+
+### 📚 Documentation
+
+- Shortcodes examples improvements
+- Add features page and improve index navigation
+
 ## [0.15.0] - 2026-01-27
 
 ### 🚀 Features
@@ -25,6 +48,10 @@ All notable changes to this project will be documented in this file.
 
 - Improve book TOC look
 - Remove hardcoded footer text from themes
+
+### Bump
+
+- Release v0.15.0
 
 ## [0.14.0] - 2026-01-26
 
