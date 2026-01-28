@@ -13,11 +13,7 @@ module Listings
   def self.enable(is_enabled : Bool, content_path : Path)
     return unless is_enabled
 
-    listings_dir = begin
-      ""
-    rescue
-      "listings"
-    end
+    listings_dir = Config.options.listings
     listings_path = content_path / listings_dir
     listings = read_all(listings_path)
     render(listings)
@@ -52,8 +48,8 @@ module Listings
       begin
         content = File.read(source_path)
 
-        # Use filename as title (without extension)
-        title = File.basename(filename, File.extname(filename))
+        # Use filename as title (with extension)
+        title = File.basename(filename)
 
         # Tartrazine will auto-detect language from content/extension
         listing = Listing.new(
@@ -129,11 +125,11 @@ module Listings
       Log.info { "👉 #{output_path}" }
 
       # Create breadcrumbs for listings index
-      breadcrumbs = [{name: "Home", link: "/"}, {name: "Code Listings", link: "/listings/"}] of NamedTuple(name: String, link: String)
+      breadcrumbs = [{name: "Home", link: "/"}, {name: "Listings", link: "/listings/"}] of NamedTuple(name: String, link: String)
 
       # Include title.tmpl which handles breadcrumbs
       title_html = Templates.environment.get_template(title_template).render({
-        "title"       => "Code Listings",
+        "title"       => "Listings",
         "link"        => "/listings/",
         "breadcrumbs" => breadcrumbs,
         "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
@@ -142,14 +138,14 @@ module Listings
       # Sort listings by title and build items list
       items = listings.sort_by(&.title).map { |listing|
         {
-          link:  "#{listing.title}#{File.extname(listing.source)}.html",
+          link:  "#{listing.title}.html",
           title: listing.title,
         }
       }
 
       # Render the item list template
       content = Templates.environment.get_template(item_list_template).render({
-        "title"       => "Code Listings",
+        "title"       => "Listings",
         "description" => "A collection of source code files with syntax highlighting.",
         "items"       => items,
       })
@@ -157,7 +153,7 @@ module Listings
       # Apply to page template
       html = Render.apply_template(page_template, {
         "content"     => title_html + content,
-        "title"       => "Code Listings",
+        "title"       => "Listings",
         "breadcrumbs" => breadcrumbs,
       })
 
@@ -191,7 +187,7 @@ module Listings
       Log.info { "👉 #{output_path}" }
 
       # Create breadcrumbs for listing page
-      breadcrumbs = [{name: "Home", link: "/"}, {name: "Code Listings", link: "/listings/"}] of NamedTuple(name: String, link: String)
+      breadcrumbs = [{name: "Home", link: "/"}, {name: "Listings", link: "/listings/"}, {name: listing.title, link: ""}] of NamedTuple(name: String, link: String)
 
       # Include title.tmpl which handles breadcrumbs
       title_html = Templates.environment.get_template(title_template).render({

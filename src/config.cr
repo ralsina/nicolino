@@ -80,6 +80,7 @@ module Config
     property content : String = "content/"
     property posts : String = "posts/"
     property galleries : String = "galleries/"
+    property listings : String = "listings/"
 
     # NOT translatable
     property theme : String = "default"
@@ -114,6 +115,7 @@ module Config
       @content = "content/"
       @posts = "posts/"
       @galleries = "galleries/"
+      @listings = "listings/"
       @theme = "default"
       @color_scheme = "default"
       @fonts = Fonts.new
@@ -404,6 +406,7 @@ location: "tags/"
     property content : String
     property posts : String
     property galleries : String
+    property listings : String
     property locale : String
     property date_output_format : String
     property theme : String
@@ -420,6 +423,7 @@ location: "tags/"
       @content = @global.content
       @posts = @global.posts
       @galleries = @global.galleries
+      @listings = @global.listings
       @locale = @lang_config.locale
       @date_output_format = @lang_config.date_output_format
       @theme = @global.theme
