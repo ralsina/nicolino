@@ -23,11 +23,14 @@ module ContinuousImport
     property skip_titles : Array(String)
     property start_at : String?
     property metadata : Hash(String, YAML::Any)
+    property pocketbase_collection : String?
+    property pocketbase_filter : String?
 
     def initialize(@urls, @template, @output_folder, @format = "md",
                    @source_extension = nil, @lang = "en", @tags = "",
                    @skip_titles = [] of String, @start_at = nil,
-                   @metadata = {} of String => YAML::Any)
+                   @metadata = {} of String => YAML::Any,
+                   @pocketbase_collection = nil, @pocketbase_filter = nil)
     end
 
     # Load from config (YAML::Any from config)
@@ -56,6 +59,9 @@ module ContinuousImport
 
       start_at = any["start_at"]?.try(&.as_s)
 
+      pocketbase_collection = any["pocketbase_collection"]?.try(&.as_s)
+      pocketbase_filter = any["pocketbase_filter"]?.try(&.as_s)
+
       metadata = {} of String => YAML::Any
       if meta_val = any["metadata"]?
         if meta_val.responds_to?(:as_h)
@@ -66,12 +72,18 @@ module ContinuousImport
       end
 
       new(urls, template, output_folder, format, source_extension,
-        lang, tags, skip_titles, start_at, metadata)
+        lang, tags, skip_titles, start_at, metadata,
+        pocketbase_collection, pocketbase_filter)
     end
 
     # Get the actual file extension to use
     def file_extension : String
       @source_extension || ".#{@format}"
+    end
+
+    # Check if this is a Pocketbase config
+    def pocketbase?
+      !@pocketbase_collection.nil?
     end
   end
 
@@ -134,6 +146,93 @@ module ContinuousImport
 
     Log.info { "Parsed #{items.size} items from #{url}" }
     items
+  end
+
+  # Fetch articles from Pocketbase CMS
+  def self.fetch_pocketbase(url : String, collection : String, filter : String? = nil) : Array(FeedItem)
+    api_url = build_pocketbase_url(url, collection, filter)
+    Log.info { "Fetching Pocketbase collection: #{collection} from #{url}" }
+
+    response = HTTP::Client.get(api_url)
+    unless response.success?
+      Log.error { "Failed to fetch Pocketbase collection: #{response.status_code}" }
+      return [] of FeedItem
+    end
+
+    parse_pocketbase_response(response.body, collection)
+  rescue ex : JSON::ParseException
+    Log.error(exception: ex) { "Failed to parse Pocketbase JSON response: #{ex.message}" }
+    Log.debug { ex.backtrace.join("\n") }
+    [] of FeedItem
+  rescue ex : Exception
+    Log.error(exception: ex) { "Failed to fetch Pocketbase collection: #{ex.message}" }
+    Log.debug { ex.backtrace.join("\n") }
+    [] of FeedItem
+  end
+
+  # Build Pocketbase API URL
+  private def self.build_pocketbase_url(url : String, collection : String, filter : String?) : String
+    api_url = "#{url.rstrip('/')}/api/collections/#{collection}/records"
+    if filter
+      api_url += "?filter=#{URI.encode_path_segment(filter)}"
+    end
+    api_url
+  end
+
+  # Parse Pocketbase JSON response into FeedItems
+  private def self.parse_pocketbase_response(body : String, collection : String) : Array(FeedItem)
+    json = JSON.parse(body)
+    items = [] of FeedItem
+    records = json["items"]?.try(&.as_a) || [] of JSON::Any
+
+    records.each do |record|
+      item = parse_pocketbase_record(record)
+      items << item if item
+    end
+
+    Log.info { "Parsed #{items.size} articles from Pocketbase collection #{collection}" }
+    items
+  end
+
+  # Parse a single Pocketbase record into a FeedItem
+  private def self.parse_pocketbase_record(record : JSON::Any) : FeedItem?
+    title = record["title"]?.try(&.as_s) || "Untitled"
+    content = record["content"]?.try(&.as_s) || ""
+    id = record["id"]?.try(&.as_s) || ""
+    link = "pocketbase://#{id}"
+
+    pub_date = extract_pocketbase_date(record)
+    data = extract_pocketbase_data(record)
+
+    FeedItem.new(title, link, pub_date, content, data)
+  end
+
+  # Extract date from Pocketbase record (tries published, created, updated)
+  private def self.extract_pocketbase_date(record : JSON::Any) : Time?
+    pub_date = nil
+    ["published", "created", "updated"].each do |date_field|
+      if date_str = record[date_field]?.try(&.as_s)
+        pub_date = parse_date(date_str)
+        break if pub_date
+      end
+    end
+    pub_date
+  end
+
+  # Extract all fields from Pocketbase record into data hash
+  private def self.extract_pocketbase_data(record : JSON::Any) : Hash(String, String | Array(String))
+    data = {} of String => String | Array(String)
+    record.as_h.each do |key, val|
+      case val.raw
+      when String
+        data[key] = val.as_s
+      when Array
+        data[key] = val.as_a.map(&.to_s).join(", ")
+      when Bool, Int64, Float64, Nil
+        data[key] = val.to_s
+      end
+    end
+    data
   end
 
   # Parse an RSS item node
@@ -388,13 +487,28 @@ module ContinuousImport
       .to_set
   end
 
-  # Fetch all items from all configured URLs
+  # Fetch all items from all configured URLs or Pocketbase
   private def self.fetch_all_feed_items(config : FeedConfig) : Array(FeedItem)
     all_items = [] of FeedItem
-    config.urls.each do |url|
-      items = fetch_feed(url)
-      all_items.concat(items)
+
+    if config.pocketbase?
+      # Fetch from Pocketbase
+      collection = config.pocketbase_collection
+      filter = config.pocketbase_filter
+      if collection
+        config.urls.each do |url|
+          items = fetch_pocketbase(url, collection, filter)
+          all_items.concat(items)
+        end
+      end
+    else
+      # Fetch from RSS/Atom feeds
+      config.urls.each do |url|
+        items = fetch_feed(url)
+        all_items.concat(items)
+      end
     end
+
     all_items
   end
 

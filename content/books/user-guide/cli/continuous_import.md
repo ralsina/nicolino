@@ -1,4 +1,4 @@
-Import content from external RSS/Atom feeds.
+Import content from external RSS/Atom feeds or Pocketbase CMS.
 
 ## Usage
 
@@ -8,13 +8,15 @@ Import content from external RSS/Atom feeds.
 
 ## Description
 
-Fetches data from configured feeds and generates posts based on templates.
-This allows you to automatically bring in content from services like
-Goodreads, YouTube, blogs, etc.
+Fetches data from configured feeds or Pocketbase collections and generates
+posts based on templates. This allows you to automatically bring in content from
+services like Goodreads, YouTube, blogs, or use Pocketbase as a headless CMS.
 
 ## Configuration
 
 Add a 'continuous_import' section to your conf.yml with feed configurations:
+
+### RSS/Atom Feeds
 
 ```yaml
 continuous_import:
@@ -37,12 +39,36 @@ continuous_import:
     output_folder: "posts/youtube"
     format: "md"
     tags: "video, youtube"
-```text
+```
+
+### Pocketbase CMS
+
+To use Pocketbase as a headless CMS, add the `pocketbase_collection` field:
+
+```yaml
+continuous_import:
+  blog:
+    urls:
+      - "http://localhost:8090"
+    pocketbase_collection: "articles"
+    pocketbase_filter: 'status = "published"'
+    template: "pocketbase_article.tmpl"
+    output_folder: "posts"
+    format: "md"
+    tags: "blog"
+```
+
+The `pocketbase_filter` uses Pocketbase's filter syntax to only import
+published articles. Your Pocketbase collection should have these fields:
+- `title` (text) - Article title
+- `content` (text) - Article content (can be markdown)
+- `status` (select) - Set to "published" for articles to import
+- `published` (date) - Publication date (optional, falls back to created/updated)
 
 Templates should be placed in `templates/continuous_import/` directory and
 use Crinja (Jinja2-like) syntax. Available variables:
 
   - `{{ item.title }}` - The item title
-  - `{{ item.link }}` - The item link
-  - `{{ item.description }}` - The item description
-  - `{{ item.<field> }}` - Any other field from the feed item
+  - `{{ item.link }}` - The item link (or `pocketbase://ID` for Pocketbase)
+  - `{{ item.description }}` / `{{ item.content }}` - The item content
+  - `{{ item.<field> }}` - Any other field from the feed item or Pocketbase record
