@@ -20,6 +20,7 @@ Common types:
 * content/posts/foo - Blog post
 * content/galleries/foo - Image gallery
 * content/pages/foo - Static page
+* content/books/foo - Book (creates SUMMARY.md, book.toml, and a chapter)
 
 Anything else creates a static page.
 
@@ -97,6 +98,52 @@ TEMPLATE
 
         Creatable.register("page", "pages", "Static page") do |path|
           Markdown.new_page(path)
+        end
+
+        Creatable.register("book", "books", "Book") do |path|
+          raise "Books are folders, not documents" if path.to_s.ends_with?(".md")
+          book_name = path.parts[-1]
+
+          # Create book directory
+          Dir.mkdir_p(path)
+
+          # Create SUMMARY.md
+          summary_path = path / "SUMMARY.md"
+          File.write(summary_path, <<-SUMMARY
+# #{book_name.split(/[-_]/).map(&.capitalize).join(" ")}
+
+- [Introduction](intro.md)
+SUMMARY
+          )
+
+          # Create book.toml
+          toml_path = path / "book.toml"
+          File.write(toml_path, <<-TOML
+[book]
+title = "#{book_name.split(/[-_]/).map(&.capitalize).join(" ")}"
+description = "A book about #{book_name}"
+authors = ["Your Name"]
+
+[build]
+create-missing = false
+TOML
+          )
+
+          # Create first chapter
+          intro_path = path / "intro.md"
+          File.write(intro_path, <<-CHAPTER
+# Introduction
+
+Welcome to #{book_name}!
+
+This is the first chapter. Add your content here.
+CHAPTER
+          )
+
+          Log.info { "Created new book: #{path}" }
+          Log.info { "  - #{summary_path}" }
+          Log.info { "  - #{toml_path}" }
+          Log.info { "  - #{intro_path}" }
         end
       end
     end
