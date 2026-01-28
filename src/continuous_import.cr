@@ -465,7 +465,7 @@ module ContinuousImport
   # Import all configured feeds
   def self.import_all
     ci_value = Config.options.continuous_import
-    return unless ci_value && !ci_value.empty?
+    return if ci_value.nil? || ci_value.empty?
 
     feeds = ci_value
     templates_dir = Config.options.continuous_import_templates

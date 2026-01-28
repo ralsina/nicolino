@@ -78,7 +78,7 @@ DOC
       private def import_single_feed(feed_name : String)
         ci_result = Config.options.continuous_import
 
-        unless ci_result && !ci_result.empty?
+        if ci_result.nil? || ci_result.empty?
           Log.error { "No continuous_import configuration found in conf.yml" }
           return 1
         end
