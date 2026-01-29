@@ -5,6 +5,10 @@ shards:
     git: https://github.com/ralsina/rss.cr.git
     version: 0.1.1+git.commit.6f74fb4f3d312babe4f9cebec4a97cf4330023a5
 
+  ameba:
+    git: https://github.com/crystal-ameba/ameba.git
+    version: 1.6.4
+
   baked_file_system: # Overridden
     git: https://github.com/ralsina/baked_file_system.git
     version: 0.10.0+git.commit.beb373124c7a235cfb9cd94e36849d8168eaa04b
@@ -15,7 +19,7 @@ shards:
 
   cr-discount:
     git: https://github.com/ralsina/cr-discount.git
-    version: 0.2.0+git.commit.4e31bb0ab7cdb07514d45769c2e363a4680dca80
+    version: 0.3.0+git.commit.f640c4d48142541cc9996e29924d5b3f89c37dbc
 
   crimage:
     git: https://github.com/naqvis/crimage.git
