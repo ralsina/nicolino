@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.18.0] - 2026-01-29
+
+### 🚀 Features
+
+- Add teaser support with "read more" links
+- Add installation script for latest release
+- Add book support to "nicolino new" command
+- Add Pocketbase CMS support to continuous_import
+
+### 🐛 Bug Fixes
+
+- Correct Pocketbase parameter order and URL handling
+- Consolidate date parsing with DateUtils helper
+
+### 📚 Documentation
+
+- Add performance warning to install script
+- README
+- Fix getting started doc
+- Add book support to "nicolino new" documentation
+- Move Pocketbase support to external docker setup
+
 ## [0.17.0] - 2026-01-28
 
 ### 🚀 Features
@@ -15,6 +37,10 @@ All notable changes to this project will be documented in this file.
 ### 📚 Documentation
 
 - Fix misleading book feature description
+
+### Bump
+
+- Release v0.17.0
 
 ## [0.16.0] - 2026-01-28
 
