@@ -54,14 +54,14 @@ module Config
     property locale : String = "en_US.UTF-8"
     property date_output_format : String = "%Y-%m-%d %H:%M"
     property verbosity : Int32 = 3
-    property continuous_import_templates : String = "user_templates"
+    property import_templates : String = "user_templates"
 
     # Taxonomies and features
     property taxonomies : Taxonomies = Taxonomies.new
     property features : Array(String) = [] of String
 
-    # Continuous import configuration (hash of feed name to config)
-    property continuous_import : Hash(String, YAML::Any) = Hash(String, YAML::Any).new
+    # Import configuration (hash of feed name to config)
+    property import : Hash(String, YAML::Any) = Hash(String, YAML::Any).new
   end
 
   # Site configuration section from conf.yml (NOT translatable)
@@ -99,10 +99,10 @@ module Config
 
     # NOT translatable
     property verbosity : Int32 = 3
-    property continuous_import_templates : String = "user_templates"
+    property import_templates : String = "user_templates"
 
-    # Continuous import configuration (hash of feed name to config)
-    property continuous_import : Hash(String, YAML::Any) = Hash(String, YAML::Any).new
+    # Import configuration (hash of feed name to config)
+    property import : Hash(String, YAML::Any) = Hash(String, YAML::Any).new
 
     # Default constructor for class variable initialization
     def initialize
@@ -126,8 +126,8 @@ module Config
       @locale = "en_US.UTF-8"
       @date_output_format = "%Y-%m-%d %H:%M"
       @verbosity = 3
-      @continuous_import_templates = "user_templates"
-      @continuous_import = Hash(String, YAML::Any).new
+      @import_templates = "user_templates"
+      @import = Hash(String, YAML::Any).new
     end
   end
 
@@ -200,8 +200,8 @@ module Config
     @@global_config.locale = config_data.locale
     @@global_config.date_output_format = config_data.date_output_format
     @@global_config.verbosity = config_data.verbosity
-    @@global_config.continuous_import_templates = config_data.continuous_import_templates
-    @@global_config.continuous_import = config_data.continuous_import
+    @@global_config.import_templates = config_data.import_templates
+    @@global_config.import = config_data.import
 
     # Store default language
     @@default_lang = @@global_config.language
@@ -349,9 +349,9 @@ location: "tags/"
     @@global_config.verbosity
   end
 
-  def self.continuous_import_templates : String
+  def self.import_templates : String
     ensure_loaded
-    @@global_config.continuous_import_templates
+    @@global_config.import_templates
   end
 
   def self.language : String
@@ -413,8 +413,8 @@ location: "tags/"
     property color_scheme : String
     property fonts : Fonts
     property pandoc_formats : Hash(String, String)
-    property continuous_import_templates : String
-    property continuous_import : Hash(String, YAML::Any)
+    property import_templates : String
+    property import : Hash(String, YAML::Any)
     property image_large : Int32
     property image_thumb : Int32
 
@@ -430,8 +430,8 @@ location: "tags/"
       @color_scheme = @global.color_scheme
       @fonts = @global.fonts
       @pandoc_formats = @global.pandoc_formats
-      @continuous_import_templates = @global.continuous_import_templates
-      @continuous_import = @global.continuous_import
+      @import_templates = @global.import_templates
+      @import = @global.import
       @image_large = @global.image_large
       @image_thumb = @global.image_thumb
     end

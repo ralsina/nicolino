@@ -1,16 +1,21 @@
+require "./date_utils"
 require "./html_filters"
 require "./sc"
 require "./similarity"
 require "./taxonomies"
 require "./theme"
 require "cr-discount"
-require "cronic"
 require "RSS"
 require "shortcodes"
 
-include Cronic
-
 module Markdown
+  # Global registry of all posts (shared across Markdown::File and HTML::File)
+  @@posts = Hash(String, File).new
+
+  def self.posts
+    @@posts
+  end
+
   # A class representing a Markdown file
   class File
     @date : Time | Nil
@@ -26,13 +31,6 @@ module Markdown
     @toc = Hash(String, String).new
     @output = Hash(String, String).new
     @taxonomy_terms = Hash(String, Hash(String, Array(String))).new
-
-    # Register all Files by @source
-    @@posts = Hash(String, File).new
-
-    def self.posts
-      @@posts
-    end
 
     # Initialize the post with proper data
     def initialize(sources, base)
@@ -60,7 +58,7 @@ module Markdown
 
         @output[lang] = "#{p}.html"
       }
-      @@posts[base.to_s] = self
+      Markdown.posts[base.to_s] = self
 
       # Load each unique source file once, then share data across languages
       # This enables bidirectional fallback: any language can use any available file
@@ -283,32 +281,11 @@ module Markdown
       # Parse from frontmatter
       t = metadata.fetch("date", nil)
       if t != nil
-        begin
-          @date = Cronic.parse(t.to_s)
-        rescue ex
-          # Try RFC 2822 format (common in RSS feeds and email)
-          begin
-            @date = Time::Format::RFC_2822.parse(t.to_s)
-          rescue ex
-            # Try YY/MM/DD HH:MM:SS TZ format (e.g., "16/05/14 18:14:24 UTC")
-            begin
-              @date = Time::Format.new("%y/%m/%d %H:%M:%S %z").parse(t.to_s)
-            rescue ex
-              # Try YYYY-MM-DD HH:MM:SS TZ format (e.g., "2024-08-02 13:21:11 UTC")
-              # Convert named timezones to UTC offset
-              begin
-                date_str = t.to_s
-                # Handle common timezone names by replacing them with +0000
-                # This is a simple approach; for production you might want a proper timezone lib
-                normalized = date_str.gsub(/ (UTC|GMT|Z)$/, " +0000")
-                @date = Time::Format.new("%Y-%m-%d %H:%M:%S %z").parse(normalized)
-              rescue ex
-                Log.error { "Error parsing date for #{source}, #{t}" }
-                Log.error { "Tried Cronic, RFC_2822, YY/MM/DD, and YYYY-MM-DD formats" }
-                raise "Failed to parse date '#{t}' for #{source}"
-              end
-            end
-          end
+        if parsed = DateUtils.parse(t.to_s)
+          @date = parsed
+        else
+          Log.error { "Error parsing date for #{source}, #{t}" }
+          raise "Failed to parse date '#{t}' for #{source}"
         end
       end
       @date
@@ -720,7 +697,7 @@ module Markdown
     posts = [] of File
     all_sources = Utils.find_all(path, "md")
     all_sources.map do |base, sources|
-      next if File.posts.keys.includes? base.to_s
+      next if Markdown.posts.keys.includes? base.to_s
       next if Utils.should_skip_file?(base)
 
       posts << File.new(sources, base)

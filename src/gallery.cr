@@ -43,7 +43,7 @@ module Gallery
       @base = base
       super(sources, base)
       @parent_gallery = nil
-      Markdown::File.posts[base.to_s] = self
+      Markdown.posts[base.to_s] = self
 
       # Patch title if it's missing, special case for galleries
       Config.languages.keys.each do |lang|

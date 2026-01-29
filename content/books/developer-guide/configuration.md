@@ -43,7 +43,7 @@ These are site-wide:
 - `pandoc_formats` - File extension to Pandoc format mapping
 - `language` - Default language code
 - `verbosity` - Logging level
-- `continuous_import_templates` - Template directory for continuous import
+- `import_templates` - Template directory for import
 
 ## Accessing Configuration Values
 

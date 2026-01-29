@@ -80,8 +80,8 @@ pandoc_formats:
 # 5: trace
 verbosity: 3
 
-# Templates for continuous import feature
-continuous_import_templates: "user_templates"
+# Templates for import feature
+import_templates: "user_templates"
 
 # Features you want to enable are listed here
 features:

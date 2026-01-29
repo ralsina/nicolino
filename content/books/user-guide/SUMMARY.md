@@ -24,7 +24,7 @@ Documentation for the Nicolino static site generator.
   - [build](cli/build.md)
   - [clean](cli/clean.md)
   - [color_schemes](cli/color_schemes.md)
-  - [continuous_import](cli/continuous_import.md)
+  - [import](cli/import.md)
   - [init](cli/init.md)
   - [link_checker](cli/link-checker.md)
   - [new](cli/new.md)

@@ -73,9 +73,9 @@ See the [Themes](themes.md) chapter for more on theming.
 
 ## Templates Directory
 
-**`templates/`** - Directory for feature-specific templates. Some features (like [continuous import](cli/continuous_import.md)) use templates stored in this directory.
+**`templates/`** - Directory for feature-specific templates. Some features (like [import](cli/import.md)) use templates stored in this directory.
 
-For example, continuous import templates go in `templates/continuous_import/` and define how imported content is rendered.
+For example, import templates go in `templates/import/` and define how imported content is rendered.
 
 See the [Templates](templates.md) chapter for details on template syntax.
 

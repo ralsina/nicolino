@@ -26,7 +26,7 @@ On the other hand, Nicolino has an approach you may like, need or enjoy:
     * It will show [code listings](listings.html) even if not like github
 
     See a pattern? It's a swiss army knife. Not great at anything, but what other
-    tool lets you do those things (and [continuous import](cli/continuous_import.html)) plus a blog plus normal webpages?
+    tool lets you do those things (and [import](cli/import.html)) plus a blog plus normal webpages?
 
 =It's pretty fast.=
     Yes, really. 20% faster than Hugo in some benchmarks. Faster or slower than

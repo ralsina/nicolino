@@ -1,5 +1,5 @@
 require "./command.cr"
-require "../continuous_import"
+require "../import"
 
 module Nicolino
   module Commands
@@ -10,11 +10,11 @@ module Nicolino
     struct Import < Command
       @@name = "import"
       @@doc = <<-DOC
-Import content from external RSS/Atom feeds.
+Import content from external RSS/Atom feeds or JSON APIs.
 
 Fetches data from configured feeds and generates posts based on templates.
 This allows you to automatically bring in content from services like
-Goodreads, YouTube, blogs, etc.
+Goodreads, YouTube, blogs, or any JSON API.
 
 Usage:
   nicolino import [--help][-c <file>][-q|-v <level>][--feed <name>]
@@ -28,35 +28,45 @@ Options:
 
 Configuration:
 
-Add a 'continuous_import' section to your conf.yml with feed configurations:
+Add an 'import' section to your conf.yml with feed configurations:
 
-  continuous_import:
+  import:
     goodreads:
       urls:
         - "https://www.goodreads.com/review/list_rss/USER_ID?shelf=read"
+      fields:
+        title: title
+        date: user_read_at
+        content: description
       template: "goodreads.tmpl"
       output_folder: "posts/goodreads"
       format: "md"
       tags: "books, goodreads"
       skip_titles:
         - "Book to Skip"
-      metadata:
-        title: "title"
-        date: ["user_read_at", "user_date_added", "published"]
 
-    youtube:
-      url: "https://www.youtube.com/feeds/videos.xml?channel_id=CHANNEL_ID"
-      template: "youtube.tmpl"
-      output_folder: "posts/youtube"
-      format: "md"
-      tags: "video, youtube"
+    # JSON API example (Pocketbase, etc.)
+    blog:
+      urls:
+        - "http://localhost:8090/api/collections/articles/records"
+      feed_format: "json"
+      fields:
+        title: title
+        date: published
+        tags: tags
+        content: content
+      output_folder: "posts"
+      format: "html"
+      template: "article.tmpl"
 
-Templates should be placed in templates/continuous_import/ directory and
-use Crinja (Jinja2-like) syntax. Available variables:
-  - {{ item.title }} - The item title
-  - {{ item.link }} - The item link
-  - {{ item.description }} - The item description
-  - {{ item.<field> }} - Any other field from the feed item
+Templates should be placed in templates/import/ directory and
+use Crinja (Jinja2-like) syntax. Templates receive variables based
+on your 'fields' mapping configuration:
+  - {{title}} - Mapped from the configured source field
+  - {{date}} - Mapped from the configured source field
+  - {{content}} - Mapped from the configured source field
+  - {{lang}} - The configured language
+  - Any other fields you define in 'fields' or 'static'
 DOC
 
       def run : Int32
@@ -65,7 +75,7 @@ DOC
         if feed_name
           import_single_feed(feed_name)
         else
-          ContinuousImport.import_all
+          ::Import.import_all
         end
 
         0
@@ -76,10 +86,10 @@ DOC
       end
 
       private def import_single_feed(feed_name : String)
-        ci_result = Config.options.continuous_import
+        ci_result = Config.options.import
 
         if ci_result.nil? || ci_result.empty?
-          Log.error { "No continuous_import configuration found in conf.yml" }
+          Log.error { "No import configuration found in conf.yml" }
           return 1
         end
 
@@ -92,10 +102,10 @@ DOC
         end
 
         feed_yaml = feeds[feed_name]
-        feed_cfg = ContinuousImport::FeedConfig.from_any(feed_yaml)
+        feed_cfg = ::Import::FeedConfig.from_any(feed_yaml)
 
-        tmpl_dir = Config.options.continuous_import_templates
-        ContinuousImport.import_feed(feed_name, feed_cfg, tmpl_dir)
+        tmpl_dir = Config.options.import_templates
+        ::Import.import_feed(feed_name, feed_cfg, tmpl_dir)
         0
       end
     end

@@ -107,7 +107,7 @@ module Pages
         output = (out_path / output_path).to_s
 
         # All markdown posts are dependencies since we use the global registry
-        all_posts = Markdown::File.posts.map(&.last.source)
+        all_posts = Markdown.posts.map(&.last.source)
 
         folder_index_template = Theme.template_path("folder_index.tmpl")
         inputs = ["kv://#{folder_index_template}", "conf.yml"] + all_posts
@@ -186,10 +186,10 @@ module Pages
           # Try relative path first (content/pages/10.md)
           item_relative = item_path.sub(/^.*\/content\//, "content/")
           # Try direct match with relative path
-          file = Markdown::File.posts[item_relative]?
+          file = Markdown.posts[item_relative]?
           # If not found, try matching against all sources
           unless file
-            file = Markdown::File.posts.values.find do |md_file|
+            file = Markdown.posts.values.find do |md_file|
               md_file.@sources.values.includes?(item_path) ||
                 md_file.@sources.values.includes?(item_relative)
             end

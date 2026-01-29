@@ -138,25 +138,26 @@ date_output_format: "%e de %B, %Y"
 
 Only include the translatable settings you want to override. Paths, theme, and other non-translatable settings remain the same across all languages.
 
-## Continuous Import
+## Import
 
 Import content from external feeds:
 
 ```yaml
-continuous_import:
+import:
   my_feed:
     urls:
       - "https://example.com/feed.atom"
+    fields:
+      title: title
+      date: published
+      content: content
     template: "my_template.tmpl"
     output_folder: "posts/imported"
     format: "md"
     tags: "imported, external"
-    metadata:
-      title: "title"
-      date: "published"
 ```
 
-See [Continuous Import](cli/continuous_import.md) for details.
+See [Import](cli/import.md) for details.
 
 ## Complete Example
 

@@ -1,0 +1,25 @@
+# Docker Compose setup for Pocketbase CMS with Nicolino
+#
+# Usage:
+#   cd pocketbase && docker compose up -d      # Start Pocketbase in background
+#   cd pocketbase && docker compose logs -f    # View logs
+#   cd pocketbase && docker compose down       # Stop Pocketbase
+#
+# The Pocketbase Admin UI will be available at: http://localhost:8090/_/
+# API endpoint: http://localhost:8090/api/
+
+services:
+  pocketbase:
+    build:
+      context: ..
+      dockerfile: pocketbase/docker/pocketbase.Dockerfile
+    container_name: nicolino-pocketbase
+    ports:
+      - "8090:8090"
+    volumes:
+      # Persist data
+      - ./pb_data:/pb/pb_data
+      - ./pb_public:/pb/pb_public
+    restart: unless-stopped
+    environment:
+      - POCKETBASE_URL=http://localhost:8090

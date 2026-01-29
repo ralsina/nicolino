@@ -79,18 +79,35 @@ folder_indexes:
   # register their output folders. Use this only for custom exclusions.
   exclude_dirs: []
 
-# Continuous import - fetch content from external feeds
-continuous_import:
+# Import - fetch content from external feeds
+import:
+  # Example: GitHub releases (RSS/Atom)
   nicolino_releases:
     urls:
       - "https://github.com/ralsina/nicolino/releases.atom"
-    template: "nicolino_release.tmpl"
+    fields:
+      title: title
+      date: updated
+      content: content
     output_folder: "posts/releases"
     format: "md"
+    template: "nicolino_release.tmpl"
     tags: "releases"
-    metadata:
-      title: "title"
-      date: "published"
+
+  # Example: Pocketbase articles (JSON API)
+  articles:
+    urls:
+      - "http://localhost:8090/api/collections/articles/records?filter=status=\"published\""
+    feed_format: "json"
+    fields:
+      title: title
+      date: published
+      tags: tags
+      content: content
+    output_folder: "posts"
+    format: "html"
+    template: "pocketbase_article.tmpl"
+    lang: "en"
 
 # Features you want to enable are listed here
 features:

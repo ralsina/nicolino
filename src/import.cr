@@ -3,14 +3,15 @@ require "http"
 require "uri"
 require "crinja"
 require "log"
+require "openssl"
 
 # require "totem"
 
-# Continuous Import module
+# Import module
 #
-# Fetches content from external RSS/Atom feeds and generates posts
+# Fetches content from external RSS/Atom/JSON feeds and generates posts
 # based on templates. Similar to Nikola's continuous import feature.
-module ContinuousImport
+module Import
   # Configuration for a single feed
   class FeedConfig
     property urls : Array(String)
@@ -22,62 +23,75 @@ module ContinuousImport
     property tags : String
     property skip_titles : Array(String)
     property start_at : String?
-    property metadata : Hash(String, YAML::Any)
+
+    # Field mappings: metadata_field -> source_field
+    # Example: {"title" => "title", "date" => "published", "content" => "body"}
+    property fields : Hash(String, String)
+
+    # Static field values (applied to all items)
+    # Example: {"tags" => "blog, imported"}
+    property static : Hash(String, String)
+
+    # Feed format: "json" for JSON APIs, nil for RSS/Atom
     property feed_format : String?
-    property pocketbase_collection : String?
-    property pocketbase_filter : String?
+
+    # Authorization token for API requests
+    property token : String?
 
     def initialize(@urls, @template, @output_folder, @format = "md",
                    @source_extension = nil, @lang = "en", @tags = "",
                    @skip_titles = [] of String, @start_at = nil,
-                   @metadata = {} of String => YAML::Any,
-                   @feed_format = nil, @pocketbase_collection = nil,
-                   @pocketbase_filter = nil)
+                   @fields = {} of String => String,
+                   @static = {} of String => String,
+                   @feed_format = nil, @token = nil)
     end
 
     # Load from config (YAML::Any from config)
     def self.from_any(any) : self
-      # Handle urls - can be array or single string
-      urls_val = any["urls"]
-      urls = if urls_val.responds_to?(:as_a)
-               urls_val.as_a.map(&.as_s)
-             else
-               [urls_val.as_s]
-             end
-
+      urls = parse_urls(any["urls"])
       template = any["template"].as_s
       output_folder = any["output_folder"].as_s
       format = any["format"]? ? any["format"].as_s : "md"
       source_extension = any["source_extension"]?.try(&.as_s)
       lang = any["lang"]? ? any["lang"].as_s : "en"
       tags = any["tags"]? ? any["tags"].as_s : ""
-
-      skip_titles_val = any["skip_titles"]?
-      skip_titles = if skip_titles_val && skip_titles_val.responds_to?(:as_a)
-                      skip_titles_val.as_a.map(&.as_s)
-                    else
-                      [] of String
-                    end
-
+      skip_titles = parse_skip_titles(any["skip_titles"]?)
       start_at = any["start_at"]?.try(&.as_s)
-
+      fields = parse_field_mapping(any["fields"]?)
+      static = parse_field_mapping(any["static"]?)
       feed_format = any["feed_format"]?.try(&.as_s)
-
-      pocketbase_collection = any["pocketbase_collection"]?.try(&.as_s)
-      pocketbase_filter = any["pocketbase_filter"]?.try(&.as_s)
-
-      metadata = {} of String => YAML::Any
-      if meta_val = any["metadata"]?
-        if meta_val.responds_to?(:as_h)
-          meta_val.as_h.each do |k, v|
-            metadata[k.to_s] = v
-          end
-        end
-      end
+      token = any["token"]?.try(&.as_s) || ENV["POCKETBASE_ADMIN_TOKEN"]?
 
       new(urls, template, output_folder, format, source_extension,
-        lang, tags, skip_titles, start_at, metadata,
-        feed_format, pocketbase_collection, pocketbase_filter)
+        lang, tags, skip_titles, start_at, fields, static, feed_format, token)
+    end
+
+    # Parse urls from config (can be array or single string)
+    private def self.parse_urls(any) : Array(String)
+      if any.responds_to?(:as_a)
+        any.as_a.map(&.as_s)
+      else
+        [any.as_s]
+      end
+    end
+
+    # Parse skip_titles from config
+    private def self.parse_skip_titles(any) : Array(String)
+      return [] of String unless any
+      return [] of String unless any.responds_to?(:as_a)
+      any.as_a.map(&.as_s)
+    end
+
+    # Parse field mapping from config
+    private def self.parse_field_mapping(any) : Hash(String, String)
+      return {} of String => String unless any
+      return {} of String => String unless any.responds_to?(:as_h)
+
+      result = {} of String => String
+      any.as_h.each do |k, v|
+        result[k.to_s] = v.as_s
+      end
+      result
     end
 
     # Get the actual file extension to use
@@ -152,87 +166,109 @@ module ContinuousImport
     items
   end
 
-  # Fetch articles from Pocketbase CMS
-  def self.fetch_pocketbase(url : String, collection : String, filter : String? = nil) : Array(FeedItem)
-    api_url = build_pocketbase_url(url, collection, filter)
-    Log.info { "Fetching Pocketbase collection: #{collection} from #{url}" }
+  # Fetch articles from JSON API (Pocketbase or generic)
+  def self.fetch_json(url : String, token : String? = nil) : Array(FeedItem)
+    Log.info { "Fetching JSON feed from: #{url}" }
 
-    response = HTTP::Client.get(api_url)
+    uri = URI.parse(url)
+    client = HTTP::Client.new(uri)
+    if token
+      client.before_request do |request|
+        request.headers["Authorization"] = "Bearer #{token}"
+      end
+    end
+
+    response = client.get(uri.request_target)
     unless response.success?
-      Log.error { "Failed to fetch Pocketbase collection: #{response.status_code}" }
+      Log.error { "Failed to fetch JSON feed: #{response.status_code}" }
       return [] of FeedItem
     end
 
-    parse_pocketbase_response(response.body, collection)
+    parse_json_response(response.body, url)
   rescue ex : JSON::ParseException
-    Log.error(exception: ex) { "Failed to parse Pocketbase JSON response: #{ex.message}" }
+    Log.error(exception: ex) { "Failed to parse JSON response: #{ex.message}" }
     Log.debug { ex.backtrace.join("\n") }
     [] of FeedItem
   rescue ex : Exception
-    Log.error(exception: ex) { "Failed to fetch Pocketbase collection: #{ex.message}" }
+    Log.error(exception: ex) { "Failed to fetch JSON feed: #{ex.message}" }
     Log.debug { ex.backtrace.join("\n") }
     [] of FeedItem
   end
 
-  # Build Pocketbase API URL
-  private def self.build_pocketbase_url(url : String, collection : String, filter : String?) : String
-    # If URL already contains the API path, use it as-is
-    # Otherwise build the full API URL
-    if url.includes?("/api/collections/")
-      api_url = url.rstrip('/')
-    else
-      api_url = "#{url.rstrip('/')}/api/collections/#{collection}/records"
-    end
-
-    if filter
-      separator = api_url.includes?('?') ? '&' : '?'
-      api_url += "#{separator}filter=#{URI.encode_path_segment(filter)}"
-    end
-    api_url
-  end
-
-  # Parse Pocketbase JSON response into FeedItems
-  private def self.parse_pocketbase_response(body : String, collection : String) : Array(FeedItem)
+  # Parse JSON response into FeedItems
+  # Supports both Pocketbase format ({"items": [...]}) and generic arrays ([...])
+  private def self.parse_json_response(body : String, url : String) : Array(FeedItem)
     json = JSON.parse(body)
     items = [] of FeedItem
-    records = json["items"]?.try(&.as_a) || [] of JSON::Any
+
+    # Detect format: Pocketbase uses {"items": [...]} or direct array [...]
+    records = if json.as_h? && json["items"]?
+                json["items"].as_a
+              elsif json.as_a?
+                json.as_a
+              else
+                [] of JSON::Any
+              end
 
     records.each do |record|
-      item = parse_pocketbase_record(record)
+      item = parse_json_record(record)
       items << item if item
     end
 
-    Log.info { "Parsed #{items.size} articles from Pocketbase collection #{collection}" }
+    Log.info { "Parsed #{items.size} items from #{url}" }
     items
   end
 
-  # Parse a single Pocketbase record into a FeedItem
-  private def self.parse_pocketbase_record(record : JSON::Any) : FeedItem?
-    title = record["title"]?.try(&.as_s) || "Untitled"
-    content = record["content"]?.try(&.as_s) || ""
-    id = record["id"]?.try(&.as_s) || ""
-    link = "pocketbase://#{id}"
-
-    pub_date = extract_pocketbase_date(record)
-    data = extract_pocketbase_data(record)
+  # Parse a single JSON record into a FeedItem
+  private def self.parse_json_record(record : JSON::Any) : FeedItem?
+    title = extract_json_title(record)
+    content = extract_json_content(record)
+    link = extract_json_link(record)
+    pub_date = extract_json_date(record)
+    data = extract_json_data(record)
 
     FeedItem.new(title, link, pub_date, content, data)
   end
 
-  # Extract date from Pocketbase record (tries published, created, updated)
-  private def self.extract_pocketbase_date(record : JSON::Any) : Time?
-    pub_date = nil
-    ["published", "created", "updated"].each do |date_field|
-      if date_str = record[date_field]?.try(&.as_s)
-        pub_date = parse_date(date_str)
-        break if pub_date
-      end
-    end
-    pub_date
+  # Extract title from JSON record, trying common field names
+  private def self.extract_json_title(record : JSON::Any) : String
+    record["title"]?.try(&.as_s) ||
+      record["name"]?.try(&.as_s) ||
+      record["headline"]?.try(&.as_s) || "Untitled"
   end
 
-  # Extract all fields from Pocketbase record into data hash
-  private def self.extract_pocketbase_data(record : JSON::Any) : Hash(String, String | Array(String))
+  # Extract content from JSON record, trying common field names
+  private def self.extract_json_content(record : JSON::Any) : String
+    record["content"]?.try(&.as_s) ||
+      record["body"]?.try(&.as_s) ||
+      record["description"]?.try(&.as_s) ||
+      record["text"]?.try(&.as_s) || ""
+  end
+
+  # Extract link from JSON record
+  private def self.extract_json_link(record : JSON::Any) : String
+    return record["url"]?.try(&.as_s) || "" if record["url"]?
+    return record["link"]?.try(&.as_s) || "" if record["link"]?
+
+    id = record["id"]?.try(&.as_s) || ""
+    id.empty? ? "" : "json://#{id}"
+  end
+
+  # Extract date from JSON record (tries common field names)
+  private def self.extract_json_date(record : JSON::Any) : Time?
+    date_fields = ["published", "date", "created", "updated", "pubDate", "published_at"]
+    date_fields.each do |date_field|
+      if date_str = record[date_field]?.try(&.as_s)
+        if parsed = parse_date(date_str)
+          return parsed
+        end
+      end
+    end
+    nil
+  end
+
+  # Extract all fields from JSON record into data hash
+  private def self.extract_json_data(record : JSON::Any) : Hash(String, String | Array(String))
     data = {} of String => String | Array(String)
     record.as_h.each do |key, val|
       case val.raw
@@ -370,67 +406,134 @@ module ContinuousImport
     nil
   end
 
-  # Get metadata value from item, trying multiple keys
-  private def self.get_metadata(item : FeedItem, keys : Array(String)) : String?
-    keys.each do |key|
-      if value = item.data[key]?
-        return value.to_s
+  # Get a mapped field value from a FeedItem
+  private def self.get_mapped_field(item : FeedItem, config : FeedConfig, metadata_field : String) : String?
+    # Look up which source field maps to this metadata field
+    source_field = config.fields[metadata_field]?
+    return nil unless source_field
+
+    item.data[source_field]?.try(&.to_s)
+  end
+
+  # Generate post from feed item
+  def self.generate_post(item : FeedItem, config : FeedConfig, template_content : String) : String
+    # Build template context from field mappings
+    context = {} of String => String
+
+    # Apply field mappings (metadata_field -> source_field)
+    config.fields.each do |target_name, source_field|
+      if value = item.data[source_field]?
+        context[target_name] = value.to_s
+      end
+    end
+
+    # Format date properly if present
+    if date_source = config.fields["date"]?
+      if date_value = item.data[date_source]?
+        if parsed_time = parse_date(date_value.to_s)
+          context["date"] = parsed_time.to_s("%Y-%m-%d %H:%M:%S %z")
+        end
+      end
+    end
+
+    # Handle tags: combine config.tags + field mapping + static tags
+    tags = build_tags(item, config)
+    context["tags"] = tags unless tags.empty?
+
+    # Add static fields (can override mapped fields, except tags which we handle above)
+    config.static.each do |name, value|
+      context[name] = value unless name == "tags"
+    end
+
+    # Add special computed fields
+    context["lang"] = config.lang
+    context["link"] = item.link
+
+    # Render template
+    Crinja.render(template_content, context)
+  end
+
+  # Build combined tags from config, field mapping, and static
+  private def self.build_tags(item : FeedItem, config : FeedConfig) : String
+    tags_parts = [] of String
+
+    # Add tags from config
+    tags_parts << config.tags unless config.tags.empty?
+
+    # Add tags from field mapping
+    if tags_field = config.fields["tags"]?
+      if tags_value = item.data[tags_field]?
+        tags_parts << tags_value.to_s unless tags_value.to_s.empty?
+      end
+    end
+
+    # Add static tags
+    if static_tags = config.static["tags"]?
+      tags_parts << static_tags unless static_tags.empty?
+    end
+
+    tags_parts.join(", ").strip
+  end
+
+  # Generate filename for post
+  def self.generate_filename(item : FeedItem, config : FeedConfig) : String
+    # Try to use stable ID first: {hash}-{title}.{ext}
+    # Otherwise fall back to date+slug
+    item_hash = get_stable_hash(item)
+
+    # Slugify title
+    slug = item.title.downcase.gsub(/[^a-z0-9\s-]/, "").gsub(/\s+/, "-").gsub(/-+/, "-")
+
+    if item_hash
+      "#{item_hash}-#{slug}#{config.file_extension}"
+    else
+      # Fall back to date+slug format
+      date_str = if pub_date = item.pub_date
+                   pub_date.to_s("%Y-%m-%d")
+                 else
+                   Time.utc.to_s("%Y-%m-%d")
+                 end
+      "#{date_str}-#{slug}#{config.file_extension}"
+    end
+  end
+
+  # Get stable hash for item (8 chars)
+  # Returns nil if no stable ID is found
+  private def self.get_stable_hash(item : FeedItem) : String?
+    # Try common ID field names
+    ["id", "guid", "entry_id", "post_id"].each do |id_field|
+      if id_value = item.data[id_field]?
+        id_str = id_value.to_s.strip
+        return short_hash(id_str) unless id_str.empty?
       end
     end
     nil
   end
 
-  # Generate post from feed item
-  def self.generate_post(item : FeedItem, config : FeedConfig, template_content : String) : String
-    # Prepare template context
-    context = {
-      "item"    => item.data,
-      "title"   => item.title,
-      "link"    => item.link,
-      "content" => item.content,
-    }
-
-    # Render template
-    output = Crinja.render(template_content, context)
-
-    output
+  # Generate git-style short hash (8 chars) from stable ID
+  private def self.short_hash(id : String) : String
+    digest = OpenSSL::Digest.new("sha256")
+    digest.update(id)
+    digest.final[0...16].hexstring[0...8]
   end
 
-  # Generate filename for post
-  def self.generate_filename(item : FeedItem, config : FeedConfig) : String
-    # Use date from metadata if specified
-    date_str = if pub_date = item.pub_date
-                 pub_date.to_s("%Y-%m-%d")
-               else
-                 Time.utc.to_s("%Y-%m-%d")
-               end
-
-    # Slugify title
-    slug = item.title.downcase.gsub(/[^a-z0-9\s-]/, "").gsub(/\s+/, "-").gsub(/-+/, "-")
-
-    "#{date_str}-#{slug}#{config.file_extension}"
+  # Find existing file with same hash (for title change detection)
+  private def self.find_existing_by_hash(output_dir : String, hash : String, ext : String) : String?
+    Dir.glob(File.join(output_dir, "#{hash}-*#{ext}")).first?
   end
 
-  # Get date for post metadata
+  # Get date for post metadata from field mappings
   private def self.get_post_date(item : FeedItem, config : FeedConfig) : Time
-    # Try metadata fields in order
-    if date_val = config.metadata["date"]?
-      keys = if date_val.as_a?
-               date_val.as_a.map(&.as_s)
-             else
-               [date_val.as_s]
-             end
-
-      keys.each do |key|
-        if value = item.data[key]?
-          if parsed = parse_date(value.to_s)
-            return parsed
-          end
+    # Try the "date" field mapping first
+    if date_field = config.fields["date"]?
+      if date_str = item.data[date_field]?
+        if parsed = parse_date(date_str.to_s)
+          return parsed
         end
       end
     end
 
-    # Fall back to pubDate
+    # Fall back to pubDate from feed parsing
     item.pub_date || Time.utc
   end
 
@@ -504,14 +607,12 @@ module ContinuousImport
     all_items = [] of FeedItem
 
     if config.json_feed?
-      # Fetch from JSON/Pocketbase
-      collection = config.pocketbase_collection
-      filter = config.pocketbase_filter
-      if collection
-        config.urls.each do |url|
-          items = fetch_pocketbase(url, collection, filter)
-          all_items.concat(items)
-        end
+      # Fetch from JSON APIs (Pocketbase or others)
+      config.urls.each do |url|
+        Log.debug { "Fetching JSON feed from #{url}" }
+        items = fetch_json(url, config.token)
+        Log.debug { "Got #{items.size} items" }
+        all_items.concat(items)
       end
     else
       # Fetch from RSS/Atom feeds
@@ -545,12 +646,8 @@ module ContinuousImport
       end
     end
 
-    # Check if already exists
-    filename = generate_filename(item, config)
-    if existing_posts.includes?(filename)
-      Log.debug { "Skipping existing: #{filename}" }
-      return true
-    end
+    # Note: We no longer skip existing files - we update them instead
+    # This ensures CMS changes are always propagated to Nicolino
 
     false
   end
@@ -566,39 +663,39 @@ module ContinuousImport
     content = generate_post(item, config, template_content)
     output_path = File.join(output_dir, filename)
 
-    # Generate frontmatter
-    date = get_post_date(item, config)
-    title = if title_val = config.metadata["title"]?
-              get_metadata(item, [title_val.as_s]) || item.title
-            else
-              item.title
-            end
+    # Check if file already exists (before writing)
+    is_update = File.exists?(output_path)
 
-    frontmatter = <<-FRONT
-      ---
-      title: "#{title.gsub(/"/, "\\\"")}"
-      date: #{date.to_s("%Y-%m-%d %H:%M:%S %z")}
-      tags: #{config.tags}
-      lang: #{config.lang}
-      ---
+    # Check if title changed (same hash, different filename)
+    item_hash = get_stable_hash(item)
+    if item_hash
+      if existing = find_existing_by_hash(output_dir, item_hash, config.file_extension)
+        if existing != filename
+          Log.info { "Title changed, deleting old: #{existing}" }
+          File.delete(File.join(output_dir, existing))
+          is_update = true # This is an update (from old file)
+        end
+      end
+    end
 
-      FRONT
-
-    File.write(output_path, frontmatter + content)
-    Log.info { "Created: #{output_path}" }
+    # Write (or overwrite) the file
+    File.write(output_path, content)
+    action = is_update ? "Updated" : "Created"
+    Log.info { "#{action}: #{output_path}" }
   end
 
   # Import all configured feeds
   def self.import_all
-    ci_value = Config.options.continuous_import
+    ci_value = Config.options.import
     return if ci_value.nil? || ci_value.empty?
 
     feeds = ci_value
-    templates_dir = Config.options.continuous_import_templates
+    templates_dir = Config.options.import_templates
 
     feeds.each do |name, cfg|
       begin
         feed_cfg = FeedConfig.from_any(cfg)
+        Log.debug { "Feed #{name}: feed_format=#{feed_cfg.feed_format.inspect}, json_feed?=#{feed_cfg.json_feed?}" }
         import_feed(name, feed_cfg, templates_dir)
       rescue ex : Exception
         Log.error(exception: ex) { "Failed to import feed '#{name}': #{ex.message}" }

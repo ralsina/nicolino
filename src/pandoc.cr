@@ -105,7 +105,7 @@ module Pandoc
       all_sources = Utils.find_all(path, ext[1..])
       all_sources.map do |base, sources|
         begin
-          next if File.posts.keys.includes? base.to_s
+          next if Markdown.posts.keys.includes? base.to_s
           next if Utils.should_skip_file?(base)
 
           posts << File.new(sources, base)
