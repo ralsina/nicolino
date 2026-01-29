@@ -54,13 +54,18 @@ DOC
         end
 
         # Setup a watcher for posts/pages and trigger respawn if files
-        # are added
-        watcher = Inotify::Watcher.new
-        watcher.watch("content", LibInotify::IN_CREATE)
-        watcher.on_event do |_|
-          server.close
-          live_reload.http_server.close
-          Process.exec(Process.executable_path.as(String), ARGV)
+        # are added, deleted, or moved
+        watcher = Inotify::Watcher.new(recursive: true)
+        watch_flags = LibInotify::IN_CREATE | LibInotify::IN_DELETE | LibInotify::IN_MOVED_FROM | LibInotify::IN_MOVED_TO
+        watcher.watch("content", watch_flags)
+        spawn do
+          watcher.on_event do |_|
+            # Add a small delay to ensure the file operation is complete
+            sleep 0.2.seconds
+            server.close
+            live_reload.http_server.close
+            Process.exec(Process.executable_path.as(String), ARGV)
+          end
         end
 
         # Create task that will be triggered in rebuilds
@@ -114,7 +119,19 @@ DOC
         # First do a normal run
         arguments = Croupier::TaskManager.tasks.keys if arguments.empty?
         # TODO: see if any other combination of args is a good idea
-        run(arguments, fast_mode: fast_mode)
+        begin
+          run(arguments, fast_mode: fast_mode)
+          # Trigger full reload for all connected clients after initial build
+          Log.info { "LiveReload: Initial build complete, triggering reload for all connected clients" }
+          live_reload.send_reload(path: "/index.html", liveCSS: false)
+        rescue ex : Exception
+          Log.error(exception: ex) { "Initial build failed, restarting: #{ex.message}" }
+          Log.debug { ex.backtrace.join("\n") }
+          sleep 1.second
+          server.close
+          live_reload.http_server.close
+          Process.exec(Process.executable_path.as(String), ARGV)
+        end
 
         # Then run in auto mode
         Croupier::TaskManager.auto_run(arguments) # FIXME: check options

@@ -409,11 +409,11 @@ module Import
       end
     end
 
-    # Format date properly if present
+    # Format date properly if present (ISO 8601 for TinaCMS compatibility)
     if date_source = config.fields["date"]?
       if date_value = item.data[date_source]?
         if parsed_time = parse_date(date_value.to_s)
-          context["date"] = parsed_time.to_s("%Y-%m-%d %H:%M:%S %z")
+          context["date"] = parsed_time.to_s("%Y-%m-%dT%H:%M:%S%z")
         end
       end
     end

@@ -16,3 +16,7 @@ content/4000/
 /mysite/
 /.claude/
 /aur-nicolino/
+
+node_modules
+.env
+package-lock.json
