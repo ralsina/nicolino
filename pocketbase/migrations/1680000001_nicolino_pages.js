@@ -25,20 +25,7 @@ migrate((app) => {
         "id": "field_slug",
         "name": "slug",
         "type": "text",
-        "required": true,
-        "unique": true
-      },
-      {
-        "system": false,
-        "id": "field_status",
-        "name": "status",
-        "type": "select",
-        "required": true,
-        "options": {
-          "values": ["draft", "published"],
-          "maxSelect": 1,
-          "default": "draft"
-        }
+        "presentable": false
       },
       {
         "system": false,

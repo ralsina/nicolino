@@ -20,13 +20,22 @@ cp -r path/to/nicolino/pocketbase /your/site/root/
 cp -r pocketbase /your/site/root/
 ```
 
+Also copy the Pocketbase templates to your `user_templates/` directory:
+
+```bash
+cp pocketbase/templates/*.tmpl user_templates/
+```
+
 Your site structure should now look like:
 
 ```
 your-site/
 ├── conf.yml
 ├── content/
-├── pocketbase/          <-- NEW
+├── user_templates/
+│   ├── pocketbase_post.tmpl   <-- NEW
+│   └── pocketbase_page.tmpl   <-- NEW
+├── pocketbase/                <-- NEW
 │   ├── docker/
 │   ├── migrations/
 │   ├── templates/
@@ -37,10 +46,11 @@ your-site/
 
 ## Step 2: Start Pocketbase
 
-Navigate to the pocketbase directory and start Pocketbase using Docker Compose:
+Navigate to the pocketbase directory, create the data directories, and start Pocketbase using Docker Compose:
 
 ```bash
 cd pocketbase
+mkdir -p pb_data pb_public
 docker compose up -d
 ```
 
@@ -61,22 +71,35 @@ docker compose logs
 You should see logs indicating Pocketbase is serving on port 8090.
 
 Pocketbase is now available at:
+
 - **Admin UI**: http://localhost:8090/_/
 - **API**: http://localhost:8090/api/
 
-## Step 3: Create an Admin Account
+## Step 3: Get Admin API Token
 
-1. Open http://localhost:8090/_/ in your browser
-2. You'll see the Pocketbase Admin UI login screen
-3. Click "Create an administrator account"
-4. Enter your email and password
-5. Submit the form
+Nicolino needs an admin token to access the Pocketbase API:
 
-You're now logged in as admin.
+1. In Pocketbase Admin UI, go to **Dashboard** (house icon)
+2. Click **Collections** in the sidebar
+3. Scroll down to **System** and click **_superusers**
+4. Click on your superuser account to open it
+5. Click the **Impersonate** dropdown in the top-right
+6. Set duration to `99999999` seconds (effectively permanent)
+7. Click **Generate token**
+8. Copy the generated token
+
+**Export the token:**
+
+```bash
+export POCKETBASE_ADMIN_TOKEN="paste_token_here"
+```
+
+You may want to add this to your `~/.bashrc` or `~/.zshrc` to persist it.
 
 ## Step 4: Verify Collections
 
 After logging in, you should see two collections in the sidebar:
+
 - **posts** - For blog posts
 - **pages** - For static pages
 
@@ -90,8 +113,9 @@ Open your site's `conf.yml` and add the `import` section. Add it at the top leve
 import:
   posts:
     urls:
-      - "http://localhost:8090/api/collections/posts/records?filter=status=\"published\""
+      - "http://localhost:8090/api/collections/posts/records"
     feed_format: json
+    token: "your-token-here"
     fields:
       title: title
       date: published
@@ -101,13 +125,14 @@ import:
       excerpt: excerpt
     output_folder: posts
     format: html
-    template: ../pocketbase/templates/pocketbase_post.tmpl
+    template: pocketbase_post.tmpl
     lang: en
 
   pages:
     urls:
-      - "http://localhost:8090/api/collections/pages/records?filter=status=\"published\""
+      - "http://localhost:8090/api/collections/pages/records"
     feed_format: json
+    token: "your-token-here"
     fields:
       title: title
       content: content
@@ -116,17 +141,14 @@ import:
       format: html
     output_folder: pages
     format: html
-    template: ../pocketbase/templates/pocketbase_page.tmpl
+    template: pocketbase_page.tmpl
     lang: en
 ```
 
-**Important**: Make sure `import_templates` is configured in your conf.yml, or add it:
-
-```yaml
-import_templates: pocketbase/templates
-```
-
-This tells Nicolino where to find the import templates.
+{{% admonition note %}}
+If you don't want the token in your `conf.yml` for security reasons, you
+can set environment variables `NICOLINO_IMPORT_{FEEDNAME}_TOKEN`
+{{% /admonition%}}
 
 ## Step 6: Create Test Content in Pocketbase
 
@@ -138,9 +160,8 @@ This tells Nicolino where to find the import templates.
    - **title**: "My First Post"
    - **content**: "This is my first post from Pocketbase!"
    - **published**: Select today's date
-   - **status**: Select "published"
-   - **tags**: "test, pocketbase"
-   - **slug**: "my-first-post"
+   - **tags**: "test, pocketbase" (optional)
+   - **slug**: "my-first-post" (optional)
 4. Click **Create**
 
 ### Create a Page
@@ -151,7 +172,6 @@ This tells Nicolino where to find the import templates.
    - **title**: "About"
    - **content**: "About this site"
    - **slug**: "about"
-   - **status**: Select "published"
 4. Click **Create**
 
 ## Step 7: Import Content
@@ -167,14 +187,14 @@ You should see output like:
 
 ```
 [INFO] Importing feed: posts
-[INFO] Fetching JSON feed from: http://localhost:8090/api/collections/posts/records?filter=status=\"published\"
-[INFO] Parsed 1 items from http://localhost:8090/api/collections/posts/records?filter=status=\"published\"
+[INFO] Fetching JSON feed from: http://localhost:8090/api/collections/posts/records
+[INFO] Parsed 1 items from http://localhost:8090/api/collections/posts/records
 [INFO] Created: content/posts/my-first-post.html
 [INFO] Imported 1 posts, skipped 0
 
 [INFO] Importing feed: pages
-[INFO] Fetching JSON feed from: http://localhost:8090/api/collections/pages/records?filter=status=\"published\"
-[INFO] Parsed 1 items from http://localhost:8090/api/collections/pages/records?filter=status=\"published\"
+[INFO] Fetching JSON feed from: http://localhost:8090/api/collections/pages/records
+[INFO] Parsed 1 items from http://localhost:8090/api/collections/pages/records
 [INFO] Created: content/pages/about.html
 [INFO] Imported 1 posts, skipped 0
 ```
@@ -255,49 +275,6 @@ docker compose down
 
 # Restart Pocketbase
 docker compose restart
-```
-
-## Troubleshooting
-
-### "Template not found" error
-
-Make sure `import_templates` is set in `conf.yml`:
-
-```yaml
-import_templates: pocketbase/templates
-```
-
-### Import creates no files
-
-1. Check Pocketbase is running: `curl http://localhost:8090/api/health`
-2. Verify the items have status="published" in Pocketbase
-3. Check the import URLs in conf.yml match your Pocketbase setup
-4. Run with verbose logging: `./bin/nicolino import -v6`
-
-### Port 8090 already in use
-
-Edit `pocketbase/docker-compose.yml` and change the port mapping:
-
-```yaml
-ports:
-  - "9090:8090"  # Use port 9090 instead
-```
-
-Then update the URLs in your `conf.yml` to use port 9090.
-
-### Migration didn't create collections
-
-Check if migrations ran:
-
-```bash
-cd pocketbase
-docker compose exec pocketbase ls -la /pb_migrations/
-```
-
-If migrations exist but collections don't show, manually run:
-
-```bash
-docker compose exec pocketbase pocketbase migrate up
 ```
 
 ## Next Steps

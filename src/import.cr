@@ -47,7 +47,7 @@ module Import
     end
 
     # Load from config (YAML::Any from config)
-    def self.from_any(any) : self
+    def self.from_any(any, feed_name : String) : self
       urls = parse_urls(any["urls"])
       template = any["template"].as_s
       output_folder = any["output_folder"].as_s
@@ -60,7 +60,13 @@ module Import
       fields = parse_field_mapping(any["fields"]?)
       static = parse_field_mapping(any["static"]?)
       feed_format = any["feed_format"]?.try(&.as_s)
-      token = any["token"]?.try(&.as_s) || ENV["POCKETBASE_ADMIN_TOKEN"]?
+
+      # Try token from config, then fallback to environment variable
+      token = any["token"]?.try(&.as_s)
+      if token.nil?
+        env_var = "NICOLINO_IMPORT_#{feed_name.upcase}_TOKEN"
+        token = ENV[env_var]?
+      end
 
       new(urls, template, output_folder, format, source_extension,
         lang, tags, skip_titles, start_at, fields, static, feed_format, token)
@@ -377,33 +383,9 @@ module Import
     child.content || ""
   end
 
-  # Parse date from various formats
+  # Parse date from various formats (delegated to DateUtils)
   private def self.parse_date(date_str : String?) : Time?
-    return nil if date_str.nil? || date_str.empty?
-
-    # Try common date formats
-    formats = [
-      Time::Format::RFC_2822,
-      Time::Format::ISO_8601_DATE_TIME,
-    ]
-
-    formats.each do |format|
-      begin
-        return format.parse(date_str)
-      rescue
-        # Try next format
-      end
-    end
-
-    # Try parsing as HTTP date
-    begin
-      return HTTP.parse_time(date_str)
-    rescue
-      # Fall through
-    end
-
-    Log.warn { "Could not parse date: #{date_str}" }
-    nil
+    DateUtils.parse(date_str)
   end
 
   # Get a mapped field value from a FeedItem
@@ -672,7 +654,7 @@ module Import
       if existing = find_existing_by_hash(output_dir, item_hash, config.file_extension)
         if existing != filename
           Log.info { "Title changed, deleting old: #{existing}" }
-          File.delete(File.join(output_dir, existing))
+          File.delete(existing)
           is_update = true # This is an update (from old file)
         end
       end
@@ -694,7 +676,7 @@ module Import
 
     feeds.each do |name, cfg|
       begin
-        feed_cfg = FeedConfig.from_any(cfg)
+        feed_cfg = FeedConfig.from_any(cfg, name)
         Log.debug { "Feed #{name}: feed_format=#{feed_cfg.feed_format.inspect}, json_feed?=#{feed_cfg.json_feed?}" }
         import_feed(name, feed_cfg, templates_dir)
       rescue ex : Exception

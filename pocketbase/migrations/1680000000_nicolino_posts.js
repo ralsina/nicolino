@@ -24,20 +24,10 @@ migrate((app) => {
         "system": false,
         "id": "field_published",
         "name": "published",
-        "type": "date",
-        "presentable": true
-      },
-      {
-        "system": false,
-        "id": "field_status",
-        "name": "status",
-        "type": "select",
-        "required": true,
-        "options": {
-          "values": ["draft", "published"],
-          "maxSelect": 1,
-          "default": "draft"
-        }
+        "type": "autodate",
+        "presentable": true,
+        "onCreate": true,
+        "onUpdate": false
       },
       {
         "system": false,
@@ -51,7 +41,7 @@ migrate((app) => {
         "id": "field_slug",
         "name": "slug",
         "type": "text",
-        "pattern": "^[a-z0-9-]+$"
+        "presentable": false
       },
       {
         "system": false,

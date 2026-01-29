@@ -94,21 +94,6 @@ import:
     template: "nicolino_release.tmpl"
     tags: "releases"
 
-  # Example: Pocketbase articles (JSON API)
-  articles:
-    urls:
-      - "http://localhost:8090/api/collections/articles/records?filter=status=\"published\""
-    feed_format: "json"
-    fields:
-      title: title
-      date: published
-      tags: tags
-      content: content
-    output_folder: "posts"
-    format: "html"
-    template: "pocketbase_article.tmpl"
-    lang: "en"
-
 # Features you want to enable are listed here
 features:
   - assets
@@ -126,7 +111,6 @@ features:
   - taxonomies
   # - similarity  # Disabled by default - makes builds significantly slower
   - archive
-
 
 fonts:
   - family: Quicksand

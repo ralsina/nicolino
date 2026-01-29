@@ -20,6 +20,8 @@ services:
       # Persist data
       - ./pb_data:/pb/pb_data
       - ./pb_public:/pb/pb_public
+      # Mount migrations at runtime (so we can edit them)
+      - ./migrations:/pb/pb_migrations:ro
     restart: unless-stopped
     environment:
       - POCKETBASE_URL=http://localhost:8090

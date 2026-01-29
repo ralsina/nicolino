@@ -102,7 +102,7 @@ DOC
         end
 
         feed_yaml = feeds[feed_name]
-        feed_cfg = ::Import::FeedConfig.from_any(feed_yaml)
+        feed_cfg = ::Import::FeedConfig.from_any(feed_yaml, feed_name)
 
         tmpl_dir = Config.options.import_templates
         ::Import.import_feed(feed_name, feed_cfg, tmpl_dir)

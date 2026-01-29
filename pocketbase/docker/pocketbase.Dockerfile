@@ -9,6 +9,10 @@ RUN apk add --no-cache \
     unzip \
     ca-certificates
 
+# Create a non-root user with fixed UID/GID that matches host
+RUN addgroup -g 1000 pocketbase && \
+    adduser -D -u 1000 -G pocketbase pocketbase
+
 # Download and unzip PocketBase
 ARG PB_VERSION=0.23.5
 ADD https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip /tmp/pb.zip
@@ -16,6 +20,13 @@ RUN unzip /tmp/pb.zip -d /pb/
 
 # Copy Nicolino-specific migrations
 COPY pocketbase/migrations /pb/pb_migrations
+
+# Set ownership
+RUN chown -R pocketbase:pocketbase /pb
+
+# Switch to non-root user
+USER pocketbase
+WORKDIR /pb
 
 # Expose the default Pocketbase port
 EXPOSE 8090

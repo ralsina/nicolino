@@ -19,6 +19,7 @@ Documentation for the Nicolino static site generator.
   - [Folder Indexes](folder_indexes.md)
   - [Similarity](similarity.md)
   - [Shortcodes](shortcodes.md)
+  - [Import](import.md)
 - [Commands]()
   - [auto](cli/auto.md)
   - [build](cli/build.md)
