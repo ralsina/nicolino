@@ -193,6 +193,8 @@ module Markdown
     def load(lang = nil) : Nil
       lang ||= Locale.language
       Log.debug { "👉 #{source(lang)}" }
+      # Clear cached date so it gets re-parsed from updated metadata
+      @date = nil
       contents = ::File.read(source(lang))
       begin
         # Metadata format: file must START with "---\n" to have metadata
@@ -538,19 +540,21 @@ module Markdown
           inputs: post.dependencies,
           mergeable: false
         ) do
-          # Validate requirements during task execution
-          if require_date && post.date == nil
-            Log.error { "Error: #{post.source lang} has no date" }
-            next
-          end
-          if require_title && post.title(lang).empty?
-            Log.error { "Error: #{post.source lang} has no title" }
-            next
-          end
-
           begin
-            # Need to refresh post contents
+            # Need to refresh post contents first, before validation
+            # This ensures we check the current metadata, not cached values
             post.load lang if Croupier::TaskManager.auto_mode?
+
+            # Validate requirements during task execution
+            if require_date && post.date == nil
+              Log.error { "Error: #{post.source lang} has no date" }
+              next
+            end
+            if require_title && post.title(lang).empty?
+              Log.error { "Error: #{post.source lang} has no title" }
+              next
+            end
+
             Log.info { "👉 #{post.output lang}" }
             template_vars = {
               "content"        => post.rendered(lang),
@@ -617,8 +621,10 @@ module Markdown
       mergeable: false
     ) do
       Log.info { "👉 #{output}" }
-      # Sort posts by date descending (newest first), posts without dates go last
-      sorted_posts = posts.sort_by { |post| post.date || Time.utc(1970, 1, 1) }.reverse!
+      # Filter out posts without dates, then sort by date descending (newest first)
+      sorted_posts = posts.select { |post| !post.date.nil? }
+        .sort_by! { |post| post.date.as(Time) }
+        .reverse!
 
       # Limit to 100 posts for index pages
       has_more = sorted_posts.size > 100

@@ -66,6 +66,14 @@ DOC
             live_reload.http_server.close
             Process.exec(Process.executable_path.as(String), ARGV)
           end
+        # are added, deleted, or moved
+        watcher = Inotify::Watcher.new(recursive: true)
+        watch_flags = LibInotify::IN_CREATE | LibInotify::IN_DELETE | LibInotify::IN_MOVED_FROM | LibInotify::IN_MOVED_TO
+        watcher.watch("content", watch_flags)
+        watcher.on_event do |_|
+          server.close
+          live_reload.http_server.close
+          Process.exec(Process.executable_path.as(String), ARGV)
         end
 
         # Create task that will be triggered in rebuilds
@@ -132,7 +140,7 @@ DOC
           live_reload.http_server.close
           Process.exec(Process.executable_path.as(String), ARGV)
         end
-
+        run(arguments, fast_mode: fast_mode)
         # Then run in auto mode
         Croupier::TaskManager.auto_run(arguments) # FIXME: check options
         loop do
