@@ -47,7 +47,7 @@ DOC
       def initialize(@options)
         # Setup logging
         verbosity = @options.fetch("-v", 4).to_s.to_i
-        verbosity = 0 if @options["-q"] == 1
+        verbosity = 0 if @options["-q"]? == true
         progress = @options.fetch("--progress", nil)
         if progress
           verbosity = 0

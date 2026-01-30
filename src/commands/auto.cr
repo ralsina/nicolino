@@ -66,14 +66,6 @@ DOC
             live_reload.http_server.close
             Process.exec(Process.executable_path.as(String), ARGV)
           end
-        # are added, deleted, or moved
-        watcher = Inotify::Watcher.new(recursive: true)
-        watch_flags = LibInotify::IN_CREATE | LibInotify::IN_DELETE | LibInotify::IN_MOVED_FROM | LibInotify::IN_MOVED_TO
-        watcher.watch("content", watch_flags)
-        watcher.on_event do |_|
-          server.close
-          live_reload.http_server.close
-          Process.exec(Process.executable_path.as(String), ARGV)
         end
 
         # Create task that will be triggered in rebuilds
@@ -132,25 +124,16 @@ DOC
           # Trigger full reload for all connected clients after initial build
           Log.info { "LiveReload: Initial build complete, triggering reload for all connected clients" }
           live_reload.send_reload(path: "/index.html", liveCSS: false)
+          # Then run in auto mode
+          Croupier::TaskManager.auto_run(arguments) # FIXME: check options
+          loop do
+            ::sleep(1.second)
+          end
         rescue ex : Exception
-          Log.error(exception: ex) { "Initial build failed, restarting: #{ex.message}" }
+          Log.error(exception: ex) { "Error running in auto mode: #{ex.message}" }
           Log.debug { ex.backtrace.join("\n") }
-          sleep 1.second
-          server.close
-          live_reload.http_server.close
-          Process.exec(Process.executable_path.as(String), ARGV)
+          1
         end
-        run(arguments, fast_mode: fast_mode)
-        # Then run in auto mode
-        Croupier::TaskManager.auto_run(arguments) # FIXME: check options
-        loop do
-          ::sleep(1.second)
-        end
-        0
-        # rescue ex : Exception
-        #   Log.error(exception: ex) { "Error running in auto mode: #{ex.message}" }
-        #   Log.debug { ex.backtrace.join("\n") }
-        #   1
       end
     end
   end
