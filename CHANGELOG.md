@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.19.0] - 2026-01-30
+
+### 🚀 Features
+
+- Improve auto mode reliability and post handling
+
+### 🐛 Bug Fixes
+
+- Correct -q flag handling and clean up auto command
+
+### 📚 Documentation
+
+- Add Import feature card to features page
+
 ## [0.18.0] - 2026-01-29
 
 ### 🚀 Features
@@ -23,6 +37,10 @@ All notable changes to this project will be documented in this file.
 - Fix getting started doc
 - Add book support to "nicolino new" documentation
 - Move Pocketbase support to external docker setup
+
+### Bump
+
+- Release v0.18.0
 
 ## [0.17.0] - 2026-01-28
 
