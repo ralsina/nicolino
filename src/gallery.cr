@@ -38,6 +38,7 @@ module Gallery
     property sub_galleries : Array(Gallery)
     property parent_gallery : Gallery?
     property base : Path
+    property image_list : Array(String)
 
     def initialize(sources, base, @image_list : Array(String), @sub_galleries : Array(Gallery) = [] of Gallery)
       @base = base
@@ -373,17 +374,31 @@ module Gallery
           "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
         })
 
-        # Build items list for the template
+        # Build items list for the template with first image for each gallery
         items = galleries.map do |gallery|
           gallery_output = gallery.output(lang)
           gallery_dir = File.dirname(gallery_output)
           gallery_link = gallery_dir.gsub(/^output\//, "/")
-          {link: gallery_link, title: gallery.title(lang)}
+          # Get first image if available and construct full path
+          # image_list contains just basenames, so we need to add the gallery directory
+          first_image = gallery.image_list.first?
+          thumb_link = nil
+          if first_image
+            # Construct the full path: /galleries/fancy-turning/lathe-patterns-00030.jpg
+            # The gallery_dir is like "output/galleries/fancy-turning"
+            # We need to convert to link path and add the image basename
+            thumb_link = "#{gallery_link}/#{File.basename(first_image)}"
+          end
+          {
+            link:       gallery_link,
+            title:      gallery.title(lang),
+            thumb_link: thumb_link,
+          }
         end
 
-        # Render the item list template
-        item_list_template = Theme.template_path("item_list.tmpl")
-        content = Templates.environment.get_template(item_list_template).render({
+        # Render the gallery cards template
+        gallery_cards_template = Theme.template_path("gallery_cards.tmpl")
+        content = Templates.environment.get_template(gallery_cards_template).render({
           "title"       => "Galleries",
           "description" => "A collection of image galleries.",
           "items"       => items,
