@@ -44,7 +44,7 @@ DOC
       def initialize(@options)
         # Setup logging only
         verbosity = @options.fetch("-v", 4).to_s.to_i
-        verbosity = 0 if @options["-q"]? == true
+        verbosity = 0 if @options["-q"]?
         Oplog.setup(verbosity)
       end
 

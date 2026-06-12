@@ -400,8 +400,11 @@ module Markdown
         result << {name: "Home", link: "/"}
 
         # Build breadcrumb path incrementally
+        # For index.md files (e.g. content/posts/foo/index.md),
+        # skip the container directory to avoid: Home / posts / foo / Title
+        breadcrumb_parts = @base.stem == "index" ? parts[1..-3] : parts[1..-2]
         current_path = ""
-        parts[1..-2].each do |part|
+        breadcrumb_parts.each do |part|
           current_path = Path[current_path] / part
           result << {
             name: part,
