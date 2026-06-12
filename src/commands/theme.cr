@@ -62,7 +62,7 @@ DOC
       def initialize(@options)
         # Setup logging only (no config file needed for theme commands)
         verbosity = @options.fetch("-v", 4).to_s.to_i
-        verbosity = 0 if @options["-q"]?
+        verbosity = 0 if @options["-q"]? == true
         Oplog.setup(verbosity)
       end
 
