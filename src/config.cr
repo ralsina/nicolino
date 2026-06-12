@@ -177,6 +177,11 @@ module Config
     @@config_file_path = path
 
     # Read and parse conf.yml
+    unless File.exists?(path)
+      Log.error { "No configuration file found at '#{path}'. Are you in a Nicolino site directory?" }
+      Log.error { "Run 'nicolino init <path>' to create a new site, or specify a config file with -c." }
+      exit 1
+    end
     config_data = ConfigFile.from_yaml(File.read(path))
 
     # Store global config (convert ConfigFile to SiteConfig)
