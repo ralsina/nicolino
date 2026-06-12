@@ -280,14 +280,14 @@ module Pages
         # Build the full output path for this breadcrumb
         full_path = Path[Config.options.output] / current_path / "index.html"
         result << {
-          name: part,
+          name: Utils.titlecase(part),
           link: Utils.path_to_link(full_path),
         }
       end
 
       # Add current folder as the last breadcrumb (with link to itself)
       result << {
-        name: @path.basename.to_s.capitalize,
+        name: Utils.titlecase(@path.basename.to_s),
         link: Utils.path_to_link(Path[Config.options.output] / output),
       }
 

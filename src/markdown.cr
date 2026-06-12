@@ -407,7 +407,7 @@ module Markdown
         breadcrumb_parts.each do |part|
           current_path = Path[current_path] / part
           result << {
-            name: part,
+            name: Utils.titlecase(part),
             link: Utils.path_to_link(Path[Config.options(lang).output] / Path[current_path] / "index.html"),
           }
         end

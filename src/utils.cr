@@ -3,6 +3,10 @@ module Utils
     string.downcase.strip.gsub(' ', '-').gsub(/[^\w]/, '-').gsub(/-+/, '-')
   end
 
+  def self.titlecase(string)
+    string.split(/[-_\s]/).map(&.capitalize).join(" ")
+  end
+
   # Convert path to link, optionally changing extension
   #
   # >> path_to_link("output/foo/../bar") # => "/bar"
