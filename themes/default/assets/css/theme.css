@@ -572,6 +572,11 @@ main code {
     transform: translateY(0); /* Slide down from top when hovered */
 }
 
+/* Centered figures */
+figure {
+    text-align: center;
+}
+
 /* PhotoSwipe Gallery */
 .pswp-gallery {
     display: grid;

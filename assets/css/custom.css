@@ -110,6 +110,11 @@ It loads after theme.css so you can override it.*/
     justify-content: center;
 }
 
+/* Centered figures */
+figure {
+    text-align: center;
+}
+
 div.warning {
     background-color: var(--b16-base02);
     border: 3px solid red;

@@ -429,6 +429,11 @@ main code {
     }
 }
 
+/* Centered figures */
+figure {
+    text-align: center;
+}
+
 /* Search results */
 #search_results {
     position: fixed;
