@@ -1,5 +1,5 @@
 variables:
-  FLAGS: "-d --error-trace -Dpreview_mt"
+  FLAGS: "-d --error-trace"
   NAME: "nicolino"
 
 tasks:
@@ -28,7 +28,7 @@ tasks:
     always_run: true
     commands: |
       hace clean
-      hace build FLAGS="--release -Dpreview_mt"
+      hace build FLAGS="--release"
 
   install:
     phony: true

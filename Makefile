@@ -8,10 +8,10 @@ release:
 	shards build --release
 	strip bin/nicolino
 mt:
-	shards build -Dpreview_mt -d
+	shards build -d
 	strip bin/nicolino
 mt-release:
-	shards build --release -Dpreview_mt
+	shards build --release
 	strip bin/nicolino
 lint:
 	bin/ameba --all --fix

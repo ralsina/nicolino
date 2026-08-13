@@ -113,7 +113,7 @@ def run(
   arguments = Croupier::TaskManager.tasks.keys if arguments.empty?
   # Run tasks for real
   Log.info { "Running tasks..." }
-  Log.info { "[DEBUG] About to call run_tasks with #{Croupier::TaskManager.tasks.size} tasks" }
+  Log.debug { "About to call run_tasks with #{Croupier::TaskManager.tasks.size} tasks" }
   start_time = Time.instant
   Croupier::TaskManager.run_tasks(
     targets: arguments,
@@ -123,7 +123,7 @@ def run(
     run_all: run_all,
   )
   elapsed = (Time.instant - start_time).total_milliseconds
-  Log.info { "[DEBUG] run_tasks took #{elapsed}ms" }
+  Log.debug { "run_tasks took #{elapsed}ms" }
 
   # Generate feature timing report
   FeatureTiming.report
