@@ -1,7 +1,8 @@
 all: bin
 clean:
-	rm /bin/nicolino shard.lock lib -rf
-test: ameba --all --except Documentation/DocumentationAdmonition --fix
+	rm -rf bin shard.lock lib
+test:
+	bin/ameba --all --except Documentation/DocumentationAdmonition --fix
 bin:
 	shards build -d --error-trace
 release:
@@ -20,4 +21,4 @@ changelog:
 	git cliff -o --sort=newest
 
 
-.PHONY: clean all test bin lint
+.PHONY: all bin clean test release mt mt-release lint changelog
