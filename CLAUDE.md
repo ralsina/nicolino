@@ -15,7 +15,7 @@ make bin                    # Build development binary
 shards build -d --error-trace  # Direct build command
 
 # Multithreaded build (optional)
-make mt                     # Build with preview_mt
+make mt                     # Build (multithreading is now default in Crystal)
 ```
 
 ### Code Quality
