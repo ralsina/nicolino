@@ -46,7 +46,7 @@ tasks:
       - shard.yml
     commands: |
       crystal tool format src/*.cr
-      ameba --fix
+      bin/ameba --fix
     always_run: true
     phony: true
 

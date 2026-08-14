@@ -15,7 +15,7 @@ repos:
       hooks:
           - id: shellcheck
           - id: markdownlint
-            exclude: '^(content|CLAUDE\.md)'
+            exclude: '^(content|CLAUDE\.md|CHANGELOG\.md|LICENSE\.md|TODO\.md)'
     - repo: https://github.com/mrtazz/checkmake
       rev: 0.2.2
       hooks:

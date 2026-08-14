@@ -1,6 +1,7 @@
 # Pocketbase CMS for Nicolino
 
-This directory contains the Docker setup for running Pocketbase as a headless CMS with Nicolino.
+This directory contains the Docker setup for running Pocketbase as a
+headless CMS with Nicolino.
 
 ## Quick Start
 

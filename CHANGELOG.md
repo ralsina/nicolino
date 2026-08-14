@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.20.0] - 2026-08-14
+
+### 🚀 Features
+
+- Add gallery card view with thumbnails
+
+### 🐛 Bug Fixes
+
+- Center figures
+- Post breadcrumb for posts/foo/index.md
+- Bool flag handling
+- Title case breadcrumbs
+- Show user-friendly error when conf.yml is missing
+- Makefile clean target and broken test target
+- -q flag silenced all command output
+
+### 🎨 Styling
+
+- Ameba 1.7 autofixes
+- Fix remaining ameba 1.7 findings
+
 ## [0.19.0] - 2026-01-30
 
 ### 🚀 Features
@@ -15,6 +36,10 @@ All notable changes to this project will be documented in this file.
 ### 📚 Documentation
 
 - Add Import feature card to features page
+
+### Bump
+
+- Release v0.19.0
 
 ## [0.18.0] - 2026-01-29
 
