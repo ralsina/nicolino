@@ -266,7 +266,7 @@ module Similarity
     safe_link = post_link.gsub("/", "_")
     key = "similarity/signatures/#{lang}/#{safe_link}.json"
     data = Croupier::TaskManager.get(key)
-    return nil if data.nil?
+    return if data.nil?
 
     parsed = JSON.parse(data)
     Signature.new(
@@ -309,7 +309,7 @@ module Similarity
 
     # Calculate similarities, filtering out the post itself
     similarities = all_signatures.compact_map do |sig|
-      next nil if sig.post_base == signature.post_base
+      next if sig.post_base == signature.post_base
 
       score = jaccard_similarity(signature, sig)
       RelatedPost.new(

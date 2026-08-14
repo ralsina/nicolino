@@ -10,29 +10,29 @@ module Nicolino
     struct New < Command
       @@name = "new"
       @@doc = <<-DOC
-Creates a new content item.
+        Creates a new content item.
 
-The content type is determined by the directory name in the PATH.
-Features can register their own creatable types.
+        The content type is determined by the directory name in the PATH.
+        Features can register their own creatable types.
 
-Common types:
+        Common types:
 
-* content/posts/foo - Blog post
-* content/galleries/foo - Image gallery
-* content/pages/foo - Static page
-* content/books/foo - Book (creates SUMMARY.md, book.toml, and a chapter)
+        * content/posts/foo - Blog post
+        * content/galleries/foo - Image gallery
+        * content/pages/foo - Static page
+        * content/books/foo - Book (creates SUMMARY.md, book.toml, and a chapter)
 
-Anything else creates a static page.
+        Anything else creates a static page.
 
-Usage:
-  nicolino new [--help] PATH [-c <file>][-q|-v <level>]
+        Usage:
+          nicolino new [--help] PATH [-c <file>][-q|-v <level>]
 
-Options:
-  --help            Show this help message
-  -c <file>         Specify a config file to use [default: conf.yml]
-  -v level          Control the verbosity, 0 to 6
-  -q                Don't log anything [default: false]
-DOC
+        Options:
+          --help            Show this help message
+          -c <file>         Specify a config file to use [default: conf.yml]
+          -v level          Control the verbosity, 0 to 6
+          -q                Don't log anything [default: false]
+        DOC
 
       def run : Int32
         # Populate the creatable registry with built-in types
@@ -85,13 +85,13 @@ DOC
           Dir.mkdir_p(gallery_path.dirname)
           ::File.open(gallery_path, "w") do |io|
             template = <<-TEMPLATE
----
-title: Add title here
-date: {{date}}
----
+              ---
+              title: Add title here
+              date: {{date}}
+              ---
 
-Add content here
-TEMPLATE
+              Add content here
+              TEMPLATE
             io << Crinja.render(template, {date: Time.local.to_s})
           end
         end
@@ -110,34 +110,34 @@ TEMPLATE
           # Create SUMMARY.md
           summary_path = path / "SUMMARY.md"
           File.write(summary_path, <<-SUMMARY
-# #{book_name.split(/[-_]/).map(&.capitalize).join(" ")}
+            # #{book_name.split(/[-_]/).map(&.capitalize).join(" ")}
 
-- [Introduction](intro.md)
-SUMMARY
+            - [Introduction](intro.md)
+            SUMMARY
           )
 
           # Create book.toml
           toml_path = path / "book.toml"
           File.write(toml_path, <<-TOML
-[book]
-title = "#{book_name.split(/[-_]/).map(&.capitalize).join(" ")}"
-description = "A book about #{book_name}"
-authors = ["Your Name"]
+            [book]
+            title = "#{book_name.split(/[-_]/).map(&.capitalize).join(" ")}"
+            description = "A book about #{book_name}"
+            authors = ["Your Name"]
 
-[build]
-create-missing = false
-TOML
+            [build]
+            create-missing = false
+            TOML
           )
 
           # Create first chapter
           intro_path = path / "intro.md"
           File.write(intro_path, <<-CHAPTER
-# Introduction
+            # Introduction
 
-Welcome to #{book_name}!
+            Welcome to #{book_name}!
 
-This is the first chapter. Add your content here.
-CHAPTER
+            This is the first chapter. Add your content here.
+            CHAPTER
           )
 
           Log.info { "Created new book: #{path}" }

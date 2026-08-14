@@ -12,7 +12,7 @@ module Posts
   # Enable posts feature and return array of posts for dependent features
   # Returns nil if posts feature is disabled
   def self.enable(is_enabled : Bool, content_post_path : Path, feature_set : Set(YAML::Any)) : Array(Markdown::File)?
-    return nil unless is_enabled
+    return unless is_enabled
 
     Log.info { "📖 Scanning for posts..." }
 

@@ -8,40 +8,40 @@ module Nicolino
     struct Theme < Command
       @@name = "theme"
       @@doc = <<-DOC
-Manage Nicolino themes
+        Manage Nicolino themes
 
-Usage:
-  nicolino theme install <name-or-url> [-c <file>][-q|-v <level>]
-  nicolino theme update <name> [-c <file>][-q|-v <level>]
-  nicolino theme list [--installed] [-c <file>][-q|-v <level>]
-  nicolino theme [--help]
+        Usage:
+          nicolino theme install <name-or-url> [-c <file>][-q|-v <level>]
+          nicolino theme update <name> [-c <file>][-q|-v <level>]
+          nicolino theme list [--installed] [-c <file>][-q|-v <level>]
+          nicolino theme [--help]
 
-Commands:
-  install <name-or-url>  Install a theme from registry or URL
-  update <name>           Update an installed theme to latest version
-  list [--installed]      List available or installed themes
+        Commands:
+          install <name-or-url>  Install a theme from registry or URL
+          update <name>           Update an installed theme to latest version
+          list [--installed]      List available or installed themes
 
-Options:
-  --help            Show this help message
-  -c <file>         Specify a config file to use [default: conf.yml]
-  -v level          Control the verbosity, 0 to 6
-  -q                Don't log anything
+        Options:
+          --help            Show this help message
+          -c <file>         Specify a config file to use [default: conf.yml]
+          -v level          Control the verbosity, 0 to 6
+          -q                Don't log anything
 
-Themes are installed to the themes/ directory in your site.
-The default theme is included with Nicolino and extracted automatically.
+        Themes are installed to the themes/ directory in your site.
+        The default theme is included with Nicolino and extracted automatically.
 
-Install a theme from the registry:
-  nicolino theme install minimal
+        Install a theme from the registry:
+          nicolino theme install minimal
 
-Install a theme from a URL:
-  nicolino theme install https://example.com/theme.tar.gz
+        Install a theme from a URL:
+          nicolino theme install https://example.com/theme.tar.gz
 
-List available themes:
-  nicolino theme list
+        List available themes:
+          nicolino theme list
 
-List installed themes:
-  nicolino theme list --installed
-DOC
+        List installed themes:
+          nicolino theme list --installed
+        DOC
 
       THEME_REGISTRY_URL = "https://nicolino.site/themes.json"
 

@@ -426,13 +426,13 @@ module Gallery
     Dir.mkdir_p(path.dirname)
     ::File.open(path, "w") do |io|
       template = <<-TEMPLATE
----
-title: Add title here
-date: {{date}}
----
+        ---
+        title: Add title here
+        date: {{date}}
+        ---
 
-Add content here
-TEMPLATE
+        Add content here
+        TEMPLATE
       io << Crinja.render(template, {date: Time.local.to_s})
     end
   end

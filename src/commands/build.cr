@@ -6,30 +6,30 @@ module Nicolino
     struct Build < Command
       @@name = "build"
       @@doc = <<-DOC
-Build the site
+        Build the site
 
-Build the output site based on your content and configuration.
-If you specify one or more TARGETs, only those files will be
-built. If you don't specify any, the whole site will be built.
+        Build the output site based on your content and configuration.
+        If you specify one or more TARGETs, only those files will be
+        built. If you don't specify any, the whole site will be built.
 
-Usage:
-  nicolino build [TARGET...] [--fast-mode][-n][-p][--progress]
-                             [-k][-q][-B][-c <file>]
-                             [-q|-v <level>]
+        Usage:
+          nicolino build [TARGET...] [--fast-mode][-n][-p][--progress]
+                                     [-k][-q][-B][-c <file>]
+                                     [-q|-v <level>]
 
-Options:
-  --help            Help for this command.
-  -B --run-all      Run all tasks, even up-to-date ones
-  -c <file>         Specify a config file to use [default: conf.yml]
-  -k --keep-going  Keep going when a task fails.
-  -n --dry-run     Dry run: don't actually do anything
-  -p --parallel    Run tasks in parallel.
-  --fast-mode       Use file timestamps rather than contents to decide rebuilds.
-  --progress        Show a progress bar instead of messages
-  -q                Don't log anything
-  -v level          Control the verbosity, 0 to 6
+        Options:
+          --help            Help for this command.
+          -B --run-all      Run all tasks, even up-to-date ones
+          -c <file>         Specify a config file to use [default: conf.yml]
+          -k --keep-going  Keep going when a task fails.
+          -n --dry-run     Dry run: don't actually do anything
+          -p --parallel    Run tasks in parallel.
+          --fast-mode       Use file timestamps rather than contents to decide rebuilds.
+          --progress        Show a progress bar instead of messages
+          -q                Don't log anything
+          -v level          Control the verbosity, 0 to 6
 
-DOC
+        DOC
 
       def run : Int32
         arguments = options.fetch("TARGET", [] of String).as(Array(String))

@@ -6,24 +6,24 @@ module Nicolino
     struct Auto < Command
       @@name = "auto"
       @@doc = <<-DOC
-Run forever automatically rebuilding the site
+        Run forever automatically rebuilding the site
 
-This command will run the site in auto mode, monitoring
-files for changes and triggering rebuilds. Also, if you
-have a page open in a browser, it will trigger a reload.
+        This command will run the site in auto mode, monitoring
+        files for changes and triggering rebuilds. Also, if you
+        have a page open in a browser, it will trigger a reload.
 
-Usage:
-  nicolino auto [--help][TARGET...] [--fast-mode][-c <file>]
-                [-q|-v <level>]
+        Usage:
+          nicolino auto [--help][TARGET...] [--fast-mode][-c <file>]
+                        [-q|-v <level>]
 
-Options:
-  --help            Show this help message
-  -c <file>         Specify a config file to use [default: conf.yml]
-  --fast-mode       Use file timestamps rather than contents to
-                    decide rebuilds.
-  -v level          Control the verbosity, 0 to 6
-  -q                Don't log anything
-DOC
+        Options:
+          --help            Show this help message
+          -c <file>         Specify a config file to use [default: conf.yml]
+          --fast-mode       Use file timestamps rather than contents to
+                            decide rebuilds.
+          -v level          Control the verbosity, 0 to 6
+          -q                Don't log anything
+        DOC
 
       def run : Int32
         create_tasks

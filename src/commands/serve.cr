@@ -6,20 +6,20 @@ module Nicolino
     struct Serve < Command
       @@name = "serve"
       @@doc = <<-DOC
-Serve the website over HTTP
+        Serve the website over HTTP
 
-Starts a local web server so you can see the site in your
-browser at http://localhost:8080
+        Starts a local web server so you can see the site in your
+        browser at http://localhost:8080
 
-Usage:
-  nicolino serve [--help][-c <file>][-q|-v <level>]
+        Usage:
+          nicolino serve [--help][-c <file>][-q|-v <level>]
 
-Options:
-  --help            Show this help message
-  -c <file>         Specify a config file to use [default: conf.yml]
-  -v level          Control the verbosity, 0 to 6
-  -q                Don't log anything
-DOC
+        Options:
+          --help            Show this help message
+          -c <file>         Specify a config file to use [default: conf.yml]
+          -v level          Control the verbosity, 0 to 6
+          -q                Don't log anything
+        DOC
 
       def run : Int32
         make_server(live_reload: false).listen

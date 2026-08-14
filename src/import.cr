@@ -392,7 +392,7 @@ module Import
   private def self.get_mapped_field(item : FeedItem, config : FeedConfig, metadata_field : String) : String?
     # Look up which source field maps to this metadata field
     source_field = config.fields[metadata_field]?
-    return nil unless source_field
+    return unless source_field
 
     item.data[source_field]?.try(&.to_s)
   end
@@ -521,8 +521,8 @@ module Import
 
   # Default template (baked-in) for simple use cases
   DEFAULT_TEMPLATE = <<-TEMPLATE
-  {{ content }}
-  TEMPLATE
+    {{ content }}
+    TEMPLATE
 
   # Import items from a feed configuration
   def self.import_feed(name : String, config : FeedConfig, templates_dir : String)

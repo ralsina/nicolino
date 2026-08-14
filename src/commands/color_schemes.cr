@@ -8,36 +8,36 @@ module Nicolino
     struct ColorSchemes < Command
       @@name = "color_schemes"
       @@doc = <<-DOC
-List and apply available base16 color scheme families.
+        List and apply available base16 color scheme families.
 
-Usage:
-  nicolino color_schemes [--help][-c <file>][--apply <family>][-q|-v <level>]
+        Usage:
+          nicolino color_schemes [--help][-c <file>][--apply <family>][-q|-v <level>]
 
-Options:
-  --help            Show this help message
-  -c <file>         Specify a config file to use [default: conf.yml]
-  --apply <family>  Apply a color scheme family to conf.yml
-  -v level          Control the verbosity, 0 to 6
-  -q                Don't log anything
+        Options:
+          --help            Show this help message
+          -c <file>         Specify a config file to use [default: conf.yml]
+          --apply <family>  Apply a color scheme family to conf.yml
+          -v level          Control the verbosity, 0 to 6
+          -q                Don't log anything
 
-Configuration:
+        Configuration:
 
-Color schemes are configured in conf.yml using a family base name:
+        Color schemes are configured in conf.yml using a family base name:
 
-  site:
-    color_scheme: "unikitty"
+          site:
+            color_scheme: "unikitty"
 
-The sixteen library will automatically find the dark and light variants
-for each family. If a variant doesn't exist, it will be auto-generated.
+        The sixteen library will automatically find the dark and light variants
+        for each family. If a variant doesn't exist, it will be auto-generated.
 
-Examples of theme families:
-  - unikitty, catppuccin, rose-pine
-  - atelier-cave, atelier-dune, atelier-forest, etc.
-  - dracula, monokai, nord, solarized
+        Examples of theme families:
+          - unikitty, catppuccin, rose-pine
+          - atelier-cave, atelier-dune, atelier-forest, etc.
+          - dracula, monokai, nord, solarized
 
-Use --apply to set the color scheme, or run without options to list
-all available families with color swatches.
-DOC
+        Use --apply to set the color scheme, or run without options to list
+        all available families with color swatches.
+        DOC
 
       def run : Int32
         if family_name = @options["--apply"]? ? @options["--apply"].as(String) : nil

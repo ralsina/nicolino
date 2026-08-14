@@ -10,25 +10,25 @@ module Nicolino
     struct CheckLinks < Command
       @@name = "check_links"
       @@doc = <<-DOC
-Check all in-site links for broken references.
+        Check all in-site links for broken references.
 
-Scans all HTML files in the output directory and verifies that
-internal links point to existing files. This is useful when
-porting a site to ensure no links were broken in the process.
+        Scans all HTML files in the output directory and verifies that
+        internal links point to existing files. This is useful when
+        porting a site to ensure no links were broken in the process.
 
-External links (http://, https://, mailto:, etc.) are skipped.
-Anchors (same-page links starting with #) are also skipped.
+        External links (http://, https://, mailto:, etc.) are skipped.
+        Anchors (same-page links starting with #) are also skipped.
 
-Usage:
-  nicolino check_links [--help][-c <file>][-q|-v <level>][--output <dir>]
+        Usage:
+          nicolino check_links [--help][-c <file>][-q|-v <level>][--output <dir>]
 
-Options:
-  --help            Show this help message
-  -c <file>         Specify a config file to use [default: conf.yml]
-  --output <dir>    Output directory to check [default: output]
-  -v level          Control the verbosity, 0 to 6
-  -q                Don't log anything
-DOC
+        Options:
+          --help            Show this help message
+          -c <file>         Specify a config file to use [default: conf.yml]
+          --output <dir>    Output directory to check [default: output]
+          -v level          Control the verbosity, 0 to 6
+          -q                Don't log anything
+        DOC
 
       def run : Int32
         output_dir = @options["--output"]? ? @options["--output"].as(String) : Config.options.output

@@ -2,7 +2,7 @@ module Search
   # Read an input file and extract the relevant stuff
   def self.extract_item(input : String, url : String, i : Int32)
     parser = Lexbor::Parser.new(File.read(input))
-    return nil if parser.nodes("main").to_a.empty?
+    return if parser.nodes("main").to_a.empty?
     text = parser.nodes(:_text) \
       .select(&.parents.all? { |node| node.visible? && !node.object? && !node.is_tag_noindex? }) \
         .select(&.parents.any? { |node| node.tag_name == "main" }) \

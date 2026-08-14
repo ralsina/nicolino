@@ -18,7 +18,7 @@ module DateUtils
   #
   # Returns nil if the date cannot be parsed.
   def self.parse(date_str : String?) : Time?
-    return nil if date_str.nil? || date_str.empty?
+    return if date_str.nil? || date_str.empty?
 
     # Try Cronic first (natural language parsing)
     begin

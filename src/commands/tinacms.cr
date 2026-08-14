@@ -7,27 +7,27 @@ module Nicolino
     struct Tinacms < Command
       @@name = "tinacms"
       @@doc = <<-DOC
-Initialize TinaCMS for content management
+        Initialize TinaCMS for content management
 
-Usage:
-  nicolino tinacms init [-c <file>][-q|-v <level>]
-  nicolino tinacms serve [-c <file>][-q|-v <level>]
-  nicolino tinacms [--help]
+        Usage:
+          nicolino tinacms init [-c <file>][-q|-v <level>]
+          nicolino tinacms serve [-c <file>][-q|-v <level>]
+          nicolino tinacms [--help]
 
-Commands:
-  init   Initialize TinaCMS in an existing Nicolino site
-  serve  Start TinaCMS dev server with nicolino auto
+        Commands:
+          init   Initialize TinaCMS in an existing Nicolino site
+          serve  Start TinaCMS dev server with nicolino auto
 
-Options:
-  --help            Show this help message
-  -c <file>         Specify a config file to use [default: conf.yml]
-  -v level          Control the verbosity, 0 to 6
-  -q                Don't log anything
+        Options:
+          --help            Show this help message
+          -c <file>         Specify a config file to use [default: conf.yml]
+          -v level          Control the verbosity, 0 to 6
+          -q                Don't log anything
 
-TinaCMS provides a visual content management interface for Nicolino sites.
+        TinaCMS provides a visual content management interface for Nicolino sites.
 
-For more information, see: https://tina.io/docs/
-DOC
+        For more information, see: https://tina.io/docs/
+        DOC
 
       def run : Int32
         # Determine which subcommand was called based on which options are present

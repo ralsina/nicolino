@@ -18,7 +18,7 @@ module Markdown
 
   # A class representing a Markdown file
   class File
-    @date : Time | Nil
+    @date : Time?
     @html = Hash(String, String).new
     @link = Hash(String, String).new
     @base = Path.new
@@ -176,7 +176,7 @@ module Markdown
     def <=>(other : File)
       # The natural sort order is date descending
       if self.@date.nil? || other.@date.nil?
-        self.title <=> other.title
+        title <=> other.title
       else
         # Both dates are non-nil here based on the check above
         my_date = @date.as(Time)
@@ -276,7 +276,7 @@ module Markdown
       @html[lang] = HtmlFilters.fix_code_classes(doc).to_html
     end
 
-    def date : Time | Nil
+    def date : Time?
       # Return cached value if already loaded
       return @date if !@date.nil?
 
@@ -722,13 +722,13 @@ module Markdown
     Dir.mkdir_p(path.dirname)
     ::File.open(path, "w") do |io|
       template = <<-TEMPLATE
----
-title: Add title here
-date: {{date}}
----
+        ---
+        title: Add title here
+        date: {{date}}
+        ---
 
-Add content here
-TEMPLATE
+        Add content here
+        TEMPLATE
       io << Crinja.render(template, {date: Time.local.to_s})
     end
   end
@@ -741,13 +741,13 @@ TEMPLATE
     Dir.mkdir_p(path.dirname)
     ::File.open(path, "w") do |io|
       template = <<-TEMPLATE
----
-title: Add title here
-date: {{date}}
----
+        ---
+        title: Add title here
+        date: {{date}}
+        ---
 
-Add content here
-TEMPLATE
+        Add content here
+        TEMPLATE
       io << Crinja.render(template, {date: Time.local.to_s})
     end
   end

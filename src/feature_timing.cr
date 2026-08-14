@@ -136,10 +136,10 @@ class FeatureTask < Croupier::Task
   # Constructor matching Croupier::Task's output (singular) signature
   def initialize(
     @feature_name : String,
-    output : String | Nil = nil,
+    output : String? = nil,
     inputs : Array(String) = [] of String,
     no_save : Bool = false,
-    id : String | Nil = nil,
+    id : String? = nil,
     always_run : Bool = false,
     mergeable : Bool = true,
     &block : Croupier::TaskProc

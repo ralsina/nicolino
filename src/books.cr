@@ -79,7 +79,7 @@ module Books
 
     # ameba:disable Metrics/CyclomaticComplexity
     def self.from_file(book_toml_path : String) : BookConfig?
-      return nil unless File.exists?(book_toml_path)
+      return unless File.exists?(book_toml_path)
 
       toml_content = File.read(book_toml_path)
       parsed = TOML.parse(toml_content)
@@ -194,7 +194,7 @@ module Books
     end
 
     # Convert to hash for template rendering
-    def to_context : Hash(String, String | Nil)
+    def to_context : Hash(String, String?)
       ctx = {
         "name"               => @name,
         "title"              => @title,
@@ -500,7 +500,7 @@ module Books
 
   # Find parent chapter in hierarchy (searches the full chapter tree, not just flat list)
   private def self.find_parent(entry : ChapterEntry, book : Book) : ChapterEntry?
-    return nil if entry.level == 0
+    return if entry.level == 0
 
     # Search in the book's full chapter hierarchy
     find_parent_in_tree(entry, book.chapters)
@@ -795,8 +795,6 @@ module Books
     referenced_files = flat_chapters.compact_map do |entry|
       if path = entry.path
         File.join(book_dir, path)
-      else
-        nil
       end
     end.to_set
 

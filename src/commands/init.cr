@@ -7,20 +7,20 @@ module Nicolino
     struct Init < Command
       @@name = "init"
       @@doc = <<-DOC
-Create a new site
+        Create a new site
 
-When given a path, it will create a folder with the
-skeleton of a Nicolino site in it, ready to use.
+        When given a path, it will create a folder with the
+        skeleton of a Nicolino site in it, ready to use.
 
-Usage:
-  nicolino init [--help] PATH [-c <file>][-q|-v <level>]
+        Usage:
+          nicolino init [--help] PATH [-c <file>][-q|-v <level>]
 
-Options:
-  --help            Show this help message
-  -c <file>         Specify a config file to use [default: conf.yml]
-  -v level          Control the verbosity, 0 to 6
-  -q                Don't log anything
-DOC
+        Options:
+          --help            Show this help message
+          -c <file>         Specify a config file to use [default: conf.yml]
+          -v level          Control the verbosity, 0 to 6
+          -q                Don't log anything
+        DOC
 
       def run : Int32
         path = options["PATH"].as(String)
