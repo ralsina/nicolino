@@ -27,7 +27,7 @@ Options:
   --fast-mode       Use file timestamps rather than contents to decide rebuilds.
   --progress        Show a progress bar instead of messages
   -q                Don't log anything
-  -v level          Control the verbosity, 0 to 6 [default: 4]
+  -v level          Control the verbosity, 0 to 6
 
 DOC
 

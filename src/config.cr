@@ -53,7 +53,7 @@ module Config
     property language : String = "en"
     property locale : String = "en_US.UTF-8"
     property date_output_format : String = "%Y-%m-%d %H:%M"
-    property verbosity : Int32 = 3
+    property verbosity : Int32 = 4
     property import_templates : String = "user_templates"
 
     # Taxonomies and features
@@ -98,7 +98,7 @@ module Config
     property date_output_format : String = "%Y-%m-%d %H:%M"
 
     # NOT translatable
-    property verbosity : Int32 = 3
+    property verbosity : Int32 = 4
     property import_templates : String = "user_templates"
 
     # Import configuration (hash of feed name to config)
@@ -125,7 +125,7 @@ module Config
       @language = "en"
       @locale = "en_US.UTF-8"
       @date_output_format = "%Y-%m-%d %H:%M"
-      @verbosity = 3
+      @verbosity = 4
       @import_templates = "user_templates"
       @import = Hash(String, YAML::Any).new
     end

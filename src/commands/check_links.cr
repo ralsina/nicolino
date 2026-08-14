@@ -26,7 +26,7 @@ Options:
   --help            Show this help message
   -c <file>         Specify a config file to use [default: conf.yml]
   --output <dir>    Output directory to check [default: output]
-  -v level          Control the verbosity, 0 to 6 [default: 4]
+  -v level          Control the verbosity, 0 to 6
   -q                Don't log anything
 DOC
 

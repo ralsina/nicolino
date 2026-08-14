@@ -24,7 +24,7 @@ Commands:
 Options:
   --help            Show this help message
   -c <file>         Specify a config file to use [default: conf.yml]
-  -v level          Control the verbosity, 0 to 6 [default: 4]
+  -v level          Control the verbosity, 0 to 6
   -q                Don't log anything
 
 Themes are installed to the themes/ directory in your site.
@@ -62,7 +62,7 @@ DOC
       def initialize(@options)
         # Setup logging only (no config file needed for theme commands)
         verbosity = @options.fetch("-v", 4).to_s.to_i
-        verbosity = 0 if @options["-q"]?
+        verbosity = 0 if @options["-q"]?.in?(1, true)
         Oplog.setup(verbosity)
       end
 

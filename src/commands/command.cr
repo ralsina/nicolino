@@ -12,11 +12,8 @@ module Nicolino
         # Load config and setup logging
         config_file = @options["-c"]? ? @options["-c"].as(String) : "conf.yml"
         Config.config(config_file)
-        verbosity = @options.fetch("-v", 4).to_s.to_i
-        verbosity = 0 if @options["-q"]?
         progress = @options.fetch("--progress", nil)
         if progress
-          verbosity = 0
           theme = Progress::Theme.new(
             complete: "-",
             incomplete: "•".colorize(:blue).to_s,
@@ -30,8 +27,23 @@ module Nicolino
             step = done * 100.0 / Croupier::TaskManager.tasks.size - bar.current
             bar.tick(step) if step >= 1
           }
+          Oplog.setup(0)
+        else
+          Oplog.setup(configured_verbosity)
         end
-        Oplog.setup(verbosity)
+      end
+
+      # Verbosity precedence: -q silences everything, an explicit -v
+      # wins, and otherwise the verbosity setting from conf.yml applies.
+      #
+      # Note: docopt represents a flag in a [-q|-v <level>] group as
+      # Int32 (0 when absent, 1 when given), and 0 is truthy in Crystal,
+      # so neither a plain truthiness test nor `== true` works here.
+      private def configured_verbosity : Int32
+        quiet = @options["-q"]?
+        return 0 if quiet.in?(1, true)
+        explicit_level = @options["-v"]?
+        explicit_level.nil? ? Config.verbosity : explicit_level.to_s.to_i
       end
 
       def run : Int32
