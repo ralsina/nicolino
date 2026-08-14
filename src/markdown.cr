@@ -20,6 +20,9 @@ module Markdown
   class File
     @date : Time?
     @html = Hash(String, String).new
+    # Guards the memoized HTML/TOC computation: parallel workers
+    # share post objects, and Hash is not safe for concurrent writes
+    @html_mutex = Mutex.new
     @link = Hash(String, String).new
     @base = Path.new
     @metadata = Hash(String, Hash(String, String)).new
@@ -195,6 +198,9 @@ module Markdown
       Log.debug { "👉 #{source(lang)}" }
       # Clear cached date so it gets re-parsed from updated metadata
       @date = nil
+      # Clear memoized HTML/TOC so reloaded content gets re-rendered
+      @html.delete(lang)
+      @toc.delete(lang)
       contents = ::File.read(source(lang))
       begin
         # Metadata format: file must START with "---\n" to have metadata
@@ -256,9 +262,24 @@ module Markdown
       Set.new(final_list).to_a
     end
 
+    # The rendered HTML for this file, memoized per language because
+    # computing it means a markdown compile plus a full HTML parse,
+    # and it is needed several times per post (html, summary, teaser).
     def html(lang = nil)
       lang ||= Locale.language
-      @html[lang], @toc[lang] = Discount.compile(
+      @html_mutex.synchronize do
+        unless @html.has_key?(lang)
+          @html[lang], @toc[lang] = compile_html(lang)
+        end
+        @html[lang]
+      end
+    end
+
+    # Produce the {html, toc} pair for this file in the given language.
+    # Subclasses (HTML::File, Pandoc::File) override this instead of
+    # `html` so they share the memoization in `html`.
+    private def compile_html(lang)
+      compiled, toc = Discount.compile(
         replace_shortcodes(lang),
         metadata(lang).fetch("toc", nil) != nil,
         flags: LibDiscount::MKD_FENCEDCODE |
@@ -270,10 +291,10 @@ module Markdown
       )
       # Performance Note: parsing the HTML takes ~.7 seconds for
       # 4000 short posts. Calling each filter is much faster.
-      doc = Lexbor::Parser.new(@html[lang])
+      doc = Lexbor::Parser.new(compiled)
       doc = HtmlFilters.downgrade_headers(doc)
       doc = HtmlFilters.remove_empty_paragraphs(doc)
-      @html[lang] = HtmlFilters.fix_code_classes(doc).to_html
+      {HtmlFilters.fix_code_classes(doc).to_html, toc}
     end
 
     def date : Time?
@@ -706,7 +727,7 @@ module Markdown
     posts = [] of File
     all_sources = Utils.find_all(path, "md")
     all_sources.map do |base, sources|
-      next if Markdown.posts.keys.includes? base.to_s
+      next if Markdown.posts.has_key? base.to_s
       next if Utils.should_skip_file?(base)
 
       posts << File.new(sources, base)

@@ -15,8 +15,9 @@ module Pandoc
 
   # A file written in markdown
   class File < Markdown::File
-    def html(lang = nil)
-      lang ||= Locale.language
+    # Produce the {html, toc} pair for this file; memoization and
+    # thread safety are handled by Markdown::File#html
+    private def compile_html(lang)
       ext = Path[source].extension
       format = Config.options.pandoc_formats[ext]
       result = compile(replace_shortcodes(lang), format)
@@ -27,8 +28,7 @@ module Pandoc
       html_with_classes = HtmlFilters.fix_code_classes(doc).to_html
 
       # Extract TOC and add anchors to headings
-      @html[lang], @toc[lang] = Toc.extract_and_annotate(html_with_classes)
-      @html[lang]
+      Toc.extract_and_annotate(html_with_classes)
     end
 
     # Use a memoized compile method because pandoc is so slow
@@ -105,7 +105,7 @@ module Pandoc
       all_sources = Utils.find_all(path, ext[1..])
       all_sources.map do |base, sources|
         begin
-          next if Markdown.posts.keys.includes? base.to_s
+          next if Markdown.posts.has_key? base.to_s
           next if Utils.should_skip_file?(base)
 
           posts << File.new(sources, base)

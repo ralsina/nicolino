@@ -165,6 +165,9 @@ module Config
   @@global_config : SiteConfig = SiteConfig.new
   @@features : Array(String) = [] of String
   @@loaded : Bool = false
+  # Memoized language map (this used to glob the config directory on
+  # every call, which was called per-file during content scans)
+  @@languages : Hash(String, Hash(String, String))? = nil
 
   # Get the raw config for legacy access (TODO: remove)
   def self.get(key)
@@ -175,6 +178,8 @@ module Config
   # Load config from conf.yml
   def self.config(path = "conf.yml")
     @@config_file_path = path
+    # A new config file may mean a different set of languages
+    @@languages = nil
 
     # Read and parse conf.yml
     unless File.exists?(path)
@@ -448,20 +453,23 @@ location: "tags/"
   end
 
   # Get all available languages by scanning for conf.LANG.yml files
+  # (memoized; invalidated by reload)
   def self.languages
-    ensure_loaded
-    lang_hash = {@@default_lang => Hash(String, String).new}
+    @@languages ||= begin
+      ensure_loaded
+      lang_hash = {@@default_lang => Hash(String, String).new}
 
-    # Scan for conf.LANG.yml files
-    Dir.glob("conf.*.yml").each do |file|
-      # Extract language code from conf.LANG.yml
-      if match = file.match(/^conf\.([a-z]{2})\.yml$/)
-        lang = match[1]
-        lang_hash[lang] = Hash(String, String).new
+      # Scan for conf.LANG.yml files
+      Dir.glob("conf.*.yml").each do |file|
+        # Extract language code from conf.LANG.yml
+        if match = file.match(/^conf\.([a-z]{2})\.yml$/)
+          lang = match[1]
+          lang_hash[lang] = Hash(String, String).new
+        end
       end
-    end
 
-    lang_hash
+      lang_hash
+    end
   end
 
   # Get the actual config file path being used
@@ -476,6 +484,7 @@ location: "tags/"
     # Clear cached configs
     @@lang_configs.clear
     @@loaded = false
+    @@languages = nil
     # Load again
     Config.config(path)
   end

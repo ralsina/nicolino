@@ -61,7 +61,7 @@ module Utils
       dirname = base.dirname
       stem = Path[base.stem]
       stem_ext = stem.extension
-      if !stem_ext.empty? && Config.languages.keys.includes? stem_ext[1..]
+      if !stem_ext.empty? && Config.languages.has_key? stem_ext[1..]
         stem = stem.stem
       end
       bases << Path[dirname] / stem
