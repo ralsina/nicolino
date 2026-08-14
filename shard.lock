@@ -7,7 +7,7 @@ shards:
 
   ameba:
     git: https://github.com/crystal-ameba/ameba.git
-    version: 1.6.4
+    version: 1.7.0-dev
 
   baked_file_system: # Overridden
     git: https://github.com/ralsina/baked_file_system.git
@@ -15,7 +15,7 @@ shards:
 
   base58:
     git: https://github.com/crystal-china/base58.cr.git
-    version: 0.1.0+git.commit.f7193c497efff614cf87b03f0bd07741915a592f
+    version: 0.1.0+git.commit.0e2c44d16a8098b00d8bf0b74add8bb9ea2f1c5f
 
   cr-discount:
     git: https://github.com/ralsina/cr-discount.git
@@ -23,11 +23,11 @@ shards:
 
   crimage:
     git: https://github.com/naqvis/crimage.git
-    version: 1.0.4+git.commit.b65f67df27f4cb8807a34d94a90dfd4162acf45a
+    version: 1.0.5+git.commit.7d3244a3850646e3d398cef071f7c3e3f52c7518
 
   crinja:
     git: https://github.com/straight-shoota/crinja.git
-    version: 0.9.0+git.commit.4688cc7764a113a3b1d337cb59dc0244896121e1
+    version: 0.9.0+git.commit.118af0dea81da1c60669d879d5ee24200420e890
 
   cronic:
     git: https://github.com/nanobowers/cronic.git
@@ -35,7 +35,7 @@ shards:
 
   croupier:
     git: https://github.com/ralsina/croupier.git
-    version: 0.8.5
+    version: 0.12.4
 
   crystalline:
     git: https://github.com/jtomschroeder/crystalline.git
@@ -55,7 +55,7 @@ shards:
 
   lexbor:
     git: https://github.com/kostya/lexbor.git
-    version: 3.4.2
+    version: 3.6.4
 
   live_reload:
     git: https://github.com/bcardiff/live_reload.cr.git

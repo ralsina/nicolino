@@ -2,7 +2,7 @@ all: bin
 clean:
 	rm -rf bin shard.lock lib
 test:
-	bin/ameba --all --except Documentation/DocumentationAdmonition --fix
+	bin/ameba --fix
 bin:
 	shards build -d --error-trace
 release:
@@ -15,7 +15,7 @@ mt-release:
 	shards build --release
 	strip bin/nicolino
 lint:
-	bin/ameba --all --fix
+	bin/ameba --fix
 
 changelog:
 	git cliff -o --sort=newest
