@@ -228,9 +228,9 @@ module Nicolino
           return 0
         end
 
-        themes = Dir.children(themes_dir).select { |entry|
+        themes = Dir.children(themes_dir).select do |entry|
           Dir.exists?(Path[themes_dir, entry])
-        }
+        end
 
         if themes.empty?
           Log.info { "No themes installed" }
@@ -313,11 +313,11 @@ module Nicolino
         list_output.rewind
         content = list_output.gets_to_end
         lines = content.lines
-        first_file_entry = lines.find { |line|
+        first_file_entry = lines.find do |line|
           parts = line.split('/', remove_empty: true)
           # We want a file (not just a directory) under themes/<name>/
           parts.size >= 3 && parts[0] == "themes"
-        }
+        end
 
         unless first_file_entry
           raise "Tarball does not contain any theme files"

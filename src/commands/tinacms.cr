@@ -152,7 +152,7 @@ module Nicolino
         # Wait for either process to exit
         begin
           tinacms_process.wait
-        rescue ex : Exception
+        rescue
           # Process was terminated
         ensure
           # Clean up both processes

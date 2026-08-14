@@ -80,9 +80,9 @@ module Nicolino
         path = Path[self.path, file.path[1..]].normalize
         FileUtils.mkdir_p(File.dirname(path))
         Log.info { "👉 Creating #{path}" }
-        File.open(path, "w") { |outf|
+        File.open(path, "w") do |outf|
           outf << file.gets_to_end
-        }
+        end
       end
     end
   end

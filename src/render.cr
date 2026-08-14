@@ -8,9 +8,9 @@ module Render
     lang ||= Config.language
     # Use Crinja's value type for flexibility
     ctx = Hash(String, Crinja::Value).new
-    context.map { |k, v|
+    context.map do |k, v|
       ctx[k] = Crinja::Value.new(v)
-    }
+    end
     # Add site config values to context using the specified language
     lang_config = Config[lang]
     ctx["site_title"] = Crinja::Value.new(lang_config.title)

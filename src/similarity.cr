@@ -34,10 +34,10 @@ module Similarity
   class_property ngram_size : Int32 = 3
 
   # Cache for all signatures across all languages
-  @@all_signatures_cache : Hash(String, Array(Signature)) | Nil = nil
+  @@all_signatures_cache : Hash(String, Array(Signature))? = nil
 
   # Cache for computed related posts results
-  @@related_posts_cache : Hash(String, Array(RelatedPost)) | Nil = nil
+  @@related_posts_cache : Hash(String, Array(RelatedPost))? = nil
 
   # Get all signatures from the kv store with caching
   def self.get_all_signatures(lang : String) : Array(Signature)

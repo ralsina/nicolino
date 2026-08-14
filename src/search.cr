@@ -28,10 +28,11 @@ module Search
     start = Time.instant
     inputs = Croupier::TaskManager.tasks.keys.select(&.to_s.ends_with?(".html"))
     Log.info { "🔍 Search: collected #{inputs.size} inputs in #{(Time.instant - start).total_milliseconds}ms" }
+    output = (Path[Config.options.output] / "search.json").to_s
     FeatureTask.new(
       feature_name: "search",
       id: "search",
-      output: output = (Path[Config.options.output] / "search.json").to_s,
+      output: output,
       inputs: inputs,
       mergeable: false,
       no_save: true

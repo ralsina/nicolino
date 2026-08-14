@@ -69,7 +69,7 @@ module HtmlFilters
   # Make all relative links absolute to the site root
   # base is where the file containing the URIs is located
   # relative to the site root
-  def self.make_links_relative(doc, base)
+  def self.make_links_relative(doc, base) # ameba:disable Metrics/CyclomaticComplexity
     @@html_filters_mutex.synchronize do
       base_uri = URI.parse(base)
       doc.nodes("a").each do |node|

@@ -36,7 +36,7 @@ module Markdown
     def initialize(sources, base)
       @sources = sources
       @base = base
-      @sources.map { |lang, _|
+      @sources.map do |lang, _|
         p = Path[base]
         # Remove the leading "posts/"
         p = Path[p.parts].relative_to Config.options.content
@@ -57,7 +57,7 @@ module Markdown
         end
 
         @output[lang] = "#{p}.html"
-      }
+      end
       Markdown.posts[base.to_s] = self
 
       # Load each unique source file once, then share data across languages
@@ -127,7 +127,7 @@ module Markdown
               terms = [str_val] unless str_val.empty?
             end
           end
-        rescue ex
+        rescue
           # Fallback to treating raw value as comma-separated
           terms = post_terms.split(",").map(&.to_s.strip).reject(&.empty?)
         end

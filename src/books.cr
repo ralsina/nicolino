@@ -148,12 +148,12 @@ module Books
       @title_override = title_override
 
       # Set output path similar to parent
-      @sources.map { |lang, _|
+      @sources.map do |lang, _|
         p = Path[base]
         p = Path[p.parts].relative_to Config.options.content
         p = Path[Config.options(lang).output] / p
         @output[lang] = "#{p}.html"
-      }
+      end
 
       # Register in posts hash
       Markdown.posts[base.to_s] = self

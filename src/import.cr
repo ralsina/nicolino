@@ -290,7 +290,7 @@ module Import
   end
 
   # Parse an RSS item node
-  private def self.parse_rss_item(item_node : XML::Node) : FeedItem?
+  private def self.parse_rss_item(item_node : XML::Node) : FeedItem? # ameba:disable Metrics/CyclomaticComplexity
     data = {} of String => String | Array(String)
 
     # Extract standard fields by iterating children

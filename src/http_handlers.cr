@@ -39,11 +39,11 @@ module Handler
   class HTMLFilter < Filter
     def initialize(htmlproc : HTMLFilterProc, @context : HTTP::Server::Context)
       @io = @context.as(HTTP::Server::Context).response.output
-      @proc = FilterProc.new { |slice|
+      @proc = FilterProc.new do |slice|
         parser = Lexbor::Parser.new(slice)
         htmlproc.call(parser)
         parser.to_html.to_slice
-      }
+      end
     end
   end
 
@@ -70,12 +70,12 @@ module Handler
 
     def call(context) : Nil
       if context.request.path.ends_with?(".html")
-        context.response.output = HTMLFilter.new(
-          HTMLFilterProc.new { |doc|
-            s = doc.create_node(:script)
-            s["src"] = "http://localhost:35729/livereload.js"
-            doc.head!.append_child(s)
-          }, context)
+        injector = HTMLFilterProc.new do |doc|
+          s = doc.create_node(:script)
+          s["src"] = "http://localhost:35729/livereload.js"
+          doc.head!.append_child(s)
+        end
+        context.response.output = HTMLFilter.new(injector, context)
       end
       call_next(context)
     end

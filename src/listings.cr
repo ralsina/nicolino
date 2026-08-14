@@ -136,12 +136,12 @@ module Listings
       })
 
       # Sort listings by title and build items list
-      items = listings.sort_by(&.title).map { |listing|
+      items = listings.sort_by(&.title).map do |listing|
         {
           link:  "#{listing.title}.html",
           title: listing.title,
         }
-      }
+      end
 
       # Render the item list template
       content = Templates.environment.get_template(item_list_template).render({

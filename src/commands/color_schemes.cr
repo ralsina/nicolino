@@ -52,7 +52,7 @@ module Nicolino
         1
       end
 
-      private def apply_family(family_name : String)
+      private def apply_family(family_name : String) # ameba:disable Metrics/CyclomaticComplexity
         # Validate the family exists (all families are now valid since sixteen can auto-generate)
         families = Sixteen.theme_families
 
@@ -122,10 +122,10 @@ module Nicolino
 
       private def show_families
         families = Sixteen.theme_families
-          .select { |family|
+          .select do |family|
             # Only show families that have at least one theme
             !family.dark_themes.empty? || !family.light_themes.empty? || !family.other_variants.empty?
-          }
+          end
           .sort_by!(&.base_name)
 
         families.each do |family|

@@ -1,4 +1,5 @@
 module Sitemap
+  # ameba:disable Style/MultilineStringLiteral
   HEADER = %(<?xml version="1.0" encoding="UTF-8"?>
 <urlset
     xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -28,10 +29,11 @@ module Sitemap
     inputs = Croupier::TaskManager.tasks.keys.select(&.ends_with?(".html"))
     Log.info { "🗺️ Sitemap: collected #{inputs.size} inputs in #{(Time.instant - start).total_milliseconds}ms" }
 
+    output = (Path[Config.options.output] / "sitemap.xml").to_s
     FeatureTask.new(
       feature_name: "sitemap",
       id: "sitemap",
-      output: output = (Path[Config.options.output] / "sitemap.xml").to_s,
+      output: output,
       inputs: inputs,
       mergeable: false,
       no_save: true
@@ -59,7 +61,7 @@ module Sitemap
                 next if noindex?(input)
                 modtime = File.info(input).modification_time
                 input_path = input.sub(/^output\//, "")
-                str << %(<url>
+                str << %(<url> # ameba:disable Style/MultilineStringLiteral
                 <loc>#{base.resolve(input_path)}</loc>
                 <lastmod>#{modtime}</lastmod>
               </url>)

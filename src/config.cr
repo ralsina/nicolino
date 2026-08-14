@@ -235,7 +235,7 @@ module Config
 
     # Set default taxonomies if empty
     return unless @@lang_configs[@@default_lang].taxonomies.empty?
-    default_taxonomy_yaml = %(
+    default_taxonomy_yaml = %( # ameba:disable Style/MultilineStringLiteral
 title: "🏷Tags"
 term_title: "Posts tagged {{term.name}}"
 location: "tags/"
