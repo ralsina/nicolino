@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.21.0] - 2026-08-14
+
+### 🐛 Bug Fixes
+
+- Parallel builds no longer crash on large sites: croupier 0.13.0
+  fixes the Boehm GC segfaults in `_run_tasks_parallel` (19 consecutive
+  cold parallel builds of a 4000-post site without a single crash,
+  where croupier 0.12.4 segfaulted on the first attempt)
+
+### ⚡ Performance
+
+- Parallel builds are now actually usable: ~4.7s vs ~14s serial for a
+  4000-post site
+
+### 📦 Dependencies
+
+- croupier ~> 0.13.0
+- Require Crystal >= 1.20.0 (as croupier 0.13.0 does)
+
 ## [0.20.0] - 2026-08-14
 
 ### 🚀 Features
