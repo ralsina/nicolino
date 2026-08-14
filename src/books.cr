@@ -173,7 +173,7 @@ module Books
       @title[lang] = @title_override || ""
 
       @link[lang] = (Path.new ["/", output.split("/")[1..]]).to_s
-      @shortcodes[lang] = full_shortcodes_list(@text[lang])
+      @shortcodes[lang] = Sc.shortcodes_in(@text[lang])
     rescue ex
       Log.error { "Error reading book chapter #{source(lang)}: #{ex}" }
       raise ex
@@ -396,7 +396,7 @@ module Books
       "conf.yml",
       "kv://#{page_template}",
       "kv://#{title_template}",
-    ] + Templates.get_deps(book_chapter_template)
+    ] + Templates.get_deps(book_chapter_template) + Sc.kv_deps_for_file(source_file)
 
     FeatureTask.new(
       feature_name: "books",
