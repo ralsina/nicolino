@@ -95,13 +95,10 @@ module Templates
       source = Croupier::TaskManager.get("#{template_key}")
       raise "Template #{template} not found (looked for #{template_key})" if source.nil?
 
-      # Find all include tags recursively and add them as dependencies
-      current_template_key = "kv://#{template_key}"
-      includes = Templates.find_includes_recursive(Crinja::Template.new(source).nodes, current_template_key)
-      includes.each do |included_key|
-        Croupier::TaskManager.tasks["kv://#{template_key}"].inputs << included_key
-      end
-
+      # Note: include dependencies are declared at task-creation time in
+      # load_templates (see get_deps), NOT discovered here. Mutating task
+      # inputs at render time was racy under parallel builds (issue #21)
+      # and could not order the current run's waves anyway.
       source
     end
   end
@@ -112,14 +109,16 @@ module Templates
     Log.debug { "Scanning Templates" }
     count = 0
     Dir.glob("#{Theme.templates_dir}/*.tmpl").each do |template|
-      # Get template dependencies for auto-mode tracking
+      # Get template dependencies (the templates it includes) so they
+      # can be declared as inputs: this orders the kv tasks correctly
+      # in parallel builds and invalidates dependents on change
       deps = get_deps(template)
       Log.debug { "Template #{template} dependencies: #{deps.inspect}" }
 
       FeatureTask.new(
         feature_name: "templates",
         id: "template",
-        inputs: [template], # Only the file itself, not other templates (those are runtime deps)
+        inputs: [template] + deps,
         output: "kv://#{template}",
         mergeable: false
       ) do
@@ -127,17 +126,6 @@ module Templates
         # Yes, we re-read it when get_deps already did it.
         # In auto mode the content may have changed though.
         File.read(template)
-      end
-
-      # Register template dependencies for auto-mode invalidation
-      # When a template changes, any task that uses it should be re-run
-      unless deps.empty?
-        deps.each do |dep|
-          # Add the current template as a dependent of the included template
-          # We can't easily add reverse deps, but we can track this separately
-          # For now, we'll add them to a special registry
-          Croupier::TaskManager.tasks[dep]?
-        end
       end
 
       count += 1
