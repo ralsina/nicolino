@@ -146,13 +146,19 @@ class FeatureTask < Croupier::Task
   )
     # Wrap the block to track timing
     wrapped_block = -> do
-      start_time = Time.instant
-      result = block.call
-      elapsed = Time.instant - start_time
+      begin
+        start_time = Time.instant
+        result = block.call
+        elapsed = Time.instant - start_time
 
-      # Record timing for this feature
-      FeatureTiming.record_task(@feature_name, elapsed)
-      result
+        # Record timing for this feature
+        FeatureTiming.record_task(@feature_name, elapsed)
+        result
+      ensure
+        # Return the Crinja environment (if this task used one) to the
+        # pool so later waves can reuse it instead of rebuilding it
+        Templates::EnvCache.release
+      end
     end
 
     super(output: output, inputs: inputs, no_save: no_save, id: id, always_run: always_run, mergeable: mergeable, &wrapped_block)

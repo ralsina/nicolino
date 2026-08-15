@@ -182,15 +182,38 @@ module Templates
     end
   end
 
-  # Thread-local environment cache
+  # Pool of Crinja environments.
+  #
+  # Croupier spawns fresh worker fibers for every wave (and for every
+  # rebuild in auto mode), so a per-fiber cache would rebuild each
+  # environment - and re-parse every template in it - on each wave,
+  # while leaking the dead fibers' entries.
+  #
+  # Environments are checked out lazily on first use by the fiber
+  # running a task (so tasks that never render, like image processing,
+  # don't create one) and returned by FeatureTask's ensure block, so
+  # environments and their template caches are reused across waves
+  # without ever being shared by two concurrent workers.
   class EnvCache
-    @@envs = Hash(Fiber, Crinja).new
+    @@pool = [] of Crinja
+    @@checkouts = Hash(Fiber, Crinja).new
     @@mutex = Mutex.new
 
-    def self.get(env_factory : Proc(Crinja))
-      fiber = Fiber.current
+    # Check out an environment for the current fiber, creating (or
+    # reusing a pooled) one if needed. Idempotent within a fiber.
+    def self.acquire(env_factory : Proc(Crinja)) : Crinja
       @@mutex.synchronize do
-        @@envs[fiber] ||= env_factory.call
+        @@checkouts[Fiber.current] ||= (@@pool.pop? || env_factory.call)
+      end
+    end
+
+    # Return the current fiber's environment to the pool, if it has
+    # one. Extra environments beyond the pool limit are dropped.
+    def self.release : Nil
+      @@mutex.synchronize do
+        if env = @@checkouts.delete(Fiber.current)
+          @@pool << env if @@pool.size < System.cpu_count
+        end
       end
     end
   end
@@ -262,8 +285,10 @@ module Templates
     env
   end
 
-  # Get the thread/fiber-local Crinja environment
+  # Get the Crinja environment for the current task, checking one out
+  # of the pool on first use (see EnvCache). Calls outside a task
+  # simply keep their environment checked out for the fiber's lifetime.
   def self.environment
-    EnvCache.get(->create_env)
+    EnvCache.acquire(->create_env)
   end
 end
