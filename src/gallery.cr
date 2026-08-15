@@ -269,7 +269,8 @@ module Gallery
             post.source(lang),
             "kv://#{post.template(lang)}",
             "kv://#{page_template}",
-          ] + post.@image_list.map { |i| "#{basedir}/#{i}" },
+          ] + post.shortcode_dependencies(lang) +
+                  post.@image_list.map { |i| "#{basedir}/#{i}" },
           mergeable: false) do
           # Need to refresh post contents in auto mode
           post.load(lang) if Croupier::TaskManager.auto_mode?

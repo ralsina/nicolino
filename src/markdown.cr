@@ -238,28 +238,10 @@ module Markdown
 
       # Performance Note: usually parse takes ~.1 seconds to
       # parse 1000 short posts that have no shortcodes.
-      @shortcodes[lang] = full_shortcodes_list(@text[lang])
+      @shortcodes[lang] = Sc.shortcodes_in(@text[lang])
     rescue ex
       Log.error { "Error parsing metadata in #{source(lang)}: #{ex}" }
       raise ex
-    end
-
-    # Parse shortcodes in the text recursively
-    def full_shortcodes_list(text)
-      # Fast path: if no shortcode delimiters, skip parsing entirely
-      return [] of Shortcodes::Shortcode unless text.includes?("{{")
-
-      sc_list = Shortcodes.parse(text)
-      return [] of Shortcodes::Shortcode if sc_list.shortcodes.empty?
-
-      final_list = sc_list.shortcodes
-      sc_list.shortcodes.each do |scode|
-        if scode.markdown? # Recurse for nested shortcodes
-          # If there are nested shortcodes, handle them
-          final_list += full_shortcodes_list(scode.data)
-        end
-      end
-      Set.new(final_list).to_a
     end
 
     # The rendered HTML for this file, memoized per language because
@@ -521,6 +503,12 @@ module Markdown
       end
     end
 
+    # kv:// inputs for the shortcode templates this post uses,
+    # so tasks that render it can declare them as dependencies
+    def shortcode_dependencies(lang = nil) : Array(String)
+      shortcodes(lang).reject(&.is_inline?).map { |scode| "kv://shortcodes/#{scode.name}.tmpl" }
+    end
+
     # List of all files and kv store items this post uses
     def dependencies : Array(String)
       page_template = Theme.template_path("page.tmpl")
@@ -537,7 +525,7 @@ module Markdown
         end
       end
 
-      result += shortcodes.reject(&.is_inline?).map { |scode| "kv://shortcodes/#{scode.name}.tmpl" }
+      result += shortcode_dependencies
 
       # Add similarity index as dependency if feature is enabled
       features = Config.features
@@ -635,7 +623,8 @@ module Markdown
       "conf.yml",
       "kv://#{index_template}",
       "kv://#{page_template}",
-    ] + posts.map(&.source) + posts.map(&.template) + extra_inputs
+    ] + posts.map(&.source) + posts.map(&.template) +
+             posts.flat_map { |post| post.shortcode_dependencies(lang) } + extra_inputs
     inputs = inputs.uniq
     FeatureTask.new(
       feature_name: feature_name,

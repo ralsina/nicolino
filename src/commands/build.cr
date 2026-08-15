@@ -41,7 +41,6 @@ module Nicolino
           run_all: !options["--run-all"].nil?,
           fast_mode: !options["--fast-mode"].nil?,
         )
-        0
       rescue ex : Exception
         Log.error(exception: ex) { "Error running build: #{ex.message}" }
         Log.debug { ex.backtrace.join("\n") }

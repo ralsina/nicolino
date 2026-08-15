@@ -6,7 +6,11 @@ module RSSFeed
   # max_items: maximum number of posts to include in the feed (default 20)
   def self.render(posts, output, title, lang = nil, feature_name = "posts", max_items : Int32 = 20)
     lang ||= Locale.language
-    inputs = ["conf.yml"] + posts.map(&.source)
+    # The feed renders each post's summary, which processes
+    # shortcodes, so the shortcode templates must be declared
+    # inputs or parallel builds race against the kv tasks
+    inputs = ["conf.yml"] + posts.map(&.source) +
+             posts.flat_map { |post| post.shortcode_dependencies(lang) }
 
     FeatureTask.new(
       feature_name: feature_name,

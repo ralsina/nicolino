@@ -111,6 +111,9 @@ def run(
   create_all_directories
 
   arguments = Croupier::TaskManager.tasks.keys if arguments.empty?
+  # Shortcode render failures are recorded per-run (see Sc.render_sc);
+  # start each run with a clean slate
+  Sc.reset_failures
   # Run tasks for real
   Log.info { "Running tasks..." }
   Log.debug { "About to call run_tasks with #{Croupier::TaskManager.tasks.size} tasks" }
@@ -127,6 +130,17 @@ def run(
 
   # Generate feature timing report
   FeatureTiming.report
+
+  # A failed shortcode render degrades that page silently; fail the
+  # whole build loudly instead of publishing corrupted output
+  failures = Sc.render_failures
+  unless failures.empty?
+    Log.error { "🏁 Done with #{failures.size} shortcode rendering failure(s):" }
+    failures.each do |failure|
+      Log.error { "  #{failure[:shortcode]}: #{failure[:error]}" }
+    end
+    return 1
+  end
 
   Log.info { "🏁 Done!" }
   0
