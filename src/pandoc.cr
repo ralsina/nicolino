@@ -103,12 +103,12 @@ module Pandoc
     posts = [] of File
     Config.options.pandoc_formats.keys.each do |ext|
       all_sources = Utils.find_all(path, ext[1..])
-      all_sources.map do |base, sources|
+      todo = all_sources.reject do |base, _|
+        Markdown.posts.has_key?(base.to_s) || Utils.should_skip_file?(base)
+      end
+      posts += Markdown.files_from(todo) do |sources, base|
         begin
-          next if Markdown.posts.has_key? base.to_s
-          next if Utils.should_skip_file?(base)
-
-          posts << File.new(sources, base)
+          File.new(sources, base)
         rescue ex
           Log.error { "Error parsing #{base}: #{ex.message}" }
           Log.debug { ex }

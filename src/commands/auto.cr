@@ -36,6 +36,8 @@ module Nicolino
           return unless modified_files.includes?(Config.config_path)
           Log.info { "Config file changed, reloading..." }
           Config.reload
+          # A new config may select a different theme
+          ::Theme.reset
         }
 
         # Now run in auto mode

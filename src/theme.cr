@@ -10,7 +10,20 @@ module Theme
 
   # Get the path to the theme directory
   # Resolves theme path from local themes/ directory or extracts baked-in default
+  # (memoized: this does a directory stat per call and is called for
+  # every template resolution, so caching matters on large sites)
+  @@cached_path : String? = nil
+
   def self.path
+    @@cached_path ||= resolve_path
+  end
+
+  # Clear the memoized path (called when config is reloaded)
+  def self.reset
+    @@cached_path = nil
+  end
+
+  private def self.resolve_path
     theme_path = Path["themes", name]
 
     # If theme exists locally, use it

@@ -11,9 +11,16 @@ require "shortcodes"
 module Markdown
   # Global registry of all posts (shared across Markdown::File and HTML::File)
   @@posts = Hash(String, File).new
+  # Guards registry insertion during parallel content loading
+  @@posts_mutex = Mutex.new
 
   def self.posts
     @@posts
+  end
+
+  # Register a file in the global posts registry (thread-safe)
+  def self.register(base : String, file : File)
+    @@posts_mutex.synchronize { @@posts[base] = file }
   end
 
   # A class representing a Markdown file
@@ -61,7 +68,7 @@ module Markdown
 
         @output[lang] = "#{p}.html"
       end
-      Markdown.posts[base.to_s] = self
+      Markdown.register(base.to_s, self)
 
       # Load each unique source file once, then share data across languages
       # This enables bidirectional fallback: any language can use any available file
@@ -709,19 +716,68 @@ module Markdown
     result
   end
 
+  # Build one Markdown::File per entry of all_sources in parallel.
+  #
+  # The block receives (sources, base) and returns a file or nil to
+  # skip it; it handles its own per-file error semantics (log-and-skip
+  # or raise). An exception escaping a worker is captured and re-raised
+  # after all entries were processed, so no error is lost.
+  def self.files_from(
+    all_sources : Hash(Path, Hash(String, String)),
+    &block : Hash(String, String), Path -> (File | Nil)
+  ) : Array(File)
+    return [] of File if all_sources.empty?
+
+    workers = Math.min(System.cpu_count, all_sources.size)
+    # Make sure the default execution context has enough OS threads for
+    # the worker fibers to actually run concurrently (same trick as
+    # croupier's enable_parallelism; without this, spawned fibers can
+    # all land on the spawning thread's queue).
+    {% if !flag?(:preview_mt) && compare_versions(Crystal::VERSION, "1.21.0") >= 0 %}
+      Fiber::ExecutionContext.default.resize(workers)
+    {% end %}
+    work = Channel({Path, Hash(String, String)}).new(all_sources.size)
+    all_sources.each { |base, sources| work.send({base, sources}) }
+    work.close
+
+    results = Channel({File?, Exception?}).new(all_sources.size)
+    workers.times do
+      spawn do
+        loop do
+          break unless item = work.receive?
+          base, sources = item
+          begin
+            results.send({block.call(sources, base), nil})
+          rescue ex
+            results.send({nil, ex})
+          end
+        end
+      end
+    end
+
+    posts = [] of File
+    first_error : Exception? = nil
+    all_sources.size.times do
+      file, error = results.receive
+      if error
+        first_error ||= error
+      elsif file
+        posts << file
+      end
+    end
+    raise first_error if first_error
+    posts
+  end
+
   # Parse all markdown posts in a path and build Markdown::File
   # objects out of them
   def self.read_all(path)
     Log.debug { "Reading Markdown from #{path}" }
-    posts = [] of File
     all_sources = Utils.find_all(path, "md")
-    all_sources.map do |base, sources|
-      next if Markdown.posts.has_key? base.to_s
-      next if Utils.should_skip_file?(base)
-
-      posts << File.new(sources, base)
+    todo = all_sources.reject do |base, _|
+      Markdown.posts.has_key?(base.to_s) || Utils.should_skip_file?(base)
     end
-    posts
+    files_from(todo) { |sources, base| File.new(sources, base) }
   end
 
   # Create a new "page" file

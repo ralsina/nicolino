@@ -1,8 +1,6 @@
 # Functions that take a Lexbor document and return a modified version
 # To create a Lexbor document, use `Lexbor::Parser.new(html)`
 module HtmlFilters
-  @@html_filters_mutex = Mutex.new
-
   # Shift headers so the highest level is n (n=2 means h1->h3, h2->h4, etc.)
   # If n=2 and doc has h3 as the highest, then h3->h2, h4->h3, etc.
   def self.downgrade_headers(doc, n = 2)
@@ -69,45 +67,44 @@ module HtmlFilters
   # Make all relative links absolute to the site root
   # base is where the file containing the URIs is located
   # relative to the site root
+  # Note: no mutex needed, each call operates on its own document
   def self.make_links_relative(doc, base) # ameba:disable Metrics/CyclomaticComplexity
-    @@html_filters_mutex.synchronize do
-      base_uri = URI.parse(base)
-      doc.nodes("a").each do |node|
-        next unless node.has_key? "href"
-        href = node["href"]
-        # Fast path: skip anchors and already-root-relative URLs
-        if href.starts_with?("#") || href.starts_with?("/")
-          next
-        end
-        node["href"] = base_uri.relativize(base_uri.resolve(href)).to_s
+    base_uri = URI.parse(base)
+    doc.nodes("a").each do |node|
+      next unless node.has_key? "href"
+      href = node["href"]
+      # Fast path: skip anchors and already-root-relative URLs
+      if href.starts_with?("#") || href.starts_with?("/")
+        next
       end
-      doc.nodes("link").each do |node|
-        next if node.fetch("rel", nil) == "canonical"
-        next unless node.has_key? "href"
-        href = node["href"]
-        if href.starts_with?("/")
-          next
-        end
-        node["href"] = base_uri.relativize(base_uri.resolve(href)).to_s
-      end
-      doc.nodes("img").each do |node|
-        next unless node.has_key? "src"
-        src = node["src"]
-        if src.starts_with?("/")
-          next
-        end
-        node["src"] = base_uri.relativize(base_uri.resolve(src)).to_s
-      end
-      doc.nodes("script").each do |node|
-        next unless node.has_key? "src"
-        src = node["src"]
-        if src.starts_with?("/")
-          next
-        end
-        node["src"] = base_uri.relativize(base_uri.resolve(src)).to_s
-      end
-      doc
+      node["href"] = base_uri.relativize(base_uri.resolve(href)).to_s
     end
+    doc.nodes("link").each do |node|
+      next if node.fetch("rel", nil) == "canonical"
+      next unless node.has_key? "href"
+      href = node["href"]
+      if href.starts_with?("/")
+        next
+      end
+      node["href"] = base_uri.relativize(base_uri.resolve(href)).to_s
+    end
+    doc.nodes("img").each do |node|
+      next unless node.has_key? "src"
+      src = node["src"]
+      if src.starts_with?("/")
+        next
+      end
+      node["src"] = base_uri.relativize(base_uri.resolve(src)).to_s
+    end
+    doc.nodes("script").each do |node|
+      next unless node.has_key? "src"
+      src = node["src"]
+      if src.starts_with?("/")
+        next
+      end
+      node["src"] = base_uri.relativize(base_uri.resolve(src)).to_s
+    end
+    doc
   end
 
   # Remove empty paragraph tags

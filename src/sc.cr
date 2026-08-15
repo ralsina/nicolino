@@ -88,8 +88,12 @@ module Sc
   end
 
   # Get list of available shortcodes for error messages
+  # (memoized: it globs the shortcodes directory and is called once
+  # per post while computing task dependencies)
+  @@available_shortcodes : Array(String)? = nil
+
   def self.available_shortcodes : Array(String)
-    Dir.glob("shortcodes/*.tmpl").map do |path|
+    @@available_shortcodes ||= Dir.glob("shortcodes/*.tmpl").map do |path|
       File.basename(path, ".tmpl")
     end.sort!
   end
@@ -98,6 +102,8 @@ module Sc
   # TODO refactor duplication from Templates.load_templates
   def self.load_shortcodes : Int32
     Log.debug { "Scanning shortcodes" }
+    # Rescan the shortcodes directory for this run
+    @@available_shortcodes = nil
     count = 0
     Dir.glob("shortcodes/*.tmpl").each do |template|
       FeatureTask.new(

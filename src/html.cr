@@ -23,19 +23,18 @@ module HTML
   # objects out of them
   def self.read_all(path)
     Log.debug { "Reading HTML files from #{path}" }
-    posts = [] of File
     all_sources = Utils.find_all(path, "html")
-    all_sources.map do |base, sources|
+    todo = all_sources.reject do |base, _|
+      Markdown.posts.has_key?(base.to_s) || Utils.should_skip_file?(base)
+    end
+    Markdown.files_from(todo) do |sources, base|
       begin
-        next if Markdown.posts.has_key? base.to_s
-        next if Utils.should_skip_file?(base)
-
-        posts << File.new(sources, base)
+        File.new(sources, base)
       rescue ex
         Log.error { "Error parsing #{base}: #{ex.message}" }
         Log.debug { ex }
+        nil
       end
     end
-    posts
   end
 end
