@@ -4,6 +4,9 @@ require "./theme"
 module Templates
   extend self
 
+  # Compute the kv:// dependencies of a template file: every other
+  # template it references through {% include %}, {% extends %},
+  # {% import %} or {% from ... import %}.
   def self.get_deps(template)
     source = File.read(template)
     if Croupier::TaskManager.get(template) == source
@@ -11,61 +14,81 @@ module Templates
     else
       Croupier::TaskManager.set(template, source)
     end
-    # Pass the current template's k/v key to skip self-includes
-    current_template_key = "kv://#{template}"
-    find_includes_recursive(Crinja::Template.new(source).nodes, current_template_key)
+    DependencyVisitor.new("kv://#{template}").dependencies(source)
   end
 
-  # Recursively traverse the AST to find all {% include %} tags
-  # current_template is used to skip self-references (templates that include themselves)
-  def self.find_includes_recursive(node : Crinja::AST::NodeList, current_template : String) : Array(String)
-    find_includes_recursive(node.@children, current_template)
-  end
-
-  private def self.find_includes_recursive(nodes : Array(Crinja::AST::TemplateNode), current_template : String) : Array(String)
-    deps = [] of String
-    nodes.each do |node|
-      deps.concat(find_includes_recursive(node, current_template))
+  # Resolve a template reference as written in a tag (see
+  # DependencyVisitor) to the key it is stored under, using the same
+  # rules as Templates::StoreLoader
+  def self.resolve_template_key(reference : String) : String
+    if reference.starts_with?("templates/")
+      "#{Theme.path}/#{reference}"
+    elsif reference.starts_with?("themes/")
+      reference
+    elsif reference.starts_with?("shortcodes/")
+      reference
+    else
+      "#{Theme.templates_dir}/#{reference}"
     end
-    deps
   end
 
-  private def self.find_includes_recursive(node : Crinja::AST::TagNode, current_template : String) : Array(String)
-    deps = [] of String
-    if node.@name == "include"
-      # Resolve included template path to full theme path
-      included_template = node.@arguments[0].value.as(String)
-      # If include path starts with "templates/", remove it and add theme path
-      # If include path starts with "shortcodes/", use it as-is (shortcodes are not in themes)
-      # Otherwise it's a relative path, just add theme path
-      if included_template.starts_with?("templates/")
-        included_key = "#{Theme.path}/#{included_template}"
-      elsif included_template.starts_with?("themes/")
-        included_key = included_template
-      elsif included_template.starts_with?("shortcodes/")
-        included_key = included_template
-      else
-        included_key = "#{Theme.templates_dir}/#{included_template}"
+  # A visitor over a parsed template's AST that collects references to
+  # other templates, following crinja's visitor pattern (see
+  # Crinja::Visitor and Visitor::Inspector). The parser AST has no
+  # accept method, so this visitor owns the traversal itself.
+  #
+  # Only statically resolvable references (string literals) are
+  # collected: a dynamic reference like {% include somevar %} can't be
+  # tracked without rendering, so it is skipped (and logged at debug
+  # level) instead of producing a bogus dependency.
+  class DependencyVisitor < Crinja::Visitor(Array(String))
+    # The visit macro builds type names as AST::<name>; make that
+    # resolve from this class
+    alias AST = Crinja::AST
+
+    # Tags whose string literal arguments name other templates
+    REFERENCE_TAGS = {"include", "extends", "import", "from"}
+
+    def initialize(@current_template : String)
+      @dependencies = [] of String
+    end
+
+    # Parse *source* and return the kv:// keys of all referenced
+    # templates, deduplicated and sorted. Self-references (a template
+    # including itself) are skipped.
+    def dependencies(source : String) : Array(String)
+      visit(Crinja::Template.new(source).nodes)
+      @dependencies.uniq!.sort!
+    end
+
+    visit(NodeList) do
+      node.children.each { |child| visit(child) }
+    end
+
+    visit(TagNode) do
+      collect_references(node) if REFERENCE_TAGS.includes?(node.name)
+      visit(node.block) unless node.block.nil?
+    end
+
+    visit(TemplateNode) do
+      # FixedString, Note, EndTagNode and PrintStatement carry no
+      # template references
+    end
+
+    private def collect_references(node : Crinja::AST::TagNode) : Nil
+      literals = node.arguments.select(&.kind.string?)
+      if literals.empty?
+        Log.debug { "Skipping untrackable dynamic #{node.name} reference in #{@current_template}" }
+        return
       end
-      kv_key = "kv://#{included_key}"
-
-      # Skip self-references (template includes itself)
-      unless kv_key == current_template
-        deps << kv_key
+      # An include may name a list of alternative templates; taking
+      # every string literal covers both that form and the plain one
+      literals.each do |literal|
+        key = "kv://#{Templates.resolve_template_key(literal.value)}"
+        next if key == @current_template # self-inclusion
+        @dependencies << key
       end
     end
-
-    # Recursively search in the tag's block (if it has one)
-    if block = node.@block
-      deps.concat(find_includes_recursive(block, current_template))
-    end
-
-    deps
-  end
-
-  private def self.find_includes_recursive(node : Crinja::AST::TemplateNode, current_template : String) : Array(String)
-    # For other node types that don't contain includes, return empty
-    [] of String
   end
 
   # A Crinja Loader that is aware of the k/v store

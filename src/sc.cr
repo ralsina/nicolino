@@ -106,10 +106,14 @@ module Sc
     @@available_shortcodes = nil
     count = 0
     Dir.glob("shortcodes/*.tmpl").each do |template|
+      # Declare include/extends/import dependencies, same as theme
+      # templates (no shortcode uses them today, but if one ever does
+      # its dependencies are tracked correctly)
+      deps = Templates.get_deps(template)
       FeatureTask.new(
         feature_name: "shortcodes",
         id: "shortcode",
-        inputs: [template],
+        inputs: [template] + deps,
         output: "kv://#{template}",
         mergeable: false
       ) do
