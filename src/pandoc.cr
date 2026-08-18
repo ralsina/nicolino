@@ -33,9 +33,18 @@ module Pandoc
 
     # Use a memoized compile method because pandoc is so slow
     @cache_compile = {} of {String, String} => String
+    @cache_compile_mutex = Mutex.new
 
     def compile(input, format = "rst")
-      @cache_compile[{input, format}] ||= _compile(input, format)
+      # Fast path: memoized value is already there
+      cached = @cache_compile_mutex.synchronize { @cache_compile[{input, format}]? }
+      return cached if cached
+      # Run pandoc outside the lock; a duplicate concurrent compile
+      # of the same input is idempotent
+      result = _compile(input, format)
+      @cache_compile_mutex.synchronize do
+        @cache_compile[{input, format}] ||= result
+      end
     end
 
     def _compile(input, format = "rst")

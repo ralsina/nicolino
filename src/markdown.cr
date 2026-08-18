@@ -27,8 +27,9 @@ module Markdown
   class File
     @date : Time?
     @html = Hash(String, String).new
-    # Guards the memoized HTML/TOC computation: parallel workers
-    # share post objects, and Hash is not safe for concurrent writes
+    # Guards the memoized HTML/TOC hashes: parallel workers
+    # share post objects, and Hash is not safe for concurrent
+    # writes. The compile itself runs outside the lock (see #html).
     @html_mutex = Mutex.new
     @link = Hash(String, String).new
     @base = Path.new
@@ -163,7 +164,7 @@ module Markdown
     end
 
     def toc(lang = nil)
-      @toc[lang || Locale.language]
+      @html_mutex.synchronize { @toc[lang || Locale.language] }
     end
 
     def title(lang = nil)
@@ -206,8 +207,10 @@ module Markdown
       # Clear cached date so it gets re-parsed from updated metadata
       @date = nil
       # Clear memoized HTML/TOC so reloaded content gets re-rendered
-      @html.delete(lang)
-      @toc.delete(lang)
+      @html_mutex.synchronize do
+        @html.delete(lang)
+        @toc.delete(lang)
+      end
       contents = ::File.read(source(lang))
       begin
         # Metadata format: file must START with "---\n" to have metadata
@@ -256,10 +259,16 @@ module Markdown
     # and it is needed several times per post (html, summary, teaser).
     def html(lang = nil)
       lang ||= Locale.language
+      # Fast path: memoized value is already there
+      cached = @html_mutex.synchronize { @html[lang]? }
+      return cached if cached
+      # Compile outside the lock so parallel workers touching the
+      # same post don't serialize on the full compile; a duplicate
+      # concurrent compile of the same language is idempotent
+      compiled_html, toc = compile_html(lang)
       @html_mutex.synchronize do
-        unless @html.has_key?(lang)
-          @html[lang], @toc[lang] = compile_html(lang)
-        end
+        @html[lang] ||= compiled_html
+        @toc[lang] ||= toc
         @html[lang]
       end
     end
@@ -631,7 +640,7 @@ module Markdown
       "kv://#{index_template}",
       "kv://#{page_template}",
     ] + posts.map(&.source) + posts.map(&.template) +
-             posts.flat_map { |post| post.shortcode_dependencies(lang) } + extra_inputs
+             posts.flat_map(&.shortcode_dependencies(lang)) + extra_inputs
     inputs = inputs.uniq
     FeatureTask.new(
       feature_name: feature_name,
