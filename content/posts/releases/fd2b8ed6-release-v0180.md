@@ -1,6 +1,6 @@
 ---
 title: Release v0.18.0
-date: 2026-01-29 12:58:05 +0000
+date: 2026-01-29T12:58:05+0000
 tags: releases
 lang: en
 ---
