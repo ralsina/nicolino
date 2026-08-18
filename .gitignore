@@ -20,3 +20,4 @@ content/4000/
 node_modules
 .env
 package-lock.json
+.zcode/
