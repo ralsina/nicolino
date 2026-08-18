@@ -10,9 +10,6 @@ site:
   footer: "Default Nicolino Theme"
 # Some options affecting output
 options:
-  # Format HTML nicely. Makes it larger but easier to read
-  # and understand.
-  pretty_html: true
   # Image sizes for output
   image_large: 1920
   image_thumb: 640

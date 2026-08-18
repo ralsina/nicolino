@@ -631,7 +631,7 @@ module Markdown
       "kv://#{index_template}",
       "kv://#{page_template}",
     ] + posts.map(&.source) + posts.map(&.template) +
-             posts.flat_map { |post| post.shortcode_dependencies(lang) } + extra_inputs
+             posts.flat_map(&.shortcode_dependencies(lang)) + extra_inputs
     inputs = inputs.uniq
     FeatureTask.new(
       feature_name: feature_name,
@@ -724,7 +724,7 @@ module Markdown
   # after all entries were processed, so no error is lost.
   def self.files_from(
     all_sources : Hash(Path, Hash(String, String)),
-    &block : Hash(String, String), Path -> (File | Nil)
+    &block : Hash(String, String), Path -> File?
   ) : Array(File)
     return [] of File if all_sources.empty?
 

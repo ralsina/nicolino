@@ -3,7 +3,7 @@
 require "lexbor"
 
 module Render
-  # Generates pretty HTML properly templated
+  # Renders a template with the given context
   def self.apply_template(template, context, lang = nil)
     lang ||= Config.language
     # Use Crinja's value type for flexibility

@@ -10,7 +10,7 @@ module RSSFeed
     # shortcodes, so the shortcode templates must be declared
     # inputs or parallel builds race against the kv tasks
     inputs = ["conf.yml"] + posts.map(&.source) +
-             posts.flat_map { |post| post.shortcode_dependencies(lang) }
+             posts.flat_map(&.shortcode_dependencies(lang))
 
     FeatureTask.new(
       feature_name: feature_name,
