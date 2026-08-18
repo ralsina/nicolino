@@ -161,6 +161,13 @@ class FeatureTask < Croupier::Task
       end
     end
 
-    super(output: output, inputs: inputs, no_save: no_save, id: id, always_run: always_run, mergeable: mergeable, &wrapped_block)
+    # Croupier 0.14+ requires explicit ids to be unique among tasks
+    # that have outputs (ids are used for subtask tracking). Several
+    # features create one task per file with a constant id ("template",
+    # "markdown", ...), so derive a unique id from the given id plus
+    # the task's output.
+    unique_id = id && output ? "#{id}:#{output}" : id
+
+    super(output: output, inputs: inputs, no_save: no_save, id: unique_id, always_run: always_run, mergeable: mergeable, &wrapped_block)
   end
 end
