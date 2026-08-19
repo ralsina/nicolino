@@ -76,7 +76,7 @@ module Sc
       template = Templates.environment.get_template(template_path)
       template.render(context)
     end
-  rescue ex : Crinja::TemplateNotFoundError # ameba:disable Lint/UnusedRescueVariable
+  rescue ex : Crinja::TemplateNotFoundError
     raise "Missing shortcode template: shortcodes/#{sc.name}.tmpl\n" +
           "Available shortcodes: #{available_shortcodes.join(", ")}"
   rescue ex

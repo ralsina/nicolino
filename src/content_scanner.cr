@@ -10,7 +10,7 @@ module ContentScanner
   # - globs: Array of glob patterns to scan
   # - create_file: Block that creates a Markdown::File from sources and base path
   def self.scan_all(
-    features : Array(NamedTuple(name: String, globs: Array(String), create_file: Hash(String, String), Path -> Markdown::File?))
+    features : Array(NamedTuple(name: String, globs: Array(String), create_file: Hash(String, String), Path -> Markdown::File?)),
   ) : Hash(String, Array(Markdown::File))
     result = Hash(String, Array(Markdown::File)).new
 

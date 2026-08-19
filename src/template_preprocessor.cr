@@ -148,7 +148,8 @@ module TemplatePreprocessor
         fixed(template, node, constants)
       end
     when Crinja::AST::TagNode
-      if FOLDABLE_TAGS.includes?(node.name) && foldable_children?(node.block.children, constants, allowed | (node.name == "for" ? for_targets(node) : Set(String).new))
+      extra = node.name == "for" ? for_targets(node) : Set(String).new
+      if FOLDABLE_TAGS.includes?(node.name) && foldable_children?(node.block.children, constants, allowed | extra)
         fixed(template, node, constants)
       elsif node.block
         node.block.children = fold_nodes(template, node.block.children, constants, allowed)
