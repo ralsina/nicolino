@@ -99,6 +99,7 @@ module Sc
   end
 
   # Load shortcodes from shortcodes/ and put them in the k/v store
+  # ameba:disable Documentation/DocumentationAdmonition
   # TODO refactor duplication from Templates.load_templates
   def self.load_shortcodes : Int32
     Log.debug { "Scanning shortcodes" }

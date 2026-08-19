@@ -22,7 +22,9 @@ module Sitemap
   end
 
   def self.render
+    # ameba:disable Documentation/DocumentationAdmonition
     # TODO: support robot exclusion
+    # ameba:disable Documentation/DocumentationAdmonition
     # TODO: support alternates for locations
     start = Time.instant
     # Sorted for deterministic output: task registration order follows
