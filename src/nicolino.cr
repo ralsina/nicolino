@@ -3,6 +3,7 @@ require "./archive"
 require "./creatable"
 require "./commands/*"
 require "./base16"
+require "./content_scanner"
 require "./feature_timing"
 require "./books"
 require "./config"
@@ -46,8 +47,6 @@ def create_tasks
   features = Config.features_set
 
   content_path = Path[Config.options.content]
-  content_post_path = content_path / Config.options.posts
-  galleries_path = content_path / Config.options.galleries
   Log.info { "✓ Configuration loaded" }
 
   # Check for required external commands
@@ -75,15 +74,42 @@ def create_tasks
   time_feature_enable("assets") { Assets.enable(features.includes?("assets")) }
   time_feature_enable("base16") { Base16.enable(features.includes?("base16")) }
 
-  # Posts must be enabled before taxonomies, archive, and similarity
-  posts = time_feature_enable("posts") { Posts.enable(features.includes?("posts"), content_post_path, features) }
+  # Parallel content scanning: posts first, then pages (priority order)
+  if features.includes?("posts") || features.includes?("pages")
+    Log.info { "📖 Scanning content..." }
+    scan_start = Time.instant
 
-  time_feature_enable("taxonomies") { Taxonomies.enable(features.includes?("taxonomies"), posts) } if posts
-  time_feature_enable("similarity") { Similarity.enable(features.includes?("similarity"), posts) } if posts
-  time_feature_enable("archive") { Archive.enable(features.includes?("archive"), posts) } if posts
+    # Build feature list in priority order (galleries before pages)
+    content_features = [] of NamedTuple(name: String, globs: Array(String), create_file: Hash(String, String), Path -> Markdown::File?)
+    content_features << {name: "posts", globs: Posts.content_globs, create_file: ->Posts.create_file(Hash(String, String), Path)}
+    content_features << {name: "galleries", globs: Gallery.content_globs, create_file: ->Gallery.create_file(Hash(String, String), Path)}
+    content_features << {name: "pages", globs: Pages.content_globs, create_file: ->Pages.create_file(Hash(String, String), Path)}
 
-  time_feature_enable("galleries") { Gallery.enable(features.includes?("galleries"), galleries_path) }
-  time_feature_enable("pages") { Pages.enable(features.includes?("pages"), content_path, features) }
+    # Single parallel scan
+    scan_results = ContentScanner.scan_all(content_features)
+    scan_elapsed = Time.instant - scan_start
+    Log.info { "✓ Content scan completed in #{scan_elapsed.total_milliseconds}ms" }
+
+    # Enable posts from scan results
+    posts = nil
+    if features.includes?("posts")
+      posts = time_feature_enable("posts") { Posts.enable_from_scan(scan_results["posts"]?, features) }
+    end
+
+    time_feature_enable("taxonomies") { Taxonomies.enable(features.includes?("taxonomies"), posts) } if posts
+    time_feature_enable("similarity") { Similarity.enable(features.includes?("similarity"), posts) } if posts
+    time_feature_enable("archive") { Archive.enable(features.includes?("archive"), posts) } if posts
+
+    # Enable galleries from scan results
+    time_feature_enable("galleries") { Gallery.enable_from_scan(scan_results["galleries"]?, features) }
+
+    # Enable pages from scan results
+    time_feature_enable("pages") { Pages.enable_from_scan(scan_results["pages"]?, features) }
+  else
+    # No content features enabled, but still need to handle other features
+    posts = nil
+  end
+
   time_feature_enable("images") { Image.enable(features.includes?("images"), content_path) }
   time_feature_enable("listings") { Listings.enable(features.includes?("listings"), content_path) }
   time_feature_enable("books") { Books.enable(features.includes?("books")) }

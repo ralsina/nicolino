@@ -18,6 +18,57 @@ module Gallery
   # Register output folder to exclude from folder_indexes
   FolderIndexes.register_exclude("galleries/")
 
+  # Return glob patterns for gallery content
+  # Galleries are index.md files inside galleries/
+  def self.content_globs : Array(String)
+    galleries_path = Path[Config.options.content] / Config.options.galleries
+    ["#{galleries_path}/**/*.md"]
+  end
+
+  # Create a Gallery object from source files
+  def self.create_file(sources : Hash(String, String), base : Path) : Markdown::File?
+    # Only index.md files are galleries
+    return nil unless base.basename == "index"
+
+    gallery_dir = base.parent
+    image_list = Dir.glob("#{gallery_dir}/*.{jpg,png,webp,gif}").map do |img_path|
+      Path[img_path].basename.to_s
+    end
+    result = ::Gallery::Gallery.new(sources, base, image_list)
+    result.as(Markdown::File)
+  rescue ex
+    Log.error { "Error creating gallery #{base}: #{ex.message}" }
+    Log.debug { ex }
+    nil
+  end
+
+  # Enable galleries feature using pre-scanned files
+  def self.enable_from_scan(scan_result : Array(Markdown::File)?, feature_set : Set(YAML::Any))
+    return unless scan_result
+    return if scan_result.empty?
+
+    Log.info { "🖼️  Scanning for galleries..." }
+
+    # Cast to Gallery objects
+    galleries = scan_result.select(::Gallery::Gallery).map(&.as(::Gallery::Gallery))
+
+    # Build parent-child relationships
+    gallery_by_dir = galleries.to_h { |gallery| {Path[gallery.base].parent, gallery} }
+    galleries.each do |gallery|
+      parent_dir = gallery.base.parent.parent
+      if potential_parent = gallery_by_dir[parent_dir]?
+        gallery.parent_gallery = potential_parent
+        potential_parent.sub_galleries << gallery unless potential_parent.sub_galleries.includes?(gallery)
+      end
+    end
+
+    # Only root-level galleries
+    root_galleries = galleries.select { |gallery| gallery.parent_gallery.nil? }
+
+    Log.info { "✓ Found #{root_galleries.size} galler#{root_galleries.size == 1 ? "y" : "ies"}" }
+    render(root_galleries, Config.options.galleries)
+  end
+
   # Enable galleries feature
   def self.enable(is_enabled : Bool, galleries_path : Path)
     return unless is_enabled

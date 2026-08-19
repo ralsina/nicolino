@@ -217,7 +217,7 @@ module Config
     @@global_config.date_output_format = config_data.date_output_format
     @@global_config.verbosity = config_data.verbosity
     @@global_config.import_templates = config_data.import_templates
-    @@global_config.pretty_html = (config_data.pretty_html? == false) ? false : true
+    @@global_config.pretty_html = !config_data.pretty_html? ? false : true
     @@global_config.import = config_data.import
 
     # Store default language

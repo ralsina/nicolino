@@ -13,6 +13,54 @@ module Pages
   # Directories that generate their own indexes (excluded from page folder indexes)
   EXCLUDED_DIRECTORIES = ["posts", "galleries", "listings", "books"]
 
+  # Return glob patterns for pages content
+  # Pages are the fallback - they scan the entire content directory
+  # Posts will claim files first, pages get the rest
+  # Excludes directories handled by other features (galleries, books)
+  def self.content_globs : Array(String)
+    content_path = Path[Config.options.content]
+    globs = [] of String
+    globs << "#{content_path}/**/*.md"
+    globs << "#{content_path}/**/*.html"
+    Config.options.pandoc_formats.keys.each do |ext|
+      globs << "#{content_path}/**/*#{ext}"
+    end
+    globs
+  end
+
+  # Create a file object from source files
+  def self.create_file(sources : Hash(String, String), base : Path) : Markdown::File?
+    # Determine file type from extension
+    first_source = sources.values.first? || return nil
+    ext = Path[first_source].extension
+    case ext
+    when ".html"
+      HTML::File.new(sources, base)
+    when /\.(rst|tex|latex|mdoc|adoc|asciidoc)$/
+      Pandoc::File.new(sources, base)
+    else
+      Markdown::File.new(sources, base)
+    end
+  rescue ex
+    Log.error { "Error creating page file #{base}: #{ex.message}" }
+    Log.debug { ex }
+    nil
+  end
+
+  # Enable pages feature using pre-scanned files
+  def self.enable_from_scan(scan_result : Array(Markdown::File)?, feature_set : Set(YAML::Any))
+    return unless scan_result
+
+    pages = scan_result
+    features = feature_set.map(&.as_s).to_set
+
+    # Render pages without requiring dates
+    Markdown.render(pages, require_date: false)
+
+    # Generate folder indexes for page directories
+    generate_folder_indexes(Path[Config.options.content]) if features.includes?("folder_indexes")
+  end
+
   # Enable pages feature
   # Render pages last because it's a catchall and will find gallery
   # posts, blog posts, etc.
