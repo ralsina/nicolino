@@ -35,7 +35,7 @@ shards:
 
   croupier:
     git: https://github.com/ralsina/croupier.git
-    version: 0.14.0
+    version: 0.14.0+git.commit.3e2f0a1bc55d10e520358b95719086b0831c76fb
 
   docopt:
     git: https://github.com/ralsina/docopt.cr.git

@@ -128,6 +128,15 @@ module Archive
           years_data[year][month_key] << post
         end
 
+        # Sort each month's posts newest first, with the output path as
+        # a tiebreaker: content reading is parallel, so the input order
+        # of same-date posts is not stable
+        years_data.each_value do |months|
+          months.each_value do |month_posts|
+            month_posts.sort_by! { |post| {post.date.as(Time), post.output} }.reverse!
+          end
+        end
+
         # Create ArchiveYear records
         sorted_years = years_data.keys.sort!.reverse!
         archive_years = sorted_years.map do |year|

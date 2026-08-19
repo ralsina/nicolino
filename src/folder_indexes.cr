@@ -95,7 +95,9 @@ module FolderIndexes
       # Find all posts whose output path starts with this folder
       matching_posts = Markdown.posts.values.select do |post|
         post.output(lang).starts_with?(output_prefix)
-      end.sort_by! { |post_data| post_data.date || Time.utc(1970, 1, 1) }.reverse!
+        # Output path tiebreaker: content reading is parallel, so the
+        # input order of same-date posts is not stable
+      end.sort_by! { |post_data| {post_data.date || Time.utc(1970, 1, 1), post_data.output(lang)} }.reverse!
 
       matching_posts
     end

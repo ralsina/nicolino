@@ -55,6 +55,11 @@ module Config
     property date_output_format : String = "%Y-%m-%d %H:%M"
     property verbosity : Int32 = 4
     property import_templates : String = "user_templates"
+    # When true (default), every page goes through a lexbor
+    # parse/serialize round trip that normalizes its HTML formatting.
+    # When false, pages that need no link or code-class fixing are
+    # written as the raw template output (faster, same DOM).
+    property? pretty_html : Bool = true
 
     # Taxonomies and features
     property taxonomies : Taxonomies = Taxonomies.new
@@ -100,6 +105,7 @@ module Config
     # NOT translatable
     property verbosity : Int32 = 4
     property import_templates : String = "user_templates"
+    property? pretty_html : Bool = true
 
     # Import configuration (hash of feed name to config)
     property import : Hash(String, YAML::Any) = Hash(String, YAML::Any).new
@@ -211,6 +217,7 @@ module Config
     @@global_config.date_output_format = config_data.date_output_format
     @@global_config.verbosity = config_data.verbosity
     @@global_config.import_templates = config_data.import_templates
+    @@global_config.pretty_html = (config_data.pretty_html? == false) ? false : true
     @@global_config.import = config_data.import
 
     # Store default language
@@ -427,6 +434,7 @@ location: "tags/"
     property import : Hash(String, YAML::Any)
     property image_large : Int32
     property image_thumb : Int32
+    property? pretty_html : Bool
 
     def initialize(@lang_config : LangConfig, @global : SiteConfig)
       @output = @global.output
@@ -444,6 +452,7 @@ location: "tags/"
       @import = @global.import
       @image_large = @global.image_large
       @image_thumb = @global.image_thumb
+      @pretty_html = @global.pretty_html?
     end
   end
 

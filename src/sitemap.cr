@@ -26,7 +26,9 @@ module Sitemap
     # TODO: support robot exclusion
     # TODO: support alternates for locations
     start = Time.instant
-    inputs = Croupier::TaskManager.tasks.keys.select(&.ends_with?(".html"))
+    # Sorted for deterministic output: task registration order follows
+    # parallel content reading and is not stable
+    inputs = Croupier::TaskManager.tasks.keys.select(&.ends_with?(".html")).sort!
     Log.info { "🗺️ Sitemap: collected #{inputs.size} inputs in #{(Time.instant - start).total_milliseconds}ms" }
 
     output = (Path[Config.options.output] / "sitemap.xml").to_s

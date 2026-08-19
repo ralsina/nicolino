@@ -64,11 +64,72 @@ module HtmlFilters
     doc
   end
 
+  # A href/src attribute value that make_links_relative would rewrite:
+  # anything not starting with "/", "#", a URL scheme (scheme'd values
+  # are absolute URLs; resolve+relativize round-trips a different-host
+  # absolute URL unchanged), and not empty (an empty value round-trips
+  # to empty, and the canonical link that carries it is skipped by the
+  # filter anyway).
+  NEEDS_LINK_FIX = /(?:href|src)\s*=\s*(?:"(?!["\/#]|[a-zA-Z][a-zA-Z0-9+.\-]*:)[^"]*"|'(?!['\/#]|[a-zA-Z][a-zA-Z0-9+.\-]*:)[^']*')/
+
+  # A code tag whose class doesn't already start with language-,
+  # which fix_code_classes would rewrite.
+  NEEDS_CODE_FIX = /<code[^>]*\sclass\s*=\s*["'](?!language-)/
+
+  # Whether the page-level post-processing pass (lexbor parse +
+  # make_links_relative + fix_code_classes + serialize) would change
+  # anything in this html. When it returns false the whole pass can
+  # be skipped and the input returned as-is, which for mostly-static
+  # pages saves a full parse/filter/serialize round trip per page.
+  def self.needs_postprocessing?(html : String) : Bool
+    html.matches?(NEEDS_LINK_FIX) || html.matches?(NEEDS_CODE_FIX)
+  end
+
+  # Capture form of NEEDS_LINK_FIX: matches a href/src value that
+  # make_links_relative would rewrite, capturing the value and the
+  # quote character around it.
+  NEEDS_LINK_FIX_CAPTURE = /(?:href|src)\s*=\s*(["'])(?!\/|#|[a-zA-Z][a-zA-Z0-9+.\-]*:)(.*?)\1/
+
+  # A href/src lookalike inside a script body or an HTML comment:
+  # the parser-based pass ignores those (they are not element
+  # attributes), so when they are present the string rewrite is not
+  # equivalent and callers must use the parser path instead.
+  LINK_FIX_UNSAFE_CONTEXT = /(?:<script[^>]*>[^<]*|\<!--[^>]*)href\s*=\s*["']/
+
+  # Whether the string-based link rewrite is safe for this html: no
+  # href/src lookalikes hiding in script bodies or comments, and no
+  # uppercase attribute spellings the capture regex would miss.
+  def self.string_rewrite_safe?(html : String) : Bool
+    !html.matches?(LINK_FIX_UNSAFE_CONTEXT) && !html.matches?(/HREF\s*=\s*["']|SRC\s*=\s*["']/)
+  end
+
+  # Rewrite relative href/src values directly on the html STRING,
+  # without parsing the document. Used when pretty_html is off and
+  # only links need fixing: no lexbor parse, no re-serialization
+  # (which historically mangled code blocks), same relativize
+  # computation as make_links_relative applied to each value.
+  # Only call when string_rewrite_safe? says the html has no
+  # href/src lookalikes outside real attributes.
+  def self.relativize_links_in_string(html : String, base : String) : String
+    # Nothing to rewrite: skip the gsub scan entirely
+    return html unless html.matches?(NEEDS_LINK_FIX)
+    base_uri = URI.parse(base)
+    html.gsub(NEEDS_LINK_FIX_CAPTURE) do |match|
+      value = $2
+      rewritten = base_uri.relativize(base_uri.resolve(value)).to_s
+      if rewritten == value
+        match
+      else
+        "#{match[0, match.size - value.size - 1]}#{rewritten}#{$1}"
+      end
+    end
+  end
+
   # Make all relative links absolute to the site root
   # base is where the file containing the URIs is located
   # relative to the site root
   # Note: no mutex needed, each call operates on its own document
-  def self.make_links_relative(doc, base) # ameba:disable Metrics/CyclomaticComplexity
+  def self.make_links_relative(doc, base)
     base_uri = URI.parse(base)
     doc.nodes("a").each do |node|
       next unless node.has_key? "href"

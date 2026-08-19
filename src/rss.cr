@@ -22,7 +22,9 @@ module RSSFeed
       feed = RSS.new title: title
       posts
         .select { |post| !post.date.nil? }
-        .sort_by! { |post| post.date.as(Time) }
+        # Output path tiebreaker: content reading is parallel, so the
+        # input order of same-date posts is not stable
+        .sort_by! { |post| {post.date.as(Time), post.output} }
         .last(max_items)
         .reverse!
         .each do |post|

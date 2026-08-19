@@ -11,6 +11,10 @@ require "shortcodes"
 module Markdown
   # Global registry of all posts (shared across Markdown::File and HTML::File)
   @@posts = Hash(String, File).new
+  # Execution context for content-reading workers (see files_from):
+  # unlike the default context, Parallel lets any scheduler resume
+  # any fiber, so the workers spread across the thread pool
+  @@files_context : Fiber::ExecutionContext::Parallel? = nil
   # Guards registry insertion during parallel content loading
   @@posts_mutex = Mutex.new
 
@@ -33,6 +37,8 @@ module Markdown
     @html_mutex = Mutex.new
     @link = Hash(String, String).new
     @base = Path.new
+    # Reader used for canonical ordering of parallel-read posts
+    getter base : Path
     @metadata = Hash(String, Hash(String, String)).new
     @rendered = Hash(String, String).new
     @shortcodes = Hash(String, Array(Shortcodes::Shortcode)).new
@@ -287,7 +293,7 @@ module Markdown
                LibDiscount::MKD_NOPANTS |
                LibDiscount::MKD_GITHUBTAGS
       )
-      # Performance Note: parsing the HTML takes ~.7 seconds for
+      # Performance Note: parsing the HTML takes ~0.7 seconds for
       # 4000 short posts. Calling each filter is much faster.
       doc = Lexbor::Parser.new(compiled)
       doc = HtmlFilters.downgrade_headers(doc)
@@ -559,13 +565,48 @@ module Markdown
   # if require_date is true, posts *must* have a date
   # if require_title is true, posts *must* have a title
   def self.render(posts, require_date = true, require_title = false)
+    # Computing a post's dependencies (shortcode validation, template
+    # lookups) is pure, so do it for all posts in parallel on the
+    # files_context pool; the task declarations themselves stay
+    # serial (croupier's registry is single-threaded at declaration)
+    dependencies = {} of File => Array(String)
+    first_error : Exception? = nil
+    unless posts.empty?
+      context = (@@files_context ||= Fiber::ExecutionContext::Parallel.new("markdown-files", Math.min(System.cpu_count, posts.size)))
+      work = Channel(File).new(posts.size)
+      posts.each { |post| work.send(post) }
+      work.close
+      results = Channel({File, Array(String)}).new(posts.size)
+      Math.min(System.cpu_count, posts.size).times do
+        context.spawn do
+          loop do
+            break unless post = work.receive?
+            deps = begin
+              post.dependencies
+            rescue ex
+              first_error = ex
+              [] of String
+            end
+            results.send({post, deps})
+          end
+        end
+      end
+      posts.size.times do
+        post, deps = results.receive
+        dependencies[post] = deps
+      end
+    end
+    if error = first_error
+      raise error
+    end
+
     Config.languages.keys.each do |lang|
       posts.each do |post|
         FeatureTask.new(
           feature_name: "posts",
           id: "markdown",
           output: post.output(lang),
-          inputs: post.dependencies,
+          inputs: dependencies[post],
           mergeable: false
         ) do
           begin
@@ -591,9 +632,25 @@ module Markdown
               "language_links" => post.language_links(lang),
             }
             html = Render.apply_template(Theme.template_path("page.tmpl"), template_vars, lang)
-            doc = Lexbor::Parser.new(html)
-            doc = HtmlFilters.make_links_relative(doc, post.link(lang))
-            HtmlFilters.fix_code_classes(doc).to_html
+            # Link relativization is mode-independent: rewrite links
+            # directly on the string whenever that is provably safe
+            # (see HtmlFilters.string_rewrite_safe?), so both pretty
+            # and fast modes produce the same hrefs. Only unsafe
+            # contexts fall back to the parser-based rewrite.
+            unless HtmlFilters.string_rewrite_safe?(html)
+              doc = Lexbor::Parser.new(html)
+              doc = HtmlFilters.make_links_relative(doc, post.link(lang))
+              html = HtmlFilters.fix_code_classes(doc).to_html
+            end
+            html = HtmlFilters.relativize_links_in_string(html, post.link(lang))
+            # pretty_html only controls output formatting: run the
+            # lexbor normalization pass for byte-stable pretty output,
+            # skip it for the faster raw template output
+            if Config.options.pretty_html?
+              doc = Lexbor::Parser.new(html)
+              html = HtmlFilters.fix_code_classes(doc).to_html
+            end
+            html
           rescue ex
             Log.error { "Error rendering post: #{post.source(lang)}" }
             Log.error { "#{ex.class}: #{ex.message}" }
@@ -650,9 +707,12 @@ module Markdown
       mergeable: false
     ) do
       Log.info { "👉 #{output}" }
-      # Filter out posts without dates, then sort by date descending (newest first)
+      # Filter out posts without dates, then sort by date descending
+      # (newest first). The output path tiebreaker keeps the order
+      # deterministic for posts sharing a date: content reading is
+      # parallel, so the input order is not stable
       sorted_posts = posts.select { |post| !post.date.nil? }
-        .sort_by! { |post| post.date.as(Time) }
+        .sort_by! { |post| {post.date.as(Time), post.output} }
         .reverse!
 
       # Limit to 100 posts for index pages
@@ -738,20 +798,17 @@ module Markdown
     return [] of File if all_sources.empty?
 
     workers = Math.min(System.cpu_count, all_sources.size)
-    # Make sure the default execution context has enough OS threads for
-    # the worker fibers to actually run concurrently (same trick as
-    # croupier's enable_parallelism; without this, spawned fibers can
-    # all land on the spawning thread's queue).
-    {% if !flag?(:preview_mt) && compare_versions(Crystal::VERSION, "1.21.0") >= 0 %}
-      Fiber::ExecutionContext.default.resize(workers)
-    {% end %}
+    # Run the workers on a Parallel execution context: any scheduler
+    # may resume any fiber, so the pool spreads across the thread
+    # pool instead of piling up on the spawning thread's run queue
+    context = (@@files_context ||= Fiber::ExecutionContext::Parallel.new("markdown-files", workers))
     work = Channel({Path, Hash(String, String)}).new(all_sources.size)
     all_sources.each { |base, sources| work.send({base, sources}) }
     work.close
 
     results = Channel({File?, Exception?}).new(all_sources.size)
     workers.times do
-      spawn do
+      context.spawn do
         loop do
           break unless item = work.receive?
           base, sources = item
@@ -775,6 +832,10 @@ module Markdown
       end
     end
     raise first_error if first_error
+    # Workers complete out of order, so the assembled array follows
+    # completion order; sort by base path so every consumer sees a
+    # stable, canonical order (same-date post listings, feeds, sitemaps)
+    posts.sort_by!(&.base.to_s)
     posts
   end
 
