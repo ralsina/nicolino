@@ -570,6 +570,7 @@ module Markdown
     # lookups) is pure, so do it for all posts in parallel on the
     # files_context pool; the task declarations themselves stay
     # serial (croupier's registry is single-threaded at declaration)
+    deps_start = Time.instant
     dependencies = {} of File => Array(String)
     first_error : Exception? = nil
     unless posts.empty?
@@ -600,7 +601,10 @@ module Markdown
     if error = first_error
       raise error
     end
+    deps_elapsed = Time.instant - deps_start
+    Log.info { "  ⏱  Dependency computation: #{deps_elapsed.total_milliseconds.round}ms (#{posts.size} posts, parallel)" }
 
+    reg_start = Time.instant
     Config.languages.keys.each do |lang|
       posts.each do |post|
         FeatureTask.new(
@@ -661,6 +665,9 @@ module Markdown
         end
       end
     end
+    reg_elapsed = Time.instant - reg_start
+    total_tasks = posts.size * Config.languages.size
+    Log.info { "  ⏱  Task registration: #{reg_elapsed.total_milliseconds.round}ms (#{total_tasks} tasks, sequential)" }
   end
 
   # Similar to self.render but it only validates correctness of posts
