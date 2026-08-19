@@ -18,6 +18,7 @@ module Render
     ctx["site_url"] = Crinja::Value.new(lang_config.url)
     ctx["site_footer"] = Crinja::Value.new(lang_config.footer)
     ctx["site_nav_items"] = Crinja::Value.new(lang_config.nav_items)
-    Templates.environment.get_template(template).render(ctx)
+    tmpl = Templates.get_template(template, lang)
+    TemplatePreprocessor.render_with(Templates.environment, tmpl, ctx)
   end
 end

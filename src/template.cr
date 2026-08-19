@@ -314,4 +314,26 @@ module Templates
   def self.environment
     EnvCache.acquire(->create_env)
   end
+
+  # The build-constant site variables templates see (per language),
+  # used by TemplatePreprocessor to fold constant subtrees at load
+  # time. Keep in sync with Render.apply_template's site vars.
+  def self.constants_for(lang) : Hash(String, Crinja::Value)
+    lang_config = Config[lang]
+    {
+      "site_title"       => Crinja::Value.new(lang_config.title),
+      "site_description" => Crinja::Value.new(lang_config.description),
+      "site_url"         => Crinja::Value.new(lang_config.url),
+      "site_footer"      => Crinja::Value.new(lang_config.footer),
+      "site_nav_items"   => Crinja::Value.new(lang_config.nav_items),
+    }
+  end
+
+  # The (folded) template for *name* in *lang* on the current
+  # fiber's environment
+  def self.get_template(name : String, lang : String) : Crinja::Template
+    env = environment
+    return env.get_template(name) if ENV["NO_FOLD"]?
+    TemplatePreprocessor.get_template(env, name, lang, constants_for(lang))
+  end
 end

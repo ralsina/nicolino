@@ -327,7 +327,8 @@ module Markdown
     # Render the markdown HTML into the right template for the fragment
     def rendered(lang = nil)
       lang ||= Locale.language
-      Templates.environment.get_template(template(lang)).render(value(lang))
+      tmpl = Templates.get_template(template(lang), lang)
+      TemplatePreprocessor.render_with(Templates.environment, tmpl, value(lang))
     end
 
     def _replace_shortcodes(text : String) : String
