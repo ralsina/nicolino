@@ -8,7 +8,7 @@ module Listings
   include Utils
 
   # Register output folder to exclude from folder_indexes
-  FolderIndexes.register_exclude("listings/")
+  FolderIndexes.register_exclude { Config.listings }
 
   # Enable listings feature
   def self.enable(is_enabled : Bool, content_path : Path)

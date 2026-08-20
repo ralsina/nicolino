@@ -7,13 +7,25 @@ module FolderIndexes
   # generate indexes for them. Feature modules register their output folders
   # via register_exclude.
   @@excluded_folders = Set(String).new
+  # Feature dirs that depend on the loaded configuration (e.g. a custom
+  # galleries/ or books/ directory) are registered as blocks so they don't
+  # need Config at module-load time; they are resolved lazily on access.
+  @@excluded_dirs = [] of Proc(String)
 
   def self.register_exclude(folder : String)
     @@excluded_folders.add(folder.chomp('/'))
   end
 
+  # Register a config-driven exclude directory, resolved when the config is
+  # available (at build time) rather than when the module is required.
+  def self.register_exclude(&block : -> String)
+    @@excluded_dirs << block
+  end
+
   def self.excluded_folders : Set(String)
-    @@excluded_folders
+    result = @@excluded_folders.dup
+    @@excluded_dirs.each { |dir| result.add(dir.call.chomp('/')) }
+    result
   end
 
   # Enable folder_indexes feature

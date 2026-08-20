@@ -113,7 +113,7 @@ module Utils
     end
 
     # Skip all files in books directories (they are handled by the Books feature)
-    books_path = Path[content_path] / "books"
+    books_path = Path[content_path] / Config.books
     if base_path.to_s.starts_with?(books_path.to_s)
       return true
     end
