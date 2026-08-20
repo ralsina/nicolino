@@ -46,8 +46,7 @@ module Nicolino
       # a config file yet.
       def initialize(@options)
         # Setup logging
-        verbosity = @options.fetch("-v", 4).to_s.to_i
-        verbosity = 0 if @options["-q"]?.in?(1, true)
+        verbosity = Command.resolve_verbosity(@options, 4)
         progress = @options.fetch("--progress", nil)
         if progress
           verbosity = 0
