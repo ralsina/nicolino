@@ -26,6 +26,26 @@ module Gallery
     ["#{galleries_path}/**/*.md"]
   end
 
+  # For gallery folders that contain images but no index.md, generate a
+  # minimal index.md so they render as galleries too (issue #49). A folder
+  # is treated as a gallery if it directly contains images. Idempotent:
+  # existing index.md files are left untouched, and a generated file is
+  # only written once so auto-mode rebuilds settle.
+  def self.ensure_index_files
+    root = (Path[Config.options.content] / Config.options.galleries).normalize
+    return unless ::Dir.exists?(root)
+
+    Dir.glob("#{root}/**/").each do |dir_str|
+      dir = Path[dir_str].normalize
+      next if dir == root
+      index_md = dir / "index.md"
+      next if ::File.exists?(index_md)
+      next if Dir.glob("#{dir}/*.{jpg,png,webp,gif}").empty?
+      ::File.write(index_md, "---\ntitle: #{dir.basename.capitalize}\n---\n\n")
+      Log.info { "🖼️  Generated #{index_md} for image-only gallery" }
+    end
+  end
+
   # Create a Gallery object from source files
   def self.create_file(sources : Hash(String, String), base : Path) : Markdown::File?
     # Only index.md files are galleries

@@ -85,6 +85,10 @@ def create_tasks
     content_features << {name: "galleries", globs: Gallery.content_globs, create_file: ->Gallery.create_file(Hash(String, String), Path)}
     content_features << {name: "pages", globs: Pages.content_globs, create_file: ->Pages.create_file(Hash(String, String), Path)}
 
+    # Materialize index.md for image-only gallery folders before scanning,
+    # so galleries without a dedicated index.md are discovered and rendered.
+    Gallery.ensure_index_files if features.includes?("galleries")
+
     # Single parallel scan
     scan_results = ContentScanner.scan_all(content_features)
     scan_elapsed = Time.instant - scan_start
