@@ -180,9 +180,12 @@ def create_all_directories
   Log.debug { "Pre-creating all output directories..." }
   directories = Set(String).new
 
-  # Collect all unique parent directories from task outputs
+  # Collect all unique parent directories from task outputs.
+  # kv:// outputs are virtual keys stored in the k/v store, not files,
+  # so their "path" must not be materialized on disk.
   Croupier::TaskManager.tasks.each do |_task_id, task|
     task.outputs.each do |output|
+      next if output.lchop?("kv://")
       directories.add(Path[output].parent.to_s)
     end
   end
