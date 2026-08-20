@@ -1,6 +1,7 @@
 require "./markdown"
 require "./theme"
 require "json"
+require "crinja"
 
 # Create automatic image galleries
 #
@@ -39,6 +40,26 @@ module Gallery
     Log.error { "Error creating gallery #{base}: #{ex.message}" }
     Log.debug { ex }
     nil
+  end
+
+  # Create a new gallery folder with an index.md
+  def self.create(path : Path)
+    raise "Galleries are folders, not documents" if path.to_s.ends_with?(".md")
+    gallery_path = path / "index.md"
+    Log.info { "Creating new gallery #{gallery_path}" }
+    raise "#{gallery_path} already exists" if ::File.exists?(gallery_path)
+    Dir.mkdir_p(gallery_path.dirname)
+    ::File.open(gallery_path, "w") do |io|
+      template = <<-TEMPLATE
+        ---
+        title: Add title here
+        date: {{date}}
+        ---
+
+        Add content here
+        TEMPLATE
+      io << Crinja.render(template, {date: Time.local.to_s})
+    end
   end
 
   # Enable galleries feature using pre-scanned files

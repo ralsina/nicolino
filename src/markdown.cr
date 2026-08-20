@@ -107,7 +107,7 @@ module Markdown
     def initialize(sources, base)
       @sources = sources
       @base = base
-      @sources.map do |lang, _|
+      @sources.each do |lang, _|
         p = Path[base]
         # Remove the leading "posts/"
         p = Path[p.parts].relative_to Config.options.content
@@ -950,10 +950,10 @@ module Markdown
     files_from(todo) { |sources, base| File.new(sources, base) }
   end
 
-  # Create a new "page" file
-  def self.new_page(path)
+  # Create a new content file from the default template
+  private def self.create_content_file(path : Path, kind : String)
     path = path / "index.md" unless path.to_s.ends_with? ".md"
-    Log.info { "Creating new page #{path}" }
+    Log.info { "Creating new #{kind} #{path}" }
     raise "#{path} already exists" if ::File.exists? path
     Dir.mkdir_p(path.dirname)
     ::File.open(path, "w") do |io|
@@ -969,22 +969,13 @@ module Markdown
     end
   end
 
+  # Create a new "page" file
+  def self.new_page(path)
+    create_content_file(path, "page")
+  end
+
   # Create a new "post" file
   def self.new_post(path)
-    path = path / "index.md" unless path.to_s.ends_with? ".md"
-    Log.info { "Creating new post #{path}" }
-    raise "#{path} already exists" if ::File.exists? path
-    Dir.mkdir_p(path.dirname)
-    ::File.open(path, "w") do |io|
-      template = <<-TEMPLATE
-        ---
-        title: Add title here
-        date: {{date}}
-        ---
-
-        Add content here
-        TEMPLATE
-      io << Crinja.render(template, {date: Time.local.to_s})
-    end
+    create_content_file(path, "post")
   end
 end

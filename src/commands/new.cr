@@ -2,7 +2,6 @@ require "./command.cr"
 require "../creatable"
 require "../markdown"
 require "../gallery"
-require "crinja"
 
 module Nicolino
   module Commands
@@ -78,22 +77,7 @@ module Nicolino
         end
 
         Creatable.register("gallery", "galleries", "Image gallery") do |path|
-          raise "Galleries are folders, not documents" if path.to_s.ends_with?(".md")
-          gallery_path = path / "index.md"
-          Log.info { "Creating new gallery #{gallery_path}" }
-          raise "#{gallery_path} already exists" if ::File.exists?(gallery_path)
-          Dir.mkdir_p(gallery_path.dirname)
-          ::File.open(gallery_path, "w") do |io|
-            template = <<-TEMPLATE
-              ---
-              title: Add title here
-              date: {{date}}
-              ---
-
-              Add content here
-              TEMPLATE
-            io << Crinja.render(template, {date: Time.local.to_s})
-          end
+          Gallery.create(path)
         end
 
         Creatable.register("page", "pages", "Static page") do |path|

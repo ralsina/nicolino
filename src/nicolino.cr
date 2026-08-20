@@ -181,17 +181,9 @@ def create_all_directories
   directories = Set(String).new
 
   # Collect all unique parent directories from task outputs
-  Croupier::TaskManager.tasks.each do |task_id, task|
-    # For image processing tasks, we need parent directories of outputs
-    if task_id.starts_with?("image:") || task_id.starts_with?("thumb:")
-      task.outputs.each do |output|
-        directories.add(Path[output].parent.to_s)
-      end
-    else
-      # For other files, get parent directory
-      task.outputs.each do |output|
-        directories.add(Path[output].parent.to_s)
-      end
+  Croupier::TaskManager.tasks.each do |_task_id, task|
+    task.outputs.each do |output|
+      directories.add(Path[output].parent.to_s)
     end
   end
 

@@ -36,13 +36,10 @@ end
 Nicolino::Commands::Serve.register
 
 def make_server(live_reload = false)
-  handlers = [
-    Handler::LiveReloadHandler.new,
-    Handler::IndexHandler.new,
-    HTTP::StaticFileHandler.new("output"),
-  ]
-
-  handlers.delete_at(0) if !live_reload
+  handlers = [] of HTTP::Handler
+  handlers << Handler::LiveReloadHandler.new if live_reload
+  handlers << Handler::IndexHandler.new
+  handlers << HTTP::StaticFileHandler.new("output")
 
   server = HTTP::Server.new handlers
   address = server.bind_tcp 8080
