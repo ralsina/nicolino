@@ -1,0 +1,10 @@
+# Hugo benchmark site configuration.
+#
+# The bench harness copies the vendored corpus (bench/corpus/*.md) into
+# content/posts/ and builds with `hugo --quiet`. The minimal `bench` theme
+# renders markdown to HTML; there is no image processing to keep the
+# comparison focused on markdown rendering.
+baseURL = 'https://bench.example.com/'
+languageCode = 'en-us'
+title = 'Hugo Benchmark'
+theme = 'bench'

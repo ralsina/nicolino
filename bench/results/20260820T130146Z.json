@@ -1,0 +1,21 @@
+{
+  "date": "20260820T130146Z",
+  "corpus_files": 4000,
+  "runs": 3,
+  "workers": 12,
+  "nicolino": {
+    "version": "0.22.0",
+    "build_mode": "dev",
+    "flags": "--fast-mode -B -p",
+    "median_seconds": 1.2708,
+    "html_files": 4000,
+    "optimized": null
+  },
+  "hugo": {
+    "version": "hugo v0.164.0+extended+withdeploy linux/amd64 BuildDate=unknown",
+    "median_seconds": 0.5981,
+    "html_files": 4004
+  },
+  "ratio_seconds_nicolino_over_hugo": 2.12,
+  "ratio_seconds_nicolino_optimized_over_hugo": null
+}

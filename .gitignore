@@ -8,10 +8,18 @@
 .kvstore
 .rucksack
 .rucksack.toc
-bench
 content/posts/ralsina/
 .crystal
-content/4000/
+# Benchmark harness transient build artifacts (corpus/site config are committed)
+/bench/site/output/
+/bench/site/content/
+/bench/site/themes/
+/bench/hugo/public/
+/bench/hugo/content/
+/bench/hugo/.hugo_build.lock
+/bench/site/.kvstore
+/bench/site/.croupier
+/bench/release-bin/
 /myblog/
 /mysite/
 /.claude/
