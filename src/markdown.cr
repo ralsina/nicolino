@@ -574,7 +574,7 @@ module Markdown
       result = [] of Hash(String, String)
 
       # For each configured language, check if we have this post
-      Config.languages.keys.each do |other_lang|
+      Config.languages.each do |other_lang|
         # Skip the current language
         next if other_lang == lang
 
@@ -636,7 +636,7 @@ module Markdown
       # Add similarity index as dependency if feature is enabled
       features = Config.features
       if features.includes?("similarity")
-        Config.languages.keys.each do |lang|
+        Config.languages.each do |lang|
           result << "kv://similarity/index/#{lang}"
         end
       end
@@ -692,7 +692,7 @@ module Markdown
     Log.info { "  ⏱  Dependency computation: #{deps_elapsed.total_milliseconds.round}ms (#{posts.size} posts, parallel)" }
 
     reg_start = Time.instant
-    Config.languages.keys.each do |lang|
+    Config.languages.each do |lang|
       posts.each do |post|
         FeatureTask.new(
           feature_name: "posts",
@@ -769,7 +769,7 @@ module Markdown
   # without actually generating output
   def self.validate(posts, require_date = true)
     error_count = 0
-    Config.languages.keys.each do |lang|
+    Config.languages.each do |lang|
       posts.each do |post|
         if require_date && post.date == nil
           error_count += 1
@@ -855,7 +855,7 @@ module Markdown
     output_str = output_path.to_s
 
     # For each configured language, check if an alternate index exists
-    Config.languages.keys.each do |other_lang|
+    Config.languages.each do |other_lang|
       next if other_lang == lang
 
       # Determine the alternate index path

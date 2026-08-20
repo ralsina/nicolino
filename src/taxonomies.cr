@@ -123,7 +123,7 @@ module Taxonomies
 
     def render
       # Render taxonomy index
-      Config.languages.keys.each do |lang|
+      Config.languages.each do |lang|
         # Make output path language-specific to avoid conflicts
         # For example: tags/ for en and es/ for other languages
         # Only add language suffix if not the default language

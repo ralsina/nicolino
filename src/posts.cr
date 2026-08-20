@@ -19,11 +19,11 @@ module Posts
 
   # Enable posts feature using pre-scanned files
   # Returns nil if posts feature is disabled
-  def self.enable_from_scan(scan_result : Array(Markdown::File)?, feature_set : Set(YAML::Any)) : Array(Markdown::File)?
+  def self.enable_from_scan(scan_result : Array(Markdown::File)?, feature_set : Set(String)) : Array(Markdown::File)?
     return unless scan_result
 
     posts = scan_result
-    features = feature_set.map(&.as_s).to_set
+    features = feature_set
 
     Log.info { "✓ Found #{posts.size} post#{posts.size == 1 ? "" : "s"}" }
 
@@ -37,7 +37,7 @@ module Posts
     Markdown.render(posts, require_date: true, require_title: true)
 
     # Render RSS feeds for each language (only 20 most recent posts)
-    Config.languages.keys.each do |lang|
+    Config.languages.each do |lang|
       # Language suffix for non-English feeds
       lang_suffix = Utils.lang_suffix(lang)
       rss_output = Path[Config.output] / "rss#{lang_suffix}.xml"

@@ -4,6 +4,11 @@ module Config
   @@config_file_path : String = "conf.yml"
   @@default_lang : String = "en"
 
+  # Raised when the configuration cannot be loaded. The CLI layer converts
+  # this into an exit code; library code should never call `exit`.
+  class ConfigError < Exception
+  end
+
   # Font description in config
   struct Font
     include YAML::Serializable
@@ -29,10 +34,10 @@ module Config
   alias Taxonomies = Hash(String, Taxonomy)
 
   # Global configuration from conf.yml (NOT translatable)
-  struct ConfigFile
+  struct SiteConfig
     include YAML::Serializable
 
-    # Translatable properties (also in SiteConfig, but read into LangConfig)
+    # Translatable properties (also in LangConfig, but read into LangConfig)
     property title : String = "Nicolino"
     property description : String = "A Nicolino Site"
     property url : String = "https://example.com"
@@ -44,6 +49,7 @@ module Config
     property content : String = "content/"
     property posts : String = "posts/"
     property galleries : String = "galleries/"
+    property listings : String = "listings/"
     property theme : String = "default"
     property color_scheme : String = "default"
     property fonts : Fonts = Fonts.new
@@ -67,74 +73,6 @@ module Config
 
     # Import configuration (hash of feed name to config)
     property import : Hash(String, YAML::Any) = Hash(String, YAML::Any).new
-  end
-
-  # Site configuration section from conf.yml (NOT translatable)
-  struct SiteConfig
-    include YAML::Serializable
-
-    # Translatable - will be in LangConfig
-    property title : String = "Nicolino"
-    property description : String = "A Nicolino Site"
-    property footer : String = "Powered by Nicolino"
-    property url : String = "https://example.com"
-    property nav_items : NavItems = NavItems.new
-
-    # NOT translatable
-    property output : String = "output/"
-    property content : String = "content/"
-    property posts : String = "posts/"
-    property galleries : String = "galleries/"
-    property listings : String = "listings/"
-
-    # NOT translatable
-    property theme : String = "default"
-    property color_scheme : String = "default"
-    property fonts : Fonts = Fonts.new
-
-    # NOT translatable
-    property image_large : Int32 = 1920
-    property image_thumb : Int32 = 640
-    property pandoc_formats : Hash(String, String) = {} of String => String
-
-    # Locale/Language settings
-    property language : String = "en"
-    property locale : String = "en_US.UTF-8"
-    property date_output_format : String = "%Y-%m-%d %H:%M"
-
-    # NOT translatable
-    property verbosity : Int32 = 4
-    property import_templates : String = "user_templates"
-    property? pretty_html : Bool = true
-
-    # Import configuration (hash of feed name to config)
-    property import : Hash(String, YAML::Any) = Hash(String, YAML::Any).new
-
-    # Default constructor for class variable initialization
-    def initialize
-      @title = "Nicolino"
-      @description = "A Nicolino Site"
-      @footer = "Powered by Nicolino"
-      @url = "https://example.com"
-      @nav_items = NavItems.new
-      @output = "output/"
-      @content = "content/"
-      @posts = "posts/"
-      @galleries = "galleries/"
-      @listings = "listings/"
-      @theme = "default"
-      @color_scheme = "default"
-      @fonts = Fonts.new
-      @image_large = 1920
-      @image_thumb = 640
-      @pandoc_formats = {} of String => String
-      @language = "en"
-      @locale = "en_US.UTF-8"
-      @date_output_format = "%Y-%m-%d %H:%M"
-      @verbosity = 4
-      @import_templates = "user_templates"
-      @import = Hash(String, YAML::Any).new
-    end
   end
 
   # Translatable configuration - can be overridden by conf.LANG.yml
@@ -168,12 +106,12 @@ module Config
 
   # Store all loaded language configs
   @@lang_configs = Hash(String, LangConfig).new
-  @@global_config : SiteConfig = SiteConfig.new
+  @@global_config : SiteConfig = SiteConfig.from_yaml("{}")
   @@features : Array(String) = [] of String
   @@loaded : Bool = false
-  # Memoized language map (this used to glob the config directory on
+  # Memoized language list (this used to glob the config directory on
   # every call, which was called per-file during content scans)
-  @@languages : Hash(String, Hash(String, String))? = nil
+  @@languages : Array(String)? = nil
 
   # Load config from conf.yml
   def self.config(path = "conf.yml")
@@ -183,42 +121,18 @@ module Config
 
     # Read and parse conf.yml
     unless File.exists?(path)
-      Log.error { "No configuration file found at '#{path}'. Are you in a Nicolino site directory?" }
-      Log.error { "Run 'nicolino init <path>' to create a new site, or specify a config file with -c." }
-      exit 1
+      raise ConfigError.new(
+        "No configuration file found at '#{path}'. Are you in a Nicolino site directory?\n" \
+        "Run 'nicolino init <path>' to create a new site, or specify a config file with -c."
+      )
     end
-    config_data = ConfigFile.from_yaml(File.read(path))
-
-    # Store global config (convert ConfigFile to SiteConfig)
-    @@global_config = SiteConfig.new
-    @@global_config.title = config_data.title
-    @@global_config.description = config_data.description
-    @@global_config.url = config_data.url
-    @@global_config.footer = config_data.footer
-    @@global_config.nav_items = config_data.nav_items
-    @@global_config.output = config_data.output
-    @@global_config.content = config_data.content
-    @@global_config.posts = config_data.posts
-    @@global_config.galleries = config_data.galleries
-    @@global_config.theme = config_data.theme
-    @@global_config.color_scheme = config_data.color_scheme
-    @@global_config.fonts = config_data.fonts
-    @@global_config.image_large = config_data.image_large
-    @@global_config.image_thumb = config_data.image_thumb
-    @@global_config.pandoc_formats = config_data.pandoc_formats
-    @@global_config.language = config_data.language
-    @@global_config.locale = config_data.locale
-    @@global_config.date_output_format = config_data.date_output_format
-    @@global_config.verbosity = config_data.verbosity
-    @@global_config.import_templates = config_data.import_templates
-    @@global_config.pretty_html = !config_data.pretty_html? ? false : true
-    @@global_config.import = config_data.import
+    @@global_config = SiteConfig.from_yaml(File.read(path))
 
     # Store default language
     @@default_lang = @@global_config.language
 
     # Build LangConfig for default language from translatable parts
-    lang_config = LangConfig.new(
+    @@lang_configs[@@default_lang] = LangConfig.new(
       title: @@global_config.title,
       description: @@global_config.description,
       footer: @@global_config.footer,
@@ -226,11 +140,10 @@ module Config
       nav_items: @@global_config.nav_items,
       date_output_format: @@global_config.date_output_format,
       locale: @@global_config.locale,
-      taxonomies: config_data.taxonomies
+      taxonomies: @@global_config.taxonomies
     )
 
-    @@lang_configs[@@default_lang] = lang_config
-    @@features = config_data.features
+    @@features = @@global_config.features
     @@loaded = true
 
     # Set default features if empty
@@ -378,7 +291,7 @@ location: "tags/"
 
   def self.url : String
     # URL is translatable (could have different domain per language)
-    self[@@default_lang].url rescue "https://example.com"
+    self[@@default_lang].url
   end
 
   # ===== Translatable accessors (forward to default language) =====
@@ -410,9 +323,9 @@ location: "tags/"
     @@features
   end
 
-  def self.features_set : Set(YAML::Any)
+  def self.features_set : Set(String)
     ensure_loaded
-    @@features.map { |feature| YAML::Any.new(feature) }.to_set
+    @@features.to_set
   end
 
   # ===== Legacy compatibility =====
@@ -463,21 +376,21 @@ location: "tags/"
 
   # Get all available languages by scanning for conf.LANG.yml files
   # (memoized; invalidated by reload)
-  def self.languages
+  def self.languages : Array(String)
     @@languages ||= begin
       ensure_loaded
-      lang_hash = {@@default_lang => Hash(String, String).new}
+      langs = [@@default_lang]
 
       # Scan for conf.LANG.yml files
       Dir.glob("conf.*.yml").each do |file|
         # Extract language code from conf.LANG.yml
         if match = file.match(/^conf\.([a-z]{2})\.yml$/)
           lang = match[1]
-          lang_hash[lang] = Hash(String, String).new
+          langs << lang unless langs.includes?(lang)
         end
       end
 
-      lang_hash
+      langs
     end
   end
 

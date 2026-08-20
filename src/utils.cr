@@ -132,7 +132,7 @@ module Utils
       dirname = base.dirname
       stem = Path[base.stem]
       stem_ext = stem.extension
-      if !stem_ext.empty? && Config.languages.has_key? stem_ext[1..]
+      if !stem_ext.empty? && Config.languages.includes? stem_ext[1..]
         stem = stem.stem
       end
       bases << Path[dirname] / stem
@@ -146,9 +146,9 @@ module Utils
     bases.each do |base|
       sources = Hash(String, String).new
       possible_sources = (["#{base}.#{extension}"] +
-                          Config.languages.keys.map { |lang| "#{base}.#{lang}.#{extension}" }) \
+                          Config.languages.map { |lang| "#{base}.#{lang}.#{extension}" }) \
         .select { |source| ::File.exists? source }
-      Config.languages.keys.each do |lang|
+      Config.languages.each do |lang|
         lang_base = "#{base}.#{lang}.#{extension}"
         if possible_sources.includes? lang_base
           sources[lang] = lang_base

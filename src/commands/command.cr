@@ -11,7 +11,12 @@ module Nicolino
       def initialize(@options)
         # Load config and setup logging
         config_file = @options["-c"]? ? @options["-c"].as(String) : "conf.yml"
-        Config.config(config_file)
+        begin
+          Config.config(config_file)
+        rescue ex : Config::ConfigError
+          Log.error { ex.message }
+          exit 1
+        end
         progress = @options.fetch("--progress", nil)
         if progress
           theme = Progress::Theme.new(

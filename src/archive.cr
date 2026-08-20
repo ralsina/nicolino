@@ -83,7 +83,7 @@ module Archive
 
   def self.render(posts : Array(Markdown::File))
     # Generate archive for each language
-    Config.languages.keys.each do |lang|
+    Config.languages.each do |lang|
       base_path = Path[Config.options(lang).output]
       # Make output path language-specific to avoid conflicts
       lang_suffix = Utils.lang_suffix(lang)

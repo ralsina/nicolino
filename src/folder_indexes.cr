@@ -165,7 +165,7 @@ module FolderIndexes
   end
 
   def self.render(indexes : Array(FolderIndex))
-    Config.languages.keys.each do |lang|
+    Config.languages.each do |lang|
       out_path = Path.new(Config.options(lang).output)
       lang_suffix = Utils.lang_suffix(lang)
 
