@@ -1,0 +1,65 @@
+name: Benchmark
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download source
+        uses: actions/checkout@v3
+
+      - name: Install Crystal
+        uses: crystal-lang/install-crystal@v1
+
+      - name: Install dependencies
+        run: shards install
+
+      - name: Install Hugo (for comparison)
+        run: sudo apt-get update && sudo apt-get install -y hugo
+
+      - name: Build optimized (release) binary
+        # --release takes ~20 minutes; done here in CI rather than locally.
+        run: shards build --release
+
+      - name: Run benchmark
+        id: bench
+        env:
+          NICOLINO_BIN: "${{ github.workspace }}/bin/nicolino"
+          RUNS: "3"
+          BUILD_MODE: "release"
+        run: ./bench/run.sh
+
+      - name: Publish summary
+        run: |
+          latest=$(ls -t bench/results/*.json | head -1)
+          echo "## Benchmark (release build)" >> "$GITHUB_STEP_SUMMARY"
+          echo "Result file: \`${latest##*/}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat "$latest" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload results artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: bench/results/*.json
+
+      # Keep a current-ish baseline in the repo. Only done on manual
+      # dispatch so pushes don't re-trigger the (slow) workflow.
+      - name: Commit current result to repo
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          latest=$(ls -t bench/results/*.json | head -1)
+          cp "$latest" bench/results/latest.json
+          git add bench/results/latest.json
+          git diff --cached --quiet && { echo "No change"; exit 0; }
+          git commit -m "chore: refresh benchmark baseline [skip ci]"
+          git push origin main
