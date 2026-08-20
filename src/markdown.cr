@@ -665,23 +665,26 @@ module Markdown
       work = Channel(File).new(posts.size)
       posts.each { |post| work.send(post) }
       work.close
-      results = Channel({File, Array(String)}).new(posts.size)
+      # Each worker reports {post, deps, error}; errors travel over the
+      # channel so only this coordinating fiber ever writes `first_error`
+      # (a shared write from parallel workers would be a data race).
+      results = Channel({File, Array(String), Exception?}).new(posts.size)
       Math.min(System.cpu_count, posts.size).times do
         context.spawn do
           loop do
             break unless post = work.receive?
-            deps = begin
-              post.dependencies
+            result = begin
+              {post, post.dependencies, nil}
             rescue ex
-              first_error = ex
-              [] of String
+              {post, [] of String, ex}
             end
-            results.send({post, deps})
+            results.send(result)
           end
         end
       end
       posts.size.times do
-        post, deps = results.receive
+        post, deps, err = results.receive
+        first_error ||= err if err
         dependencies[post] = deps
       end
     end
