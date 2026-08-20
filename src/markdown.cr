@@ -18,6 +18,60 @@ module Markdown
   # Guards registry insertion during parallel content loading
   @@posts_mutex = Mutex.new
 
+  # Profiling accumulators
+  class Profiler
+    class_property mutex = Mutex.new
+    class_property discount_ns : Float64 = 0.0
+    class_property lexbor_ns : Float64 = 0.0
+    class_property filters_ns : Float64 = 0.0
+    class_property serialize_ns : Float64 = 0.0
+    class_property template_ns : Float64 = 0.0
+    class_property relativize_ns : Float64 = 0.0
+    class_property pages : Int32 = 0
+
+    def self.reset
+      mutex.synchronize do
+        self.discount_ns = 0.0
+        self.lexbor_ns = 0.0
+        self.filters_ns = 0.0
+        self.serialize_ns = 0.0
+        self.template_ns = 0.0
+        self.relativize_ns = 0.0
+        self.pages = 0
+      end
+    end
+
+    def self.record_compile(discount, lexbor, filters, serialize)
+      mutex.synchronize do
+        self.discount_ns += discount
+        self.lexbor_ns += lexbor
+        self.filters_ns += filters
+        self.serialize_ns += serialize
+      end
+    end
+
+    def self.record_task(template, relativize)
+      mutex.synchronize do
+        self.template_ns += template
+        self.relativize_ns += relativize
+        self.pages += 1
+      end
+    end
+
+    def self.report
+      Log.info {
+        "  ⏱  compile: discount=#{ms(discount_ns)}ms lex=#{ms(lexbor_ns)}ms " \
+        "filters=#{ms(filters_ns)}ms serialize=#{ms(serialize_ns)}ms | " \
+        "task: template=#{ms(template_ns)}ms relativize=#{ms(relativize_ns)}ms " \
+        "(#{pages} pages)"
+      }
+    end
+
+    private def self.ms(ns : Float64) : String
+      (ns / 1_000_000.0).round(1).to_s
+    end
+  end
+
   def self.posts
     @@posts
   end
@@ -282,7 +336,13 @@ module Markdown
     # Produce the {html, toc} pair for this file in the given language.
     # Subclasses (HTML::File, Pandoc::File) override this instead of
     # `html` so they share the memoization in `html`.
+    #
+    # Lexbor HTML filters (downgrade_headers, remove_empty_paragraphs,
+    # fix_code_classes) are applied here on the small post content.
+    # If no filter would change anything, Lexbor is skipped entirely.
+    # Link relativization happens in the task body in Markdown.render.
     private def compile_html(lang)
+      t0 = Time.instant
       compiled, toc = Discount.compile(
         replace_shortcodes(lang),
         metadata(lang).fetch("toc", nil) != nil,
@@ -293,12 +353,34 @@ module Markdown
                LibDiscount::MKD_NOPANTS |
                LibDiscount::MKD_GITHUBTAGS
       )
-      # Performance Note: parsing the HTML takes ~0.7 seconds for
-      # 4000 short posts. Calling each filter is much faster.
-      doc = Lexbor::Parser.new(compiled)
-      doc = HtmlFilters.downgrade_headers(doc)
-      doc = HtmlFilters.remove_empty_paragraphs(doc)
-      {HtmlFilters.fix_code_classes(doc).to_html, toc}
+      t1 = Time.instant
+      # Check if any filter would change the HTML. Cheap string checks
+      # avoid a full Lexbor parse + filter walk + re-serialize.
+      needs_headers = compiled.matches?(/<\/?h[1-6]/)
+      needs_empty_p = compiled.matches?(/<p>\s*<\/p>/)
+      needs_code_fix = compiled.matches?(HtmlFilters::NEEDS_CODE_FIX)
+      if needs_headers || needs_empty_p || needs_code_fix
+        doc = Lexbor::Parser.new(compiled)
+        t2 = Time.instant
+        doc = HtmlFilters.downgrade_headers(doc) if needs_headers
+        doc = HtmlFilters.remove_empty_paragraphs(doc) if needs_empty_p
+        doc = HtmlFilters.fix_code_classes(doc) if needs_code_fix
+        t3 = Time.instant
+        html = doc.to_html
+        t4 = Time.instant
+      else
+        t2 = t1
+        t3 = t1
+        html = compiled
+        t4 = t1
+      end
+      Profiler.record_compile(
+        (t1 - t0).total_nanoseconds,
+        (t2 - t1).total_nanoseconds,
+        (t3 - t2).total_nanoseconds,
+        (t4 - t3).total_nanoseconds
+      )
+      {html, toc}
     end
 
     def date : Time?
@@ -565,7 +647,9 @@ module Markdown
   # posts is an Array of `Markdown::File`
   # if require_date is true, posts *must* have a date
   # if require_title is true, posts *must* have a title
+  # ameba:disable Metrics/CyclomaticComplexity
   def self.render(posts, require_date = true, require_title = false)
+    Profiler.reset
     # Computing a post's dependencies (shortcode validation, template
     # lookups) is pure, so do it for all posts in parallel on the
     # files_context pool; the task declarations themselves stay
@@ -630,24 +714,27 @@ module Markdown
             end
 
             Log.info { "👉 #{post.output lang}" }
+            rendered = post.rendered(lang)
+            t0 = Time.instant
             template_vars = {
-              "content"        => post.rendered(lang),
+              "content"        => rendered,
               "title"          => post.title(lang),
               "breadcrumbs"    => post.breadcrumbs(lang),
               "language_links" => post.language_links(lang),
             }
             html = Render.apply_template(Theme.template_path("page.tmpl"), template_vars, lang)
-            # Link relativization is mode-independent: rewrite links
-            # directly on the string whenever that is provably safe
-            # (see HtmlFilters.string_rewrite_safe?), so both pretty
-            # and fast modes produce the same hrefs. Only unsafe
-            # contexts fall back to the parser-based rewrite.
-            unless HtmlFilters.string_rewrite_safe?(html)
+            t1 = Time.instant
+            if HtmlFilters.string_rewrite_safe?(html)
+              # Safe for string rewriting: regex-only path, no Lexbor parse.
+              html = HtmlFilters.relativize_links_in_string(html, post.link(lang))
+            else
+              # DOM path: Lexbor parse + make_links_relative + fix_code_classes.
+              # make_links_relative now handles all tags with href/src, so the
+              # regex-based relativize_links_in_string is not needed here.
               doc = Lexbor::Parser.new(html)
               doc = HtmlFilters.make_links_relative(doc, post.link(lang))
               html = HtmlFilters.fix_code_classes(doc).to_html
             end
-            html = HtmlFilters.relativize_links_in_string(html, post.link(lang))
             # pretty_html only controls output formatting: run the
             # lexbor normalization pass for byte-stable pretty output,
             # skip it for the faster raw template output
@@ -655,6 +742,11 @@ module Markdown
               doc = Lexbor::Parser.new(html)
               html = HtmlFilters.fix_code_classes(doc).to_html
             end
+            t2 = Time.instant
+            Profiler.record_task(
+              (t1 - t0).total_nanoseconds,
+              (t2 - t1).total_nanoseconds
+            )
             html
           rescue ex
             Log.error { "Error rendering post: #{post.source(lang)}" }

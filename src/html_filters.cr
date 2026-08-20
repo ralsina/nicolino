@@ -76,15 +76,6 @@ module HtmlFilters
   # which fix_code_classes would rewrite.
   NEEDS_CODE_FIX = /<code[^>]*\sclass\s*=\s*["'](?!language-)/
 
-  # Whether the page-level post-processing pass (lexbor parse +
-  # make_links_relative + fix_code_classes + serialize) would change
-  # anything in this html. When it returns false the whole pass can
-  # be skipped and the input returned as-is, which for mostly-static
-  # pages saves a full parse/filter/serialize round trip per page.
-  def self.needs_postprocessing?(html : String) : Bool
-    html.matches?(NEEDS_LINK_FIX) || html.matches?(NEEDS_CODE_FIX)
-  end
-
   # Capture form of NEEDS_LINK_FIX: matches a href/src value that
   # make_links_relative would rewrite, capturing the value and the
   # quote character around it.
@@ -125,45 +116,31 @@ module HtmlFilters
     end
   end
 
-  # Make all relative links absolute to the site root
+  # Make all relative links relative to the page location.
   # base is where the file containing the URIs is located
-  # relative to the site root
+  # relative to the site root.
+  # Handles all tags with href/src attributes.
   # Note: no mutex needed, each call operates on its own document
   def self.make_links_relative(doc, base)
     base_uri = URI.parse(base)
-    doc.nodes("a").each do |node|
-      next unless node.has_key? "href"
-      href = node["href"]
-      # Fast path: skip anchors and already-root-relative URLs
-      if href.starts_with?("#") || href.starts_with?("/")
-        next
+    {"a", "link"}.each do |tag|
+      doc.nodes(tag).each do |node|
+        next unless node.has_key? "href"
+        href = node["href"]
+        next if href.starts_with?("#") || href.starts_with?("/")
+        next if href.matches?(/^[a-zA-Z][a-zA-Z0-9+.\-]*:/)
+        next if tag == "link" && node.fetch("rel", nil) == "canonical"
+        node["href"] = base_uri.relativize(base_uri.resolve(href)).to_s
       end
-      node["href"] = base_uri.relativize(base_uri.resolve(href)).to_s
     end
-    doc.nodes("link").each do |node|
-      next if node.fetch("rel", nil) == "canonical"
-      next unless node.has_key? "href"
-      href = node["href"]
-      if href.starts_with?("/")
-        next
+    {"img", "script", "video", "audio", "source", "iframe", "embed"}.each do |tag|
+      doc.nodes(tag).each do |node|
+        next unless node.has_key? "src"
+        src = node["src"]
+        next if src.starts_with?("/")
+        next if src.matches?(/^[a-zA-Z][a-zA-Z0-9+.\-]*:/)
+        node["src"] = base_uri.relativize(base_uri.resolve(src)).to_s
       end
-      node["href"] = base_uri.relativize(base_uri.resolve(href)).to_s
-    end
-    doc.nodes("img").each do |node|
-      next unless node.has_key? "src"
-      src = node["src"]
-      if src.starts_with?("/")
-        next
-      end
-      node["src"] = base_uri.relativize(base_uri.resolve(src)).to_s
-    end
-    doc.nodes("script").each do |node|
-      next unless node.has_key? "src"
-      src = node["src"]
-      if src.starts_with?("/")
-        next
-      end
-      node["src"] = base_uri.relativize(base_uri.resolve(src)).to_s
     end
     doc
   end

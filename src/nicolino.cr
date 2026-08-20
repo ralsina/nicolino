@@ -155,6 +155,10 @@ def run(
   elapsed = (Time.instant - start_time).total_milliseconds
   Log.debug { "run_tasks took #{elapsed}ms" }
 
+  # Per-page profiling breakdown
+  Log.info { "  ⏱  Per-page breakdown:" }
+  Markdown::Profiler.report
+
   # Generate feature timing report
   FeatureTiming.report
 
