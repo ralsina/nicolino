@@ -20,8 +20,8 @@ jobs:
       - name: Install dependencies
         run: shards install
 
-      - name: Install native dependencies (libvips) and Hugo
-        run: sudo apt-get update && sudo apt-get install -y libvips-dev hugo
+      - name: Install native dependencies (libvips, ragel) and Hugo
+        run: sudo apt-get update && sudo apt-get install -y libvips-dev ragel hugo
 
       - name: Build optimized (release) binary
         # --release takes ~20 minutes; done here in CI rather than locally.

@@ -17,8 +17,8 @@ jobs:
         uses: crystal-lang/install-crystal@v1
       - name: Install dependencies
         run: shards install
-      - name: Install native dependencies (libvips)
-        run: sudo apt-get update && sudo apt-get install -y libvips-dev
+      - name: Install native dependencies (libvips, ragel)
+        run: sudo apt-get update && sudo apt-get install -y libvips-dev ragel
       - name: Build
         run: shards build -d
       - name: Smoke test (build the benchmark corpus)
