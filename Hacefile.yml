@@ -69,7 +69,7 @@ tasks:
       rm -rf content/bench/
       rm -rf output/
       bin/nicolino build -B
-      rsync -rzav --delete output/* ralsina@rocky:/data/stacks/web/websites/nicolino.ralsina.me/
+      rsync -rzav --delete output/* root@rocky:/data/stacks/web/websites/nicolino.ralsina.me/
     outputs:
       - output/sitemap.xml
 
