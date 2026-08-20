@@ -9,15 +9,11 @@
 title: "Nicolino Benchmark"
 description: "Reproducible build-time benchmark"
 url: "https://bench.example.com"
-
-options:
-  output: "output/"
-  content: "content/"
-  posts: "posts/"
-  language: "en"
-  # Disable pretty-printing HTML to keep the pipeline focused on
-  # markdown rendering.
-  pretty_html: false
+output: "output/"
+content: "content/"
+posts: "posts/"
+language: "en"
+pretty_html: false
 
 features:
   - pages
