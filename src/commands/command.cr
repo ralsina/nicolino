@@ -34,16 +34,21 @@ module Nicolino
       end
 
       # Verbosity precedence: -q silences everything, an explicit -v
-      # wins, and otherwise the verbosity setting from conf.yml applies.
+      # wins, and otherwise the given default applies.
+      private def configured_verbosity : Int32
+        Command.resolve_verbosity(@options, Config.verbosity)
+      end
+
+      # Resolve verbosity from parsed options.
       #
       # Note: docopt represents a flag in a [-q|-v <level>] group as
       # Int32 (0 when absent, 1 when given), and 0 is truthy in Crystal,
       # so neither a plain truthiness test nor `== true` works here.
-      private def configured_verbosity : Int32
-        quiet = @options["-q"]?
+      def self.resolve_verbosity(options : Hash(String, (Nil | String | Int32 | Bool | Array(String))), default : Int32) : Int32
+        quiet = options["-q"]?
         return 0 if quiet.in?(1, true)
-        explicit_level = @options["-v"]?
-        explicit_level.nil? ? Config.verbosity : explicit_level.to_s.to_i
+        explicit_level = options["-v"]?
+        explicit_level.nil? ? default : explicit_level.to_s.to_i
       end
 
       def run : Int32
