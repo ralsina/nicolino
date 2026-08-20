@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Install Crystal
         uses: crystal-lang/install-crystal@v1
@@ -49,7 +49,7 @@ jobs:
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload results artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: benchmark-results
           path: bench/results/*.json
