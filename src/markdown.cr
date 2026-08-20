@@ -123,7 +123,7 @@ module Markdown
         p = Path[Config.options(lang).output] / p
 
         # Add suffix for non-default languages (both language-specific and shared files)
-        if lang != "en"
+        if lang != Config.default_lang
           p = Path[p.dirname] / "#{p.stem}.#{lang}#{p.extension}"
         end
 
@@ -494,12 +494,13 @@ module Markdown
 
       output_path = Path[output(lang)]
       parts = output_path.parts
+      output_parts = Path[Config.options.output].normalize.parts
 
-      # Skip "output" directory and build breadcrumbs from remaining path parts
+      # Skip the output directory and build breadcrumbs from remaining path parts
       # For example: output/docs/continuous_import.html -> docs -> continuous_import
-      if parts.size >= 2 && parts[0] == "output"
+      if parts.size >= output_parts.size + 1 && parts[0, output_parts.size] == output_parts
         # Check if this is the home page (index.html at root)
-        if parts.size == 2 && parts[1] == "index.html"
+        if parts.size == output_parts.size + 1 && parts[-1] == "index.html"
           # This IS the home page, no breadcrumbs needed
           return [{name: title(lang), link: link(lang)}]
         end
@@ -510,7 +511,7 @@ module Markdown
         # Build breadcrumb path incrementally
         # For index.md files (e.g. content/posts/foo/index.md),
         # skip the container directory to avoid: Home / posts / foo / Title
-        breadcrumb_parts = @base.stem == "index" ? parts[1..-3] : parts[1..-2]
+        breadcrumb_parts = @base.stem == "index" ? parts[output_parts.size..-3] : parts[output_parts.size..-2]
         current_path = ""
         breadcrumb_parts.each do |part|
           current_path = Path[current_path] / part
@@ -635,7 +636,9 @@ module Markdown
       # Add similarity index as dependency if feature is enabled
       features = Config.features
       if features.includes?("similarity")
-        result << "kv://similarity/index/en"
+        Config.languages.keys.each do |lang|
+          result << "kv://similarity/index/#{lang}"
+        end
       end
 
       result
@@ -858,7 +861,7 @@ module Markdown
       # Determine the alternate index path
       # If current is output/posts/index.html, alternate should be output/posts/index.es.html
       # If current is output/posts/index.es.html, alternate should be output/posts/index.html
-      if lang == "en"
+      if lang == Config.default_lang
         # Current is English, look for .es.html (or other language suffixes)
         lang_suffix = ".#{other_lang}"
         alt_path = output_str.sub(/\.html$/, "#{lang_suffix}.html")

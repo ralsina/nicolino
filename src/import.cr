@@ -572,7 +572,7 @@ module Import
 
   # Setup output directory for feed
   private def self.setup_feed_output_dir(config : FeedConfig) : String
-    output_dir = File.join("content", config.output_folder)
+    output_dir = File.join(Config.options.content, config.output_folder)
     Dir.mkdir_p(output_dir)
     output_dir
   end

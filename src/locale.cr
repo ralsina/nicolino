@@ -3,6 +3,6 @@ module Locale
     return @@current_language = language unless language.nil?
     # ameba:disable Documentation/DocumentationAdmonition
     # FIXME: support LANG environment variable / config setting
-    @@current_language ||= "en"
+    @@current_language ||= Config.default_lang
   end
 end

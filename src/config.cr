@@ -370,6 +370,12 @@ location: "tags/"
     @@global_config.language
   end
 
+  # The default/primary language code
+  def self.default_lang : String
+    ensure_loaded
+    @@default_lang
+  end
+
   def self.url : String
     # URL is translatable (could have different domain per language)
     self[@@default_lang].url rescue "https://example.com"

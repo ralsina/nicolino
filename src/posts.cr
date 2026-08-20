@@ -60,7 +60,7 @@ module Posts
     # Render RSS feeds for each language (only 20 most recent posts)
     Config.languages.keys.each do |lang|
       # Language suffix for non-English feeds
-      lang_suffix = lang == "en" ? "" : ".#{lang}"
+      lang_suffix = Utils.lang_suffix(lang)
       rss_output = Path[Config.output] / "rss#{lang_suffix}.xml"
 
       # Get language-specific site title

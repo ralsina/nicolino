@@ -58,7 +58,7 @@ module Search
             chunk_data.each_with_index do |input, i|
               item = extract_item(
                 input,
-                input.sub(/^output\//, "/"),
+                Utils.path_to_link(input),
                 start_idx + i
               )
               results << item unless item.nil?

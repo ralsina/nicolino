@@ -330,7 +330,7 @@ module Gallery
   private def self.render_galleries_index(galleries : Array(Gallery), prefix = "")
     Config.languages.keys.each do |lang|
       # Make output path language-specific to avoid conflicts
-      lang_suffix = lang == "en" ? "" : ".#{lang}"
+      lang_suffix = Utils.lang_suffix(lang)
       galleries_dir = prefix.empty? ? "galleries" : prefix
       output_path = Path[Config.options(lang).output] / "#{galleries_dir}#{lang_suffix}" / "index.html"
 
@@ -363,7 +363,7 @@ module Gallery
         items = galleries.map do |gallery|
           gallery_output = gallery.output(lang)
           gallery_dir = File.dirname(gallery_output)
-          gallery_link = gallery_dir.gsub(/^output\//, "/")
+          gallery_link = Utils.path_to_link(gallery_dir)
           # Get first image if available and construct full path
           # image_list contains just basenames, so we need to add the gallery directory
           first_image = gallery.image_list.first?

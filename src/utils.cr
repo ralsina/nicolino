@@ -12,18 +12,32 @@ module Utils
   # >> path_to_link("output/foo/../bar") # => "/bar"
   def self.path_to_link(path, extension = nil)
     p = Path[path].normalize
-    # Ensure path starts with "output" and doesn't escape it via ".."
-    if p.parts.empty? || p.parts[0] != "output"
-      raise "Invalid path: #{path} (must start with output/)"
+    output_parts = Path[Config.options.output].normalize.parts
+    # Ensure path starts with the output dir and doesn't escape it via ".."
+    if p.parts.size < output_parts.size || p.parts[0, output_parts.size] != output_parts
+      raise "Invalid path: #{path} (must start with #{Config.options.output})"
     end
 
-    # Remove "output" prefix and convert to link
-    link_parts = p.parts[1..]
+    # Remove the output dir prefix and convert to link
+    link_parts = p.parts[output_parts.size..]
     if extension.nil?
       "/#{link_parts.join("/")}"
     else
       "/#{link_parts.join("/").rchop(p.extension)}#{extension}"
     end
+  end
+
+  # Suffix to append to a filename for a given language
+  # (empty for the default language, ".#{lang}" otherwise)
+  def self.lang_suffix(lang : String) : String
+    lang == Config.default_lang ? "" : ".#{lang}"
+  end
+
+  # The configured output directory with a trailing slash, for building
+  # URL prefixes (e.g. "output/", "public/site/")
+  def self.output_prefix : String
+    output = Path[Config.options.output].normalize.to_s
+    output.ends_with?("/") ? output : "#{output}/"
   end
 
   # Filter out files from directories that correspond to disabled features
