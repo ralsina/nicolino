@@ -12,11 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
       - name: Install Crystal
         uses: crystal-lang/install-crystal@v1
       - name: Install dependencies
         run: shards install
+      - name: Install native dependencies (libvips)
+        run: sudo apt-get update && sudo apt-get install -y libvips-dev
       - name: Build
         run: shards build -d
       - name: Smoke test (build the benchmark corpus)
