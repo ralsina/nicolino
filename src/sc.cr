@@ -6,14 +6,17 @@ module Sc
   # rescue in render_sc). The build reports these and exits non-zero
   # so a rendering failure can never silently corrupt a page.
   @@render_failures = [] of NamedTuple(shortcode: String, error: String)
+  # Guarded because parallel task workers can record failures concurrently
+  # (Array is not thread-safe; concurrent appends could corrupt or drop).
+  @@render_failures_mutex = Mutex.new
 
-  def self.render_failures
-    @@render_failures
+  def self.render_failures : Array(NamedTuple(shortcode: String, error: String))
+    @@render_failures_mutex.synchronize { @@render_failures.dup }
   end
 
   # Clear recorded failures (called at the start of each run)
   def self.reset_failures
-    @@render_failures.clear
+    @@render_failures_mutex.synchronize { @@render_failures.clear }
   end
 
   # Recursively collect all shortcodes in a text, including
@@ -83,7 +86,7 @@ module Sc
     Log.error(exception: ex) { "Can't load shortcode #{sc.name}: #{ex.message}" }
     # Record the failure so the build can exit non-zero instead of
     # silently emitting the literal shortcode into the output
-    @@render_failures << {shortcode: sc.name, error: ex.message || ex.class.to_s}
+    @@render_failures_mutex.synchronize { @@render_failures << {shortcode: sc.name, error: ex.message || ex.class.to_s} }
     sc.whole
   end
 
