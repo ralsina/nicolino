@@ -97,7 +97,6 @@ def create_tasks
     end
 
     time_feature_enable("taxonomies") { Taxonomies.enable(features.includes?("taxonomies"), posts) } if posts
-    time_feature_enable("similarity") { Similarity.enable(features.includes?("similarity"), posts) } if posts
     time_feature_enable("archive") { Archive.enable(features.includes?("archive"), posts) } if posts
 
     # Enable galleries from scan results

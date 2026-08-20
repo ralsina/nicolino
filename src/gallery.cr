@@ -1,6 +1,5 @@
 require "./markdown"
 require "./theme"
-require "./creatable"
 require "json"
 
 # Create automatic image galleries
@@ -67,21 +66,6 @@ module Gallery
 
     Log.info { "✓ Found #{root_galleries.size} galler#{root_galleries.size == 1 ? "y" : "ies"}" }
     render(root_galleries, Config.options.galleries)
-  end
-
-  # Enable galleries feature
-  def self.enable(is_enabled : Bool, galleries_path : Path)
-    return unless is_enabled
-
-    Log.info { "🖼️  Scanning for galleries..." }
-
-    # Note: Galleries are already registered by nicolino new command,
-    # but features can register additional types here if needed
-
-    # Render galleries
-    galleries = read_all(galleries_path)
-    Log.info { "✓ Found #{galleries.size} galler#{galleries.size == 1 ? "y" : "ies"}" }
-    render(galleries, Config.options.galleries)
   end
 
   # An image gallery
@@ -207,78 +191,6 @@ module Gallery
       end
       depth
     end
-  end
-
-  # Recursively scan directory and build gallery tree structure
-  private def self.scan_gallery_directory(dir_path : Path, parent_gallery : Gallery? = nil) : Array(Gallery)
-    galleries = [] of Gallery
-
-    # Look for index.md files (gallery definitions)
-    Dir.glob("#{dir_path}/*/index.md").each do |index_file|
-      gallery_dir = Path[index_file].parent
-      gallery_base = Path[index_file]
-
-      # Find images in this gallery directory (not subdirectories)
-      image_list = Dir.glob("#{gallery_dir}/*.{jpg,png,webp,gif}").map do |img_path|
-        Path[img_path].basename.to_s
-      end
-
-      # Create gallery with empty sub-galleries for now
-      gallery = Gallery.new([index_file], gallery_base, image_list)
-      galleries << gallery
-    end
-
-    # Now scan for sub-galleries recursively and build parent-child relationships
-    galleries.each do |gallery|
-      gallery_dir = Path[gallery.base].parent
-
-      # Find sub-galleries (directories with index.md)
-      sub_galleries = scan_gallery_directory(gallery_dir, gallery)
-      gallery.sub_galleries = sub_galleries
-    end
-
-    galleries
-  end
-
-  def self.read_all(path)
-    Log.debug { "Reading galleries from #{path}" }
-
-    # First pass: scan the entire directory tree and collect all galleries
-    all_galleries = [] of Gallery
-
-    # Use Utils.find_all to properly find and group gallery files
-    gallery_sources = Utils.find_all(path, "md")
-
-    # Filter to only include index.md files (galleries)
-    gallery_sources.each do |base, sources|
-      if base.basename == "index"
-        gallery_dir = base.parent
-
-        # Find images in this gallery directory (not subdirectories)
-        image_list = Dir.glob("#{gallery_dir}/*.{jpg,png,webp,gif}").map do |img_path|
-          Path[img_path].basename.to_s
-        end
-
-        gallery = Gallery.new(sources, base, image_list)
-        all_galleries << gallery
-      end
-    end
-
-    # Build parent-child relationships using hash map for O(n) lookup
-    gallery_by_dir = all_galleries.to_h { |gallery| {Path[gallery.base].parent, gallery} }
-
-    all_galleries.each do |gallery|
-      gallery_dir = Path[gallery.base].parent
-      parent_dir = gallery_dir.parent
-
-      if potential_parent = gallery_by_dir[parent_dir]?
-        gallery.parent_gallery = potential_parent
-        potential_parent.sub_galleries << gallery unless potential_parent.sub_galleries.includes?(gallery)
-      end
-    end
-
-    # Return only root-level galleries (those without parents)
-    all_galleries.select { |gallery| gallery.parent_gallery.nil? }
   end
 
   # Recursively collect all galleries in the tree
@@ -466,26 +378,6 @@ module Gallery
         doc = HtmlFilters.make_links_relative(doc, output_path.to_s)
         doc.to_html
       end
-    end
-  end
-
-  # Create a new gallery
-  def self.new_gallery(path)
-    raise "Galleries are folders, not documents" if path.to_s.ends_with? ".md"
-    path = path / "index.md"
-    Log.info { "Creating new gallery #{path}" }
-    raise "#{path} already exists" if ::File.exists? path
-    Dir.mkdir_p(path.dirname)
-    ::File.open(path, "w") do |io|
-      template = <<-TEMPLATE
-        ---
-        title: Add title here
-        date: {{date}}
-        ---
-
-        Add content here
-        TEMPLATE
-      io << Crinja.render(template, {date: Time.local.to_s})
     end
   end
 end
