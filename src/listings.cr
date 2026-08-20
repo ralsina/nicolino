@@ -1,5 +1,6 @@
 require "./utils"
 require "./theme"
+require "./render"
 require "tartrazine"
 require "lexbor"
 
@@ -111,29 +112,22 @@ module Listings
   def self.render_index(listings : Array(Listing))
     base_path = Path[Config.options.output]
     output_path = (base_path / "listings" / "index.html").normalize.to_s
-    page_template = Theme.template_path("page.tmpl")
-    title_template = Theme.template_path("title.tmpl")
     item_list_template = Theme.template_path("item_list.tmpl")
 
     FeatureTask.new(
       feature_name: "listings",
       id: "listings-index",
       output: output_path,
-      inputs: ["conf.yml", "kv://#{item_list_template}", "kv://#{title_template}", "kv://#{page_template}"],
+      inputs: ["conf.yml", "kv://#{item_list_template}", "kv://#{Theme.template_path("title.tmpl")}", "kv://#{Theme.template_path("page.tmpl")}"],
       mergeable: false
     ) do
       Log.info { "👉 #{output_path}" }
 
       # Create breadcrumbs for listings index
-      breadcrumbs = [{name: "Home", link: "/"}, {name: "Listings", link: "/listings/"}] of NamedTuple(name: String, link: String)
+      breadcrumbs = Render.section_breadcrumbs("Listings", "/listings/")
 
       # Include title.tmpl which handles breadcrumbs
-      title_html = Templates.environment.get_template(title_template).render({
-        "title"       => "Listings",
-        "link"        => "/listings/",
-        "breadcrumbs" => breadcrumbs,
-        "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
-      })
+      title_html = Render.title_html("Listings", "/listings/", breadcrumbs)
 
       # Sort listings by title and build items list
       items = listings.sort_by(&.title).map do |listing|
@@ -150,17 +144,8 @@ module Listings
         "items"       => items,
       })
 
-      # Apply to page template
-      html = Render.apply_template(page_template, {
-        "content"     => title_html + content,
-        "title"       => "Listings",
-        "breadcrumbs" => breadcrumbs,
-      })
-
-      # Process with HTML filters
-      doc = Lexbor::Parser.new(html)
-      doc = HtmlFilters.make_links_relative(doc, "/listings/")
-      HtmlFilters.fix_code_classes(doc).to_html
+      # Apply to page template with HTML filters
+      Render.page_html("/listings/", title_html + content, "Listings", breadcrumbs, fix_code_classes: true)
     end
   end
 

@@ -9,33 +9,12 @@ module Posts
   # Return glob patterns for posts content
   # Posts live in content/posts/ and support markdown, html, and pandoc formats
   def self.content_globs : Array(String)
-    content_post_path = Path[Config.options.content] / Config.options.posts
-    globs = [] of String
-    globs << "#{content_post_path}/**/*.md"
-    globs << "#{content_post_path}/**/*.html"
-    Config.options.pandoc_formats.keys.each do |ext|
-      globs << "#{content_post_path}/**/*#{ext}"
-    end
-    globs
+    Utils.content_globs(Path[Config.options.content] / Config.options.posts)
   end
 
   # Create a file object from source files
   def self.create_file(sources : Hash(String, String), base : Path) : Markdown::File?
-    # Determine file type from extension
-    first_source = sources.values.first? || return nil
-    ext = Path[first_source].extension
-    case ext
-    when ".html"
-      HTML::File.new(sources, base)
-    when /\.(rst|tex|latex|mdoc|adoc|asciidoc)$/
-      Pandoc::File.new(sources, base)
-    else
-      Markdown::File.new(sources, base)
-    end
-  rescue ex
-    Log.error { "Error creating post file #{base}: #{ex.message}" }
-    Log.debug { ex }
-    nil
+    Utils.create_content_file(sources, base, "post")
   end
 
   # Enable posts feature using pre-scanned files

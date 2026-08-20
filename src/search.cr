@@ -40,50 +40,21 @@ module Search
       Log.info { "👉 #{output}" }
 
       # Split into chunks for parallel processing
-      chunk_size = 100
-      num_chunks = (inputs.size // chunk_size) + 1
-
-      # Channel for collecting results from fibers
-      channels = Channel(Array(Hash(String, String | Int32)) | Exception).new
-
-      # Process each chunk in a separate fiber
-      num_chunks.times do |chunk_idx|
-        spawn do
-          begin
-            start_idx = chunk_idx * chunk_size
-            end_idx = Math.min(start_idx + chunk_size, inputs.size)
-            chunk_data = inputs[start_idx...end_idx]
-
-            results = Array(Hash(String, String | Int32)).new
-            chunk_data.each_with_index do |input, i|
-              item = extract_item(
-                input,
-                Utils.path_to_link(input),
-                start_idx + i
-              )
-              results << item unless item.nil?
-            end
-            channels.send(results)
-          rescue ex
-            channels.send(ex)
-          end
+      all_data = Utils.parallel_chunks(inputs) do |chunk_data, start_idx|
+        results = Array(Hash(String, String | Int32)).new
+        chunk_data.each_with_index do |input, i|
+          item = extract_item(
+            input,
+            Utils.path_to_link(input),
+            start_idx + i
+          )
+          results << item unless item.nil?
         end
-      end
+        results
+      end.flatten
 
-      # Collect all results and write to file
+      # Write results to file
       File.open(output, "w") do |io|
-        all_data = Array(Hash(String, String | Int32)).new
-
-        num_chunks.times do
-          result = channels.receive
-          case result
-          when Array
-            all_data.concat(result)
-          when Exception
-            Log.error { "Error in search chunk: #{result.message}" }
-          end
-        end
-
         all_data.to_json(io)
       end
 

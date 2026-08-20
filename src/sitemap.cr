@@ -44,36 +44,17 @@ module Sitemap
       Log.info { "👉 #{output}" }
 
       # Split into chunks for parallel processing
-      chunk_size = 100
-      num_chunks = (inputs.size // chunk_size) + 1
-
-      # Channel for collecting XML chunks from fibers
-      channels = Channel(String).new
-
-      # Process each chunk in a separate fiber
-      num_chunks.times do |chunk_idx|
-        spawn do
-          begin
-            start_idx = chunk_idx * chunk_size
-            end_idx = Math.min(start_idx + chunk_size, inputs.size)
-            chunk_data = inputs[start_idx...end_idx]
-
-            base = URI.parse(Config.url)
-            chunk_xml = String.build do |str|
-              chunk_data.each do |input|
-                next if noindex?(input)
-                modtime = File.info(input).modification_time
-                input_path = input.sub(/^#{Regex.escape(Utils.output_prefix)}/, "")
-                str << %(<url> # ameba:disable Style/MultilineStringLiteral
-                <loc>#{base.resolve(input_path)}</loc>
-                <lastmod>#{modtime}</lastmod>
-              </url>)
-              end
-            end
-            channels.send(chunk_xml)
-          rescue ex
-            Log.error { "Error in sitemap chunk: #{ex.message}" }
-            channels.send("")
+      chunks = Utils.parallel_chunks(inputs) do |chunk_data, _start_idx|
+        base = URI.parse(Config.url)
+        String.build do |str|
+          chunk_data.each do |input|
+            next if noindex?(input)
+            modtime = File.info(input).modification_time
+            input_path = input.sub(/^#{Regex.escape(Utils.output_prefix)}/, "")
+            str << %(<url> # ameba:disable Style/MultilineStringLiteral
+              <loc>#{base.resolve(input_path)}</loc>
+              <lastmod>#{modtime}</lastmod>
+            </url>)
           end
         end
       end
@@ -81,10 +62,7 @@ module Sitemap
       # Write output
       File.open(output, "w") do |io|
         io << HEADER
-        num_chunks.times do
-          chunk = channels.receive
-          io << chunk unless chunk.empty?
-        end
+        io << chunks.join
         io << FOOTER
       end
 

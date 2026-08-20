@@ -2,11 +2,15 @@ require "./books/summary_parser"
 require "./folder_indexes"
 require "./sc"
 require "./theme"
+require "./render"
 require "json"
 require "shortcodes"
 require "toml"
 
 module Books
+  # Register books output folder to exclude from folder_indexes
+  FolderIndexes.register_exclude("books/")
+
   # Navigation link structure for book chapters
   record NavigationLink,
     title : String,
@@ -273,9 +277,6 @@ module Books
   def self.enable(is_enabled : Bool)
     return unless is_enabled
 
-    # Register books output folder for exclusion from folder_indexes
-    FolderIndexes.register_exclude("books/")
-
     books_path = Path[Config.options.content] / "books"
     return unless Dir.exists?(books_path)
 
@@ -446,13 +447,7 @@ module Books
       page_title = entry.formatted_number.empty? ? entry.title : "#{entry.formatted_number} #{entry.title}"
 
       # Include title.tmpl which handles breadcrumbs
-      title_template = Theme.template_path("title.tmpl")
-      title_html = Templates.environment.get_template(title_template).render({
-        "title"       => page_title,
-        "link"        => entry.link(book.name),
-        "breadcrumbs" => breadcrumbs,
-        "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
-      })
+      title_html = Render.title_html(page_title, entry.link(book.name), breadcrumbs)
 
       # Combine title HTML with content
       content_html = title_html + html
@@ -643,13 +638,7 @@ module Books
       ] of NamedTuple(name: String, link: String)
 
       # Include title.tmpl which handles breadcrumbs
-      title_template = Theme.template_path("title.tmpl")
-      title_html = Templates.environment.get_template(title_template).render({
-        "title"       => book.title,
-        "link"        => "/books/#{book.name}/",
-        "breadcrumbs" => breadcrumbs,
-        "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
-      })
+      title_html = Render.title_html(book.title, "/books/#{book.name}/", breadcrumbs)
 
       book_index_template = Theme.template_path("book_index.tmpl")
       template = Templates.environment.get_template(book_index_template)
@@ -669,16 +658,13 @@ module Books
 
       content = title_html + template.render(ctx)
 
-      page_template = Theme.template_path("page.tmpl")
-      html = Render.apply_template(page_template, {
-        "content"     => content,
-        "title"       => book.title,
-        "breadcrumbs" => breadcrumbs,
-      })
-
-      doc = Lexbor::Parser.new(html)
-      doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output_path.to_s))
-      HtmlFilters.fix_code_classes(doc).to_html
+      Render.page_html(
+        Utils.path_to_link(output_path.to_s),
+        content,
+        book.title,
+        breadcrumbs,
+        fix_code_classes: true
+      )
     end
   end
 
@@ -702,16 +688,10 @@ module Books
       Log.info { "👉 #{output_path}" }
 
       # Create breadcrumbs
-      breadcrumbs = [{name: "Home", link: "/"}, {name: "Books", link: "/books/"}] of NamedTuple(name: String, link: String)
+      breadcrumbs = Render.section_breadcrumbs("Books", "/books/")
 
       # Include title.tmpl which handles breadcrumbs
-      title_template = Theme.template_path("title.tmpl")
-      title_html = Templates.environment.get_template(title_template).render({
-        "title"       => "Books",
-        "link"        => "/books/",
-        "breadcrumbs" => breadcrumbs,
-        "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
-      })
+      title_html = Render.title_html("Books", "/books/", breadcrumbs)
 
       item_list_template = Theme.template_path("item_list.tmpl")
       template = Templates.environment.get_template(item_list_template)
@@ -731,16 +711,13 @@ module Books
         "items"       => items,
       })
 
-      page_template = Theme.template_path("page.tmpl")
-      html = Render.apply_template(page_template, {
-        "content"     => title_html + content,
-        "title"       => "Books",
-        "breadcrumbs" => breadcrumbs,
-      })
-
-      doc = Lexbor::Parser.new(html)
-      doc = HtmlFilters.make_links_relative(doc, "/books/")
-      HtmlFilters.fix_code_classes(doc).to_html
+      Render.page_html(
+        "/books/",
+        title_html + content,
+        "Books",
+        breadcrumbs,
+        fix_code_classes: true
+      )
     end
   end
 
