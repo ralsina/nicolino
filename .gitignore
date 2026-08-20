@@ -29,3 +29,4 @@ node_modules
 .env
 package-lock.json
 .zcode/
+/bench/results/

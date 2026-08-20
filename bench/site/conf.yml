@@ -13,6 +13,7 @@ output: "output/"
 content: "content/"
 posts: "posts/"
 language: "en"
+theme: "bench"
 pretty_html: false
 
 features:

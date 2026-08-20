@@ -67,6 +67,11 @@ nicolino_setup() {
   rm -rf "$SITE_DIR/output" "$SITE_DIR/.kvstore" "$SITE_DIR/.croupier"
   mkdir -p "$SITE_DIR/content"
   cp "$CORPUS"/*.md "$SITE_DIR/content/"
+  # Install the minimal bench theme (the site's themes/ dir is gitignored
+  # because nicolino generates themes/default there at build time).
+  mkdir -p "$SITE_DIR/themes"
+  rm -rf "$SITE_DIR/themes/bench"
+  cp -r "$SCRIPT_DIR/theme" "$SITE_DIR/themes/bench"
 }
 
 nicolino_run_with() {
