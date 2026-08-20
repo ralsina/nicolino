@@ -33,6 +33,7 @@ RUNS="${RUNS:-3}"
 NICOLINO_BIN="${NICOLINO_BIN:-$ROOT_DIR/bin/nicolino}"
 NICOLINO_RELEASE_BIN="${NICOLINO_RELEASE_BIN:-}"
 HUGO_BIN="${HUGO_BIN:-$(command -v hugo || true)}"
+ZOLA_BIN="${ZOLA_BIN:-$(command -v zola || true)}"
 NICOLINO_FLAGS="${NICOLINO_FLAGS:---fast-mode -B -p}"
 CORES="$(nproc)"
 
@@ -93,6 +94,20 @@ hugo_run() {
   ( cd "$HUGO_DIR" && "$HUGO_BIN" --quiet )
 }
 
+zola_setup() {
+  rm -rf "$SITE_DIR/output"
+  mkdir -p "$SITE_DIR/content"
+  cp "$CORPUS"/*.md "$SITE_DIR/content/"
+  mkdir -p "$SITE_DIR/templates"
+}
+
+
+zola_run() {
+  ( cd "$SITE_DIR" && "$ZOLA_BIN" build )
+}
+
+
+
 bench() {
   # bench <label> <setup-fn> <run-fn> -> prints median seconds
   local label="$1" setup_fn="$2" run_fn="$3"
@@ -142,15 +157,32 @@ main() {
     log "NICOLINO_RELEASE_BIN not set; skipping optimized build"
   fi
 
-  hugo_time=""
+  local nico_time nico_release_time hugo_time
+  log "Timing Nicolino (normal/dev)..."
+  nico_time=$(bench "nicolino-normal" nicolino_setup nicolino_run_normal)
+  log "  nicolino normal median: ${nico_time}s"
   if [[ -n "$HUGO_BIN" ]]; then
     log ""
     log "Timing Hugo..."
     hugo_time=$(bench "hugo" hugo_setup hugo_run)
     log "  hugo median: ${hugo_time}s"
+  fi
+  zola_time=""
+  if [[ -n "$ZOLA_BIN" ]]; then
+    log ""
+    log "Timing Zola..."
+    set +e
+    zola_time=$(bench "zola" zola_setup zola_run)
+    set -e
+    if [[ $? -ne 0 ]]; then
+      log "Zola build failed; skipping Zola comparison"
+      zola_time=""
+    else
+      log "  zola median: ${zola_time}s"
+    fi
   else
     log ""
-    log "hugo not found; skipping comparison"
+    log "zola not found; skipping comparison"
   fi
 
   local nico_html hugo_html=""
@@ -160,7 +192,7 @@ main() {
   fi
 
   # Assertion: nicolino must render every corpus file. This also makes the
-  # harness usable as a CI smoke gate.
+  # harness usable as a CI smoke gat.
   local corpus_count
   corpus_count=$(find "$CORPUS" -name '*.md' | wc -l)
   if [[ "$nico_html" -ne "$corpus_count" ]]; then
