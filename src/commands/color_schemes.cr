@@ -65,25 +65,8 @@ module Nicolino
         end
 
         # Get the variants that will be used (same logic as show_families)
-        dark_theme = if name = family.dark_themes.find { true }
-                       Sixteen.theme(name)
-                     elsif name = family.light_themes.find { true }
-                       Sixteen.theme(name).invert_for_theme(:dark)
-                     elsif name = family.other_variants.find { true }
-                       Sixteen.theme(name).invert_for_theme(:dark)
-                     else
-                       raise "No themes found for family #{family.base_name}"
-                     end
-
-        light_theme = if name = family.light_themes.find { true }
-                        Sixteen.theme(name)
-                      elsif name = family.dark_themes.find { true }
-                        Sixteen.theme(name).invert_for_theme(:light)
-                      elsif name = family.other_variants.find { true }
-                        Sixteen.theme(name).invert_for_theme(:light)
-                      else
-                        raise "No themes found for family #{family.base_name}"
-                      end
+        dark_theme = resolve_variant(family, dark: true)
+        light_theme = resolve_variant(family, dark: false)
 
         # Write the family base name to conf.yml (base16.cr will resolve variants)
         config_file = @options["-c"]? ? @options["-c"].as(String) : "conf.yml"
@@ -118,6 +101,20 @@ module Nicolino
         Log.info { "  light: #{light_theme.name}" }
         Log.info { "" }
         Log.info { "Run 'nicolino build' to apply the new color scheme." }
+      end
+
+      private def resolve_variant(family : Sixteen::ThemeFamily, dark : Bool) : Sixteen::Theme
+        preferred = dark ? family.dark_themes : family.light_themes
+        fallback = dark ? family.light_themes : family.dark_themes
+        if name = preferred.find { true }
+          Sixteen.theme(name)
+        elsif name = fallback.find { true }
+          Sixteen.theme(name).invert_for_theme(dark ? :dark : :light)
+        elsif name = family.other_variants.find { true }
+          Sixteen.theme(name).invert_for_theme(dark ? :dark : :light)
+        else
+          raise "No themes found for family #{family.base_name}"
+        end
       end
 
       private def show_families

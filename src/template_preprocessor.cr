@@ -154,11 +154,7 @@ module TemplatePreprocessor
       elsif node.block
         node.block.children = fold_nodes(template, node.block.children, constants, allowed)
         nil
-      else
-        nil
       end
-    else
-      nil
     end
   end
 

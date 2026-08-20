@@ -44,7 +44,7 @@ module Nicolino
       # Note: docopt represents a flag in a [-q|-v <level>] group as
       # Int32 (0 when absent, 1 when given), and 0 is truthy in Crystal,
       # so neither a plain truthiness test nor `== true` works here.
-      def self.resolve_verbosity(options : Hash(String, (Nil | String | Int32 | Bool | Array(String))), default : Int32) : Int32
+      def self.resolve_verbosity(options : Hash(String, (String | Int32 | Bool | Array(String))?), default : Int32) : Int32
         quiet = options["-q"]?
         return 0 if quiet.in?(1, true)
         explicit_level = options["-v"]?

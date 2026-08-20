@@ -59,12 +59,12 @@ module Markdown
     end
 
     def self.report
-      Log.info {
+      Log.info do
         "  ⏱  compile: discount=#{ms(discount_ns)}ms lex=#{ms(lexbor_ns)}ms " \
         "filters=#{ms(filters_ns)}ms serialize=#{ms(serialize_ns)}ms | " \
         "task: template=#{ms(template_ns)}ms relativize=#{ms(relativize_ns)}ms " \
         "(#{pages} pages)"
-      }
+      end
     end
 
     private def self.ms(ns : Float64) : String
@@ -896,7 +896,7 @@ module Markdown
   # after all entries were processed, so no error is lost.
   def self.files_from(
     all_sources : Hash(Path, Hash(String, String)),
-    &block : Hash(String, String), Path -> (File | Nil)
+    &block : Hash(String, String), Path -> File?
   ) : Array(File)
     return [] of File if all_sources.empty?
 

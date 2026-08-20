@@ -50,6 +50,14 @@ tasks:
     always_run: true
     phony: true
 
+  test:
+    dependencies:
+      - bin/{{NAME}}
+    commands: |
+      NICOLINO_BIN="$PWD/bin/{{NAME}}" RUNS=1 ./bench/run.sh
+    always_run: true
+    phony: true
+
   deploy:
     dependencies:
       - bin/nicolino
@@ -86,5 +94,4 @@ tasks:
     outputs:
       - bin/{{NAME}}-static-linux-amd64
     commands: |
-      hace clean
       ./build_static.sh

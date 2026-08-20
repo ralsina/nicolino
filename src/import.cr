@@ -293,7 +293,6 @@ module Import
   private def self.parse_rss_item(item_node : XML::Node) : FeedItem?
     data = {} of String => String | Array(String)
 
-    # Extract standard fields by iterating children
     title = "Untitled"
     link = ""
     description = ""
@@ -301,14 +300,9 @@ module Import
 
     item_node.children.each do |child|
       next unless child.element?
-
-      case child.name
-      when "title"                          then title = child.content || "Untitled"
-      when "link"                           then link = child.content || ""
-      when "description", "content:encoded" then description = child.content || ""
-      when "pubDate"                        then pub_date_str = child.content || ""
-      end
-
+      title, link, description, pub_date_str = process_rss_child(
+        child, title, link, description, pub_date_str
+      )
       # Store all fields in data hash
       data[child.name] = child.content || ""
     end
@@ -316,6 +310,46 @@ module Import
     pub_date = parse_date(pub_date_str)
 
     FeedItem.new(title, link, pub_date, description, data)
+  end
+
+  # Process a single child node in RSS item
+  private def self.process_rss_child(
+    child : XML::Node,
+    title : String,
+    link : String,
+    description : String,
+    pub_date_str : String,
+  ) : Tuple(String, String, String, String)
+    title = extract_rss_title(child, title)
+    link = extract_rss_link(child, link)
+    description = extract_rss_description(child, description)
+    pub_date_str = extract_rss_date(child, pub_date_str)
+
+    {title, link, description, pub_date_str}
+  end
+
+  # Extract title from RSS child node
+  private def self.extract_rss_title(child : XML::Node, current : String) : String
+    return current unless child.name == "title"
+    child.content || "Untitled"
+  end
+
+  # Extract link from RSS child node
+  private def self.extract_rss_link(child : XML::Node, current : String) : String
+    return current unless child.name == "link"
+    child.content || ""
+  end
+
+  # Extract description from RSS child node
+  private def self.extract_rss_description(child : XML::Node, current : String) : String
+    return current unless {"description", "content:encoded"}.includes?(child.name)
+    child.content || ""
+  end
+
+  # Extract date from RSS child node
+  private def self.extract_rss_date(child : XML::Node, current : String) : String
+    return current unless child.name == "pubDate"
+    child.content || ""
   end
 
   # Parse an Atom entry node

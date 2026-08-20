@@ -3,7 +3,6 @@ require "./rss"
 require "./theme"
 require "./render"
 
-# ameba:disable Documentation/DocumentationAdmonition
 # FIXME: Get rid of the named tuples
 
 module Taxonomies
@@ -118,7 +117,6 @@ module Taxonomies
 
     def link(lang = nil)
       lang ||= Locale.language
-      # ameba:disable Documentation/DocumentationAdmonition
       # FIXME localize link
       {name: @title, link: Utils.path_to_link Path[Config.options(lang).output] / "#{@path}/index.html"}
     end

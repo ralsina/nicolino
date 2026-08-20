@@ -54,7 +54,7 @@ module Utils
   # Create the right content file for a source based on its extension
   # kind is used in error messages (e.g. "post", "page")
   def self.create_content_file(sources : Hash(String, String), base : Path, kind : String) : Markdown::File?
-    first_source = sources.values.first? || return nil
+    first_source = sources.values.first? || return
     ext = Path[first_source].extension
     case ext
     when ".html"

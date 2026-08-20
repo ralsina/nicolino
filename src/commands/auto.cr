@@ -120,7 +120,6 @@ module Nicolino
 
         # First do a normal run
         arguments = Croupier::TaskManager.tasks.keys if arguments.empty?
-        # ameba:disable Documentation/DocumentationAdmonition
         # TODO: see if any other combination of args is a good idea
         begin
           run(arguments, fast_mode: fast_mode)
@@ -128,7 +127,6 @@ module Nicolino
           Log.info { "LiveReload: Initial build complete, triggering reload for all connected clients" }
           live_reload.send_reload(path: "/index.html", liveCSS: false)
           # Then run in auto mode
-          # ameba:disable Documentation/DocumentationAdmonition
           Croupier::TaskManager.auto_run(arguments) # FIXME: check options
           loop do
             ::sleep(1.second)

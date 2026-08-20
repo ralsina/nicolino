@@ -29,7 +29,7 @@ module Gallery
   # Create a Gallery object from source files
   def self.create_file(sources : Hash(String, String), base : Path) : Markdown::File?
     # Only index.md files are galleries
-    return nil unless base.basename == "index"
+    return unless base.basename == "index"
 
     gallery_dir = base.parent
     image_list = Dir.glob("#{gallery_dir}/*.{jpg,png,webp,gif}").map do |img_path|
