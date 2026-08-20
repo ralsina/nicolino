@@ -20,8 +20,18 @@ jobs:
       - name: Install dependencies
         run: shards install
 
-      - name: Install native dependencies (libvips, ragel) and Hugo
-        run: sudo apt-get update && sudo apt-get install -y libvips-dev ragel hugo
+      - name: Install native dependencies (libvips, ragel)
+        run: sudo apt-get update && sudo apt-get install -y libvips-dev ragel
+
+      - name: Install latest Hugo (for comparison)
+        # The Ubuntu apt package is years behind (0.12x vs current 0.16x),
+        # which skews the comparison; grab the latest release directly.
+        run: |
+          tag=$(curl -s https://api.github.com/repos/gohugoio/hugo/releases/latest | grep -oP '"tag_name": "\K[^"]+')
+          ver=${tag#v}
+          curl -sL "https://github.com/gohugoio/hugo/releases/download/${tag}/hugo_extended_${ver}_linux-amd64.tar.gz" -o /tmp/hugo.tgz
+          sudo tar -C /usr/local/bin -xzf /tmp/hugo.tgz hugo
+          hugo version
 
       - name: Build optimized (release) binary
         # --release takes ~20 minutes; done here in CI rather than locally.

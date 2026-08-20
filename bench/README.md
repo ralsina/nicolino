@@ -50,7 +50,11 @@ The harness:
 | `NICOLINO_RELEASE_BIN`| *(unset)*              | Optimized (`--release`) binary; when set it is also benchmarked |
 | `HUGO_BIN`            | `$(command -v hugo)`   | Path to hugo (empty skips hugo)          |
 | `NICOLINO_FLAGS`      | `--fast-mode -B -p`    | Flags passed to `nicolino build`         |
-| `CRYSTAL_WORKERS`     | `$(nproc)`             | Crystal worker count                     |
+
+The result JSON records the machine's core count (`cores`) for context.
+Note: nicolino's parallelism is fixed at compile time (Crystal MT); there is
+no runtime worker knob, so results are comparable across machines modulo CPU
+speed and core count.
 
 ## Methodology
 
@@ -65,8 +69,10 @@ The harness:
 
 [`.github/workflows/benchmark.yml`](../.github/workflows/benchmark.yml) builds
 both the normal (`-d`) and optimized (`--release`) binaries in CI and runs the
-harness on every push to `main` (and on manual dispatch), installing Hugo so
-the comparison is reproduced. The results are:
+harness on every push to `main` (and on manual dispatch), installing the
+**latest** Hugo release directly from GitHub (the Ubuntu apt package is years
+behind and skews the comparison) so the timings are representative. The
+results are:
 
 - published to the Actions run's summary
 - uploaded as the `benchmark-results` artifact
@@ -78,10 +84,10 @@ the comparison is reproduced. The results are:
 
 The repo's committed baseline is a **dev-build** reference captured in the
 dual-mode format (see
-[`results/20260820T130146Z.json`](results/20260820T130146Z.json)):
+[`results/20260820T135134Z.json`](results/20260820T135134Z.json)):
 
-- **nicolino 0.22.0** (`--fast-mode -B -p`, 12 workers, dev build): **1.271 s** (4000 html)
-- **hugo v0.164.0**: **0.598 s** (4004 html)
+- **nicolino 0.22.0** (`--fast-mode -B -p`, 12 cores, dev build): **1.169 s** (4000 html)
+- **hugo v0.164.0**: **0.604 s** (4004 html)
 
 That run used an unoptimized dev binary so it does not reflect shipping
 performance. Use the CI workflow (or a local `--release` build) for

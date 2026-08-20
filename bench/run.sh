@@ -19,7 +19,6 @@
 #                         also benchmarked and recorded as "optimized"
 #   HUGO_BIN              Path to hugo (default: found on PATH)
 #   NICOLINO_FLAGS        Flags passed to `nicolino build` (default "--fast-mode -B -p")
-#   CRYSTAL_WORKERS       Crystal worker count for nicolino
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -35,7 +34,7 @@ NICOLINO_BIN="${NICOLINO_BIN:-$ROOT_DIR/bin/nicolino}"
 NICOLINO_RELEASE_BIN="${NICOLINO_RELEASE_BIN:-}"
 HUGO_BIN="${HUGO_BIN:-$(command -v hugo || true)}"
 NICOLINO_FLAGS="${NICOLINO_FLAGS:---fast-mode -B -p}"
-WORKERS="${CRYSTAL_WORKERS:-$(nproc)}"
+CORES="$(nproc)"
 
 mkdir -p "$RESULTS_DIR"
 
@@ -114,7 +113,7 @@ main() {
   log "Nicolino vs Hugo benchmark"
   log "  corpus: $(find "$CORPUS" -name '*.md' | wc -l) files"
   log "  runs per tool: $RUNS (median)"
-  log "  workers: $WORKERS"
+  log "  cores: $CORES"
   log "  nicolino flags: $NICOLINO_FLAGS"
   log ""
 
@@ -200,7 +199,7 @@ main() {
   "date": "$ts",
   "corpus_files": $(find "$CORPUS" -name '*.md' | wc -l),
   "runs": $RUNS,
-  "workers": $WORKERS,
+  "cores": $CORES,
   "nicolino": {
     "version": "$nico_ver",
     "build_mode": "dev",
