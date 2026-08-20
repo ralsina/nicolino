@@ -13,7 +13,8 @@ module Archive
     link : String,
     date : String do
     def self.from_post(post : Markdown::File) : self
-      post_date = post.date.as(Time)
+      post_date = post.date
+      raise "Archive post #{post.source} has no date (required for archive)" unless post_date.is_a?(Time)
       new(
         title: post.title,
         link: post.link,

@@ -179,7 +179,7 @@ module Books
       @link[lang] = (Path.new ["/", output.split("/")[1..]]).to_s
       @shortcodes[lang] = Sc.shortcodes_in(@text[lang])
     rescue ex
-      Log.error { "Error reading book chapter #{source(lang)}: #{ex}" }
+      Log.error { "Error reading book chapter #{source(lang)}: #{ex.message}" }
       raise ex
     end
 
