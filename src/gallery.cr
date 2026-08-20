@@ -1,5 +1,6 @@
 require "./markdown"
 require "./theme"
+require "./render"
 require "json"
 require "crinja"
 
@@ -348,16 +349,10 @@ module Gallery
 
         # Create breadcrumbs for galleries index
         galleries_link = "/galleries#{lang_suffix}/"
-        breadcrumbs = [{name: "Home", link: "/"}, {name: "Galleries", link: galleries_link}] of NamedTuple(name: String, link: String)
+        breadcrumbs = Render.section_breadcrumbs("Galleries", galleries_link)
 
         # Include title.tmpl which handles breadcrumbs
-        title_template = Theme.template_path("title.tmpl")
-        title_html = Templates.environment.get_template(title_template).render({
-          "title"       => "Galleries",
-          "link"        => galleries_link,
-          "breadcrumbs" => breadcrumbs,
-          "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
-        })
+        title_html = Render.title_html("Galleries", galleries_link, breadcrumbs)
 
         # Build items list for the template with first image for each gallery
         items = galleries.map do |gallery|
@@ -389,15 +384,7 @@ module Gallery
           "items"       => items,
         })
 
-        page_template = Theme.template_path("page.tmpl")
-        html = Render.apply_template(page_template, {
-          "content"     => title_html + content,
-          "title"       => "Galleries",
-          "breadcrumbs" => breadcrumbs,
-        }, lang)
-        doc = Lexbor::Parser.new(html)
-        doc = HtmlFilters.make_links_relative(doc, output_path.to_s)
-        doc.to_html
+        Render.page_html(output_path.to_s, title_html + content, "Galleries", breadcrumbs, lang)
       end
     end
   end

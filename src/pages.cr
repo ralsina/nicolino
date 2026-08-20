@@ -8,43 +8,21 @@ require "./creatable"
 require "./render"
 require "./html_filters"
 require "./theme"
+require "./utils"
+require "./folder_indexes"
 
 module Pages
-  # Directories that generate their own indexes (excluded from page folder indexes)
-  EXCLUDED_DIRECTORIES = ["posts", "galleries", "listings", "books"]
-
   # Return glob patterns for pages content
   # Pages are the fallback - they scan the entire content directory
   # Posts will claim files first, pages get the rest
   # Excludes directories handled by other features (galleries, books)
   def self.content_globs : Array(String)
-    content_path = Path[Config.options.content]
-    globs = [] of String
-    globs << "#{content_path}/**/*.md"
-    globs << "#{content_path}/**/*.html"
-    Config.options.pandoc_formats.keys.each do |ext|
-      globs << "#{content_path}/**/*#{ext}"
-    end
-    globs
+    Utils.content_globs(Path[Config.options.content])
   end
 
   # Create a file object from source files
   def self.create_file(sources : Hash(String, String), base : Path) : Markdown::File?
-    # Determine file type from extension
-    first_source = sources.values.first? || return nil
-    ext = Path[first_source].extension
-    case ext
-    when ".html"
-      HTML::File.new(sources, base)
-    when /\.(rst|tex|latex|mdoc|adoc|asciidoc)$/
-      Pandoc::File.new(sources, base)
-    else
-      Markdown::File.new(sources, base)
-    end
-  rescue ex
-    Log.error { "Error creating page file #{base}: #{ex.message}" }
-    Log.debug { ex }
-    nil
+    Utils.create_content_file(sources, base, "page")
   end
 
   # Enable pages feature using pre-scanned files
@@ -93,7 +71,7 @@ module Pages
 
       # Skip excluded directories (they generate their own indexes)
       first_part = relative_path.parts.first?
-      next if first_part && EXCLUDED_DIRECTORIES.includes?(first_part)
+      next if first_part && (first_part == "posts" || FolderIndexes.excluded_folders.includes?(first_part))
 
       # Check if any task already produces this folder's index.html
       temp_index = PageFolderIndex.new(folder_path, content_path)

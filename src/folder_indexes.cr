@@ -3,21 +3,18 @@ require "./rss"
 require "./theme"
 
 module FolderIndexes
-  # Registry for feature modules to register their output folders
-  # that should be excluded from automatic index generation
-  @@excluded_folders = [] of String
+  # Single registry for directories handled by other features, so we don't
+  # generate indexes for them. Feature modules register their output folders
+  # via register_exclude.
+  @@excluded_folders = Set(String).new
 
   def self.register_exclude(folder : String)
-    @@excluded_folders << folder unless @@excluded_folders.includes?(folder)
+    @@excluded_folders.add(folder.chomp('/'))
   end
 
-  def self.excluded_folders
+  def self.excluded_folders : Set(String)
     @@excluded_folders
   end
-
-  # Directories that generate their own indexes (excluded from folder_indexes)
-  # Pages now handles page directories, so we exclude those too
-  DEFAULT_EXCLUDED = ["galleries", "listings", "books", "pages"]
 
   # Enable folder_indexes feature
   # This now ONLY handles posts/ folder and subfolders
@@ -26,7 +23,7 @@ module FolderIndexes
 
     Log.info { "📁 Scanning for posts folder indexes..." }
 
-    # Collect exclude patterns from two sources:
+    # Collect exclude patterns:
     # 1. Config file (manual overrides)
     # 2. Feature modules that register their output folders
     # 3. Default exclusions (features that handle their own indexes)
@@ -42,10 +39,8 @@ module FolderIndexes
     end
 
     # 2. Get registered exclusions from feature modules
-    exclude_patterns += excluded_folders
-
-    # 3. Add default exclusions for features that handle their own indexes
-    exclude_patterns += DEFAULT_EXCLUDED
+    # 3. Pages feature generates its own directory indexes
+    exclude_patterns += excluded_folders.to_a + ["pages"]
 
     # Scan posts path for folders needing indexes
     content_path = content_path.expand

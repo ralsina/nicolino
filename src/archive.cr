@@ -1,6 +1,7 @@
 require "./markdown"
 require "./theme"
 require "./utils"
+require "./render"
 require "lexbor"
 
 module Archive
@@ -150,16 +151,10 @@ module Archive
 
         # Create breadcrumbs for archive
         archive_link = "/archive#{lang_suffix}/"
-        breadcrumbs = [{name: "Home", link: "/"}, {name: "Archive", link: archive_link}] of NamedTuple(name: String, link: String)
+        breadcrumbs = Render.section_breadcrumbs("Archive", archive_link)
 
         # Include title.tmpl which handles breadcrumbs
-        title_template = Theme.template_path("title.tmpl")
-        title_html = Templates.environment.get_template(title_template).render({
-          "title"       => "Archive",
-          "link"        => archive_link,
-          "breadcrumbs" => breadcrumbs,
-          "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
-        })
+        title_html = Render.title_html("Archive", archive_link, breadcrumbs)
 
         # Render the archive template
         archive_template = Theme.template_path("archive.tmpl")
@@ -168,18 +163,8 @@ module Archive
           "latest_year" => latest_year,
         })
 
-        # Apply to page template
-        page_template = Theme.template_path("page.tmpl")
-        html = Render.apply_template(page_template, {
-          "content"     => title_html + rendered,
-          "title"       => "Archive",
-          "breadcrumbs" => breadcrumbs,
-        }, lang)
-
-        # Process with HTML filters
-        doc = Lexbor::Parser.new(html)
-        doc = HtmlFilters.make_links_relative(doc, archive_link)
-        doc.to_html
+        # Apply to page template with HTML filters
+        Render.page_html(archive_link, title_html + rendered, "Archive", breadcrumbs, lang)
       end
     end
   end

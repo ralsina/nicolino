@@ -40,6 +40,67 @@ module Utils
     output.ends_with?("/") ? output : "#{output}/"
   end
 
+  # Glob patterns for markdown, html and pandoc content under a base path
+  def self.content_globs(base_path : Path) : Array(String)
+    globs = [] of String
+    globs << "#{base_path}/**/*.md"
+    globs << "#{base_path}/**/*.html"
+    Config.options.pandoc_formats.keys.each do |ext|
+      globs << "#{base_path}/**/*#{ext}"
+    end
+    globs
+  end
+
+  # Create the right content file for a source based on its extension
+  # kind is used in error messages (e.g. "post", "page")
+  def self.create_content_file(sources : Hash(String, String), base : Path, kind : String) : Markdown::File?
+    first_source = sources.values.first? || return nil
+    ext = Path[first_source].extension
+    case ext
+    when ".html"
+      HTML::File.new(sources, base)
+    when /\.(rst|tex|latex|mdoc|adoc|asciidoc)$/
+      Pandoc::File.new(sources, base)
+    else
+      Markdown::File.new(sources, base)
+    end
+  rescue ex
+    Log.error { "Error creating #{kind} file #{base}: #{ex.message}" }
+    Log.debug { ex }
+    nil
+  end
+
+  # Process inputs in parallel chunks, returning per-chunk results in order.
+  # Errors in a chunk are logged and that chunk is skipped.
+  def self.parallel_chunks(inputs : Array(String), chunk_size : Int32 = 100, &block : Array(String), Int32 -> T) : Array(T) forall T
+    num_chunks = (inputs.size // chunk_size) + 1
+    channels = Channel(T | Exception).new
+    num_chunks.times do |chunk_idx|
+      spawn do
+        begin
+          start_idx = chunk_idx * chunk_size
+          end_idx = Math.min(start_idx + chunk_size, inputs.size)
+          chunk_data = inputs[start_idx...end_idx]
+          channels.send(block.call(chunk_data, start_idx))
+        rescue ex
+          channels.send(ex)
+        end
+      end
+    end
+
+    results = [] of T
+    num_chunks.times do
+      result = channels.receive
+      case result
+      when Exception
+        Log.error { "Error in parallel chunk: #{result.message}" }
+      else
+        results << result
+      end
+    end
+    results
+  end
+
   # Filter out files from directories that correspond to disabled features
   def self.should_skip_file?(base_path : Path) : Bool
     enabled_features = Config.features

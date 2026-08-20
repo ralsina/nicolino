@@ -1,6 +1,7 @@
 require "./utils"
 require "./rss"
 require "./theme"
+require "./render"
 
 # ameba:disable Documentation/DocumentationAdmonition
 # FIXME: Get rid of the named tuples
@@ -131,7 +132,6 @@ module Taxonomies
         lang_suffix = Utils.lang_suffix(lang)
         base_path = Path[Config.options(lang).output] / Path["#{@path.chomp('/')}#{lang_suffix}"]
         output = (base_path / "index.html").to_s
-        page_template = Theme.template_path("page.tmpl")
         title_template = Theme.template_path("title.tmpl")
         taxonomy_template = Theme.template_path("taxonomy.tmpl")
 
@@ -139,18 +139,13 @@ module Taxonomies
         taxonomy_link = Utils.path_to_link(
           Path[Config.options(lang).output] / "#{@path.chomp('/')}#{lang_suffix}/"
         )
-        breadcrumbs = [
-          {name: "Home", link: "/"},
-          {name: @title, link: taxonomy_link},
-        ] of NamedTuple(name: String, link: String)
+        breadcrumbs = Render.section_breadcrumbs(@title, taxonomy_link)
 
         # Include title.tmpl which handles breadcrumbs
-        title_html = Templates.environment.get_template(title_template).render({
-          "title"       => @title,
-          "link"        => Utils.path_to_link(Path[Config.options(lang).output] / "#{@path}/"),
-          "breadcrumbs" => breadcrumbs,
-          "taxonomies"  => [] of NamedTuple(name: String, link: NamedTuple(link: String, title: String)),
-        })
+        title_html = Render.title_html(
+          @title,
+          Utils.path_to_link(Path[Config.options(lang).output] / "#{@path}/"),
+          breadcrumbs)
 
         rendered = Templates.environment.get_template(taxonomy_template).render({"taxonomy" => lightweight_value(lang)})
 
@@ -162,15 +157,14 @@ module Taxonomies
           mergeable: false
         ) do
           Log.info { "👉 #{output}" }
-          html = Render.apply_template(page_template,
-            {
-              "content"     => title_html + rendered,
-              "title"       => @title,
-              "breadcrumbs" => breadcrumbs,
-            }, lang)
-          doc = Lexbor::Parser.new(html)
-          doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))
-          HtmlFilters.fix_code_classes(doc).to_html
+          Render.page_html(
+            Utils.path_to_link(output),
+            title_html + rendered,
+            @title,
+            breadcrumbs,
+            lang,
+            fix_code_classes: true
+          )
         end
 
         @terms.values.each do |term|
