@@ -29,8 +29,10 @@ On the other hand, Nicolino has an approach you may like, need or enjoy:
     tool lets you do those things (and [import](cli/import.html)) plus a blog plus normal webpages?
 
 =It's pretty fast.=
-    Yes, really. 20% faster than Hugo in some benchmarks. Faster or slower than
-    other similar software. But pretty fast in general!
+    Yes, really. On the 4000-page [build benchmark](https://www.zachleat.com/web/build-benchmark/),
+    the release build is about 20% faster than [Hugo](https://gohugo.io)
+    (see the [benchmark harness](https://github.com/ralsina/nicolino/tree/main/bench)).
+    Faster or slower than other similar software. But pretty fast in general!
 
     Also, it's built around only doing what needs doing so in normal usage it
     will be even faster. Ideally, when there is nothing to be done, it should be

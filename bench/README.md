@@ -89,7 +89,15 @@ dual-mode format (see
 - **nicolino 0.22.0** (`--fast-mode -B -p`, 12 cores, dev build): **1.169 s** (4000 html)
 - **hugo v0.164.0**: **0.604 s** (4004 html)
 
-That run used an unoptimized dev binary so it does not reflect shipping
-performance. Use the CI workflow (or a local `--release` build) for
-representative numbers; the optimized figures are published to each `main`
+That run used an unoptimized dev binary and predates the minimal bench theme,
+so it does not reflect shipping performance. The CI workflow
+(`.github/workflows/benchmark.yml`, a 2-core runner) reflects the current
+state with both build modes:
+
+- **nicolino release**: **0.74 s** — about 20% faster than Hugo
+- **hugo**: **0.96 s**
+- **nicolino dev**: **1.70 s** (~2.3× slower than release)
+
+The optimized figure is what ships; the dev figure shows the headroom
+`--release` optimization provides. Fresh results are published to each `main`
 run's summary and, when refreshed manually, to `bench/results/latest.json`.

@@ -22,7 +22,12 @@ So, Nicolino. Here are some reasons why I think it's worth using:
 =It *is* fast=
     While benchmarks are not very important
     it *does* run [this benchmark](https://www.zachleat.com/web/build-benchmark/) ... fast.
-    How fast? Usually faster than [Hugo](https://gohugo.io).
+    How fast? Usually faster than [Hugo](https://gohugo.io) on the
+    [build benchmark](https://www.zachleat.com/web/build-benchmark/) — the
+    release build is about 20% faster (see the
+    [benchmark harness](https://github.com/ralsina/nicolino/tree/main/bench)).
+    On a 12-core machine this very site builds from scratch in under a second
+    (`bin/nicolino build --fast-mode -B -p` ≈ 0.9s).
 
     It will often be even faster because Nicolino has incremental builds as its
     core. Everything is incrementally built. Changing your content will only

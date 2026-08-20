@@ -14,6 +14,30 @@ A **good** static site generator.
 - **Sitemap** - Automatic XML sitemap generation
 - **Fast builds** - Parallel, incremental builds via Croupier task system
 
+## Performance
+
+On the
+[4000-page build benchmark](https://www.zachleat.com/web/build-benchmark/)
+the **release** build is about 20% faster than Hugo, and the dev build stays
+comfortably usable. On a 12-core machine the dev build renders this site from
+scratch in under a second:
+
+```sh
+time bin/nicolino build --fast-mode -B -p -v 3
+# ≈ 0.9s (cold/full rebuild)
+```
+
+When nothing changed, the incremental build is near-instant:
+
+```sh
+time bin/nicolino build --fast-mode -p -v 3
+# ≈ 0.2s (warm, no-change)
+```
+
+Results are published to each CI benchmark run; see
+[`bench/README.md`](bench/README.md) for methodology and the reproducible
+harness.
+
 ## WARNING
 
 This project is still in development and may change suddenly in places like
