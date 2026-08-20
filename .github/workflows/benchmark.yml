@@ -23,13 +23,18 @@ jobs:
       - name: Install native dependencies (libvips) and Hugo
         run: sudo apt-get update && sudo apt-get install -y libvips-dev hugo
 
-      - name: Build normal (dev) binary
-        run: shards build -d
-
       - name: Build optimized (release) binary
         # --release takes ~20 minutes; done here in CI rather than locally.
-        # Output to a separate path so both binaries coexist for the harness.
-        run: shards build --release --output "${{ github.workspace }}/bench/release-bin/nicolino"
+        # `shards build` has no --output flag; it always writes to the target
+        # default (bin/nicolino), so copy it aside for the harness.
+        run: |
+          shards build --release
+          mkdir -p "${{ github.workspace }}/bench/release-bin"
+          cp bin/nicolino "${{ github.workspace }}/bench/release-bin/nicolino"
+
+      - name: Build normal (dev) binary
+        # Rebuild dev afterwards so bin/nicolino is the dev binary for the harness.
+        run: shards build -d
 
       - name: Run benchmark
         id: bench
