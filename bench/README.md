@@ -10,21 +10,26 @@ The corpus is a snapshot of Zach Leat's static-site build benchmark
 
 ## Requirements
 
-- a **release** build of `nicolino` (see below; dev builds are unoptimized and
-  not representative)
+- a `nicolino` binary (the harness builds a **normal (dev)** one if missing)
+- an **optimized (`--release`)** binary, optionally, via `NICOLINO_RELEASE_BIN`
 - `hugo` on `PATH` (optional — the Hugo comparison is skipped if absent)
 - `bash`, `awk`, `date`
 
-> **Use a release binary.** Dev builds (`shards build -d`) are roughly 2x
-> slower and make the results meaningless. Build one locally with
-> `shards build --release` (takes ~20 minutes) or, better, let CI do it — see
-> the [CI workflow](#ci-workflow) below.
+> **Both build modes are measured.** Dev builds (`shards build -d`) are roughly
+> 2x slower than `--release` builds, so the harness times both and records them
+> under `nicolino` (dev) and `nicolino.optimized` in the result JSON. For
+> shipping-performance numbers you care about the **optimized** figure; the
+> dev figure shows the headroom optimization gives. Build a release binary
+> locally with `shards build --release` (takes ~20 minutes) or let CI do it —
+> see the [CI workflow](#ci-workflow) below.
 
 ## Usage
 
 ```sh
-shards build --release
-NICOLINO_BIN="$PWD/bin/nicolino" ./bench/run.sh
+shards build --release --output bench/release-bin/nicolino
+NICOLINO_BIN="$PWD/bin/nicolino" \
+NICOLINO_RELEASE_BIN="$PWD/bench/release-bin/nicolino" \
+./bench/run.sh
 ```
 
 The harness:
@@ -38,14 +43,14 @@ The harness:
 
 ### Configuration
 
-| Env var           | Default                | Purpose                            |
-| ----------------- | ---------------------- | ---------------------------------- |
-| `RUNS`            | `3`                    | Number of timed runs per tool      |
-| `NICOLINO_BIN`    | `./bin/nicolino`       | Path to the nicolino binary        |
-| `HUGO_BIN`        | `$(command -v hugo)`   | Path to hugo (empty skips hugo)    |
-| `NICOLINO_FLAGS`  | `--fast-mode -B -p`    | Flags passed to `nicolino build`   |
-| `CRYSTAL_WORKERS` | `$(nproc)`             | Crystal worker count               |
-| `BUILD_MODE`      | `dev`                  | Recorded in the result JSON        |
+| Env var               | Default                | Purpose                                  |
+| --------------------- | ---------------------- | ---------------------------------------- |
+| `RUNS`                | `3`                    | Number of timed runs per tool            |
+| `NICOLINO_BIN`        | `./bin/nicolino`       | Normal (dev) nicolino binary             |
+| `NICOLINO_RELEASE_BIN`| *(unset)*              | Optimized (`--release`) binary; when set it is also benchmarked |
+| `HUGO_BIN`            | `$(command -v hugo)`   | Path to hugo (empty skips hugo)          |
+| `NICOLINO_FLAGS`      | `--fast-mode -B -p`    | Flags passed to `nicolino build`         |
+| `CRYSTAL_WORKERS`     | `$(nproc)`             | Crystal worker count                     |
 
 ## Methodology
 
@@ -59,9 +64,9 @@ The harness:
 ## CI workflow
 
 [`.github/workflows/benchmark.yml`](../.github/workflows/benchmark.yml) builds
-the optimized `--release` binary in CI and runs the harness on every push to
-`main` (and on manual dispatch), installing Hugo so the comparison is
-reproduced. The results are:
+both the normal (`-d`) and optimized (`--release`) binaries in CI and runs the
+harness on every push to `main` (and on manual dispatch), installing Hugo so
+the comparison is reproduced. The results are:
 
 - published to the Actions run's summary
 - uploaded as the `benchmark-results` artifact
@@ -71,14 +76,14 @@ reproduced. The results are:
 
 ## Baseline
 
-The repo's committed baseline is a **dev-build** reference captured when the
-corpus was first vendored (see
-[`results/20260820T124100Z.json`](results/20260820T124100Z.json)):
+The repo's committed baseline is a **dev-build** reference captured in the
+dual-mode format (see
+[`results/20260820T130146Z.json`](results/20260820T130146Z.json)):
 
-- **nicolino 0.22.0** (`--fast-mode -B -p`, 12 workers, dev build): **1.370 s** (4000 html)
-- **hugo v0.164.0**: **0.877 s** (4004 html)
+- **nicolino 0.22.0** (`--fast-mode -B -p`, 12 workers, dev build): **1.271 s** (4000 html)
+- **hugo v0.164.0**: **0.598 s** (4004 html)
 
-Because that run used an unoptimized dev binary it does not reflect shipping
+That run used an unoptimized dev binary so it does not reflect shipping
 performance. Use the CI workflow (or a local `--release` build) for
 representative numbers; the optimized figures are published to each `main`
 run's summary and, when refreshed manually, to `bench/results/latest.json`.

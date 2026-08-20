@@ -23,22 +23,26 @@ jobs:
       - name: Install Hugo (for comparison)
         run: sudo apt-get update && sudo apt-get install -y hugo
 
+      - name: Build normal (dev) binary
+        run: shards build -d
+
       - name: Build optimized (release) binary
         # --release takes ~20 minutes; done here in CI rather than locally.
-        run: shards build --release
+        # Output to a separate path so both binaries coexist for the harness.
+        run: shards build --release --output "${{ github.workspace }}/bench/release-bin/nicolino"
 
       - name: Run benchmark
         id: bench
         env:
           NICOLINO_BIN: "${{ github.workspace }}/bin/nicolino"
+          NICOLINO_RELEASE_BIN: "${{ github.workspace }}/bench/release-bin/nicolino"
           RUNS: "3"
-          BUILD_MODE: "release"
         run: ./bench/run.sh
 
       - name: Publish summary
         run: |
           latest=$(ls -t bench/results/*.json | head -1)
-          echo "## Benchmark (release build)" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Benchmark (dev + release)" >> "$GITHUB_STEP_SUMMARY"
           echo "Result file: \`${latest##*/}\`" >> "$GITHUB_STEP_SUMMARY"
           echo '```json' >> "$GITHUB_STEP_SUMMARY"
           cat "$latest" >> "$GITHUB_STEP_SUMMARY"

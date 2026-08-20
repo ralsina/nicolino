@@ -19,6 +19,7 @@ content/posts/ralsina/
 /bench/hugo/.hugo_build.lock
 /bench/site/.kvstore
 /bench/site/.croupier
+/bench/release-bin/
 /myblog/
 /mysite/
 /.claude/
