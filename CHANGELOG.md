@@ -2,6 +2,58 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.23.0] - 2026-08-20
+
+### 🚀 Features
+
+- Reproducible benchmark harness + optimized-build CI (#39)
+- Complete template dependency detection via AST visitor
+
+### 🐛 Bug Fixes
+
+- Make `nicolino init` work without a `-v` flag (#34)
+- Honor configured output, content and default-language paths (#36)
+- Don't materialize `kv://` virtual outputs as directories
+- Declare template include deps at task creation
+- Declare shortcode kv deps so parallel builds can't race them
+- Derive unique task ids for croupier 0.14
+- Suppress ameba TODO/FIXME warnings
+- Remove stale ameba directives and fix line length
+
+### ⚡ Performance
+
+- Optimize HTML processing pipeline
+- Add timing instrumentation to Markdown.render
+- Parallel content scanning via ContentScanner
+- Preprocess templates (inline includes, fold constant subtrees)
+- Page post-processing fast paths and parallel content reading
+- Compile markdown and pandoc outside the memo mutex
+- Pool Crinja environments across waves and rebuilds
+- Raise parallel utilization in creation and page post-processing
+- Memoize post HTML, language scan, and registry lookups
+
+### 🚜 Refactor
+
+- Remove dead code left behind by the enable_from_scan refactor (#33)
+- Deduplicate gallery creation and tidy misc code smells (#35)
+- Deduplicate copy-pasted feature logic (#38)
+
+### 📚 Documentation
+
+- Add release notes posts v0.11.1 through v0.21.0
+- Cite reproducible benchmark numbers in performance claims
+
+### Build
+
+- Add minimal bench theme + install step
+
+### Ci
+
+- Install libvips before building (#40)
+- Build release to default path then copy it aside
+- Install ragel for the shortcodes shard postinstall
+- Install native deps before shards install
+
 ## [0.21.0] - 2026-08-14
 
 ### 🐛 Bug Fixes
