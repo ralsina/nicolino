@@ -17,7 +17,7 @@ require "crinja"
 #   images and sub-galleries below it.
 module Gallery
   # Register output folder to exclude from folder_indexes
-  FolderIndexes.register_exclude("galleries/")
+  FolderIndexes.register_exclude { Config.galleries }
 
   # Return glob patterns for gallery content
   # Galleries are index.md files inside galleries/
@@ -130,7 +130,7 @@ module Gallery
       breadcrumbs << {name: "Home", link: "/"}
 
       # Add "Galleries" root
-      gal_path = "/galleries/"
+      gal_path = "/#{Config.galleries}"
       breadcrumbs << {name: "Galleries", link: gal_path}
 
       # Build path hierarchy

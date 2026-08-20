@@ -9,7 +9,7 @@ require "toml"
 
 module Books
   # Register books output folder to exclude from folder_indexes
-  FolderIndexes.register_exclude("books/")
+  FolderIndexes.register_exclude { Config.books }
 
   # Navigation link structure for book chapters
   record NavigationLink,
@@ -254,9 +254,9 @@ module Books
     # Get the link for this chapter (preserves directory structure)
     def link(book_name : String) : String
       if slug.empty?
-        "/books/#{book_name}/"
+        "/#{Config.books}#{book_name}/"
       else
-        "/books/#{book_name}/#{slug}.html"
+        "/#{Config.books}#{book_name}/#{slug}.html"
       end
     end
 
@@ -277,7 +277,7 @@ module Books
   def self.enable(is_enabled : Bool)
     return unless is_enabled
 
-    books_path = Path[Config.options.content] / "books"
+    books_path = Path[Config.options.content] / Config.books
     return unless Dir.exists?(books_path)
 
     create_tasks(books_path.to_s)
@@ -385,7 +385,7 @@ module Books
     summary_path : String,
     flat_chapters : Array(ChapterEntry),
   )
-    output_path = Path[Config.options.output] / "books" / book.name / "#{entry.slug}.html"
+    output_path = Path[Config.options.output] / Config.books / book.name / "#{entry.slug}.html"
 
     page_template = Theme.template_path("page.tmpl")
     title_template = Theme.template_path("title.tmpl")
@@ -418,8 +418,8 @@ module Books
       # Build breadcrumbs
       breadcrumbs = [
         {name: "Home", link: "/"},
-        {name: "Books", link: "/books/"},
-        {name: book.title, link: "/books/#{book.name}/"},
+        {name: "Books", link: "/#{Config.books}"},
+        {name: book.title, link: "/#{Config.books}#{book.name}/"},
         {name: entry.title, link: entry.link(book.name)},
       ] of NamedTuple(name: String, link: String)
 
@@ -483,7 +483,7 @@ module Books
 
     # For the first chapter, use the book index as the previous link
     prev_link = if idx == 0
-                  NavigationLink.new(title: book.title, link: "/books/#{book_name}/")
+                  NavigationLink.new(title: book.title, link: "/#{Config.books}#{book_name}/")
                 else
                   prev_entry ? nav_link_for_entry(prev_entry, book_name) : nil
                 end
@@ -608,7 +608,7 @@ module Books
 
   # Create task for book index page
   private def self.create_book_index_task(book : Book, book_dir : String)
-    output_path = Path[Config.options.output] / "books" / book.name / "index.html"
+    output_path = Path[Config.options.output] / Config.books / book.name / "index.html"
 
     page_template = Theme.template_path("page.tmpl")
     title_template = Theme.template_path("title.tmpl")
@@ -633,12 +633,12 @@ module Books
       # Create breadcrumbs
       breadcrumbs = [
         {name: "Home", link: "/"},
-        {name: "Books", link: "/books/"},
-        {name: book.title, link: "/books/#{book.name}/"},
+        {name: "Books", link: "/#{Config.books}"},
+        {name: book.title, link: "/#{Config.books}#{book.name}/"},
       ] of NamedTuple(name: String, link: String)
 
       # Include title.tmpl which handles breadcrumbs
-      title_html = Render.title_html(book.title, "/books/#{book.name}/", breadcrumbs)
+      title_html = Render.title_html(book.title, "/#{Config.books}#{book.name}/", breadcrumbs)
 
       book_index_template = Theme.template_path("book_index.tmpl")
       template = Templates.environment.get_template(book_index_template)
@@ -672,7 +672,7 @@ module Books
   private def self.create_books_index(books : Array(Book))
     return if books.empty?
 
-    output_path = Path[Config.options.output] / "books" / "index.html"
+    output_path = Path[Config.options.output] / Config.books / "index.html"
 
     page_template = Theme.template_path("page.tmpl")
     title_template = Theme.template_path("title.tmpl")
@@ -688,10 +688,10 @@ module Books
       Log.info { "👉 #{output_path}" }
 
       # Create breadcrumbs
-      breadcrumbs = Render.section_breadcrumbs("Books", "/books/")
+      breadcrumbs = Render.section_breadcrumbs("Books", "/#{Config.books}")
 
       # Include title.tmpl which handles breadcrumbs
-      title_html = Render.title_html("Books", "/books/", breadcrumbs)
+      title_html = Render.title_html("Books", "/#{Config.books}", breadcrumbs)
 
       item_list_template = Theme.template_path("item_list.tmpl")
       template = Templates.environment.get_template(item_list_template)
@@ -700,7 +700,7 @@ module Books
         {
           "title"       => book.title,
           "description" => book.description || "",
-          "link"        => "/books/#{book.name}/",
+          "link"        => "/#{Config.books}#{book.name}/",
           "date"        => nil,
         }
       end
@@ -712,7 +712,7 @@ module Books
       })
 
       Render.page_html(
-        "/books/",
+        "/#{Config.books}",
         title_html + content,
         "Books",
         breadcrumbs,

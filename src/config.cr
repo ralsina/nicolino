@@ -50,6 +50,8 @@ module Config
     property posts : String = "posts/"
     property galleries : String = "galleries/"
     property listings : String = "listings/"
+    property books : String = "books/"
+    property archive : String = "archive/"
     property theme : String = "default"
     property color_scheme : String = "default"
     property fonts : Fonts = Fonts.new
@@ -234,6 +236,21 @@ location: "tags/"
     @@global_config.galleries
   end
 
+  def self.listings : String
+    ensure_loaded
+    @@global_config.listings
+  end
+
+  def self.books : String
+    ensure_loaded
+    @@global_config.books
+  end
+
+  def self.archive : String
+    ensure_loaded
+    @@global_config.archive
+  end
+
   def self.theme : String
     ensure_loaded
     @@global_config.theme
@@ -337,6 +354,8 @@ location: "tags/"
     property posts : String
     property galleries : String
     property listings : String
+    property books : String
+    property archive : String
     property locale : String
     property date_output_format : String
     property theme : String
@@ -355,6 +374,8 @@ location: "tags/"
       @posts = @global.posts
       @galleries = @global.galleries
       @listings = @global.listings
+      @books = @global.books
+      @archive = @global.archive
       @locale = @lang_config.locale
       @date_output_format = @lang_config.date_output_format
       @theme = @global.theme

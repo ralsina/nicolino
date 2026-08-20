@@ -70,7 +70,7 @@ module Archive
   end
 
   # Register output folder to exclude from folder_indexes
-  FolderIndexes.register_exclude("archive/")
+  FolderIndexes.register_exclude { Config.archive }
 
   # Enable archive feature if posts are available
   def self.enable(is_enabled : Bool, posts : Array(Markdown::File))
@@ -87,7 +87,7 @@ module Archive
       base_path = Path[Config.options(lang).output]
       # Make output path language-specific to avoid conflicts
       lang_suffix = Utils.lang_suffix(lang)
-      output_path = (base_path / "archive#{lang_suffix}" / "index.html").normalize.to_s
+      output_path = (base_path / "#{Config.archive.rstrip('/')}#{lang_suffix}" / "index.html").normalize.to_s
 
       # Collect all dependencies from all posts (no eager date loading)
       all_dependencies = posts.flat_map(&.dependencies)
@@ -150,7 +150,7 @@ module Archive
         Log.info { "👉 #{output_path}" }
 
         # Create breadcrumbs for archive
-        archive_link = "/archive#{lang_suffix}/"
+        archive_link = "/#{Config.archive.rstrip('/')}#{lang_suffix}/"
         breadcrumbs = Render.section_breadcrumbs("Archive", archive_link)
 
         # Include title.tmpl which handles breadcrumbs
