@@ -163,7 +163,7 @@ module Books
       Markdown.posts[base.to_s] = self
 
       # Load for each language
-      Config.languages.keys.each do |lang|
+      Config.languages.each do |lang|
         load lang
       end
     end

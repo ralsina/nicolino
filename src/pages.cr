@@ -26,11 +26,11 @@ module Pages
   end
 
   # Enable pages feature using pre-scanned files
-  def self.enable_from_scan(scan_result : Array(Markdown::File)?, feature_set : Set(YAML::Any))
+  def self.enable_from_scan(scan_result : Array(Markdown::File)?, feature_set : Set(String))
     return unless scan_result
 
     pages = scan_result
-    features = feature_set.map(&.as_s).to_set
+    features = feature_set
 
     # Render pages without requiring dates
     Markdown.render(pages, require_date: false)
@@ -99,7 +99,7 @@ module Pages
 
   # Render all page folder indexes
   def self.render_indexes(indexes : Array(PageFolderIndex), content_path : Path)
-    Config.languages.keys.each do |lang|
+    Config.languages.each do |lang|
       out_path = Path.new(Config.options(lang).output)
       lang_suffix = Utils.lang_suffix(lang)
 

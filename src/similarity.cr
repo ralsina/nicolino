@@ -290,7 +290,7 @@ module Similarity
 
     # Collect all signatures from all languages to handle duplicates across languages
     all_signatures = [] of Signature
-    Config.languages.keys.each do |current_lang|
+    Config.languages.each do |current_lang|
       all_signatures.concat(get_all_signatures(current_lang))
     end
     return [] of RelatedPost if all_signatures.empty?
@@ -349,7 +349,7 @@ module Similarity
   def self.create_tasks(posts : Array(Markdown::File)) : Nil
     return if posts.empty?
 
-    Config.languages.keys.each do |lang|
+    Config.languages.each do |lang|
       posts.each do |post|
         safe_link = post.link(lang).gsub("/", "_")
         # Create a task to calculate and store the signature for this post

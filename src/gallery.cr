@@ -64,7 +64,7 @@ module Gallery
   end
 
   # Enable galleries feature using pre-scanned files
-  def self.enable_from_scan(scan_result : Array(Markdown::File)?, feature_set : Set(YAML::Any))
+  def self.enable_from_scan(scan_result : Array(Markdown::File)?, feature_set : Set(String))
     return unless scan_result
     return if scan_result.empty?
 
@@ -104,7 +104,7 @@ module Gallery
       Markdown.posts[base.to_s] = self
 
       # Patch title if it's missing, special case for galleries
-      Config.languages.keys.each do |lang|
+      Config.languages.each do |lang|
         if @title[lang].empty?
           # Use folder name
           @title[lang] = base.parts[-2].capitalize
@@ -235,7 +235,7 @@ module Gallery
     render_galleries_index(galleries, prefix)
 
     # Then render all individual gallery pages
-    Config.languages.keys.each do |lang|
+    Config.languages.each do |lang|
       all_galleries.each do |post|
         basedir = File.dirname(post.source)
         page_template = Theme.template_path("page.tmpl")
@@ -329,7 +329,7 @@ module Gallery
 
   # Render the main galleries index page
   private def self.render_galleries_index(galleries : Array(Gallery), prefix = "")
-    Config.languages.keys.each do |lang|
+    Config.languages.each do |lang|
       # Make output path language-specific to avoid conflicts
       lang_suffix = Utils.lang_suffix(lang)
       galleries_dir = prefix.empty? ? "galleries" : prefix
