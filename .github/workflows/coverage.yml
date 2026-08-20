@@ -15,10 +15,13 @@ jobs:
         uses: actions/checkout@v5
       - name: Install Crystal
         uses: crystal-lang/install-crystal@v1
+      - name: Install native dependencies (libvips, ragel)
+        # Must precede `shards install`: the shortcodes postinstall
+        # invokes ragel at build time.
+        run: sudo apt-get update && sudo apt-get install -y libvips-dev ragel
+
       - name: Install dependencies
         run: shards install
-      - name: Install native dependencies (libvips, ragel)
-        run: sudo apt-get update && sudo apt-get install -y libvips-dev ragel
       - name: Build
         run: shards build -d
       - name: Smoke test (build the benchmark corpus)

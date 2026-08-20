@@ -17,11 +17,13 @@ jobs:
       - name: Install Crystal
         uses: crystal-lang/install-crystal@v1
 
+      - name: Install native dependencies (libvips, ragel)
+        # Must precede `shards install`: the shortcodes postinstall
+        # invokes ragel at build time.
+        run: sudo apt-get update && sudo apt-get install -y libvips-dev ragel
+
       - name: Install dependencies
         run: shards install
-
-      - name: Install native dependencies (libvips, ragel)
-        run: sudo apt-get update && sudo apt-get install -y libvips-dev ragel
 
       - name: Install latest Hugo (for comparison)
         # The Ubuntu apt package is years behind (0.12x vs current 0.16x),
