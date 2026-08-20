@@ -20,8 +20,8 @@ jobs:
       - name: Install dependencies
         run: shards install
 
-      - name: Install Hugo (for comparison)
-        run: sudo apt-get update && sudo apt-get install -y hugo
+      - name: Install native dependencies (libvips) and Hugo
+        run: sudo apt-get update && sudo apt-get install -y libvips-dev hugo
 
       - name: Build normal (dev) binary
         run: shards build -d
