@@ -61,30 +61,6 @@ module Pages
     generate_folder_indexes(Path[Config.options.content]) if features.includes?("folder_indexes")
   end
 
-  # Enable pages feature
-  # Render pages last because it's a catchall and will find gallery
-  # posts, blog posts, etc.
-  def self.enable(is_enabled : Bool, content_path : Path, feature_set : Set(YAML::Any))
-    return unless is_enabled
-
-    # Note: Pages are already registered by nicolino new command,
-    # but features can register additional types here if needed
-
-    # Convert YAML::Any set to string set for easier use
-    features = feature_set.map(&.as_s).to_set
-
-    # Read pages from multiple sources
-    pages = Markdown.read_all(content_path)
-    pages += HTML.read_all(content_path)
-    pages += Pandoc.read_all(content_path) if features.includes?("pandoc")
-
-    # Render pages without requiring dates
-    Markdown.render(pages, require_date: false)
-
-    # Generate folder indexes for page directories
-    generate_folder_indexes(content_path) if features.includes?("folder_indexes")
-  end
-
   # Generate folder indexes for page directories (non-posts, non-feature folders)
   def self.generate_folder_indexes(content_path : Path)
     Log.info { "📁 Scanning for page folder indexes..." }

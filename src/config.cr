@@ -175,12 +175,6 @@ module Config
   # every call, which was called per-file during content scans)
   @@languages : Hash(String, Hash(String, String))? = nil
 
-  # Get the raw config for legacy access (TODO: remove)
-  def self.get(key)
-    ensure_loaded
-    nil
-  end
-
   # Load config from conf.yml
   def self.config(path = "conf.yml")
     @@config_file_path = path

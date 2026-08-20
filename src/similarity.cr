@@ -23,12 +23,6 @@ module Similarity
     end
   end
 
-  # Enable similarity feature (actual work is done in Posts.create_tasks)
-  def self.enable(is_enabled : Bool, posts : Array(Markdown::File))
-    # Similarity tasks are created by Posts.enable() before rendering
-    # This is a no-op for API consistency
-  end
-
   # Configuration for MinHash generation
   class_property num_permutations : Int32 = 128
   class_property ngram_size : Int32 = 3
@@ -67,12 +61,6 @@ module Similarity
     # Cache the result
     sig_cache[lang] = signatures
     signatures
-  end
-
-  # Clear the signatures cache (useful for testing or rebuilds)
-  def self.clear_cache : Nil
-    @@all_signatures_cache = nil
-    @@related_posts_cache = nil
   end
 
   # A MinHash signature for a document

@@ -21,13 +21,6 @@ module FeatureTiming
     @@task_counts[feature_name] += 1
   end
 
-  # Get total time for a feature (enable + tasks)
-  def self.total_for(feature_name : String) : Time::Span
-    enable_time = @@enable_timings[feature_name]? || Time::Span.zero
-    task_time = @@task_timings[feature_name]? || Time::Span.zero
-    enable_time + task_time
-  end
-
   # Generate timing report as a table
   def self.report
     return if @@enable_timings.empty? && @@task_timings.empty?
