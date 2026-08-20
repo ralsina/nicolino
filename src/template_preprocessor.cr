@@ -9,7 +9,9 @@ require "crinja"
 # - Subtrees that only reference build-constant site variables are
 #   evaluated once against the constants and replaced by fixed text
 #   ("folding"). Constants are per language (site title, nav items,
-#   ...), so folded templates are cached per {env, template, lang}.
+#   ...), so folded templates are cached per {env, template, lang} plus
+#   a hash of the inlined source, so a template edit (e.g. in auto
+#   mode) re-folds instead of serving a stale cached template.
 #
 # Folding is deliberately conservative: only if-tags, for-tags whose
 # collection and body are constant, print statements and fixed text
@@ -31,7 +33,7 @@ module TemplatePreprocessor
   # Tags whose rendering has no side effects on the context.
   FOLDABLE_TAGS = Set{"if", "for", "raw"}
 
-  @@cache = Hash({UInt64, String, String}, Crinja::Template).new
+  @@cache = Hash({UInt64, String, String, UInt64}, Crinja::Template).new
   @@mutex = Mutex.new
 
   # The folded template for *name* in *lang*, loading the source
@@ -39,10 +41,17 @@ module TemplatePreprocessor
   # *env*: render it via render_with, not Template#render.
   def self.get_template(env : Crinja, name : String, lang : String,
                         constants : Hash(String, Crinja::Value)) : Crinja::Template
-    key = {env.object_id, name, lang}
+    # Key the cache by the (transitively inlined) source so a template
+    # edit invalidates the folded entry: envs are pooled and reused across
+    # auto-rebuild waves, so a key of just {env, name, lang} would return
+    # the stale folded template forever and template changes would never
+    # reach the rendered output (issue #43). inline_includes reads the
+    # current source from the loader (fresh in auto mode) and also folds
+    # in any changed included template, so the hash tracks every edit.
+    source = inline_includes(env, name, Set{name})
+    key = {env.object_id, name, lang, source.hash}
     @@mutex.synchronize do
       @@cache[key] ||= begin
-        source = inline_includes(env, name, Set{name})
         template = Crinja::Template.new(source, env, name)
         fold(template, constants)
         template
