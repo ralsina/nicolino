@@ -86,10 +86,10 @@ module FolderIndexes
       # For posts/foo/bar/: output_prefix = "output/posts/foo/bar/"
       if rel_from_posts.to_s == "." || rel_from_posts.to_s == ""
         # This is the posts/ directory itself
-        output_prefix = "output/#{posts_dir}/"
+        output_prefix = "#{Utils.output_prefix}#{posts_dir}/"
       else
         # This is a subfolder of posts/
-        output_prefix = "output/#{posts_dir}/#{rel_from_posts}/"
+        output_prefix = "#{Utils.output_prefix}#{posts_dir}/#{rel_from_posts}/"
       end
 
       # Find all posts whose output path starts with this folder
@@ -172,7 +172,7 @@ module FolderIndexes
   def self.render(indexes : Array(FolderIndex))
     Config.languages.keys.each do |lang|
       out_path = Path.new(Config.options(lang).output)
-      lang_suffix = lang == "en" ? "" : ".#{lang}"
+      lang_suffix = Utils.lang_suffix(lang)
 
       # Render posts folders using Markdown.render_index
       indexes.each do |index|

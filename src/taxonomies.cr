@@ -128,7 +128,7 @@ module Taxonomies
         # Make output path language-specific to avoid conflicts
         # For example: tags/ for en and es/ for other languages
         # Only add language suffix if not the default language
-        lang_suffix = lang == "en" ? "" : ".#{lang}"
+        lang_suffix = Utils.lang_suffix(lang)
         base_path = Path[Config.options(lang).output] / Path["#{@path.chomp('/')}#{lang_suffix}"]
         output = (base_path / "index.html").to_s
         page_template = Theme.template_path("page.tmpl")

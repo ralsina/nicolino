@@ -63,7 +63,7 @@ module Sitemap
               chunk_data.each do |input|
                 next if noindex?(input)
                 modtime = File.info(input).modification_time
-                input_path = input.sub(/^output\//, "")
+                input_path = input.sub(/^#{Regex.escape(Utils.output_prefix)}/, "")
                 str << %(<url> # ameba:disable Style/MultilineStringLiteral
                 <loc>#{base.resolve(input_path)}</loc>
                 <lastmod>#{modtime}</lastmod>

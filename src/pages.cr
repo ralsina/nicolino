@@ -123,7 +123,7 @@ module Pages
   def self.render_indexes(indexes : Array(PageFolderIndex), content_path : Path)
     Config.languages.keys.each do |lang|
       out_path = Path.new(Config.options(lang).output)
-      lang_suffix = lang == "en" ? "" : ".#{lang}"
+      lang_suffix = Utils.lang_suffix(lang)
 
       indexes.each do |index|
         # Add language suffix to output path

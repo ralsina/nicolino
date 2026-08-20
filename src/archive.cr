@@ -85,7 +85,7 @@ module Archive
     Config.languages.keys.each do |lang|
       base_path = Path[Config.options(lang).output]
       # Make output path language-specific to avoid conflicts
-      lang_suffix = lang == "en" ? "" : ".#{lang}"
+      lang_suffix = Utils.lang_suffix(lang)
       output_path = (base_path / "archive#{lang_suffix}" / "index.html").normalize.to_s
 
       # Collect all dependencies from all posts (no eager date loading)
