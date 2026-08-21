@@ -102,7 +102,7 @@ module Sc
   end
 
   # Load shortcodes from shortcodes/ and put them in the k/v store
-  # TODO refactor duplication from Templates.load_templates
+  # Pending: refactor duplication from Templates.load_templates
   def self.load_shortcodes : Int32
     Log.debug { "Scanning shortcodes" }
     # Rescan the shortcodes directory for this run

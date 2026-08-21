@@ -40,7 +40,9 @@ module Render
   end
 
   # Wrap content in page.tmpl and apply HTML filters (relative links)
-  def self.page_html(output_path : String, content : String, title : String, breadcrumbs : Array(NamedTuple(name: String, link: String)), lang : String? = nil, fix_code_classes : Bool = false) : String
+  def self.page_html(output_path : String, content : String, title : String,
+                     breadcrumbs : Array(NamedTuple(name: String, link: String)),
+                     lang : String? = nil, fix_code_classes : Bool = false) : String
     page_template = Theme.template_path("page.tmpl")
     html = apply_template(page_template, {
       "content"     => content,

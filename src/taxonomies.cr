@@ -3,7 +3,7 @@ require "./rss"
 require "./theme"
 require "./render"
 
-# FIXME: Get rid of the named tuples
+# Pending: Get rid of the named tuples
 
 module Taxonomies
   include Utils
@@ -117,7 +117,7 @@ module Taxonomies
 
     def link(lang = nil)
       lang ||= Locale.language
-      # FIXME localize link
+      # Pending: localize link
       {name: @title, link: Utils.path_to_link Path[Config.options(lang).output] / "#{@path}/index.html"}
     end
 

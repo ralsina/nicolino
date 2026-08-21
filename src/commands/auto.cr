@@ -120,14 +120,14 @@ module Nicolino
 
         # First do a normal run
         arguments = Croupier::TaskManager.tasks.keys if arguments.empty?
-        # TODO: see if any other combination of args is a good idea
+        # Pending: see if any other combination of args is a good idea
         begin
           run(arguments, fast_mode: fast_mode)
           # Trigger full reload for all connected clients after initial build
           Log.info { "LiveReload: Initial build complete, triggering reload for all connected clients" }
           live_reload.send_reload(path: "/index.html", liveCSS: false)
           # Then run in auto mode
-          Croupier::TaskManager.auto_run(arguments) # FIXME: check options
+          Croupier::TaskManager.auto_run(arguments) # Pending: check options
           loop do
             ::sleep(1.second)
           end

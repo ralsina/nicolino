@@ -24,8 +24,8 @@ module Sitemap
   end
 
   def self.render
-    # TODO: support robot exclusion
-    # TODO: support alternates for locations
+    # Pending: support robot exclusion
+    # Pending: support alternates for locations
     start = Time.instant
     # Sorted for deterministic output: task registration order follows
     # parallel content reading and is not stable

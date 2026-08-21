@@ -118,7 +118,9 @@ module Listings
       feature_name: "listings",
       id: "listings-index",
       output: output_path,
-      inputs: ["conf.yml", "kv://#{item_list_template}", "kv://#{Theme.template_path("title.tmpl")}", "kv://#{Theme.template_path("page.tmpl")}"],
+      inputs: ["conf.yml", "kv://#{item_list_template}",
+               "kv://#{Theme.template_path("title.tmpl")}",
+               "kv://#{Theme.template_path("page.tmpl")}"],
       mergeable: false
     ) do
       Log.info { "👉 #{output_path}" }
