@@ -20,10 +20,6 @@ jobs:
         # invokes ragel at build time.
         run: sudo apt-get update && sudo apt-get install -y libvips-dev ragel
 
-      - name: Install benchmark tooling (hyperfine, jq)
-        # The smoke test runs bench/run.sh, which needs both.
-        run: sudo apt-get install -y hyperfine jq
-
       - name: Install dependencies
         run: shards install
       - name: Build
@@ -31,5 +27,14 @@ jobs:
       - name: Smoke test (build the benchmark corpus)
         # Builds the 4000-file vendored corpus and asserts every file renders.
         # Serves as a regression gate and exercises the render pipeline.
+        # (A plain build + count, not bench/run.sh: timing benchmarks belong
+        # to the dedicated Benchmark workflow.)
         run: |
-          NICOLINO_BIN="$PWD/bin/nicolino" RUNS=1 ./bench/run.sh
+          site=bench/site-nicolino
+          rm -rf "$site/output"
+          mkdir -p "$site/content"
+          cp bench/corpus/*.md "$site/content/"
+          ( cd "$site" && "$GITHUB_WORKSPACE/bin/nicolino" build --fast-mode -B -p )
+          n=$(find "$site/output" -name '*.html' | wc -l)
+          echo "rendered $n pages"
+          test "$n" -eq "$(ls bench/corpus/*.md | wc -l)"
