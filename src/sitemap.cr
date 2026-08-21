@@ -59,10 +59,13 @@ module Sitemap
         end
       end
 
-      # Write output
+      # Write output incrementally, chunk by chunk, avoiding
+      # a joined copy of all chunks in memory
       File.open(output, "w") do |io|
         io << HEADER
-        io << chunks.join
+        chunks.each do |chunk|
+          io << chunk
+        end
         io << FOOTER
       end
 
