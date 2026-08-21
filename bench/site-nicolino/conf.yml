@@ -1,0 +1,20 @@
+# Configuration for the Nicolino benchmark site.
+#
+# The bench harness copies the vendored corpus (bench/corpus/*.md) into
+# content/ and builds with `nicolino build -p --fast-mode`.
+#
+# The `pages` feature renders every markdown file to an equivalent HTML
+# file without requiring frontmatter dates, so all corpus files are
+# exercised. Other features are disabled to isolate markdown rendering.
+title: "Nicolino Benchmark"
+description: "Reproducible build-time benchmark"
+url: "https://bench.example.com"
+output: "output/"
+content: "content/"
+posts: "posts/"
+language: "en"
+theme: "bench"
+pretty_html: false
+
+features:
+  - pages

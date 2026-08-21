@@ -1,7 +1,7 @@
 # Benchmark harness
 
 Reproducibly times a full build of a 4000-file Markdown corpus with Nicolino
-and (optionally) Hugo, and records the results. It exists to make the
+and (optionally) Hugo and Zola, and records the results. It exists to make the
 project's "faster than Hugo" claim measurable rather than anecdotal.
 
 The corpus is a snapshot of Zach Leat's static-site build benchmark
@@ -13,6 +13,9 @@ The corpus is a snapshot of Zach Leat's static-site build benchmark
 - a `nicolino` binary (the harness builds a **normal (dev)** one if missing)
 - an **optimized (`--release`)** binary, optionally, via `NICOLINO_RELEASE_BIN`
 - `hugo` on `PATH` (optional — the Hugo comparison is skipped if absent)
+- `zola` on `PATH` (optional — the Zola comparison is skipped if absent)
+- `hyperfine` (timing and statistics)
+- `jq` (report assembly)
 - `bash`, `awk`, `date`
 
 > **Both build modes are measured.** Dev builds (`shards build -d`) are roughly
@@ -34,10 +37,12 @@ NICOLINO_RELEASE_BIN="$PWD/bench/release-bin/nicolino" \
 
 The harness:
 
-1. copies the corpus into a throwaway `bench/site/content/` and
-   `bench/hugo/content/posts/`
-2. times several full builds of each tool (median of `RUNS` runs, default 3),
-   cleaning between runs so every timing measures a fresh build
+1. copies the corpus into the throwaway content dirs of each committed
+   site (`bench/site-nicolino/`, `bench/site-zola/`, `bench/hugo/`)
+2. times several full builds of each tool with
+   [hyperfine](https://github.com/sharkdp/hyperfine) (median of `RUNS` runs,
+   default 3, after `WARMUP` untimed warmup runs, default 1), cleaning between
+   runs so every timing measures a fresh build
 3. asserts every corpus file rendered
 4. writes a timestamped JSON report to `bench/results/` and prints a summary
 
@@ -46,9 +51,11 @@ The harness:
 | Env var               | Default                | Purpose                                  |
 | --------------------- | ---------------------- | ---------------------------------------- |
 | `RUNS`                | `3`                    | Number of timed runs per tool            |
+| `WARMUP`              | `1`                    | Untimed warmup runs per tool             |
 | `NICOLINO_BIN`        | `./bin/nicolino`       | Normal (dev) nicolino binary             |
 | `NICOLINO_RELEASE_BIN`| *(unset)*              | Optimized (`--release`) binary; when set it is also benchmarked |
 | `HUGO_BIN`            | `$(command -v hugo)`   | Path to hugo (empty skips hugo)          |
+| `ZOLA_BIN`            | `$(command -v zola)`   | Path to zola (empty skips zola)          |
 | `NICOLINO_FLAGS`      | `--fast-mode -B -p`    | Flags passed to `nicolino build`         |
 
 The result JSON records the machine's core count (`cores`) for context.
@@ -58,9 +65,9 @@ speed and core count.
 
 ## Methodology
 
-- Both tools render the same 4000 files to HTML. The nicolino site uses the
+- All tools render the same 4000 files to HTML. The nicolino site uses the
   `pages` feature so every file is rendered regardless of frontmatter dates;
-  the hugo site uses a minimal `bench` theme.
+  the hugo and zola sites use minimal themes/templates.
 - Timing measures wall-clock time of the full build command from a clean
   state (output and cache removed before each run).
 - The median of `RUNS` runs is reported to dampen scheduler noise.
