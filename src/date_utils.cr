@@ -1,5 +1,6 @@
 require "time"
 require "log"
+require "http"
 require "cronic"
 
 # Date parsing utilities
