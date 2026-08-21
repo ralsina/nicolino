@@ -22,6 +22,10 @@ jobs:
         # invokes ragel at build time.
         run: sudo apt-get update && sudo apt-get install -y libvips-dev ragel
 
+      - name: Install benchmark tooling (hyperfine, jq)
+        # hyperfine does the timing/statistics, jq assembles the report.
+        run: sudo apt-get update && sudo apt-get install -y hyperfine jq
+
       - name: Install dependencies
         run: shards install
 
@@ -34,6 +38,16 @@ jobs:
           curl -sL "https://github.com/gohugoio/hugo/releases/download/${tag}/hugo_extended_${ver}_linux-amd64.tar.gz" -o /tmp/hugo.tgz
           sudo tar -C /usr/local/bin -xzf /tmp/hugo.tgz hugo
           hugo version
+
+      - name: Install latest Zola (for comparison)
+        # Same reasoning as Hugo: get the current release from GitHub
+        # instead of the outdated distro package.
+        run: |
+          tag=$(curl -s https://api.github.com/repos/getzola/zola/releases/latest | grep -oP '"tag_name": "\K[^"]+')
+          ver=${tag#v}
+          curl -sL "https://github.com/getzola/zola/releases/download/${tag}/zola-v${ver}-x86_64-unknown-linux-gnu.tar.gz" -o /tmp/zola.tgz
+          sudo tar -C /usr/local/bin -xzf /tmp/zola.tgz zola
+          zola --version
 
       - name: Build optimized (release) binary
         # --release takes ~20 minutes; done here in CI rather than locally.

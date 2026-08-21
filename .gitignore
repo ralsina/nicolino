@@ -10,15 +10,17 @@
 .rucksack.toc
 content/posts/ralsina/
 .crystal
-# Benchmark harness transient build artifacts (corpus/site config are committed)
-/bench/site/output/
-/bench/site/content/
-/bench/site/themes/
+# Benchmark harness transient build artifacts (site configs are committed)
+/bench/site-nicolino/output/
+/bench/site-nicolino/content/
+/bench/site-nicolino/themes/default/
+/bench/site-nicolino/.kvstore
+/bench/site-nicolino/.croupier
+/bench/site-zola/public/
+/bench/site-zola/content/
 /bench/hugo/public/
 /bench/hugo/content/
 /bench/hugo/.hugo_build.lock
-/bench/site/.kvstore
-/bench/site/.croupier
 /bench/release-bin/
 /myblog/
 /mysite/

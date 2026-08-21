@@ -2,6 +2,11 @@
 <!DOCTYPE html>
 <html lang="{{ lang }}" class="dark light">
 
+    <head>
+        <meta charset="utf-8">
+        <title>{% if page %}{{ page.title }}{% elif section %}{{ section.title }}{% else %}{{ config.title }}{% endif %}</title>
+    </head>
+
     <body>
         <div class="left-content">
             {% block left_content %}
