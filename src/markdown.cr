@@ -343,14 +343,17 @@ module Markdown
     # Link relativization happens in the task body in Markdown.render.
     private def compile_html(lang)
       t0 = Time.instant
+      # Only ask discount to generate a TOC when the page's metadata
+      # requests one; the engine skips mkd_toc entirely otherwise.
+      flags = LibDiscount::MKD_FENCEDCODE |
+              LibDiscount::MKD_AUTOLINK |
+              LibDiscount::MKD_SAFELINK |
+              LibDiscount::MKD_NOPANTS |
+              LibDiscount::MKD_GITHUBTAGS
+      flags |= LibDiscount::MKD_TOC if metadata(lang).fetch("toc", nil) != nil
       result = Discount.compile(
         replace_shortcodes(lang),
-        flags: LibDiscount::MKD_FENCEDCODE |
-               LibDiscount::MKD_TOC |
-               LibDiscount::MKD_AUTOLINK |
-               LibDiscount::MKD_SAFELINK |
-               LibDiscount::MKD_NOPANTS |
-               LibDiscount::MKD_GITHUBTAGS
+        flags: flags
       )
       compiled = result[:html]
       toc = result[:toc]
