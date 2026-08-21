@@ -343,9 +343,8 @@ module Markdown
     # Link relativization happens in the task body in Markdown.render.
     private def compile_html(lang)
       t0 = Time.instant
-      compiled, toc = Discount.compile(
+      result = Discount.compile(
         replace_shortcodes(lang),
-        metadata(lang).fetch("toc", nil) != nil,
         flags: LibDiscount::MKD_FENCEDCODE |
                LibDiscount::MKD_TOC |
                LibDiscount::MKD_AUTOLINK |
@@ -353,6 +352,8 @@ module Markdown
                LibDiscount::MKD_NOPANTS |
                LibDiscount::MKD_GITHUBTAGS
       )
+      compiled = result[:html]
+      toc = result[:toc]
       t1 = Time.instant
       # Check if any filter would change the HTML. Cheap string checks
       # avoid a full Lexbor parse + filter walk + re-serialize.

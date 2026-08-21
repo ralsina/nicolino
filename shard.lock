@@ -19,7 +19,7 @@ shards:
 
   cr-discount:
     git: https://github.com/ralsina/cr-discount.git
-    version: 0.3.0+git.commit.f640c4d48142541cc9996e29924d5b3f89c37dbc
+    version: 0.3.0+git.commit.20e71d3e9ead0ce5c25ff6720648c07cab8007e0
 
   crimage:
     git: https://github.com/naqvis/crimage.git

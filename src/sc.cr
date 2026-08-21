@@ -56,7 +56,7 @@ module Sc
   # Render shortcode using its template
   def self.render_sc(sc, context : Crinja::Context) : String
     if sc.markdown?
-      context["inner"] = Discount.compile(sc.data)[0]
+      context["inner"] = Discount.compile(sc.data)[:html]
     else
       context["inner"] = sc.data
     end
