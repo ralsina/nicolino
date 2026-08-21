@@ -15,8 +15,8 @@ crystal: ">= 1.20.0"
 
 dependencies:
   crinja:
-    github: straight-shoota/crinja
-    branch: master
+    github: ralsina/crinja
+    branch: perf/memoize-lookups
   RSS:
     github: ralsina/RSS.cr
     branch: master

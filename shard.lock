@@ -26,8 +26,8 @@ shards:
     version: 1.0.5+git.commit.7d3244a3850646e3d398cef071f7c3e3f52c7518
 
   crinja:
-    git: https://github.com/straight-shoota/crinja.git
-    version: 0.9.0+git.commit.118af0dea81da1c60669d879d5ee24200420e890
+    git: https://github.com/ralsina/crinja.git
+    version: 0.9.0+git.commit.a33863d9a7b62cfd7b2ec02b00cda85c32f76873
 
   cronic:
     git: https://github.com/nanobowers/cronic.git
