@@ -1,0 +1,27 @@
+name: Spec
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  spec:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download source
+        uses: actions/checkout@v5
+
+      - name: Install Crystal
+        uses: crystal-lang/install-crystal@v1
+
+      - name: Install native dependencies (libvips, ragel)
+        # Must precede `shards install`: the shortcodes postinstall
+        # invokes ragel at build time.
+        run: sudo apt-get update && sudo apt-get install -y libvips-dev ragel
+
+      - name: Install dependencies
+        run: shards install
+
+      - name: Run specs
+        run: crystal spec --error-trace

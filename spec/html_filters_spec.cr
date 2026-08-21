@@ -1,0 +1,125 @@
+require "./spec_helper"
+
+require "lexbor"
+require "../src/html_filters"
+
+def parse(html : String)
+  Lexbor::Parser.new(html)
+end
+
+describe HtmlFilters do
+  describe ".downgrade_headers" do
+    it "shifts the highest header level to n" do
+      doc = parse("<h3>Title</h3><h4>Sub</h4>")
+      result = HtmlFilters.downgrade_headers(doc, 2).to_html
+      result.should contain "<h2>"
+      result.should contain "<h3>"
+      result.should_not contain "<h4>"
+    end
+
+    it "downgrades h1 when n is 2" do
+      doc = parse("<h1>Big</h1><h2>Small</h2>")
+      result = HtmlFilters.downgrade_headers(doc, 2).to_html
+      result.should contain "<h2>Big</h2>"
+      result.should contain "<h3>Small</h3>"
+    end
+
+    it "leaves documents alone when the highest level is already n" do
+      html = "<h2>Fine</h2>"
+      HtmlFilters.downgrade_headers(parse(html), 2).to_html.should contain "<h2>Fine</h2>"
+    end
+
+    it "never creates headings above level 6" do
+      doc = parse("<h5>A</h5><h6>B</h6>")
+      result = HtmlFilters.downgrade_headers(doc, 2).to_html
+      result.should_not match(/<h[7-9]/)
+    end
+  end
+
+  describe ".remove_empty_paragraphs" do
+    it "removes empty and whitespace-only paragraphs" do
+      doc = parse("<p></p><p>   </p><p>kept</p>")
+      result = HtmlFilters.remove_empty_paragraphs(doc).to_html
+      result.should contain "<p>kept</p>"
+      result.should_not contain "<p></p>"
+    end
+  end
+
+  describe ".fix_code_classes" do
+    it "adds a language- class to code blocks" do
+      doc = parse(%(<pre><code class="crystal">x = 1</code></pre>))
+      result = HtmlFilters.fix_code_classes(doc).to_html
+      result.should contain %(class="crystal language-crystal")
+      result.should contain %(data-lang="crystal")
+    end
+
+    it "leaves code blocks that already have a language- class" do
+      html = %(<pre><code class="language-crystal">x = 1</code></pre>)
+      result = HtmlFilters.fix_code_classes(parse(html)).to_html
+      result.should contain %(class="language-crystal")
+    end
+
+    it "ignores code blocks without a class" do
+      html = %(<pre><code>x = 1</code></pre>)
+      result = HtmlFilters.fix_code_classes(parse(html)).to_html
+      result.should_not contain "language-"
+    end
+  end
+
+  describe ".make_links_relative" do
+    it "normalizes redundant path segments in hrefs" do
+      doc = parse(%(<a href="./other.html">x</a>))
+      result = HtmlFilters.make_links_relative(doc, "/posts/sub/page.html").to_html
+      result.should contain %(href="other.html")
+    end
+
+    it "keeps links to the same directory unchanged" do
+      doc = parse(%(<a href="other.html">x</a>))
+      result = HtmlFilters.make_links_relative(doc, "/posts/sub/page.html").to_html
+      result.should contain %(href="other.html")
+    end
+
+    it "leaves absolute URLs, root-relative and fragment links alone" do
+      html = %(<a href="https://example.com/x">a</a><a href="/root">b</a><a href="#anchor">c</a>)
+      result = HtmlFilters.make_links_relative(parse(html), "posts/page.html").to_html
+      result.should contain %(href="https://example.com/x")
+      result.should contain %(href="/root")
+      result.should contain %(href="#anchor")
+    end
+
+    it "rewrites relative img src values" do
+      doc = parse(%(<img src="../../pic.jpg">))
+      result = HtmlFilters.make_links_relative(doc, "/posts/page.html").to_html
+      result.should contain %(src="../pic.jpg")
+    end
+  end
+
+  describe ".string_rewrite_safe?" do
+    it "is true for plain html" do
+      HtmlFilters.string_rewrite_safe?(%(<a href="x.html">x</a>)).should be_true
+    end
+
+    it "is false when hrefs appear inside scripts or comments" do
+      HtmlFilters.string_rewrite_safe?(%(<script>var h = "href='x'";</script>)).should be_false
+      HtmlFilters.string_rewrite_safe?(%(<!-- href="x" -->)).should be_false
+    end
+
+    it "is false for uppercase attribute spellings" do
+      HtmlFilters.string_rewrite_safe?(%(<A HREF="x.html">x</A>)).should be_false
+    end
+  end
+
+  describe ".relativize_links_in_string" do
+    it "normalizes redundant path segments without parsing the document" do
+      result = HtmlFilters.relativize_links_in_string(
+        %(<a href="./other.html">x</a>), "/posts/sub/page.html"
+      )
+      result.should contain %(href="other.html")
+    end
+
+    it "keeps absolute URLs unchanged" do
+      html = %(<a href="https://example.com/">x</a>)
+      HtmlFilters.relativize_links_in_string(html, "page.html").should eq html
+    end
+  end
+end
