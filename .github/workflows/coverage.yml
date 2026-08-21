@@ -20,6 +20,10 @@ jobs:
         # invokes ragel at build time.
         run: sudo apt-get update && sudo apt-get install -y libvips-dev ragel
 
+      - name: Install benchmark tooling (hyperfine, jq)
+        # The smoke test runs bench/run.sh, which needs both.
+        run: sudo apt-get install -y hyperfine jq
+
       - name: Install dependencies
         run: shards install
       - name: Build
