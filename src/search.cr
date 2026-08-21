@@ -40,7 +40,7 @@ module Search
       Log.info { "👉 #{output}" }
 
       # Split into chunks for parallel processing
-      all_data = Utils.parallel_chunks(inputs) do |chunk_data, start_idx|
+      chunks = Utils.parallel_chunks(inputs) do |chunk_data, start_idx|
         results = Array(Hash(String, String | Int32)).new
         chunk_data.each_with_index do |input, i|
           item = extract_item(
@@ -51,11 +51,21 @@ module Search
           results << item unless item.nil?
         end
         results
-      end.flatten
+      end
 
-      # Write results to file
+      # Write results to file incrementally, chunk by chunk,
+      # avoiding a flattened copy of all items and one big JSON buffer
       File.open(output, "w") do |io|
-        all_data.to_json(io)
+        io << "["
+        first_item = true
+        chunks.each do |chunk_results|
+          chunk_results.each do |item|
+            io << "," unless first_item
+            first_item = false
+            item.to_json(io)
+          end
+        end
+        io << "]"
       end
 
       "" # Return empty string for task output
