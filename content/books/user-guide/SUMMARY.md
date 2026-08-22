@@ -37,3 +37,4 @@ Documentation for the Nicolino static site generator.
 - [Themes](themes.md)
   - [Color Schemes and Fonts](color-schemes-and-fonts.md)
   - [Templates](templates.md)
+  - [Lua Filters](lua-filters.md)

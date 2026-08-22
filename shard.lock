@@ -57,6 +57,10 @@ shards:
     git: https://github.com/bcardiff/live_reload.cr.git
     version: 0.1.0
 
+  lua:
+    git: https://github.com/veelenga/lua.cr.git
+    version: 0.4.0
+
   number_parser:
     git: https://github.com/mhib/number_parser.git
     version: 0.1.0

@@ -678,6 +678,10 @@ module Markdown
       result << source
       result << "kv://#{template}"
 
+      # Lua filter scripts used by templates: changing one re-renders
+      # this page (and puts the scripts on auto mode's watch list)
+      result += LuaFilters.dependency_paths
+
       # Validate that all referenced shortcodes exist
       available = Sc.available_shortcodes
       shortcodes.reject(&.is_inline?).each do |scode|
@@ -860,7 +864,8 @@ module Markdown
       "kv://#{index_template}",
       "kv://#{page_template}",
     ] + posts.map(&.source) + posts.map(&.template) +
-             posts.flat_map(&.shortcode_dependencies(lang)) + extra_inputs
+             posts.flat_map(&.shortcode_dependencies(lang)) +
+             LuaFilters.dependency_paths + extra_inputs
     inputs = inputs.uniq
     FeatureTask.new(
       feature_name: feature_name,

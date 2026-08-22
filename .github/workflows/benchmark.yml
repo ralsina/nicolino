@@ -20,7 +20,7 @@ jobs:
       - name: Install native dependencies (libvips, ragel)
         # Must precede `shards install`: the shortcodes postinstall
         # invokes ragel at build time.
-        run: sudo apt-get update && sudo apt-get install -y libvips-dev ragel
+        run: sudo apt-get update && sudo apt-get install -y libvips-dev ragel liblua5.4-dev
 
       - name: Install benchmark tooling (hyperfine, jq)
         # hyperfine does the timing/statistics, jq assembles the report.

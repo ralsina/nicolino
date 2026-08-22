@@ -14,6 +14,9 @@ license: MIT
 crystal: ">= 1.20.0"
 
 dependencies:
+  lua:
+    github: veelenga/lua.cr
+    version: ~> 0.4.0
   crinja:
     github: ralsina/crinja
     branch: perf/memoize-lookups

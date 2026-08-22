@@ -1,0 +1,16 @@
+{#-
+  luademo.tmpl - Live demonstration of user-defined Lua filters.
+
+  The shortcode body is piped through reverse_title_case from the
+  site's own filters/docs.lua, so the Lua Filters documentation page
+  shows the feature running for real. Pass the sample text as the
+  shortcode body. Site-level script and shortcode: not shipped to
+  new sites.
+
+  Note: keep literal brace-tag examples out of Crinja comments; its
+  lexer does not shield them.
+-#}
+<p>
+  <code>{{ inner }}</code> becomes
+  <code>{{ inner | reverse_title_case }}</code>
+</p>

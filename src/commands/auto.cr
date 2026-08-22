@@ -62,6 +62,13 @@ module Nicolino
           watcher = Inotify::Watcher.new(recursive: true)
           watch_flags = LibInotify::IN_CREATE | LibInotify::IN_DELETE | LibInotify::IN_MOVED_FROM | LibInotify::IN_MOVED_TO
           watcher.watch("content", watch_flags)
+          # Watch filter script directories too: adding or removing a
+          # .lua file changes the set of task inputs, which only a
+          # respawn can pick up. Edits to existing files are handled by
+          # Croupier's change detection instead.
+          ["filters", "#{::Theme.path}/filters"].select { |dir| Dir.exists?(dir) }.each do |dir|
+            watcher.watch(dir, watch_flags)
+          end
           spawn do
             watcher.on_event do |_|
               # Add a small delay to ensure the file operation is complete

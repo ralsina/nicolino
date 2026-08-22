@@ -397,7 +397,8 @@ module Books
       "conf.yml",
       "kv://#{page_template}",
       "kv://#{title_template}",
-    ] + Templates.get_deps(book_chapter_template) + Sc.kv_deps_for_file(source_file)
+    ] + Templates.get_deps(book_chapter_template) + Sc.kv_deps_for_file(source_file) +
+             LuaFilters.dependency_paths
 
     FeatureTask.new(
       feature_name: "books",
@@ -619,7 +620,7 @@ module Books
       "conf.yml",
       "kv://#{page_template}",
       "kv://#{title_template}",
-    ] + Templates.get_deps(book_index_template)
+    ] + Templates.get_deps(book_index_template) + LuaFilters.dependency_paths
 
     FeatureTask.new(
       feature_name: "books",
@@ -682,7 +683,7 @@ module Books
       feature_name: "books",
       id: "books/index",
       output: output_path.to_s,
-      inputs: ["conf.yml", "kv://#{page_template}", "kv://#{title_template}"] + Templates.get_deps(item_list_template),
+      inputs: ["conf.yml", "kv://#{page_template}", "kv://#{title_template}"] + Templates.get_deps(item_list_template) + LuaFilters.dependency_paths,
       mergeable: false
     ) do
       Log.info { "👉 #{output_path}" }

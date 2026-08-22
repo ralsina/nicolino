@@ -120,7 +120,7 @@ module Listings
       output: output_path,
       inputs: ["conf.yml", "kv://#{item_list_template}",
                "kv://#{Theme.template_path("title.tmpl")}",
-               "kv://#{Theme.template_path("page.tmpl")}"],
+               "kv://#{Theme.template_path("page.tmpl")}"] + LuaFilters.dependency_paths,
       mergeable: false
     ) do
       Log.info { "👉 #{output_path}" }
@@ -168,7 +168,7 @@ module Listings
       feature_name: "listings",
       id: "listing:#{listing.source}",
       output: output_path,
-      inputs: listing.dependencies + ["kv://#{listing_template}", "kv://#{title_template}", "kv://#{page_template}"],
+      inputs: listing.dependencies + ["kv://#{listing_template}", "kv://#{title_template}", "kv://#{page_template}"] + LuaFilters.dependency_paths,
       mergeable: false
     ) do
       Log.info { "👉 #{output_path}" }

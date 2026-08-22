@@ -12,7 +12,43 @@ A **good** static site generator.
   sidebar TOC, and navigation
 - **Search** - Site search functionality
 - **Sitemap** - Automatic XML sitemap generation
+- **Lua filters** - Custom template filters in Lua, no recompiling needed
 - **Fast builds** - Parallel, incremental builds via Croupier task system
+
+## Custom Filters in Lua
+
+Themes can ship template filters written in Lua — and so can your site:
+put scripts in `filters/` at the project root (like `shortcodes/`) or in
+`themes/<theme>/filters/*.lua`. Site-level scripts win name collisions.
+Each script returns a table of functions:
+
+```lua
+-- themes/mytheme/filters/text.lua
+return {
+  shout = function(text)
+    return string.upper(text) .. "!"
+  end,
+}
+```
+
+Every function becomes a Jinja-style filter usable in any template:
+
+```jinja
+{{ title | shout }}
+```
+
+The piped value arrives as the first argument, extra filter arguments
+follow (`{{ page.title | truncate(80) }}` calls `truncate(title, 80)`).
+Strings, numbers, booleans, arrays and dictionaries marshal in both
+directions; integral numbers come back as integers.
+
+Notes:
+
+- Scripts run with Lua's full standard library, so themes are trusted
+  code — review `filters/` before installing third-party themes.
+- Filter changes are picked up automatically by `nicolino auto`.
+- Building requires the Lua development headers (`liblua5.4-dev` or
+  equivalent, same as any other build dependency).
 
 ## Performance
 
@@ -47,12 +83,13 @@ For more information, visit <https://nicolino.ralsina.me>
 
 ## Building from Source
 
-Building requires `libvips` to be available on your system:
+Building requires `libvips` and Lua development headers to be available on
+your system:
 
-- **macOS**: `brew install vips`
-- **Debian/Ubuntu**: `apt install libvips-dev`
-- **Fedora**: `dnf install vips-devel`
-- **Arch**: `pacman -S libvips`
+- **macOS**: `brew install vips lua`
+- **Debian/Ubuntu**: `apt install libvips-dev liblua5.4-dev`
+- **Fedora**: `dnf install vips-devel lua-devel`
+- **Arch**: `pacman -S libvips lua`
 
 ## Building for Release (Static Binaries)
 

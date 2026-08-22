@@ -114,7 +114,8 @@ module Pages
         all_posts = Markdown.posts.map(&.last.source)
 
         folder_index_template = Theme.template_path("folder_index.tmpl")
-        inputs = ["kv://#{folder_index_template}", "conf.yml"] + all_posts
+        inputs = ["kv://#{folder_index_template}", "conf.yml"] + all_posts +
+                 LuaFilters.dependency_paths
 
         # Use unique task ID based on output path and language
         task_id = "page_folder_index::#{lang}::#{index.output}"

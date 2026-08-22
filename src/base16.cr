@@ -19,7 +19,7 @@ module Base16
       feature_name: "base16",
       id: "base16",
       output: output_path,
-      inputs: [Config.config_path] + Templates.get_deps(base16_template),
+      inputs: [Config.config_path] + Templates.get_deps(base16_template) + LuaFilters.dependency_paths,
       no_save: true,
       mergeable: false
     ) do

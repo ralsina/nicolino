@@ -275,7 +275,8 @@ module Gallery
             "kv://#{post.template(lang)}",
             "kv://#{page_template}",
           ] + post.shortcode_dependencies(lang) +
-                  post.@image_list.map { |i| "#{basedir}/#{i}" },
+                  post.@image_list.map { |i| "#{basedir}/#{i}" } +
+                  LuaFilters.dependency_paths,
           mergeable: false) do
           # Need to refresh post contents in auto mode
           post.load(lang) if Croupier::TaskManager.auto_mode?
@@ -362,7 +363,7 @@ module Gallery
         feature_name: "galleries",
         id: "galleries_index",
         output: output_path.to_s,
-        inputs: ["conf.yml", "kv://#{page_template}", "kv://#{title_template}"],
+        inputs: ["conf.yml", "kv://#{page_template}", "kv://#{title_template}"] + LuaFilters.dependency_paths,
         mergeable: false
       ) do
         Log.info { "👉 #{output_path}" }

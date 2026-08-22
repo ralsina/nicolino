@@ -151,7 +151,8 @@ module Taxonomies
           feature_name: "taxonomies",
           id: "taxonomy",
           output: output,
-          inputs: @posts.flat_map(&.dependencies) + ["kv://#{taxonomy_template}", "kv://#{title_template}"],
+          inputs: @posts.flat_map(&.dependencies) + ["kv://#{taxonomy_template}", "kv://#{title_template}"] +
+                  LuaFilters.dependency_paths,
           mergeable: false
         ) do
           Log.info { "👉 #{output}" }
