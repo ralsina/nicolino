@@ -12,7 +12,7 @@ and it will work fine.
 ## Why Nicolino?
 
 Honest answer? You are probably going to be fine using many other more
-established, more mature SSGs. You can't go wrong using [Hugo](https://hugo.io)
+established, more mature SSGs. You can't go wrong using [Hugo](https://gohugo.io)
 or many others like [Nikola](https://getnikola.com) which I started many
 years ago.
 
