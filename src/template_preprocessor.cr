@@ -89,7 +89,12 @@ module TemplatePreprocessor
       else
         begin
           inline_includes(env, included, seen + Set{included}).chomp
-        rescue
+        rescue ex : Exception
+          # Unknown or unloadable include target: leave the include
+          # dynamic so the template still renders at runtime
+          Log.debug(exception: ex) do
+            "Could not inline include #{included} in #{name}; leaving it dynamic"
+          end
           match
         end
       end
@@ -204,7 +209,17 @@ module TemplatePreprocessor
     end
     Crinja::AST::FixedString.new(text, false, false, false, false)
   rescue ex
-    Log.debug { "Template fold failed for #{template.name}: #{ex.class}: #{ex.message}" }
+    if ex.is_a?(Crinja::Error)
+      # Expected: an expression can look statically foldable yet
+      # reference values that don't exist at fold time; leaving the
+      # subtree dynamic is normal operation
+      Log.debug { "Template fold skipped for #{template.name}: #{ex.class}: #{ex.message}" }
+    else
+      # Anything else is a real defect worth surfacing
+      Log.warn(exception: ex) do
+        "Template fold failed unexpectedly in #{template.name}; leaving subtree dynamic"
+      end
+    end
     nil
   end
 

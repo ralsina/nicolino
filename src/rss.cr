@@ -23,8 +23,9 @@ module RSSFeed
       posts
         .select { |post| !post.date.nil? }
         # Output path tiebreaker: content reading is parallel, so the
-        # input order of same-date posts is not stable
-        .sort_by! { |post| {post.date.as(Time), post.output} }
+        # input order of same-date posts is not stable. All selected
+        # posts have dates, so coalescing never kicks in
+        .sort_by! { |post| {post.date || Time.unix(0), post.output} }
         .last(max_items)
         .reverse!
         .each do |post|

@@ -64,8 +64,10 @@ module Pages
       # Get the relative path from content directory
       begin
         relative_path = folder_path.relative_to(content_path)
-      rescue
-        # Can't make relative - probably outside content path
+      rescue ex : Exception
+        Log.warn(exception: ex) do
+          "Cannot resolve #{folder_path} against content path #{content_path}; skipping folder index"
+        end
         next
       end
 

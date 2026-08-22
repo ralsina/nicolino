@@ -73,8 +73,25 @@ module Config
     property taxonomies : Taxonomies = Taxonomies.new
     property features : Array(String) = [] of String
 
+    # folder_indexes feature options (see conf.yml's folder_indexes
+    # section)
+    property folder_indexes : FolderIndexesConfig = FolderIndexesConfig.new
+
     # Import configuration (hash of feed name to config)
     property import : Hash(String, YAML::Any) = Hash(String, YAML::Any).new
+  end
+
+  # Options for the folder_indexes feature (conf.yml's folder_indexes
+  # section)
+  class FolderIndexesConfig
+    include YAML::Serializable
+
+    # Directories excluded from automatic index generation, on top of
+    # the exclusions registered by features themselves
+    property exclude_dirs : Array(String) = [] of String
+
+    def initialize
+    end
   end
 
   # Translatable configuration - can be overridden by conf.LANG.yml
@@ -170,6 +187,12 @@ location: "tags/"
   private def self.ensure_loaded
     return if @@loaded
     config
+  end
+
+  # Custom folder_indexes exclusions from conf.yml
+  def self.folder_indexes_excludes : Array(String)
+    ensure_loaded
+    @@global_config.folder_indexes.exclude_dirs
   end
 
   # Load or get cached LangConfig for a specific language

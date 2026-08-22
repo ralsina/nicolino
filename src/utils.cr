@@ -93,7 +93,7 @@ module Utils
       result = channels.receive
       case result
       when Exception
-        Log.error { "Error in parallel chunk: #{result.message}" }
+        Log.error(exception: result) { "Error in parallel chunk; skipping it" }
       else
         results << result
       end
@@ -112,10 +112,13 @@ module Utils
       return true if base_path.to_s.starts_with?(galleries_path.to_s)
     end
 
-    # Skip all files in books directories (they are handled by the Books feature)
-    books_path = Path[content_path] / Config.books
-    if base_path.to_s.starts_with?(books_path.to_s)
-      return true
+    # Skip books directories when the books feature is enabled: the
+    # Books feature renders those sources itself. When disabled, let
+    # them flow through the regular content pipeline instead of
+    # silently dropping them
+    if enabled_features.includes?("books")
+      books_path = Path[content_path] / Config.books
+      return true if base_path.to_s.starts_with?(books_path.to_s)
     end
 
     false
