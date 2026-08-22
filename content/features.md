@@ -61,7 +61,7 @@ Fetch content from external sources like RSS feeds, JSON APIs, and headless CMSs
 
 {{% tag div %}}
 ---
-<a href="/books/user-guide/pocketbase.html" role="button">Example</a>
+<a href="/pocketbase.html" role="button">Example</a>
 <a href="/books/user-guide/import.html" role="button">Docs</a>
 {{% /tag %}}
 {{% /card %}}
