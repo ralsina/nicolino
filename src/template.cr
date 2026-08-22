@@ -217,26 +217,90 @@ module Templates
   # don't create one) and returned by FeatureTask's ensure block, so
   # environments and their template caches are reused across waves
   # without ever being shared by two concurrent workers.
+  #
+  # The pool used to be a mutex-guarded Hash + Array; under a parallel
+  # build every task checks an environment out (and back in) several
+  # times, and blocking acquisitions serialize all workers on
+  # scheduler park/unpark cycles (~70us each), which dominated
+  # profiled build time. Instead, checkout state lives in fixed-size
+  # parallel arrays guarded by an atomic free-slot bitmask:
+  #
+  # - @@envs holds the pooled environments themselves (a plain,
+  #   GC-scanned array: references must never be stored inside
+  #   atomics, or the collector cannot see them).
+  # - @@owners[i] names the fiber currently holding slot i (written
+  #   only by the winning fiber itself, so plain reads are safe).
+  # - @@free_mask has bit i set while slot i is unclaimed; claiming
+  #   is a CAS loop on it.
+  #
+  # Nothing here ever blocks: the fast path is an O(slots) scan of
+  # @@owners, the slow path is a bitmask CAS. When every slot is taken
+  # (more concurrent rendering fibers than slots) a transient
+  # unpooled environment is created instead; its template cache dies
+  # with the task, which only costs a re-parse of the few templates
+  # it uses.
   class EnvCache
-    @@pool = [] of Crinja
-    @@checkouts = Hash(Fiber, Crinja).new
-    @@mutex = Mutex.new
+    @@size : Int32 = Math.min(Math.max(System.cpu_count, 4), 64)
+    @@envs : Array(Crinja?) = Array(Crinja?).new(@@size, nil)
+    @@owners : Array(Fiber?) = Array(Fiber?).new(@@size, nil)
+    @@free_mask = Atomic(UInt64).new((@@size == 64 ? ~0u64 : ((1u64 << @@size) - 1)))
 
-    # Check out an environment for the current fiber, creating (or
-    # reusing a pooled) one if needed. Idempotent within a fiber.
+    # Fast path: does any slot already belong to the current fiber?
     def self.acquire(env_factory : Proc(Crinja)) : Crinja
-      @@mutex.synchronize do
-        @@checkouts[Fiber.current] ||= (@@pool.pop? || env_factory.call)
+      fiber = Fiber.current
+      fast_path(fiber) || acquire_slow(fiber, env_factory) || env_factory.call
+    end
+
+    private def self.fast_path(fiber : Fiber) : Crinja?
+      i = 0
+      count = @@size
+      while i < count
+        if fiber.same?(@@owners[i])
+          env = @@envs[i]
+          return env if env
+        end
+        i += 1
       end
+      nil
+    end
+
+    # Slow path: claim a free slot via the bitmask CAS loop, then take
+    # (or lazily create) its environment. Returns nil when all slots
+    # are owned by other fibers.
+    private def self.acquire_slow(fiber : Fiber, env_factory : Proc(Crinja)) : Crinja?
+      mask = @@free_mask.get
+      while mask != 0
+        index = mask.trailing_zeros_count
+        bit = 1u64 << index
+        _, success = @@free_mask.compare_and_set(mask, mask & ~bit)
+        if success
+          # Publish the owner first so no other fiber can claim this
+          # slot; the env slot itself is only ever touched by its owner
+          @@owners[index] = fiber
+          env = @@envs[index] ||= env_factory.call
+          return env
+        end
+        mask = @@free_mask.get
+      end
+
+      nil
     end
 
     # Return the current fiber's environment to the pool, if it has
-    # one. Extra environments beyond the pool limit are dropped.
+    # one. Transient environments (all slots were busy) are dropped.
     def self.release : Nil
-      @@mutex.synchronize do
-        if env = @@checkouts.delete(Fiber.current)
-          @@pool << env if @@pool.size < System.cpu_count
+      fiber = Fiber.current
+      i = 0
+      count = @@size
+      while i < count
+        if fiber.same?(@@owners[i])
+          # Clear ownership before freeing the slot so no other fiber
+          # can match a slot that is already back in the pool
+          @@owners[i] = nil
+          @@free_mask.or(1u64 << i)
+          return
         end
+        i += 1
       end
     end
   end

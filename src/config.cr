@@ -390,9 +390,21 @@ location: "tags/"
     end
   end
 
+  # Memoized per-language OptionsWrapper: building one copies ~17
+  # fields, and hot paths (per-page value()/breadcrumbs) call this
+  # several times per page
+  @@options_cache = Hash(String, OptionsWrapper).new
+  @@options_mutex = Mutex.new
+
   def self.options(lang = nil)
     lang ||= @@default_lang
-    OptionsWrapper.new(self[lang], @@global_config)
+    ensure_loaded
+    cached = @@options_cache[lang]?
+    return cached if cached
+
+    @@options_mutex.synchronize do
+      @@options_cache[lang] ||= OptionsWrapper.new(self[lang], @@global_config)
+    end
   end
 
   # Get all available languages by scanning for conf.LANG.yml files
@@ -428,6 +440,7 @@ location: "tags/"
     @@lang_configs.clear
     @@loaded = false
     @@languages = nil
+    @@options_cache.clear
     # Load again
     Config.config(path)
   end

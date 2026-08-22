@@ -100,6 +100,11 @@ module Markdown
     @text = Hash(String, String).new
     @title = Hash(String, String).new
     @toc = Hash(String, String).new
+    # Whether the rendered HTML contains the <!--more--> teaser
+    # marker, computed once when the HTML is memoized (a naive
+    # includes? costs ~14us per KB in dev builds, and the answer was
+    # being recomputed 2-4 times per page)
+    @more_marker = Hash(String, Bool).new
     @output = Hash(String, String).new
     @taxonomy_terms = Hash(String, Hash(String, Array(String))).new
 
@@ -270,6 +275,7 @@ module Markdown
       @html_mutex.synchronize do
         @html.delete(lang)
         @toc.delete(lang)
+        @more_marker.delete(lang)
       end
       contents = ::File.read(source(lang))
       begin
@@ -329,8 +335,15 @@ module Markdown
       @html_mutex.synchronize do
         @html[lang] ||= compiled_html
         @toc[lang] ||= toc
+        @more_marker[lang] ||= compiled_html.includes?("<!--more-->")
         @html[lang]
       end
+    end
+
+    # Whether the (memoized) HTML for *lang* holds a <!--more-->
+    # marker. Must be called after html(lang).
+    private def more_marker?(lang : String)
+      @more_marker.fetch(lang, false)
     end
 
     # Produce the {html, toc} pair for this file in the given language.
@@ -413,8 +426,15 @@ module Markdown
     # Render the markdown HTML into the right template for the fragment
     def rendered(lang = nil)
       lang ||= Locale.language
+      rendered(value(lang), lang)
+    end
+
+    # Render the fragment from an already-built value() context, so
+    # callers that also need the value (page title, breadcrumbs,
+    # language links) build it once per page
+    def rendered(val, lang : String)
       tmpl = Templates.get_template(template(lang), lang)
-      TemplatePreprocessor.render_with(Templates.environment, tmpl, value(lang))
+      TemplatePreprocessor.render_with(Templates.environment, tmpl, val)
     end
 
     def _replace_shortcodes(text : String) : String
@@ -475,12 +495,16 @@ module Markdown
 
     def summary(lang = nil)
       lang ||= Locale.language
+      summary(html(lang), lang)
+    end
+
+    def summary(page_html : String, lang : String)
       return metadata(lang)["summary"] if metadata(lang).has_key?("summary")
-      # Split HTML in the comment
-      if html(lang).includes?("<!--more-->")
-        html(lang).split("<!--more-->")[0]
+      # Split HTML at the teaser comment
+      if more_marker?(lang)
+        page_html.split("<!--more-->")[0]
       else
-        html(lang)
+        page_html
       end
     end
 
@@ -488,12 +512,23 @@ module Markdown
     def has_teaser?(lang = nil)
       lang ||= Locale.language
       return true if metadata(lang).has_key?("summary")
-      html(lang).includes?("<!--more-->")
+      # Ensure the HTML (and with it the marker) has been computed
+      html(lang)
+      more_marker?(lang)
+    end
+
+    def has_teaser?(page_html : String, lang : String)
+      return true if metadata(lang).has_key?("summary")
+      more_marker?(lang)
     end
 
     # What to show as breadcrumbs for this post
     def breadcrumbs(lang = nil)
       lang ||= Locale.language
+      compute_breadcrumbs(lang)
+    end
+
+    private def compute_breadcrumbs(lang : String)
       result = [] of NamedTuple(name: String, link: String)
 
       output_path = Path[output(lang)]
@@ -553,13 +588,14 @@ module Markdown
     # Return a value Crinja can use in templates
     def value(lang = nil)
       lang = lang || Locale.language
+      page_html = html(lang)
       {
         "breadcrumbs"    => breadcrumbs(lang),
         "date"           => date.try &.as(Time).to_s(Config.options(lang).date_output_format),
-        "html"           => html(lang),
+        "html"           => page_html,
         "link"           => link(lang),
         "source"         => source(lang),
-        "summary"        => summary(lang),
+        "summary"        => summary(page_html, lang),
         "taxonomies"     => taxonomies,
         "title"          => title(lang),
         "toc"            => toc(lang),
@@ -567,7 +603,7 @@ module Markdown
         "show_updated"   => show_updated?(lang),
         "related_posts"  => related_posts(lang),
         "language_links" => language_links(lang),
-        "has_teaser"     => has_teaser?(lang),
+        "has_teaser"     => has_teaser?(page_html, lang),
       }
     end
 
@@ -575,6 +611,10 @@ module Markdown
     # Returns an array of Hash for Crinja compatibility
     def language_links(lang : String? = nil)
       lang ||= Locale.language
+      compute_language_links(lang)
+    end
+
+    private def compute_language_links(lang : String)
       result = [] of Hash(String, String)
 
       # For each configured language, check if we have this post
@@ -724,14 +764,15 @@ module Markdown
             end
 
             Log.info { "👉 #{post.output lang}" }
-            rendered = post.rendered(lang)
-            t0 = Time.instant
+            page_value = post.value(lang)
+            rendered = post.rendered(page_value, lang)
             template_vars = {
               "content"        => rendered,
-              "title"          => post.title(lang),
-              "breadcrumbs"    => post.breadcrumbs(lang),
-              "language_links" => post.language_links(lang),
+              "title"          => page_value["title"],
+              "breadcrumbs"    => page_value["breadcrumbs"],
+              "language_links" => page_value["language_links"],
             }
+            t0 = Time.instant
             html = Render.apply_template(Theme.template_path("page.tmpl"), template_vars, lang)
             t1 = Time.instant
             if HtmlFilters.string_rewrite_safe?(html)
