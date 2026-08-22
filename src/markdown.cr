@@ -203,8 +203,13 @@ module Markdown
               terms = [str_val] unless str_val.empty?
             end
           end
-        rescue
-          # Fallback to treating raw value as comma-separated
+        rescue ex : Exception
+          # Fallback to treating raw value as comma-separated, but
+          # leave a trace of why the structured parse was rejected
+          Log.warn(exception: ex) do
+            "Taxonomy #{tax_name} in #{source(lang)} is not a YAML list " \
+            "(#{post_terms.inspect}); treating as comma-separated"
+          end
           terms = post_terms.split(",").map(&.to_s.strip).reject(&.empty?)
         end
 
@@ -251,12 +256,11 @@ module Markdown
 
     def <=>(other : File)
       # The natural sort order is date descending
-      if self.@date.nil? || other.@date.nil?
+      my_date = @date
+      other_date = other.@date
+      if my_date.nil? || other_date.nil?
         title <=> other.title
       else
-        # Both dates are non-nil here based on the check above
-        my_date = @date.as(Time)
-        other_date = other.@date.as(Time)
         -1 * (my_date <=> other_date)
       end
     end
@@ -569,18 +573,23 @@ module Markdown
     # Check if the updated date should be shown (at least 1 minute different from post date)
     def show_updated?(lang = nil)
       lang ||= Locale.language
-      return false if @date.nil?
+      post_date = @date
+      return false if post_date.nil?
 
       updated_str = metadata(lang).fetch("updated", nil)
       return false if updated_str.nil?
 
-      # Try to parse the updated date
+      # Try to parse the updated date; an unparseable value only means
+      # no "updated" hint is shown, but it should not pass silently
       begin
         updated_time = Cronic.parse(updated_str)
         return false if updated_time.nil?
         # Show if updated is at least 1 minute (60 seconds) after the original date
-        (updated_time - @date.as(Time)) >= Time::Span.new(seconds: 60)
-      rescue
+        (updated_time - post_date) >= Time::Span.new(seconds: 60)
+      rescue ex : Exception
+        Log.warn(exception: ex) do
+          "Unparseable 'updated' value #{updated_str.inspect} in #{source(lang)}; ignoring it"
+        end
         false
       end
     end
@@ -642,13 +651,16 @@ module Markdown
       features = Config.features
       return [] of Hash(String, String | Float64) unless features.includes?("similarity")
 
-      # Only try to find related posts if signatures exist
-      # This avoids errors during initial build or when signatures aren't ready
+      # A broken similarity index must not silently produce pages
+      # without related posts; degrade gracefully but say why
       begin
         related_posts = Similarity.find_related(self, lang, 5)
         # Convert to hash for template compatibility
         related_posts.map(&.to_h)
-      rescue
+      rescue ex : Exception
+        Log.error(exception: ex) do
+          "Related posts lookup failed for #{base} (#{lang}); rendering none"
+        end
         [] of Hash(String, String | Float64)
       end
     end
@@ -862,9 +874,12 @@ module Markdown
       # (newest first). The output path tiebreaker keeps the order
       # deterministic for posts sharing a date: content reading is
       # parallel, so the input order is not stable
-      sorted_posts = posts.select { |post| !post.date.nil? }
-        .sort_by! { |post| {post.date.as(Time), post.output} }
-        .reverse!
+      dated = posts.compact_map do |post|
+        next unless date = post.date
+        {date, post.output, post}
+      end
+      dated.sort_by! { |entry| entry }.reverse!
+      sorted_posts = dated.map(&.[2])
 
       # Limit to 100 posts for index pages
       has_more = sorted_posts.size > 100

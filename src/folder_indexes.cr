@@ -40,15 +40,7 @@ module FolderIndexes
     # 2. Feature modules that register their output folders
     # 3. Default exclusions (features that handle their own indexes)
 
-    exclude_patterns = [] of String
-
-    # 1. Get exclude patterns from config if available
-    begin
-      exclude_dirs = nil
-      exclude_patterns = exclude_dirs.as_a.map(&.as_s) if exclude_dirs
-    rescue
-      # Key doesn't exist, use empty array
-    end
+    exclude_patterns = Config.folder_indexes_excludes.dup
 
     # 2. Get registered exclusions from feature modules
     # 3. Pages feature generates its own directory indexes

@@ -121,7 +121,8 @@ module Archive
         years_data = Hash(Int32, Hash(String, Array(Markdown::File))).new
 
         dated_posts.each do |post|
-          post_date = post.date.as(Time)
+          # dated_posts is filtered above; coalesce for the type system
+          post_date = post.date || Time.unix(0)
           year = post_date.year
           month_key = post_date.to_s("%Y-%m")
 
@@ -135,7 +136,7 @@ module Archive
         # of same-date posts is not stable
         years_data.each_value do |months|
           months.each_value do |month_posts|
-            month_posts.sort_by! { |post| {post.date.as(Time), post.output} }.reverse!
+            month_posts.sort_by! { |post| {post.date || Time.unix(0), post.output} }.reverse!
           end
         end
 
