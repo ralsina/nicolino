@@ -1,0 +1,22 @@
+{#- Vega-Lite chart shortcode.
+
+  Usage: vegalite id="sales" with a vega-lite JSON spec as the body.
+  The spec is passed to vegaEmbed as-is, so anything a vega-lite
+  editor accepts works here, including inline values datasets or
+  url-based ones. Load the libraries once per page (see the
+  External JavaScript chapter); this shortcode only emits the chart
+  container and the embed call. Pass distinct ids when a page has
+  several charts; the default id is derived from the body length.
+-#}
+{%- if args['id'] and args['id'] != "" -%}
+  {%- set chart_id = args['id'] -%}
+{%- else -%}
+  {%- set chart_id = "vl-chart-" ~ (inner.size) -%}
+{%- endif -%}
+<div class="vega-chart" id="{{chart_id}}"></div>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var spec = {{inner}};
+    vegaEmbed('#{{chart_id}}', spec, {actions: false});
+  });
+</script>
