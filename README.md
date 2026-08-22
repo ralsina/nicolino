@@ -45,6 +45,15 @@ the configuration file format, but it is ready to start being used.
 
 For more information, visit <https://nicolino.ralsina.me>
 
+## Building from Source
+
+Building requires `libvips` to be available on your system:
+
+- **macOS**: `brew install vips`
+- **Debian/Ubuntu**: `apt install libvips-dev`
+- **Fedora**: `dnf install vips-devel`
+- **Arch**: `pacman -S libvips`
+
 ## Building for Release (Static Binaries)
 
 The project uses `libvips` for fast image processing, but libvips cannot be
