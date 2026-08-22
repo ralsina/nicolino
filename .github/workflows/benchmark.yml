@@ -73,17 +73,25 @@ jobs:
       - name: Publish summary
         run: |
           latest=$(ls -t bench/results/*.json | head -1)
-          echo "## Benchmark (dev + release)" >> "$GITHUB_STEP_SUMMARY"
-          echo "Result file: \`${latest##*/}\`" >> "$GITHUB_STEP_SUMMARY"
-          echo '```json' >> "$GITHUB_STEP_SUMMARY"
-          cat "$latest" >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          # Human-readable comparison table first...
+          cat "${latest%.json}.md" >> "$GITHUB_STEP_SUMMARY"
+          # ...raw JSON tucked into a collapsible section for machines.
+          {
+            echo '<details><summary>Raw JSON result</summary>'
+            echo ''
+            echo '```json'
+            cat "$latest"
+            echo '```'
+            echo '</details>'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload results artifact
         uses: actions/upload-artifact@v5
         with:
           name: benchmark-results
-          path: bench/results/*.json
+          path: |
+            bench/results/*.json
+            bench/results/*.md
 
       # Keep a current-ish baseline in the repo. Only done on manual
       # dispatch so pushes don't re-trigger the (slow) workflow.

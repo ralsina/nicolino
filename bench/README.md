@@ -39,12 +39,16 @@ The harness:
 
 1. copies the corpus into the throwaway content dirs of each committed
    site (`bench/site-nicolino/`, `bench/site-zola/`, `bench/hugo/`)
-2. times several full builds of each tool with
-   [hyperfine](https://github.com/sharkdp/hyperfine) (median of `RUNS` runs,
-   default 3, after `WARMUP` untimed warmup runs, default 1), cleaning between
-   runs so every timing measures a fresh build
+2. times several full builds of **all tools in a single hyperfine
+   invocation** (median of `RUNS` runs, default 3, after `WARMUP`
+   untimed warmup runs, default 1). The shared prepare step resets
+   every site between runs so each timing measures a fresh build,
+   and one invocation lets hyperfine compute its native relative
+   comparison across tools
 3. asserts every corpus file rendered
-4. writes a timestamped JSON report to `bench/results/` and prints a summary
+4. writes a timestamped JSON report and a Markdown companion (same
+   name, `.md`) to `bench/results/`, and prints a summary with
+   cross-tool ratios
 
 ### Configuration
 
