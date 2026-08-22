@@ -29,7 +29,7 @@ This is all it takes to make a Vega-Lite shortcode — save it as
 `shortcodes/vegalite.tmpl` in your site (it ships with Nicolino):
 
 ```html
-<div class="vega-chart" id="{{chart_id}}"></div>
+<div class="vega-chart" id="{{chart_id}}" style="display:flex;justify-content:center;"></div>
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     var spec = {{inner}};

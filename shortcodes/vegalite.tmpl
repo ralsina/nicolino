@@ -13,7 +13,7 @@
 {%- else -%}
   {%- set chart_id = "vl-chart-" ~ (inner.size) -%}
 {%- endif -%}
-<div class="vega-chart" id="{{chart_id}}"></div>
+<div class="vega-chart" id="{{chart_id}}" style="display:flex;justify-content:center;"></div>
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     var spec = {{inner}};
