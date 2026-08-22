@@ -57,18 +57,21 @@ module Nicolino
 
         # Setup a watcher for posts/pages and trigger respawn if files
         # are added, deleted, or moved
-        watcher = Inotify::Watcher.new(recursive: true)
-        watch_flags = LibInotify::IN_CREATE | LibInotify::IN_DELETE | LibInotify::IN_MOVED_FROM | LibInotify::IN_MOVED_TO
-        watcher.watch("content", watch_flags)
-        spawn do
-          watcher.on_event do |_|
-            # Add a small delay to ensure the file operation is complete
-            sleep 0.2.seconds
-            server.close
-            live_reload.http_server.close
-            Process.exec(Process.executable_path.as(String), ARGV)
+        # Inotify is Linux-specific; auto_run itself is unsupported on other platforms
+        {% if flag?(:linux) %}
+          watcher = Inotify::Watcher.new(recursive: true)
+          watch_flags = LibInotify::IN_CREATE | LibInotify::IN_DELETE | LibInotify::IN_MOVED_FROM | LibInotify::IN_MOVED_TO
+          watcher.watch("content", watch_flags)
+          spawn do
+            watcher.on_event do |_|
+              # Add a small delay to ensure the file operation is complete
+              sleep 0.2.seconds
+              server.close
+              live_reload.http_server.close
+              Process.exec(Process.executable_path.as(String), ARGV)
+            end
           end
-        end
+        {% end %}
 
         # Create task that will be triggered in rebuilds
         Croupier::Task.new(
