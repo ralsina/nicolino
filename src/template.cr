@@ -1,4 +1,5 @@
 require "crinja"
+require "./lua_filters"
 require "./theme"
 
 module Templates
@@ -310,6 +311,9 @@ module Templates
     env = Crinja.new
     env.loader = StoreLoader.new
     env.cache = Crinja::TemplateCache::InMemory.new
+
+    # User-defined filters written in Lua (no-op without filters/*.lua)
+    LuaFilters.register(env)
 
     # Convenience filters
     env.filters["link"] = Crinja.filter() do

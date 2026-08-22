@@ -75,6 +75,14 @@ The build process uses Croupier for parallel task execution:
 - `sitemap` - XML sitemap generation
 - `taxonomies` - Content classification (tags/categories)
 
+### Lua Filters (auto-enabled)
+Not a config feature: active whenever `filters/*.lua` exists site-wide or in
+the current theme. Each script returns a table of functions that become Crinja
+filters (see src/lua_filters.cr). Scripts are declared as inputs of every
+template-rendering task family, so Croupier re-renders affected pages when
+they change; auto mode respawns on filter files added/removed. Scripts run
+with Lua's full stdlib — themes are trusted code.
+
 ## Development Guidelines
 
 ### Code Style and Quality

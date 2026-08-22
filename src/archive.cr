@@ -105,7 +105,7 @@ module Archive
           "kv://#{archive_template}",
           "kv://#{title_template}",
           "kv://#{page_template}",
-        ],
+        ] + LuaFilters.dependency_paths,
         mergeable: false
       ) do
         # Filter posts that have dates (done during task execution)
