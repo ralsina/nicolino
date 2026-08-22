@@ -19,6 +19,7 @@ Documentation for the Nicolino static site generator.
   - [Folder Indexes](folder_indexes.md)
   - [Similarity](similarity.md)
   - [Shortcodes](shortcodes.md)
+  - [External JavaScript](external-javascript.md)
   - [Import](import.md)
   - [TinaCMS](tinacms.md)
 - [Commands]()
