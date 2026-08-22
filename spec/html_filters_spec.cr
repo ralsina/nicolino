@@ -92,6 +92,33 @@ describe HtmlFilters do
       result = HtmlFilters.make_links_relative(doc, "/posts/page.html").to_html
       result.should contain %(src="../pic.jpg")
     end
+
+    it "rewrites links to markdown sources into rendered pages" do
+      doc = parse(%(<a href="directory-layout.md">x</a>))
+      result = HtmlFilters.make_links_relative(doc, "/books/user-guide/page.html").to_html
+      result.should contain %(href="directory-layout.html")
+    end
+
+    it "preserves anchors when rewriting markdown links" do
+      doc = parse(%(<a href="features.md#section-2">x</a>))
+      result = HtmlFilters.make_links_relative(doc, "/books/user-guide/page.html").to_html
+      result.should contain %(href="features.html#section-2")
+    end
+
+    it "rewrites nested and language-suffixed markdown links" do
+      doc = parse(%(<a href="../cli/import.md">a</a><a href="intro.es.md">b</a>))
+      result = HtmlFilters.make_links_relative(doc, "/books/user-guide/page.html").to_html
+      result.should contain %(href="../cli/import.html")
+      result.should contain %(href="intro.es.html")
+    end
+
+    it "leaves external .md URLs and non-markdown links alone" do
+      html = %(<a href="https://example.com/raw.md">a</a><a href="/x.md">b</a><a href="y.txt">c</a>)
+      result = HtmlFilters.make_links_relative(parse(html), "/books/user-guide/page.html").to_html
+      result.should contain %(href="https://example.com/raw.md")
+      result.should contain %(href="/x.md")
+      result.should contain %(href="y.txt")
+    end
   end
 
   describe ".string_rewrite_safe?" do
@@ -120,6 +147,29 @@ describe HtmlFilters do
     it "keeps absolute URLs unchanged" do
       html = %(<a href="https://example.com/">x</a>)
       HtmlFilters.relativize_links_in_string(html, "page.html").should eq html
+    end
+
+    it "rewrites markdown links exactly like the DOM pass" do
+      result = HtmlFilters.relativize_links_in_string(
+        %(<a href="directory-layout.md">x</a><a href="features.md#anchor">y</a>),
+        "/books/user-guide/page.html"
+      )
+      result.should contain %(href="directory-layout.html")
+      result.should contain %(href="features.html#anchor")
+    end
+  end
+
+  describe ".md_link_to_html" do
+    it "swaps the extension and keeps anchors" do
+      HtmlFilters.md_link_to_html("foo.md").should eq "foo.html"
+      HtmlFilters.md_link_to_html("foo.md#bar").should eq "foo.html#bar"
+      HtmlFilters.md_link_to_html("../dir/foo.es.md").should eq "../dir/foo.es.html"
+    end
+
+    it "leaves everything that is not a .md link untouched" do
+      HtmlFilters.md_link_to_html("foo.html").should eq "foo.html"
+      HtmlFilters.md_link_to_html("https://example.com/x.md").should eq "https://example.com/x.md"
+      HtmlFilters.md_link_to_html("notes.txt").should eq "notes.txt"
     end
   end
 end

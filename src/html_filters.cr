@@ -107,13 +107,31 @@ module HtmlFilters
     base_uri = URI.parse(base)
     html.gsub(NEEDS_LINK_FIX_CAPTURE) do |match|
       value = $2
-      rewritten = base_uri.relativize(base_uri.resolve(value)).to_s
+      rewritten = md_link_to_html(base_uri.relativize(base_uri.resolve(value)).to_s)
       if rewritten == value
         match
       else
         "#{match[0, match.size - value.size - 1]}#{rewritten}#{$1}"
       end
     end
+  end
+
+  # Map a relative link to a markdown source file onto its rendered
+  # page: content links are written with .md paths so they also work
+  # when the source is browsed as markdown (e.g. on GitHub); once
+  # rendered, they must target the generated HTML. Anchors survive:
+  # foo.md#section becomes foo.html#section. Absolute URLs, root
+  # -relative paths, fragment-only links, and non-.md targets pass
+  # through untouched, so this is always safe to call on any href/src
+  # value regardless of the caller's own filtering.
+  def self.md_link_to_html(link : String) : String
+    return link if link.starts_with?("/") || link.starts_with?("#")
+    return link if link.matches?(/^[a-zA-Z][a-zA-Z0-9+.\-]*:/)
+    hash = link.index("#")
+    target = hash ? link[0...hash] : link
+    anchor = hash ? link[hash..] : ""
+    return link unless target.ends_with?(".md")
+    "#{target[0...-3]}.html#{anchor}"
   end
 
   # Make all relative links relative to the page location.
@@ -130,7 +148,7 @@ module HtmlFilters
         next if href.starts_with?("#") || href.starts_with?("/")
         next if href.matches?(/^[a-zA-Z][a-zA-Z0-9+.\-]*:/)
         next if tag == "link" && node.fetch("rel", nil) == "canonical"
-        node["href"] = base_uri.relativize(base_uri.resolve(href)).to_s
+        node["href"] = md_link_to_html(base_uri.relativize(base_uri.resolve(href)).to_s)
       end
     end
     {"img", "script", "video", "audio", "source", "iframe", "embed"}.each do |tag|

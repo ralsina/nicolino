@@ -156,6 +156,15 @@ Discount supports basic table syntax:
 ~~strikethrough text~~
 ```
 
+## Linking Between Pages
+
+When linking to another page of your site, use the `.md` path of its
+source file (e.g. `[Getting Started](getting-started.md)`). The link
+works as-is when your content is browsed as markdown (for example on
+GitHub), and Nicolino rewrites it to point to the generated HTML page
+when building the site. Fragments work too: `features.md#usage`
+becomes a link to that section of the rendered page.
+
 ## More Information
 
 For complete documentation of Discount's features and extensions, visit the [Discount homepage](https://www.pell.portland.or.us/~orc/Code/discount/).
