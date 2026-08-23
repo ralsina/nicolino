@@ -91,8 +91,8 @@ tasks:
       rm -rf shard.lock bin lib
 
   static:
-    outputs:
-      - bin/{{NAME}}-static-linux-amd64
-      - bin/{{NAME}}-static-linux-arm64
+    # Release artifacts: never reuse stale binaries across versions.
+    phony: true
+    always_run: true
     commands: |
       ./build_static.sh
