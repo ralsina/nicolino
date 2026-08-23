@@ -36,4 +36,7 @@ NOTES=$(awk -v v="$VERSION" '
 if [ -z "$NOTES" ]; then
     NOTES=$(git cliff -l -s all)
 fi
-gh release create "v$VERSION" "bin/$PKGNAME-static-linux-amd64" --title "Release v$VERSION" --notes "$NOTES"
+gh release create "v$VERSION" \
+    "bin/$PKGNAME-static-linux-amd64" \
+    "bin/$PKGNAME-static-linux-arm64" \
+    --title "Release v$VERSION" --notes "$NOTES"

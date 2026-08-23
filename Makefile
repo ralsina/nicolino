@@ -14,6 +14,8 @@ mt:
 mt-release:
 	shards build --release
 	strip bin/nicolino
+static:
+	./build_static.sh
 lint:
 	bin/ameba --fix
 
@@ -21,4 +23,4 @@ changelog:
 	git cliff -o --sort=newest
 
 
-.PHONY: all bin clean test release mt mt-release lint changelog
+.PHONY: all bin clean test release mt mt-release static lint changelog
