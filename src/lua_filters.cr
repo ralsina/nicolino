@@ -136,7 +136,8 @@ module LuaFilters
     # Values that can cross the Crystal→Lua boundary. The explicit Nil
     # member is required: a recursive alias needs it so nested
     # containers may hold nils.
-    private alias LuaArg = Nil | Bool | Int32 | Int64 | Float64 | String | Array(LuaArg) | Hash(String, LuaArg) # ameba:disable Style/VerboseNilType
+    private alias LuaArg = Nil | Bool | Int32 | Int64 | Float64 |
+                           String | Array(LuaArg) | Hash(String, LuaArg)
 
     # Convert a Crinja value into something `Lua::Stack` can push
 

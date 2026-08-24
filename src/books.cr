@@ -683,7 +683,8 @@ module Books
       feature_name: "books",
       id: "books/index",
       output: output_path.to_s,
-      inputs: ["conf.yml", "kv://#{page_template}", "kv://#{title_template}"] + Templates.get_deps(item_list_template) + LuaFilters.dependency_paths,
+      inputs: ["conf.yml", "kv://#{page_template}", "kv://#{title_template}"] +
+              Templates.get_deps(item_list_template) + LuaFilters.dependency_paths,
       mergeable: false
     ) do
       Log.info { "👉 #{output_path}" }

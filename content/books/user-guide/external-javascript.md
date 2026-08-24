@@ -100,9 +100,27 @@ spec small by pointing at an external file:
 "data": {"url": "/data/sales.json"}
 ```
 
-Place `data/sales.json` in your content directory so it gets copied to
-the output, or fetch it from an external source at build time using the
-[Import](import.md) feature.
+Place the file in your `assets` directory, for example
+`assets/data/sales.json`: the [assets](directory-layout.md) feature
+copies everything under `assets/` to the root of the output directory,
+so the chart can load it from `/data/sales.json`. Files in the content
+directory that are not Markdown, HTML or Pandoc documents are ignored
+during the build, so a JSON file placed next to your pages would never
+be copied to the output. You can also fetch the data from an external
+source at build time using the [Import](import.md) feature.
+
+One Vega-Lite quirk to keep in mind: `data: {"url": ...}` expects the
+file to contain a *raw JSON array* of records, such as:
+
+```json
+[
+  {"category": "A", "amount": 28},
+  {"category": "B", "amount": 55}
+]
+```
+
+The `{"values": [...]}` wrapper you use for inline data does not work
+in files loaded by URL, and produces an empty chart.
 
 <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>

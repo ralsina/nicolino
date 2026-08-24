@@ -384,7 +384,10 @@ module Markdown
         doc = Lexbor::Parser.new(compiled)
         t2 = Time.instant
         doc = HtmlFilters.downgrade_headers(doc) if needs_headers
-        doc = HtmlFilters.remove_empty_paragraphs(doc) if needs_empty_p
+        # Always drop empty paragraphs on a Lexbor pass: the parse itself
+        # can create them (e.g. discount wraps unknown block tags as
+        # <p><aside></p>, which becomes <p></p><aside><p></p>)
+        doc = HtmlFilters.remove_empty_paragraphs(doc)
         doc = HtmlFilters.fix_code_classes(doc) if needs_code_fix
         t3 = Time.instant
         html = doc.to_html
