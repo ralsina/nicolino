@@ -6,6 +6,9 @@ VERSION=$(git cliff --bumped-version | cut -dv -f2)
 
 # ameba is a dev dependency installed into lib/, not a build target of this
 # shard; compile its CLI into bin/ so the lint task (`bin/ameba --fix`) works.
+# lib/ may be missing or stale (e.g. after `hace clean` or a static build),
+# so refresh it first; shards install is idempotent when it is up to date.
+shards install
 crystal build lib/ameba/src/cli.cr -o bin/ameba
 
 sed "s/^version:.*$/version: $VERSION/g" -i shard.yml

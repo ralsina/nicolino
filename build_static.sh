@@ -24,5 +24,12 @@ for platform in linux/amd64 linux/arm64; do
     mv bin/nicolino "$output"
 done
 
+# The containers rebuild lib/ inside the mounted volume, and the last
+# one (arm64) leaves musl/aarch64 objects the host linker cannot use;
+# restore a host-built lib/ so development and release tasks keep working
+echo "==> Restoring host lib/"
+rm -rf lib
+shards install
+
 echo "==> Done"
 ls -la bin/nicolino-static-linux-*
