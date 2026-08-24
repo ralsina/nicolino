@@ -114,7 +114,8 @@ module Pages
         all_posts = Markdown.posts.map(&.last.source)
 
         folder_index_template = Theme.template_path("folder_index.tmpl")
-        inputs = ["kv://#{folder_index_template}", "conf.yml"] + all_posts +
+        page_template = Theme.template_path("page.tmpl")
+        inputs = ["kv://#{folder_index_template}", "kv://#{page_template}", "conf.yml"] + all_posts +
                  LuaFilters.dependency_paths
 
         # Use unique task ID based on output path and language
@@ -127,9 +128,9 @@ module Pages
           mergeable: false
         ) do
           Log.info { "👉 #{output}" }
-          page_template = Theme.template_path("page.tmpl")
           html = Render.apply_template(page_template,
-            {"content" => index.rendered, "title" => index.title, "breadcrumbs" => index.breadcrumbs}, lang)
+            {"content" => index.rendered, "title" => index.title, "breadcrumbs" => index.breadcrumbs,
+             "link" => Utils.path_to_link(output)}, lang)
           doc = Lexbor::Parser.new(html)
           doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))
           doc.to_html

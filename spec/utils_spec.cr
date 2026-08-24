@@ -100,4 +100,26 @@ describe Utils do
       sources["es"].should eq "content/posts/solo.md"
     end
   end
+
+  describe ".text_excerpt" do
+    it "strips tags and collapses whitespace" do
+      Utils.text_excerpt("<p>Hello   <b>world</b></p>\n\n<p>again</p>").should eq "Hello world again"
+    end
+
+    it "returns empty string for empty input" do
+      Utils.text_excerpt("").should eq ""
+      Utils.text_excerpt("   ").should eq ""
+    end
+
+    it "truncates long text at a word boundary with an ellipsis" do
+      excerpt = Utils.text_excerpt("word " * 100, limit: 50)
+      excerpt.size.should be <= 51
+      excerpt.should end_with "…"
+      excerpt.should_not end_with " …"
+    end
+
+    it "keeps short text intact" do
+      Utils.text_excerpt("short and sweet", limit: 50).should eq "short and sweet"
+    end
+  end
 end

@@ -12,6 +12,7 @@ The base template that wraps all pages. It provides:
 
 - Complete HTML document structure (DOCTYPE, html, head, body)
 - Meta tags for SEO, favicons, canonical URLs
+- OpenGraph and Twitter Card tags for social sharing
 - CSS includes (Pico CSS, theme.css, custom.css, highlight.js)
 - JavaScript includes (VenoBox, MiniSearch, hyperscript, highlight.js)
 - Header with site title, description, and navigation
@@ -19,6 +20,26 @@ The base template that wraps all pages. It provides:
 - Footer with site footer text
 
 **Used by**: All features as the wrapping template
+
+#### Social sharing metadata
+
+Every page gets [OpenGraph](https://ogp.me/) and Twitter Card tags so
+links preview nicely on social media. The tags are built from the
+page's context:
+
+- `canonical_url` - the site URL plus the page's path
+- `og:type` - `article` for dated posts, `website` for everything else
+- `og:title` / `twitter:title` - the page title, or the site title
+- `og:description` / `twitter:description` - the page's `description`
+  metadata, falling back to a plain-text excerpt of the summary, and
+  finally to the site description
+- `og:image` / `twitter:image` - the page's `preview_image` metadata
+  (`cover_image` and `image` also work); root-relative paths are made
+  absolute using the site URL
+
+When a preview image is set the Twitter card is `summary_large_image`,
+otherwise it's a plain `summary` card. To customize the tags, override
+`page.tmpl` in your own theme.
 
 ### `title.tmpl` - Page Title with Breadcrumbs
 

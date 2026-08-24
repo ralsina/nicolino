@@ -9,8 +9,8 @@ module Render
     lang ||= Config.language
     # Use Crinja's value type for flexibility
     ctx = Hash(String, Crinja::Value).new
-    context.each do |k, v|
-      ctx[k] = Crinja::Value.new(v)
+    context.each do |key, value|
+      ctx[key] = Crinja::Value.new(value)
     end
     # Add site config values to context using the specified language
     lang_config = Config[lang]
@@ -19,6 +19,21 @@ module Render
     ctx["site_url"] = Crinja::Value.new(lang_config.url)
     ctx["site_footer"] = Crinja::Value.new(lang_config.footer)
     ctx["site_nav_items"] = Crinja::Value.new(lang_config.nav_items)
+    # Canonical URL for the page (used by rel=canonical and OpenGraph):
+    # the site URL plus the page's root-relative link, with index.html
+    # normalized away (e.g. "/foo/index.html" -> "/foo/")
+    if raw_link = ctx["link"]?.try(&.as_s?)
+      link = raw_link.sub(/index\.html$/, "")
+      base_url = lang_config.url.chomp("/")
+      ctx["canonical_url"] = Crinja::Value.new("#{base_url}#{link}")
+    end
+    # OpenGraph images must be absolute URLs; root-relative preview
+    # images are resolved against the site URL
+    if image = ctx["preview_image"]?.try(&.as_s?)
+      unless image.matches?(/^[a-zA-Z][a-zA-Z0-9+.\-]*:/) || image.empty?
+        ctx["preview_image"] = Crinja::Value.new("#{lang_config.url.chomp("/")}#{image}")
+      end
+    end
     tmpl = Templates.get_template(template, lang)
     TemplatePreprocessor.render_with(Templates.environment, tmpl, ctx)
   end
@@ -48,6 +63,7 @@ module Render
       "content"     => content,
       "title"       => title,
       "breadcrumbs" => breadcrumbs,
+      "link"        => output_path,
     }, lang)
     doc = Lexbor::Parser.new(html)
     doc = HtmlFilters.make_links_relative(doc, output_path)

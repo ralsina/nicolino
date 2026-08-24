@@ -1,6 +1,23 @@
+require "lexbor"
+
 module Utils
   def self.slugify(string)
     string.downcase.strip.gsub(' ', '-').gsub(/[^\w]/, '-').gsub(/-+/, '-')
+  end
+
+  # Plain-text excerpt of an HTML fragment, for meta description tags:
+  # strips tags via lexbor, collapses whitespace, and truncates to at
+  # most *limit* characters at a word boundary with an ellipsis.
+  def self.text_excerpt(html : String, limit = 200) : String
+    return "" if html.strip.empty?
+    text = Lexbor::Parser.new(html).body.try(&.inner_text) || ""
+    text = text.gsub(/\s+/, " ").strip
+    return text if text.size <= limit
+    cut = text[0, limit]
+    if space = cut.rindex(' ')
+      cut = cut[0, space]
+    end
+    "#{cut}…"
   end
 
   def self.titlecase(string)

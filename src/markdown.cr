@@ -597,6 +597,22 @@ module Markdown
       end
     end
 
+    # Social-sharing metadata for this page (OpenGraph/Twitter cards):
+    # an explicit `description` from the frontmatter, falling back to a
+    # plain-text excerpt of the summary, and a `preview_image` (also
+    # accepts `cover_image` or `image`) for the card thumbnail.
+    def social_context(lang = nil)
+      lang ||= Locale.language
+      meta = metadata(lang)
+      description = meta["description"]?
+      description ||= Utils.text_excerpt(summary(html(lang), lang))
+      preview_image = meta["preview_image"]? || meta["cover_image"]? || meta["image"]?
+      {
+        "description"   => description,
+        "preview_image" => preview_image,
+      } of String => String?
+    end
+
     # Return a value Crinja can use in templates
     def value(lang = nil)
       lang = lang || Locale.language
@@ -790,7 +806,10 @@ module Markdown
               "title"          => page_value["title"],
               "breadcrumbs"    => page_value["breadcrumbs"],
               "language_links" => page_value["language_links"],
-            }
+              # Social sharing metadata (OpenGraph/Twitter cards)
+              "link"    => post.link(lang),
+              "og_type" => require_date ? "article" : "website",
+            }.merge(post.social_context(lang))
             t0 = Time.instant
             html = Render.apply_template(Theme.template_path("page.tmpl"), template_vars, lang)
             t1 = Time.instant
@@ -911,6 +930,7 @@ module Markdown
           "extra_feed"     => extra_feed,
           "main_feed"      => main_feed,
           "language_links" => language_links,
+          "link"           => Utils.path_to_link(output),
         },
         lang)
       doc = Lexbor::Parser.new(html)

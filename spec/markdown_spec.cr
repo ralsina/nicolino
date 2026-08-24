@@ -26,6 +26,72 @@ module PostSite
 end
 
 describe Markdown::File do
+  describe ".social_context" do
+    it "uses the description metadata when present" do
+      PostSite.in_site do
+        post = PostSite.write_post("hello.md", <<-MD)
+          ---
+          title: Hello World
+          date: 2024-05-01
+          description: Hand written description
+          ---
+
+          Body text that should not be used.
+          MD
+
+        post.social_context["description"].should eq "Hand written description"
+      end
+    end
+
+    it "falls back to a plain text excerpt of the summary" do
+      PostSite.in_site do
+        post = PostSite.write_post("hello.md", <<-MD)
+          ---
+          title: Hello World
+          date: 2024-05-01
+          ---
+
+          Some *markdown* text with <b>HTML</b> in it.
+          MD
+
+        post.social_context["description"].should eq "Some markdown text with HTML in it."
+      end
+    end
+
+    it "accepts preview_image, cover_image and image metadata" do
+      PostSite.in_site do
+        post = PostSite.write_post("cover.md", <<-MD)
+          ---
+          title: Covered
+          date: 2024-05-01
+          cover_image: /covers/x.jpg
+          ---
+
+          Text
+          MD
+        post.social_context["preview_image"].should eq "/covers/x.jpg"
+
+        post = PostSite.write_post("image.md", <<-MD)
+          ---
+          title: Imaged
+          date: 2024-05-01
+          image: /imgs/y.jpg
+          ---
+
+          Text
+          MD
+        post.social_context["preview_image"].should eq "/imgs/y.jpg"
+      end
+    end
+
+    it "has no preview image when none is set" do
+      PostSite.in_site do
+        post = PostSite.write_post("plain.md", "---\ntitle: Plain\ndate: 2024-05-01\n---\n\nText\n")
+        post.social_context["preview_image"].should be_nil
+      end
+    end
+  end
+
   it "parses frontmatter metadata and title" do
     PostSite.in_site do
       post = PostSite.write_post("hello.md", <<-MD)

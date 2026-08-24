@@ -459,6 +459,7 @@ module Books
         "title"           => page_title,
         "breadcrumbs"     => breadcrumbs,
         "sidebar_content" => toc_html,
+        "link"            => Utils.path_to_link(output_path.to_s),
       })
 
       # Process HTML filters

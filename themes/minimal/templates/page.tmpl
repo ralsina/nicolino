@@ -23,9 +23,25 @@
   {% if noindex %}
   <meta name="robots" content="noindex" />{% endif %}
   <title>{{ site_title }}: {{ title }}</title>
-  <meta name="description" content="{{ site_description }}" />
+  <meta name="description" content="{% if description %}{{ description }}{% else %}{{ site_description }}{% endif %}" />
   <link rel="shortcut icon" href="/favicon.ico" />
   <link rel="canonical" href="{{ canonical_url }}" />
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="{% if og_type %}{{ og_type }}{% else %}website{% endif %}" />
+  <meta property="og:site_name" content="{{ site_title }}" />
+  <meta property="og:url" content="{{ canonical_url }}" />
+  <meta property="og:title" content="{% if title and title|length > 0 %}{{ title }}{% else %}{{ site_title }}{% endif %}" />
+  <meta property="og:description" content="{% if description %}{{ description }}{% else %}{{ site_description }}{% endif %}" />
+  {% if preview_image %}
+  <meta property="og:image" content="{{ preview_image }}" />
+  {% endif %}
+  <!-- Twitter -->
+  <meta name="twitter:card" content="{% if preview_image %}summary_large_image{% else %}summary{% endif %}" />
+  <meta name="twitter:title" content="{% if title and title|length > 0 %}{{ title }}{% else %}{{ site_title }}{% endif %}" />
+  <meta name="twitter:description" content="{% if description %}{{ description }}{% else %}{{ site_description }}{% endif %}" />
+  {% if preview_image %}
+  <meta name="twitter:image" content="{{ preview_image }}" />
+  {% endif %}
   <link rel="alternate" type="application/rss+xml" href="/rss.xml" title="RSS Feed" />
   {% if extra_feed %}
   <link rel="alternate" type="application/rss+xml" href="{{ extra_feed.link }}" title="{{ extra_feed.title }}" />

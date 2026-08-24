@@ -35,6 +35,26 @@ Your markdown content here...
 - `description` - Post description/summary
 - `image` - Featured image path
 
+## Social Sharing
+
+Posts and pages get [OpenGraph](https://ogp.me/) and Twitter Card
+metadata so they preview nicely when shared. Set `description` and
+`preview_image` in the frontmatter to control them:
+
+```yaml
+---
+title: My post
+date: 2024-01-15
+description: A short, punchy summary
+preview_image: /images/cover.jpg
+---
+```
+
+Without them, Nicolino derives a description from the post's summary
+and skips the image tags. See
+[Social sharing metadata](templates.md#social-sharing-metadata) for
+details.
+
 ## File Organization
 
 ```

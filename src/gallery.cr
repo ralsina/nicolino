@@ -286,7 +286,8 @@ module Gallery
             "title"          => post.title(lang),
             "breadcrumbs"    => post.breadcrumbs(lang),
             "language_links" => post.language_links(lang),
-          }
+            "link"           => post.link(lang),
+          }.merge(post.social_context(lang))
           page_template = Theme.template_path("page.tmpl")
           html = Render.apply_template(page_template, template_context, lang)
           doc = Lexbor::Parser.new(html)

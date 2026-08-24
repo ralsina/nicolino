@@ -221,6 +221,7 @@ module Listings
         "no_highlightjs" => true,
         "listings_css"   => true,
         "breadcrumbs"    => breadcrumbs,
+        "link"           => Utils.path_to_link(output_path),
       })
 
       # Process with HTML filters
