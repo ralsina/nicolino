@@ -133,11 +133,12 @@ module LuaFilters
       return __nicolino_call
       LUA
 
-    # Values that can cross the Crystal→Lua boundary. The explicit Nil
-    # member is required: a recursive alias needs it so nested
-    # containers may hold nils.
-    private alias LuaArg = Nil | Bool | Int32 | Int64 | Float64 |
-                           String | Array(LuaArg) | Hash(String, LuaArg)
+    # Values that can cross the Crystal→Lua boundary. The nilable `?`
+    # members keep Nil in the union (a recursive alias needs it so
+    # nested containers and bare values may hold nils) while satisfying
+    # ameba's Style/VerboseNilType, which rejects a literal `| Nil`.
+    private alias LuaArg = Bool | Int32 | Int64 | Float64 | String |
+                           Array(LuaArg)? | Hash(String, LuaArg)?
 
     # Convert a Crinja value into something `Lua::Stack` can push
 
