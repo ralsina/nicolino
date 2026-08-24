@@ -8,11 +8,13 @@ RUN apk add --no-cache \
     libjpeg-turbo-static \
     libxml2-dev \
     libxml2-static \
+    lua5.4-dev \
     make \
     openssl-dev \
     openssl-libs-static \
     pcre2-dev \
     pcre2-static \
+    pkgconf \
     ragel \
     shards \
     xz-dev \
