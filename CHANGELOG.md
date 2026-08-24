@@ -2,6 +2,74 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.24.0] - 2026-08-24
+
+### 🚀 Features
+
+- Make feature-directory names (books, archive, galleries) configurable (#55)
+- Support galleries without an index.md (#59)
+- *(bench)* Use hyperfine for timing, add Zola, restructure sites
+- User-defined template filters in Lua (#71)
+- OpenGraph and Twitter Cards metadata (#42)
+
+### 🐛 Bug Fixes
+
+- Synchronize shared failure state in parallel builds (#56)
+- Re-fold templates in auto-rebuild when source changes (#57)
+- Make fix_code_classes idempotent (#58)
+- Quiet error paths and unsafe date casts (issue #29)
+- Adapt to cr-discount NamedTuple compile API
+- Restore TOC gating with new cr-discount flags API
+- Correct Hugo URL in user guide, fixes #65
+- Support --version flag, fixes #63
+- *(auto)* Guard inotify watcher behind Linux flag (#62)
+- Rewrite .md content links to .html when rendering, fixes #64 (#67)
+- Point features page PocketBase example at /pocketbase.html
+- Surface silent-failure paths, drop unsafe date casts, fixes #29 (#68)
+- Always rebuild static binaries in release pipeline
+- Admonition shortcode HTML leak and external data docs (#72, #73)
+- Release scripts survive missing or container-built lib/
+
+### 🚜 Refactor
+
+- Consolidate config structs and raise a typed ConfigError (#41)
+
+### 📚 Documentation
+
+- Missing releases
+- Document how to install libvips for source builds, refs #62
+- External JavaScript chapter with vega-lite chart shortcode (#69)
+- Center vega-lite charts in their container
+
+### ⚡ Performance
+
+- Stream sitemap and search index writes to reduce allocations (#61)
+- Lock-free Crinja env pool, memoize per-page hot paths
+
+### 🎨 Styling
+
+- Fix all ameba lint failures
+- Spell LuaArg's nilable members with ? for bundled ameba
+
+### 🧪 Testing
+
+- Add initial spec suite (#60)
+
+### Build
+
+- Use ralsina/crinja perf/memoize-lookups branch
+- Bump versions
+- Bump versions
+- Build static release binaries for amd64 and arm64
+- Add lua5.4-dev to the static build image
+
+### Ci
+
+- Zola scaffolding for benchmark
+- Install hyperfine and jq for the smoke test
+- Smoke test builds the corpus directly instead of running the benchmark
+- Single-invocation benchmark harness, consistent report (#70)
+
 ## [0.23.0] - 2026-08-20
 
 ### 🚀 Features
