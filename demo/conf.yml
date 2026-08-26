@@ -1,0 +1,39 @@
+# Nicolino Theme Showcase
+#
+# A tiny site that exercises the features a theme should support:
+# posts, taxonomies, archive, images, base16 theming and i18n.
+#
+# Switch themes by editing `theme:` below ("terminal" or "default").
+
+title: "Theme Showcase"
+description: "A small site for demoing Nicolino themes"
+url: "https://nicolino.ralsina.me"
+footer: "Powered by Nicolino"
+
+# The theme to demo: "terminal" (ported from Hugo Terminal) or
+# "default" (the built-in pico-based theme)
+theme: papermod
+
+# base16 color scheme used by both themes (see `nicolino color_schemes`)
+color_scheme: "gruvbox"
+
+theme_params:
+  center_theme: true
+
+# Classify posts by tags
+taxonomies:
+  tags:
+    title: "Tags"
+    term_title: "Posts tagged {{term.name}}"
+    location: "tags/"
+
+features:
+  - assets
+  - posts
+  - pages
+  - taxonomies
+  - images
+  - sitemap
+  - base16
+  - folder_indexes
+  - archive

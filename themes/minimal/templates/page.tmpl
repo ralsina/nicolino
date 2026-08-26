@@ -54,16 +54,12 @@
   <script src="https://cdn.jsdelivr.net/npm/venobox@2.0.4/dist/venobox.min.js"></script>
   <script src="https://unpkg.com/hyperscript.org@0.9.9"></script>
   <script src="https://cdn.jsdelivr.net/npm/minisearch@6.1.0/dist/umd/index.min.js"></script>
-  {% if not no_highlightjs %}
-  <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
-  <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/languages/django.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlightjs-copy@1.0.3/dist/highlightjs-copy.min.css" />
-  <script src="https://unpkg.com/highlightjs-copy@1.0.3/dist/highlightjs-copy.min.js"></script>
-  {% endif %}
   <!-- Theme styles -->
   <link rel="stylesheet" href="/css/theme.css" />
   <!-- Base16 color scheme (light/dark themes) -->
   <link rel="stylesheet" href="/css/style.css" />
+  <!-- Syntax highlighting (server-side, tartrazine) -->
+  <link rel="stylesheet" href="/css/syntax.css" />
   <!-- Custom style (loaded last for user overrides) -->
   <link rel="stylesheet" href="/css/custom.css" />
   {% if listings_css %}
@@ -190,10 +186,6 @@
       share: true,
       maxWidth: "80%",
     });
-    {% if not no_highlightjs %}
-    hljs.highlightAll();
-    hljs.addPlugin(new CopyButtonPlugin());
-    {% endif %}
   </script>
   <script src="/search.js"></script>
 </body>

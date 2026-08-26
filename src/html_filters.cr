@@ -74,7 +74,7 @@ module HtmlFilters
 
   # A code tag whose class doesn't already start with language-,
   # which fix_code_classes would rewrite.
-  NEEDS_CODE_FIX = /<code[^>]*\sclass\s*=\s*["'](?!language-)/
+  NEEDS_CODE_FIX = /<code[^>]*\sclass\s*=\s*["'](?!language-|tz-)/
 
   # Capture form of NEEDS_LINK_FIX: matches a href/src value that
   # make_links_relative would rewrite, capturing the value and the
@@ -168,9 +168,12 @@ module HtmlFilters
     # Collect nodes first, then remove to avoid modifying during iteration
     empty_paragraphs = [] of Lexbor::Node
     doc.nodes("p").each do |node|
-      # Remove if empty or only whitespace
-      text = node.inner_text.strip
-      empty_paragraphs << node if text.empty?
+      # Remove if it has no text AND no element children: a paragraph
+      # holding only an image, video or iframe has no inner text but
+      # is far from empty
+      next unless node.inner_text.strip.empty?
+      has_elements = node.children.any? { |child| !child.is_text? && !child.is_comment? }
+      empty_paragraphs << node unless has_elements
     end
     empty_paragraphs.each(&.remove!)
     doc
@@ -186,7 +189,9 @@ module HtmlFilters
       classes = node["class"].to_s
       split_classes = classes.split
       next if split_classes.empty?
-      next if split_classes.any?(&.starts_with?("language-"))
+      # language- codes are already normalized; tz- codes come
+      # pre-highlighted from tartrazine and must stay as they are
+      next if split_classes.any? { |cls| cls.starts_with?("language-") || cls.starts_with?("tz-") }
       node["data-lang"] = split_classes[0]
       split_classes[0] = "#{split_classes[0]} language-#{split_classes[0]}"
       node["class"] = split_classes.join(" ")

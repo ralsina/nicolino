@@ -166,7 +166,8 @@ module Archive
         })
 
         # Apply to page template with HTML filters
-        Render.page_html(archive_link, title_html + rendered, "Archive", breadcrumbs, lang)
+        Render.page_html(archive_link, title_html + rendered, "Archive", breadcrumbs, lang,
+          language_links: Utils.language_links_for(output_path, lang, :dir_suffix))
       end
     end
   end

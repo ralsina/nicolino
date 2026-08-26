@@ -14,7 +14,12 @@ module Assets
   def self.render
     Dir.glob("assets/**/*").each do |src|
       next if File.directory?(src)
-      dest = Path[Config.options.output] / Path[Path[src].parts[1..]]
+      # Skip files the theme already provides — theme assets
+      # take priority, otherwise Croupier sees two tasks writing
+      # to the same output path and refuses to merge them.
+      rel = Path[Path[src].parts[1..]]
+      next if File.exists?(Path[Theme.assets_dir] / rel)
+      dest = Path[Config.options.output] / rel
       FeatureTask.new(
         feature_name: "assets",
         id: "assets",

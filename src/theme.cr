@@ -1,11 +1,63 @@
 require "file_utils"
 require "log"
+require "yaml"
 require "./commands/init"
 
 module Theme
   # Get the current theme name from config
   def self.name
     Config.options.theme
+  end
+
+  # Parameters declared in the active theme's theme.yml, overridden
+  # by the site's conf.yml `theme_params:` section. A `params:` key
+  # in theme.yml holds the theme's configurable parameters; other
+  # top-level keys are metadata but also exposed. Exposed to every
+  # template as the `theme` variable.
+  @@params : Hash(String, Crinja::Value)? = nil
+
+  def self.params : Hash(String, Crinja::Value)
+    @@params ||= begin
+      params = Hash(String, Crinja::Value).new
+      theme_yml = Path["themes", name, "theme.yml"]
+      if File.exists?(theme_yml)
+        parsed = YAML.parse(File.read(theme_yml))
+        if parsed.as_h?
+          parsed.as_h.each do |key, value|
+            if key.as_s == "params" && value.as_h?
+              value.as_h.each do |param_key, param_value|
+                params[param_key.as_s] = any_to_crinja(param_value)
+              end
+            else
+              params[key.as_s] = any_to_crinja(value)
+            end
+          end
+        end
+      end
+      Config.theme_params.each do |key, value|
+        params[key] = any_to_crinja(value)
+      end
+      params
+    end
+  end
+
+  # Convert a YAML::Any value into something Crinja can render
+  # (scalars, arrays and hashes, recursively)
+  private def self.any_to_crinja(value : YAML::Any) : Crinja::Value
+    case value.raw
+    when Hash
+      Crinja::Value.new(value.as_h.transform_values { |item| any_to_crinja(item) })
+    when Array
+      Crinja::Value.new(value.as_a.map { |item| any_to_crinja(item) })
+    else
+      raw = value.raw
+      case raw
+      when Bool, Int32, Int64, Float64
+        Crinja::Value.new(raw)
+      else
+        Crinja::Value.new(raw.to_s)
+      end
+    end
   end
 
   # Get the path to the theme directory
@@ -21,6 +73,7 @@ module Theme
   # Clear the memoized path (called when config is reloaded)
   def self.reset
     @@cached_path = nil
+    @@params = nil
   end
 
   private def self.resolve_path

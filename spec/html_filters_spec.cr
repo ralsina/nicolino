@@ -43,6 +43,13 @@ describe HtmlFilters do
       result.should contain "<p>kept</p>"
       result.should_not contain "<p></p>"
     end
+
+    it "keeps paragraphs that hold only an image" do
+      doc = parse(%(<p>text</p><p><img src="/images/a.png" alt="a"></p><p></p>))
+      result = HtmlFilters.remove_empty_paragraphs(doc).to_html
+      result.should contain %(<img src="/images/a.png" alt="a">)
+      result.should_not contain "<p></p>"
+    end
   end
 
   describe ".fix_code_classes" do

@@ -127,16 +127,15 @@ module LinkChecker
     link = link.lchop("/")
     path = Path["output", link].to_s
 
-    # If link doesn't have an extension and is a directory,
-    # try index.html
-    if !path.includes?(".") || File.extname(path) == ""
-      if File.directory?(path)
-        path = Path[path, "index.html"].to_s
-      elsif !File.exists?(path)
-        # Try with .html extension
-        path_with_ext = path + ".html"
-        path = path_with_ext if File.exists?(path_with_ext)
-      end
+    # Directory links resolve to their index page, even when the
+    # directory name contains dots (e.g. /tags.es/ language
+    # variants, which look like file extensions)
+    if File.directory?(path)
+      path = Path[path, "index.html"].to_s
+    elsif !path.includes?(".") || File.extname(path) == ""
+      # No extension: try appending .html
+      path_with_ext = path + ".html"
+      path = path_with_ext if File.exists?(path_with_ext)
     end
 
     path

@@ -19,6 +19,9 @@ module Render
     ctx["site_url"] = Crinja::Value.new(lang_config.url)
     ctx["site_footer"] = Crinja::Value.new(lang_config.footer)
     ctx["site_nav_items"] = Crinja::Value.new(lang_config.nav_items)
+    # Theme parameters from theme.yml, overridden by conf.yml's
+    # theme_params (see Theme.params)
+    ctx["theme"] = Crinja::Value.new(Theme.params)
     # Canonical URL for the page (used by rel=canonical and OpenGraph):
     # the site URL plus the page's root-relative link, with index.html
     # normalized away (e.g. "/foo/index.html" -> "/foo/")
@@ -57,14 +60,18 @@ module Render
   # Wrap content in page.tmpl and apply HTML filters (relative links)
   def self.page_html(output_path : String, content : String, title : String,
                      breadcrumbs : Array(NamedTuple(name: String, link: String)),
-                     lang : String? = nil, fix_code_classes : Bool = false) : String
+                     lang : String? = nil,
+                     language_links : Array(Hash(String, String))? = nil,
+                     fix_code_classes : Bool = false) : String
     page_template = Theme.template_path("page.tmpl")
-    html = apply_template(page_template, {
+    context = {
       "content"     => content,
       "title"       => title,
       "breadcrumbs" => breadcrumbs,
       "link"        => output_path,
-    }, lang)
+    } of String => String | Array(NamedTuple(name: String, link: String)) | Array(Hash(String, String))?
+    context["language_links"] = language_links if language_links
+    html = apply_template(page_template, context, lang)
     doc = Lexbor::Parser.new(html)
     doc = HtmlFilters.make_links_relative(doc, output_path)
     if fix_code_classes

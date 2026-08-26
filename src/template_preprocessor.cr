@@ -163,11 +163,42 @@ module TemplatePreprocessor
       end
     when Crinja::AST::TagNode
       extra = node.name == "for" ? for_targets(node) : Set(String).new
-      if FOLDABLE_TAGS.includes?(node.name) && foldable_children?(node.block.children, constants, allowed | extra)
+      if FOLDABLE_TAGS.includes?(node.name) &&
+         tag_arguments_foldable?(node, constants, allowed | extra) &&
+         foldable_children?(node.block.children, constants, allowed | extra)
         fixed(template, node, constants)
       elsif node.block
         node.block.children = fold_nodes(template, node.block.children, constants, allowed)
         nil
+      end
+    end
+  end
+
+  # Keywords (and words like filter names) that may legally appear in
+  # a foldable tag's arguments without naming a runtime variable
+  TAG_KEYWORDS = Set{"and", "or", "not", "in", "is", "if", "else",
+                     "div", "mod", "by", "loop", "defined", "none",
+                     "true", "false", "length", "count", "upper",
+                     "lower", "title", "capitalize", "trim", "first",
+                     "last", "default"}
+
+  # Whether every identifier-like token in the tag's arguments names
+  # a build constant, a bound loop variable or a keyword. Without
+  # this check, `{% if some_runtime_var %}` with a fully static body
+  # would be folded against the constants-only context, where any
+  # unknown variable is undefined (and thus falsy): the branch would
+  # be resolved to the wrong side at load time.
+  private def self.tag_arguments_foldable?(tag : Crinja::AST::TagNode,
+                                           constants : Hash(String, Crinja::Value),
+                                           allowed : Set(String)) : Bool
+    tag.arguments.all? do |token|
+      case token.kind
+      when Crinja::Parser::Token::Kind::IDENTIFIER
+        constants.has_key?(token.value) || allowed.includes?(token.value) ||
+          TAG_KEYWORDS.includes?(token.value)
+      else
+        # Literals, operators, punctuation: no free variables
+        true
       end
     end
   end

@@ -21,6 +21,7 @@ module RSSFeed
     ) do
       feed = RSS.new title: title
       posts
+        .select(&.has_language?(lang))
         .select { |post| !post.date.nil? }
         # Output path tiebreaker: content reading is parallel, so the
         # input order of same-date posts is not stable. All selected

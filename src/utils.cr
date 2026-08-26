@@ -160,8 +160,14 @@ module Utils
 
     # Now for each base file find sources for all languages
     #
-    # If there is a localized file for that language, use it
-    # If not, use the file for the first language that has a file
+    # If there is a localized file for that language, use it.
+    # Otherwise:
+    # - With content fallback (default), use the first available
+    #   source (usually the unsuffixed base file) so every language
+    #   gets a version of the content, flagged as fallback.
+    # - Without content fallback, only the unsuffixed base file may
+    #   be shared; languages with no dedicated file get no source at
+    #   all and their pages are simply not generated.
     all_sources = Hash(Path, Hash(String, String)).new
     bases.each do |base|
       sources = Hash(String, String).new
@@ -172,12 +178,83 @@ module Utils
         lang_base = "#{base}.#{lang}.#{extension}"
         if possible_sources.includes? lang_base
           sources[lang] = lang_base
-        else
+        elsif Config.content_fallback? || possible_sources[0] == "#{base}.#{extension}"
           sources[lang] = possible_sources[0]
         end
       end
-      all_sources[base] = sources
+      all_sources[base] = sources unless sources.empty?
     end
     all_sources
+  end
+
+  # Alternate-language links for a generated page. Two output
+  # conventions exist (issue #54):
+  #
+  # - :file_suffix (default): "<stem>.<lang>.html" / "<stem>.html",
+  #   used by post and folder index pages
+  #   (output/posts/index.es.html)
+  # - :dir_suffix: the FIRST directory under output/ carries the
+  #   language marker (output/tags.es/foo/index.html), used by
+  #   taxonomies, the archive and galleries roots
+  #
+  # Returns one {lang, link, title} hash per other configured
+  # language. This is the site-level helper behind translation
+  # switcher menus.
+  def self.language_links_for(output_path : String | Path, lang : String,
+                              style : Symbol = :file_suffix) : Array(Hash(String, String))
+    result = [] of Hash(String, String)
+    output_str = output_path.to_s
+
+    Config.languages.each do |other_lang|
+      next if other_lang == lang
+
+      alt_path = case style
+                 when :dir_suffix
+                   dir_suffix_alt_path(output_str, lang, other_lang)
+                 else
+                   # If current is output/posts/index.html, the alternate is
+                   # output/posts/index.es.html; if current is index.es.html, the
+                   # alternate for another language L is index.L.html (and the
+                   # default language has no suffix)
+                   if lang == Config.default_lang
+                     output_str.sub(/\.html$/, ".#{other_lang}.html")
+                   else
+                     output_str.sub(/\.#{lang}\.html$/, other_lang == Config.default_lang ? ".html" : ".#{other_lang}.html")
+                   end
+                 end
+
+      site_title = begin
+        Config[other_lang].title
+      rescue
+        other_lang.upcase
+      end
+      result << {
+        "lang"  => other_lang,
+        "link"  => Utils.path_to_link(Path[alt_path]),
+        "title" => site_title,
+      }
+    end
+
+    result
+  end
+
+  # Alternate path for the dir-suffix convention: the language
+  # marker rides on the first directory under the output root
+  # (output/tags.es/foo/index.html <-> output/tags/foo/index.html)
+  private def self.dir_suffix_alt_path(output_str : String, lang : String, other_lang : String) : String
+    parts = output_str.split('/')
+    idx = parts.index(Config.options.output.rstrip('/')) || 0
+    component = parts[idx + 1]?
+    return output_str unless component
+
+    parts[idx + 1] = if lang == Config.default_lang
+                       "#{component}.#{other_lang}"
+                     elsif component.ends_with?(".#{lang}")
+                       stripped = component.rchop(".#{lang}")
+                       other_lang == Config.default_lang ? stripped : "#{stripped}.#{other_lang}"
+                     else
+                       component
+                     end
+    parts.join('/')
   end
 end

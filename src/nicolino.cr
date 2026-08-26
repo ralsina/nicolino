@@ -10,6 +10,7 @@ require "./config"
 require "./gallery"
 require "./html"
 require "./http_handlers"
+require "./highlight"
 require "./image"
 require "./folder_indexes"
 require "./pages"
@@ -73,6 +74,10 @@ def create_tasks
   Log.info { "🚀 Enabling features..." }
   time_feature_enable("assets") { Assets.enable(features.includes?("assets")) }
   time_feature_enable("base16") { Base16.enable(features.includes?("base16")) }
+
+  # Server-side syntax highlighting styles (independent of the
+  # base16 feature: works without a data-theme toggle too)
+  Highlight.render_css if Highlight.enabled?
 
   # Parallel content scanning: posts first, then pages (priority order)
   if features.includes?("posts") || features.includes?("pages")

@@ -130,6 +130,7 @@ module Pages
           Log.info { "👉 #{output}" }
           html = Render.apply_template(page_template,
             {"content" => index.rendered, "title" => index.title, "breadcrumbs" => index.breadcrumbs,
+             "language_links" => Utils.language_links_for(output, lang),
              "link" => Utils.path_to_link(output)}, lang)
           doc = Lexbor::Parser.new(html)
           doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))

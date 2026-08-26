@@ -394,6 +394,9 @@ module Templates
       "site_url"         => Crinja::Value.new(lang_config.url),
       "site_footer"      => Crinja::Value.new(lang_config.footer),
       "site_nav_items"   => Crinja::Value.new(lang_config.nav_items),
+      # Theme parameters from theme.yml, overridden by conf.yml's
+      # theme_params (see Theme.params)
+      "theme" => Crinja::Value.new(Theme.params),
     }
   end
 

@@ -16,7 +16,7 @@ repos:
           - id: shellcheck
           - id: markdownlint
             # bench/ holds benchmark corpus data and a machine-tuned README
-            exclude: '^(content|CLAUDE\.md|CHANGELOG\.md|LICENSE\.md|TODO\.md|bench/)'
+            exclude: '^(content|demo/|CLAUDE\.md|CHANGELOG\.md|LICENSE\.md|TODO\.md|bench/)'
     - repo: https://github.com/mrtazz/checkmake
       rev: 0.2.2
       hooks:

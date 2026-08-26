@@ -2,6 +2,48 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### 🚀 Features
+
+- Server-side syntax highlighting for markdown code blocks via
+  tartrazine (used by listings before, now everywhere): tz-prefixed
+  CSS classes, css/syntax.css with dark/light variants derived from
+  the site's color_scheme (or `syntax_theme:` override); opt out
+  with `syntax_highlighter: none`; highlight.js CDN scripts dropped
+  from all bundled themes
+- Translation fallback system (#54): untranslated content is rendered
+  from its default-language version (or any available translation),
+  flagged with `is_fallback` in the post and page template contexts;
+  disable with `content_fallback: false` in conf.yml
+- Site-level `language_links` helper shared by posts, index pages,
+  taxonomy pages and page folder indexes, so translation-switcher
+  menus work everywhere (#54)
+- Theme parameters: theme.yml's `params:` section (plus metadata) is
+  exposed to all templates as the `theme` variable; sites override
+  values via conf.yml's `theme_params:` section
+- Terminal theme, ported from the Hugo theme by panr (MIT), with
+  base16 color-scheme integration and a dark/light toggle
+- PaperMod theme, ported from the Hugo theme by adityatelange (MIT),
+  with base16 palette and highlight.js token mapping
+- Index pages now render with site/theme constants in scope, so
+  templates can use `site_*` and `theme.*` in index.tmpl
+
+### 🐛 Bug Fixes
+
+- Fix `remove_empty_paragraphs` deleting paragraphs that contain only
+  an image (or any element without text), which made markdown images
+  disappear from posts whenever the HTML filter pass ran
+- Template preprocessor folded `{% if %}` tags whose body was static
+  without checking the condition, silently dropping branches that
+  test runtime variables (e.g. `is_fallback`, `language_links`)
+
+### 📚 Documentation
+
+- Theme-porting best practices guide (docs/theme-porting.md)
+- Theme showcase site (demo/): markdown tour, code blocks, image,
+  i18n with fallback badge, base16 scheme switching
+
 ## [0.24.0] - 2026-08-24
 
 ### 🚀 Features

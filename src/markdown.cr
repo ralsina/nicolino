@@ -1,4 +1,5 @@
 require "./date_utils"
+require "./highlight"
 require "./html_filters"
 require "./sc"
 require "./similarity"
@@ -107,6 +108,10 @@ module Markdown
     @more_marker = Hash(String, Bool).new
     @output = Hash(String, String).new
     @taxonomy_terms = Hash(String, Hash(String, Array(String))).new
+    # Whether the content shown for a language is a fallback (the
+    # language has no dedicated source file). Only possible when
+    # Config.content_fallback? is enabled
+    @fallback = Hash(String, Bool).new
 
     # Initialize the post with proper data
     def initialize(sources, base)
@@ -133,6 +138,16 @@ module Markdown
         end
 
         @output[lang] = "#{p}.html"
+
+        # A language is on fallback when it has no dedicated source
+        # file: either its content comes from another language's
+        # file (e.g. an English page built from 958.es.md) or from
+        # the shared unsuffixed file (958.md), which non-default
+        # languages can't read as "their own" translation. The
+        # default language is always the source of truth.
+        source_stem = Path[@sources[lang]].stem
+        stem_lang = Path[source_stem].extension.lchop('.')
+        @fallback[lang] = lang != Config.default_lang && stem_lang != lang
       end
       Markdown.register(base.to_s, self)
 
@@ -218,40 +233,65 @@ module Markdown
     end
 
     def source(lang = nil)
-      @sources[lang || Locale.language]
+      lang ||= Locale.language
+      # Posts may lack some languages when content fallback is
+      # disabled; dependency computation and friends still ask for
+      # them, so fall back to whatever language exists
+      @sources[lang]? || @sources.first_value
     end
 
     def text(lang = nil)
-      @text[lang || Locale.language]
+      lang ||= Locale.language
+      @text[lang]? || @text.first_value
     end
 
     def metadata(lang = nil)
-      @metadata[lang || Locale.language]
+      lang ||= Locale.language
+      @metadata[lang]? || @metadata.first_value
     end
 
     def link(lang = nil)
-      @link[lang || Locale.language]
+      lang ||= Locale.language
+      @link[lang]? || @link.first_value
     end
 
     def toc(lang = nil)
-      @html_mutex.synchronize { @toc[lang || Locale.language] }
+      lang ||= Locale.language
+      @html_mutex.synchronize { @toc[lang]? || @toc.first_value? }
     end
 
     def title(lang = nil)
-      @title[lang || Locale.language]
+      lang ||= Locale.language
+      @title[lang]? || @title.first_value
     end
 
     def output(lang = nil)
-      @output[lang || Locale.language]
+      lang ||= Locale.language
+      @output[lang]? || @output.first_value
     end
 
     def shortcodes(lang = nil)
-      @shortcodes[lang || Locale.language]
+      lang ||= Locale.language
+      @shortcodes[lang]? || @shortcodes.first_value
     end
 
     def taxonomy_terms(lang = nil)
       lang ||= Locale.language
       @taxonomy_terms.fetch(lang, {} of String => Array(String))
+    end
+
+    # True when the content shown for *lang* comes from another
+    # language's source file (only possible when content fallback
+    # is enabled)
+    def fallback?(lang = nil) : Bool
+      lang ||= Locale.language
+      @fallback[lang]? || false
+    end
+
+    # Whether this post exists for the given language (it always
+    # does when content fallback is enabled)
+    def has_language?(lang : String) : Bool
+      @sources.has_key?(lang)
     end
 
     def <=>(other : File)
@@ -374,6 +414,9 @@ module Markdown
       )
       compiled = result[:html]
       toc = result[:toc]
+      # Server-side syntax highlighting (no-op when disabled or
+      # when no lexer matches a block's language)
+      compiled = Highlight.html(compiled) if Highlight.enabled?
       t1 = Time.instant
       # Check if any filter would change the HTML. Cheap string checks
       # avoid a full Lexbor parse + filter walk + re-serialize.
@@ -427,7 +470,7 @@ module Markdown
     # Path for the `Templates::Template` this post should be rendered with
     def template(lang = nil)
       lang ||= Locale.language
-      @metadata[lang].fetch("template", Theme.template_path("post.tmpl")).to_s
+      metadata(lang).fetch("template", Theme.template_path("post.tmpl")).to_s
     end
 
     # Render the markdown HTML into the right template for the fragment
@@ -632,6 +675,7 @@ module Markdown
         "related_posts"  => related_posts(lang),
         "language_links" => language_links(lang),
         "has_teaser"     => has_teaser?(page_html, lang),
+        "is_fallback"    => fallback?(lang),
       }
     end
 
@@ -776,6 +820,7 @@ module Markdown
     reg_start = Time.instant
     Config.languages.each do |lang|
       posts.each do |post|
+        next unless post.has_language?(lang)
         FeatureTask.new(
           feature_name: "posts",
           id: "markdown",
@@ -806,6 +851,7 @@ module Markdown
               "title"          => page_value["title"],
               "breadcrumbs"    => page_value["breadcrumbs"],
               "language_links" => page_value["language_links"],
+              "is_fallback"    => post.fallback?(lang),
               # Social sharing metadata (OpenGraph/Twitter cards)
               "link"    => post.link(lang),
               "og_type" => require_date ? "article" : "website",
@@ -877,6 +923,7 @@ module Markdown
     main_feed = nil,
     lang = nil,
     feature_name = "posts",
+    lang_style : Symbol = :file_suffix,
   )
     lang ||= Locale.language
     index_template = Theme.template_path("index.tmpl")
@@ -902,6 +949,7 @@ module Markdown
       # deterministic for posts sharing a date: content reading is
       # parallel, so the input order is not stable
       dated = posts.compact_map do |post|
+        next unless post.has_language?(lang)
         next unless date = post.date
         {date, post.output, post}
       end
@@ -912,15 +960,21 @@ module Markdown
       has_more = sorted_posts.size > 100
       display_posts = sorted_posts.first(100)
 
-      content = Templates.environment.get_template(index_template).render(
-        {
-          "posts"    => display_posts.map(&.value(lang)),
-          "has_more" => has_more,
-        })
+      # Rendered with the per-language folded template so build
+      # constants (site vars, theme params) resolve like on pages:
+      # they are both folded at load time and present in the render
+      # scope for the subtrees that stay dynamic
+      bindings = Templates.constants_for(lang)
+      bindings["posts"] = Crinja::Value.new(display_posts.map(&.value(lang)))
+      bindings["has_more"] = Crinja::Value.new(has_more)
+      content = TemplatePreprocessor.render_with(
+        Templates.environment,
+        Templates.get_template(index_template, lang),
+        bindings)
 
       # Calculate language links for this index
       # Get alternate language versions of this index page
-      language_links = calculate_index_language_links(output, lang)
+      language_links = calculate_index_language_links(output, lang, lang_style)
 
       html = Render.apply_template(page_template,
         {
@@ -941,42 +995,9 @@ module Markdown
 
   # Calculate language alternate links for index pages
   # Returns an array of Hash for Crinja compatibility
-  private def self.calculate_index_language_links(output_path : String | Path, lang : String)
-    result = [] of Hash(String, String)
-    output_str = output_path.to_s
-
-    # For each configured language, check if an alternate index exists
-    Config.languages.each do |other_lang|
-      next if other_lang == lang
-
-      # Determine the alternate index path
-      # If current is output/posts/index.html, alternate should be output/posts/index.es.html
-      # If current is output/posts/index.es.html, alternate should be output/posts/index.html
-      if lang == Config.default_lang
-        # Current is English, look for .es.html (or other language suffixes)
-        lang_suffix = ".#{other_lang}"
-        alt_path = output_str.sub(/\.html$/, "#{lang_suffix}.html")
-      else
-        # Current is non-English (e.g., index.es.html)
-        # Look for English version (no suffix)
-        alt_path = output_str.sub(/\.#{lang}\.html$/, ".html")
-      end
-
-      # Check if the alternate file would exist (by checking if it's in a known location)
-      # For now, we'll assume it exists if the path pattern matches
-      site_title = begin
-        Config[other_lang].title
-      rescue
-        other_lang.upcase
-      end
-      result << {
-        "lang"  => other_lang,
-        "link"  => Utils.path_to_link(Path[alt_path]),
-        "title" => site_title,
-      }
-    end
-
-    result
+  private def self.calculate_index_language_links(output_path : String | Path, lang : String,
+                                                  style : Symbol = :file_suffix)
+    Utils.language_links_for(output_path, lang, style)
   end
 
   # Build one Markdown::File per entry of all_sources in parallel.

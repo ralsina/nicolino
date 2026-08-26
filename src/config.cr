@@ -63,11 +63,28 @@ module Config
     property date_output_format : String = "%Y-%m-%d %H:%M"
     property verbosity : Int32 = 4
     property import_templates : String = "user_templates"
+    # Overrides for the active theme's theme.yml parameters (exposed
+    # to templates as the `theme` variable)
+    property theme_params : Hash(String, YAML::Any) = Hash(String, YAML::Any).new
+    # When true (default), content that has no translation for the
+    # current language is still rendered using the default-language
+    # version, flagged with is_fallback in the template context.
+    # When false, untranslated content is simply absent from that
+    # language's site.
+    property? content_fallback : Bool = true
     # When true (default), every page goes through a lexbor
     # parse/serialize round trip that normalizes its HTML formatting.
     # When false, pages that need no link or code-class fixing are
     # written as the raw template output (faster, same DOM).
     property? pretty_html : Bool = true
+    # Server-side syntax highlighter for markdown code blocks:
+    # "tartrazine" (default) or "none" (leaves language-* classes
+    # for client-side highlighting)
+    property syntax_highlighter : String = "tartrazine"
+    # Explicit tartrazine theme name for code blocks (e.g.
+    # "monokai"). When unset, dark and light syntax themes are
+    # derived from the site's base16 color_scheme
+    property syntax_theme : String = ""
 
     # Taxonomies and features
     property taxonomies : Taxonomies = Taxonomies.new
@@ -316,6 +333,26 @@ location: "tags/"
   def self.import_templates : String
     ensure_loaded
     @@global_config.import_templates
+  end
+
+  def self.content_fallback? : Bool
+    ensure_loaded
+    @@global_config.content_fallback?
+  end
+
+  def self.theme_params : Hash(String, YAML::Any)
+    ensure_loaded
+    @@global_config.theme_params
+  end
+
+  def self.syntax_highlighter : String
+    ensure_loaded
+    @@global_config.syntax_highlighter
+  end
+
+  def self.syntax_theme : String
+    ensure_loaded
+    @@global_config.syntax_theme
   end
 
   def self.language : String

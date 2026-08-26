@@ -4,8 +4,8 @@
   This is the base template for all pages in the site. It provides:
   - Complete HTML document structure (DOCTYPE, html, head, body)
   - Meta tags for SEO, favicons, canonical URLs
-  - CSS includes (Pico CSS, theme.css, custom.css, highlight.js)
-  - JavaScript includes (VenoBox, MiniSearch, hyperscript, highlight.js)
+  - CSS includes (Pico CSS, theme.css, custom.css, syntax.css)
+  - JavaScript includes (VenoBox, MiniSearch, hyperscript)
   - Header with site title, description, and navigation
   - Main content area where page-specific content is rendered
   - Footer with site footer text
@@ -56,16 +56,12 @@
   <link rel="stylesheet" href="https://unpkg.com/photoswipe@5.4.4/dist/photoswipe.css" />
   <script src="https://unpkg.com/hyperscript.org@0.9.9"></script>
   <script src="https://cdn.jsdelivr.net/npm/minisearch@6.1.0/dist/umd/index.min.js"></script>
-  {% if not no_highlightjs %}
-  <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
-  <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/languages/django.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlightjs-copy@1.0.3/dist/highlightjs-copy.min.css" />
-  <script src="https://unpkg.com/highlightjs-copy@1.0.3/dist/highlightjs-copy.min.js"></script>
-  {% endif %}
   <!-- Theme styles -->
   <link rel="stylesheet" href="/css/theme.css" />
   <!-- Base16 color scheme (light/dark themes) -->
   <link rel="stylesheet" href="/css/style.css" />
+  <!-- Syntax highlighting (server-side, tartrazine) -->
+  <link rel="stylesheet" href="/css/syntax.css" />
   <!-- Custom style (loaded last for user overrides) -->
   <link rel="stylesheet" href="/css/custom.css" />
   {% if listings_css %}
@@ -170,11 +166,6 @@
     });
     lightbox.init();
   </script>
-  <script>
-    {% if not no_highlightjs %}
-    hljs.highlightAll();
-    hljs.addPlugin(new CopyButtonPlugin());
-    {% endif %}
   </script>
   <script src="/search.js"></script>
 </body>

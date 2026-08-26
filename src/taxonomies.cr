@@ -135,7 +135,7 @@ module Taxonomies
 
         # Create breadcrumbs for taxonomy index
         taxonomy_link = Utils.path_to_link(
-          Path[Config.options(lang).output] / "#{@path.chomp('/')}#{lang_suffix}/"
+          (base_path / "index.html").normalize
         )
         breadcrumbs = Render.section_breadcrumbs(@title, taxonomy_link)
 
@@ -163,6 +163,7 @@ module Taxonomies
             @title,
             breadcrumbs,
             lang,
+            language_links: Utils.language_links_for(output, lang, :dir_suffix),
             fix_code_classes: true
           )
         end
@@ -188,6 +189,7 @@ module Taxonomies
             extra_feed: {link: Utils.path_to_link(feed_path), title: "#{title} RSS"},
             main_feed: nil, # Taxonomy term pages don't get main feed
             lang: lang,
+            lang_style: :dir_suffix,
           )
         end
       end
