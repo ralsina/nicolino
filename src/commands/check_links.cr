@@ -20,12 +20,13 @@ module Nicolino
         Anchors (same-page links starting with #) are also skipped.
 
         Usage:
-          nicolino check_links [--help][-c <file>][-q|-v <level>][--output <dir>]
+          nicolino check_links [--help][-c <file>][-q|-v <level>][--output <dir>][--exclude <pattern>]
 
         Options:
           --help            Show this help message
           -c <file>         Specify a config file to use [default: conf.yml]
           --output <dir>    Output directory to check [default: output]
+          --exclude <pattern>  Exclude paths containing this pattern (can be repeated)
           -v level          Control the verbosity, 0 to 6
           -q                Don't log anything
         DOC
@@ -33,13 +34,24 @@ module Nicolino
       def run : Int32
         output_dir = @options["--output"]? ? @options["--output"].as(String) : Config.options.output
 
+        # Collect exclude patterns (repeatable --exclude flag)
+        exclude = [] of String
+        if @options["--exclude"]?
+          val = @options["--exclude"]
+          if val.is_a?(Array)
+            exclude = val.map(&.as(String))
+          else
+            exclude = [val.as(String)]
+          end
+        end
+
         # Check if output directory exists
         unless Dir.exists?(output_dir)
           Log.error { "Output directory '#{output_dir}' does not exist. Run 'nicolino build' first." }
           return 1
         end
 
-        results = LinkChecker.check_all(output_dir)
+        results = LinkChecker.check_all(output_dir, exclude)
         broken_count = LinkChecker.print_summary(results)
 
         if broken_count > 0

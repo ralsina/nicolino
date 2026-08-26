@@ -162,7 +162,7 @@ module LinkChecker
   end
 
   # Check all HTML files in the output directory
-  def self.check_all(output_dir : String = "output") : Array(LinkResult)
+  def self.check_all(output_dir : String = "output", exclude : Array(String) = [] of String) : Array(LinkResult)
     Log.info { "Checking links in #{output_dir}/" }
 
     # Build set of all existing files
@@ -176,8 +176,10 @@ module LinkChecker
 
     all_results = [] of LinkResult
 
-    # Find all HTML files
-    html_files = Dir.glob("#{output_dir}/**/*.html")
+    # Find all HTML files, excluding patterns
+    html_files = Dir.glob("#{output_dir}/**/*.html").reject do |html_file|
+      exclude.any? { |pattern| html_file.includes?(pattern) }
+    end
     Log.info { "Checking #{html_files.size} HTML files" }
 
     html_files.each do |html_file|

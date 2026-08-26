@@ -1,5 +1,7 @@
 Nicolino uses a theming system to control the appearance and structure of your generated site. Themes allow you to completely customize how your content looks and feels without modifying the core application.
 
+> **[Browse live theme demos →](/pages/themes-showcase.html)**
+
 ## What is a Theme?
 
 A theme in Nicolino is a collection of **templates** and **assets** that work together to render your site. Every site must have a theme selected.

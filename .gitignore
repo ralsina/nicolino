@@ -4,6 +4,7 @@
 /.shards/
 *.dwarf
 /output/
+/assets/themes/demo/
 .croupier
 .kvstore
 .rucksack

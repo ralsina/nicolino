@@ -22,5 +22,10 @@ lint:
 changelog:
 	git cliff -o --sort=newest
 
+theme-demos: bin
+	scripts/build-theme-demos.sh
 
-.PHONY: all bin clean test release mt mt-release static lint changelog
+site: theme-demos
+	./bin/nicolino build
+
+.PHONY: all bin clean test release mt mt-release static lint changelog theme-demos site
