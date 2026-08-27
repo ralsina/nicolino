@@ -59,28 +59,54 @@ tasks:
     phony: true
 
   theme-demos:
-    phony: true
-    always_run: true
     dependencies:
       - bin/{{NAME}}
+      - demo/conf.yml
+      - themes/default
+      - themes/minimal
+      - themes/terminal
+      - themes/papermod
+    outputs:
+      - assets/themes/demo/default
+      - assets/themes/demo/minimal
+      - assets/themes/demo/terminal
+      - assets/themes/demo/papermod
     commands: |
       scripts/build-theme-demos.sh
 
   screenshots:
-    phony: true
-    always_run: true
+    dependencies:
+      - assets/themes/demo/default
+      - assets/themes/demo/minimal
+      - assets/themes/demo/terminal
+      - assets/themes/demo/papermod
+    outputs:
+      - assets/themes/shots/default.png
+      - assets/themes/shots/minimal.png
+      - assets/themes/shots/terminal.png
+      - assets/themes/shots/papermod.png
     commands: |
-      scripts/build-theme-demos.sh
       (cd scripts && npm install --silent && npx playwright install firefox)
       node scripts/screenshot-themes.js
 
   theme-registry:
-    phony: true
-    always_run: true
+    dependencies:
+      - themes/default
+      - themes/minimal
+      - themes/terminal
+      - themes/papermod
+    outputs:
+      - assets/themes.json
+      - assets/themes/registry/default.tar.gz
+      - assets/themes/registry/minimal.tar.gz
+      - assets/themes/registry/terminal.tar.gz
+      - assets/themes/registry/papermod.tar.gz
     commands: |
       scripts/build-theme-registry.sh
 
   deploy:
+    phony: true
+    always_run: true
     dependencies:
       - bin/nicolino
       - src
@@ -94,8 +120,6 @@ tasks:
       rm -rf output/
       bin/nicolino build -B
       rsync -rzav --delete output/* root@rocky:/data/stacks/web/websites/nicolino.ralsina.me/
-    outputs:
-      - output/sitemap.xml
 
   pre-commit:
     default: true
