@@ -48,7 +48,12 @@ THEME="$(sed -E 's/^- \[ \] ([^ (]+).*/\1/' <<<"$NEXT")"
 REPO="$(sed -E 's/.*\(([^],]+),.*/\1/' <<<"$NEXT")"
 echo "🎨 Porting next theme: $THEME ($REPO)"
 
-exec opencode run --auto --title "port-$THEME" \
+# Model for the port agent. The global default (glm-4.6) was erroring
+# server-side; glm-5.2 is the known-good endpoint. Override with
+# PORT_MODEL=... hace port-next-theme
+PORT_MODEL="${PORT_MODEL:-zai-coding-plan/glm-5.2}"
+
+exec opencode run --auto --model "$PORT_MODEL" --title "port-$THEME" \
   "Port the Hugo theme $REPO (entry \`$THEME\` in THEME-TODO.md) to Nicolino.
 
 Follow docs/theme-porting.md and mirror the structure of themes/blox/
