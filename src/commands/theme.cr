@@ -43,7 +43,9 @@ module Nicolino
           nicolino theme list --installed
         DOC
 
-      THEME_REGISTRY_URL = "https://nicolino.site/themes.json"
+      # The production site mirrors the registry it serves: build-theme-registry.sh
+      # generates themes.json + tarballs into assets/, deploys them via `hace deploy`.
+      THEME_REGISTRY_URL = "https://nicolino.ralsina.me/themes.json"
 
       def run : Int32
         # Determine which subcommand was called based on which options are present
@@ -61,9 +63,7 @@ module Nicolino
       # have a config file yet
       def initialize(@options)
         # Setup logging only (no config file needed for theme commands)
-        verbosity = @options.fetch("-v", 4).to_s.to_i
-        verbosity = 0 if @options["-q"]?.in?(1, true)
-        Oplog.setup(verbosity)
+        Oplog.setup(Command.resolve_verbosity(@options, 4))
       end
 
       private def run_install : Int32

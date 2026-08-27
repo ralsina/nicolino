@@ -1,0 +1,50 @@
+{#-
+  post.tmpl - PaperMod single post
+
+  Variables: breadcrumbs, title, link, date, metadata, taxonomies,
+  toc, html, related_posts, is_fallback
+-#}
+<article class="post-single">
+  {% include "templates/title.tmpl" %}
+  {% if description %}
+  <div class="post-description">{{ description }}</div>
+  {% endif %}
+  <div class="post-meta">
+    {% if date %}{{ date }}{% endif %}
+    {% if metadata.updated and show_updated %} · Updated: {{ metadata.updated }}{% endif %}
+    {% if is_fallback %}
+    · <span title="No translation available for this language">🌐 untranslated</span>
+    {% endif %}
+  </div>
+
+  {% if toc and toc|length > 0 %}
+  <details class="toc" open>
+    <summary>
+      <h3 id="toc-header">Table of Contents</h3>
+    </summary>
+    {{ toc|safe }}
+  </details>
+  {% endif %}
+
+  <div class="post-content md-content">
+    {{ html|safe }}
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      {% for taxonomy, terms in taxonomies %}
+        {% for term in terms %}
+        <li><a href="{{ term.link }}">{{ term.name }}</a></li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+    {% if related_posts and related_posts|length > 0 %}
+    <ul class="post-tags">
+      <li>Related:</li>
+      {% for related in related_posts %}
+      <li><a href="{{ related.link }}">{{ related.title }}</a></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </footer>
+</article>

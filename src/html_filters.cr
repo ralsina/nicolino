@@ -87,11 +87,35 @@ module HtmlFilters
   # equivalent and callers must use the parser path instead.
   LINK_FIX_UNSAFE_CONTEXT = /(?:<script[^>]*>[^<]*|\<!--[^>]*)href\s*=\s*["']/
 
+  # A root-relative href/src value that make_links_relative would
+  # rewrite (starts with "/" but not a protocol like "//").
+  ROOT_RELATIVE_FIX = /(?:href|src)\s*=\s*(["'])\/(?!\/)(.*?)\1/
+
   # Whether the string-based link rewrite is safe for this html: no
   # href/src lookalikes hiding in script bodies or comments, and no
   # uppercase attribute spellings the capture regex would miss.
   def self.string_rewrite_safe?(html : String) : Bool
     !html.matches?(LINK_FIX_UNSAFE_CONTEXT) && !html.matches?(/HREF\s*=\s*["']|SRC\s*=\s*["']/)
+  end
+
+  # Compute a relative path from `base` (a page URL like
+  # "/posts/foo/index.html") to the site root.  Used to turn
+  # root-relative links (/css/style.css) into page-relative ones
+  # (../../css/style.css).
+  private def self.relative_prefix(base : String) : String
+    # Strip url_prefix if present — it's a virtual mount point,
+    # not a real directory in the output tree
+    site_prefix = Config.options.url_prefix.chomp("/")
+    path = base
+    if !site_prefix.empty? && path.starts_with?("/#{site_prefix}")
+      path = path.lchop("/#{site_prefix}")
+    end
+    # Strip leading "/" and split into parts; the last part is a
+    # filename so we only count the directory components.
+    parts = path.lchop('/').split('/')
+    depth = parts.size > 1 ? parts.size - 1 : 0
+    return "" if depth == 0
+    ("../" * depth)
   end
 
   # Rewrite relative href/src values directly on the html STRING,
@@ -103,9 +127,11 @@ module HtmlFilters
   # href/src lookalikes outside real attributes.
   def self.relativize_links_in_string(html : String, base : String) : String
     # Nothing to rewrite: skip the gsub scan entirely
-    return html unless html.matches?(NEEDS_LINK_FIX)
+    return html unless html.matches?(NEEDS_LINK_FIX) || html.matches?(ROOT_RELATIVE_FIX)
+    prefix = relative_prefix(base)
     base_uri = URI.parse(base)
-    html.gsub(NEEDS_LINK_FIX_CAPTURE) do |match|
+    # Relative links (not starting with /)
+    html = html.gsub(NEEDS_LINK_FIX_CAPTURE) do |match|
       value = $2
       rewritten = md_link_to_html(base_uri.relativize(base_uri.resolve(value)).to_s)
       if rewritten == value
@@ -114,6 +140,23 @@ module HtmlFilters
         "#{match[0, match.size - value.size - 1]}#{rewritten}#{$1}"
       end
     end
+    # Root-relative links (/css/style.css → ../../css/style.css)
+    # relative_prefix already strips url_prefix to compute the real
+    # output-tree depth, so just use the bare path after the "/".
+    # For root-level pages (prefix empty), still prepend url_prefix.
+    html = html.gsub(ROOT_RELATIVE_FIX) do |match|
+      quote = $1
+      path = $2
+      if prefix.empty? && !Config.options.url_prefix.empty?
+        resolved = "#{Config.options.url_prefix.chomp("/")}/#{path}"
+        "#{match[0..-(path.size + quote.size + 2)]}#{resolved}#{quote}"
+      elsif !prefix.empty?
+        "#{match[0..-(path.size + quote.size + 2)]}#{prefix}#{path}#{quote}"
+      else
+        match
+      end
+    end
+    html
   end
 
   # Map a relative link to a markdown source file onto its rendered
@@ -139,25 +182,47 @@ module HtmlFilters
   # relative to the site root.
   # Handles all tags with href/src attributes.
   # Note: no mutex needed, each call operates on its own document
+  private def self.resolve_root_relative(path : String, prefix : String) : String
+    stripped = path[1..]
+    if prefix.empty? && !Config.options.url_prefix.empty?
+      "/#{Config.options.url_prefix.chomp("/")}/#{stripped}"
+    else
+      "#{prefix}#{stripped}"
+    end
+  end
+
+  # Make all relative links relative to the page location.
+  # base is where the file containing the URIs is located
+  # relative to the site root.
+  # Handles all tags with href/src attributes.
+  # Note: no mutex needed, each call operates on its own document
   def self.make_links_relative(doc, base)
+    prefix = relative_prefix(base)
     base_uri = URI.parse(base)
     {"a", "link"}.each do |tag|
       doc.nodes(tag).each do |node|
         next unless node.has_key? "href"
         href = node["href"]
-        next if href.starts_with?("#") || href.starts_with?("/")
+        next if href.starts_with?("#")
         next if href.matches?(/^[a-zA-Z][a-zA-Z0-9+.\-]*:/)
         next if tag == "link" && node.fetch("rel", nil) == "canonical"
-        node["href"] = md_link_to_html(base_uri.relativize(base_uri.resolve(href)).to_s)
+        if href.starts_with?("/")
+          node["href"] = resolve_root_relative(href, prefix)
+        else
+          node["href"] = md_link_to_html(base_uri.relativize(base_uri.resolve(href)).to_s)
+        end
       end
     end
     {"img", "script", "video", "audio", "source", "iframe", "embed"}.each do |tag|
       doc.nodes(tag).each do |node|
         next unless node.has_key? "src"
         src = node["src"]
-        next if src.starts_with?("/")
         next if src.matches?(/^[a-zA-Z][a-zA-Z0-9+.\-]*:/)
-        node["src"] = base_uri.relativize(base_uri.resolve(src)).to_s
+        if src.starts_with?("/")
+          node["src"] = resolve_root_relative(src, prefix)
+        else
+          node["src"] = base_uri.relativize(base_uri.resolve(src)).to_s
+        end
       end
     end
     doc

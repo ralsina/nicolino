@@ -1,0 +1,14 @@
+{#- language_switcher.tmpl - Terminal theme language switcher
+    Variables: language_links [{lang, link, title}] -#}
+{% if language_links and language_links|length > 0 %}
+<li class="language-switcher">
+  <details>
+    <summary role="button">🌐 {{ Locale.language | default("lang") }}</summary>
+    <ul>
+      {% for lang_link in language_links %}
+      <li><a href="{{ lang_link.link }}">{{ lang_link.lang }} - {{ lang_link.title }}</a></li>
+      {% endfor %}
+    </ul>
+  </details>
+</li>
+{% endif %}

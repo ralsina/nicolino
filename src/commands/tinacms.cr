@@ -43,9 +43,7 @@ module Nicolino
       # a new subsystem and want to control logging explicitly
       def initialize(@options)
         # Setup logging only
-        verbosity = @options.fetch("-v", 4).to_s.to_i
-        verbosity = 0 if @options["-q"]?.in?(1, true)
-        Oplog.setup(verbosity)
+        Oplog.setup(Command.resolve_verbosity(@options, 4))
       end
 
       private def run_init : Int32

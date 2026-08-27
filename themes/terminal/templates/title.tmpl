@@ -1,0 +1,24 @@
+{#-
+  title.tmpl - Terminal theme page title with breadcrumbs
+
+  Variables: breadcrumbs, link, title, taxonomies
+-#}
+{% if breadcrumbs|length > 1 %}
+<h1 class="post-title">
+  {% for item in breadcrumbs %}
+    {% if not loop.first %} / {% endif %}<a href="{{ item.link }}">{{ item.name }}</a>
+  {% endfor %}
+</h1>
+{% else %}
+<h1 class="post-title"><a href="{{ link }}">{{ title }}</a></h1>
+{% endif %}
+
+{% if taxonomies and taxonomies|length > 0 %}
+<span class="post-tags">
+  {% for taxonomy, terms in taxonomies %}
+    {% for term in terms %}
+    #<a href="{{ term.link }}">{{ term.name }}</a>&nbsp;
+    {% endfor %}
+  {% endfor %}
+</span>
+{% endif %}

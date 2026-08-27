@@ -291,7 +291,7 @@ module Gallery
           page_template = Theme.template_path("page.tmpl")
           html = Render.apply_template(page_template, template_context, lang)
           doc = Lexbor::Parser.new(html)
-          doc = HtmlFilters.make_links_relative(doc, post.output(lang))
+          doc = HtmlFilters.make_links_relative(doc, post.link(lang))
           doc.to_html
         end
 

@@ -1,0 +1,8 @@
+{#- listing.tmpl - PaperMod code listing page
+    Variables: title, code, raw_content -#}
+<article class="post-single">
+  {% include "templates/title.tmpl" %}
+  <div class="post-content">
+    {{ code|safe }}
+  </div>
+</article>

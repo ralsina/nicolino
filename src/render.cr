@@ -73,7 +73,15 @@ module Render
     context["language_links"] = language_links if language_links
     html = apply_template(page_template, context, lang)
     doc = Lexbor::Parser.new(html)
-    doc = HtmlFilters.make_links_relative(doc, output_path)
+    # Convert output_path to a link URL for the relativizer.
+    # Some callers pass filesystem paths (output/foo.html), others
+    # already-converted URLs (/foo/).  Detect and handle both.
+    base = if output_path.starts_with?("/")
+             output_path
+           else
+             Utils.path_to_link(output_path)
+           end
+    doc = HtmlFilters.make_links_relative(doc, base)
     if fix_code_classes
       HtmlFilters.fix_code_classes(doc).to_html
     else

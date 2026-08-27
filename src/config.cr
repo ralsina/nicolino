@@ -85,6 +85,11 @@ module Config
     # "monokai"). When unset, dark and light syntax themes are
     # derived from the site's base16 color_scheme
     property syntax_theme : String = ""
+    # URL prefix prepended to all generated links.  When the site
+    # is served under a subpath (e.g. /blog/), set this to that
+    # prefix so the relativizer computes correct relative paths.
+    # Leave empty (default) for root-mounted sites.
+    property url_prefix : String = ""
 
     # Taxonomies and features
     property taxonomies : Taxonomies = Taxonomies.new
@@ -427,6 +432,7 @@ location: "tags/"
     property image_large : Int32
     property image_thumb : Int32
     property? pretty_html : Bool
+    property url_prefix : String
 
     def initialize(@lang_config : LangConfig, @global : SiteConfig)
       @output = @global.output
@@ -447,6 +453,7 @@ location: "tags/"
       @image_large = @global.image_large
       @image_thumb = @global.image_thumb
       @pretty_html = @global.pretty_html?
+      @url_prefix = @global.url_prefix
     end
   end
 

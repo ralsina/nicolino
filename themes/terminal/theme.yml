@@ -1,0 +1,17 @@
+name: Terminal
+version: 1.0.0
+description: A terminal-styled blog theme for Nicolino, ported from the Hugo theme by panr
+author: panr (Hugo original), ported to Nicolino
+license: MIT
+screenshot: https://nicolino.ralsina.me/themes/shots/terminal.png
+# Default theme parameters, overridable from conf.yml's theme_params
+params:
+  color_scheme: dark
+  center_theme: false
+  full_width_theme: false
+  show_menu_items: 0
+  menu_more: "show more"
+  read_more: "Read more"
+  show_language_selector: true
+  date_format: ""
+  one_heading_size: false

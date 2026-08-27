@@ -15,7 +15,9 @@ styling.
 
 **Author:** Roberto Alsina · **License:** MIT
 
-[Live Demo](/themes/demo/default/){.button}
+[![Default theme screenshot](/themes/shots/default.png)](/themes/demo/default/)
+
+<p><a href="/themes/demo/default/" role="button">Live Demo</a></p>
 
 ## Minimal
 
@@ -24,7 +26,9 @@ distraction-free reading experience.
 
 **Author:** Roberto Alsina · **License:** MIT
 
-[Live Demo](/themes/demo/minimal/){.button}
+[![Minimal theme screenshot](/themes/shots/minimal.png)](/themes/demo/minimal/)
+
+<p><a href="/themes/demo/minimal/" role="button">Live Demo</a></p>
 
 ## Terminal
 
@@ -33,7 +37,9 @@ fonts, dark palette, and a retro feel.
 
 **Author:** panr (Hugo original), ported to Nicolino · **License:** MIT
 
-[Live Demo](/themes/demo/terminal/){.button}
+[![Terminal theme screenshot](/themes/shots/terminal.png)](/themes/demo/terminal/)
+
+<p><a href="/themes/demo/terminal/" role="button">Live Demo</a></p>
 
 ## PaperMod
 
@@ -43,7 +49,9 @@ adityatelange. Focused on readability and performance.
 **Author:** adityatelange, nanxiaobei (Hugo original), ported to Nicolino
 · **License:** MIT
 
-[Live Demo](/themes/demo/papermod/){.button}
+[![PaperMod theme screenshot](/themes/shots/papermod.png)](/themes/demo/papermod/)
+
+<p><a href="/themes/demo/papermod/" role="button">Live Demo</a></p>
 
 ---
 

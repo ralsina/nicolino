@@ -1,0 +1,22 @@
+{#-
+  taxonomy.tmpl - PaperMod taxonomy index
+
+  Variables:
+  - taxonomy: {name, terms: [{name}]}
+-#}
+<div class="terms">
+  <h1>{{ taxonomy.name }}</h1>
+  <ul>
+    {% for term in taxonomy.terms %}
+    <li>
+      <a class="terms-title" href="{{ term.name }}/index.html">{{ term.name }}
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" height="18">
+          <path d="M4 11a9 9 0 0 1 9 9"></path>
+          <path d="M4 4a16 16 0 0 1 16 16"></path>
+          <circle cx="5" cy="19" r="1"></circle>
+        </svg>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>

@@ -5,6 +5,8 @@
 *.dwarf
 /output/
 /assets/themes/demo/
+/assets/themes/registry/
+/assets/themes.json
 .croupier
 .kvstore
 .rucksack

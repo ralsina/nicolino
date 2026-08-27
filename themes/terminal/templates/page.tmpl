@@ -1,0 +1,134 @@
+{#-
+  page.tmpl - Terminal theme base layout
+
+  Ported from panr's Hugo Terminal theme (MIT). Provides the full
+  HTML document, header (logo + menu), content area and footer.
+
+  Theme parameters available via `theme.*`:
+  - center_theme, full_width_theme: container layout variants
+  - show_menu_items: how many nav items to show before "show more"
+  - menu_more: label of the "more" dropdown
+  - read_more: read-more button label
+  - date_format: override for post dates
+-#}
+<!DOCTYPE html>
+<html lang="{{ language }}" data-theme="{{ theme.color_scheme | default('dark') }}">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  {% if noindex %}
+  <meta name="robots" content="noindex" />{% endif %}
+  <title>{% if title and title|length > 0 %}{{ title }} :: {{ site_title }}{% else %}{{ site_title }}{% endif %}</title>
+  <meta name="description" content="{% if description %}{{ description }}{% else %}{{ site_description }}{% endif %}" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="canonical" href="{{ canonical_url }}" />
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="{% if og_type %}{{ og_type }}{% else %}website{% endif %}" />
+  <meta property="og:site_name" content="{{ site_title }}" />
+  <meta property="og:url" content="{{ canonical_url }}" />
+  <meta property="og:title" content="{% if title and title|length > 0 %}{{ title }}{% else %}{{ site_title }}{% endif %}" />
+  <meta property="og:description" content="{% if description %}{{ description }}{% else %}{{ site_description }}{% endif %}" />
+  {% if preview_image %}
+  <meta property="og:image" content="{{ preview_image }}" />
+  <meta name="twitter:image" content="{{ preview_image }}" />
+  {% endif %}
+  <meta name="twitter:card" content="{% if preview_image %}summary_large_image{% else %}summary{% endif %}" />
+  {% if main_feed %}
+  <link rel="alternate" type="application/rss+xml" href="{{ main_feed.link }}" title="{{ main_feed.title }}" />
+  {% else %}
+  <link rel="alternate" type="application/rss+xml" href="/rss.xml" title="RSS Feed" />
+  {% endif %}
+  {% if extra_feed %}
+  <link rel="alternate" type="application/rss+xml" href="{{ extra_feed.link }}" title="{{ extra_feed.title }}" />
+  {% endif %}
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/terminal.css" />
+  <link rel="stylesheet" href="/css/syntax.css" />
+  <link rel="stylesheet" href="/css/custom.css" />
+  {% if (theme.background_color|default('')) != '' or (theme.foreground_color|default('')) != '' or (theme.accent_color|default('')) != '' %}
+  {# Site-level hue overrides (theme_params). Rendered after the
+     stylesheets on purpose: explicit site hues win over theme and
+     base16 scheme colors alike #}
+  <style>
+    :root {
+      {% if (theme.background_color|default('')) != '' %}--background: {{ theme.background_color }};{% endif %}
+      {% if (theme.foreground_color|default('')) != '' %}--foreground: {{ theme.foreground_color }};{% endif %}
+      {% if (theme.accent_color|default('')) != '' %}--accent: {{ theme.accent_color }};{% endif %}
+    }
+  </style>
+  {% endif %}
+</head>
+
+<body>
+  <div class="{% if theme.full_width_theme %}container full{% elif theme.center_theme %}container center{% else %}container{% endif %}{% if theme.one_heading_size %} headings--one-size{% endif %}">
+    <header class="header">
+      <div class="header__inner">
+        <div class="header__logo">
+          <a href="/" style="text-decoration: none;">
+            <div class="logo">
+              {{ site_title }}
+            </div>
+          </a>
+        </div>
+        {% if site_nav_items and site_nav_items|length > 0 %}
+        <div class="menu-trigger">☰</div>
+        {% endif %}
+        <button id="scheme_toggle" aria-label="Toggle color scheme" style="background: none; border: 1px solid var(--accent); border-radius: 0; color: var(--foreground); cursor: pointer; font: inherit; padding: 2px 8px;">◐</button>
+        {% if theme.show_language_selector and language_links and language_links|length > 0 %}
+        <nav class="navigation-menu navigation-menu--mobile">
+          <ul class="navigation-menu__inner">
+            {% for lang_link in language_links %}
+            <li><a href="{{ lang_link.link }}">{{ lang_link.lang }}</a></li>
+            {% endfor %}
+          </ul>
+        </nav>
+        {% endif %}
+      </div>
+      {% if site_nav_items and site_nav_items|length > 0 %}
+      <nav class="navigation-menu">
+        <ul class="navigation-menu__inner menu--desktop">
+          {% for item in site_nav_items %}
+          <li><a href="/{{ item }}/">{{ item }}</a></li>
+          {% endfor %}
+          {% if language_links and language_links|length > 0 %}
+          {% for lang_link in language_links %}
+          <li><a href="{{ lang_link.link }}">{{ lang_link.lang }}</a></li>
+          {% endfor %}
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+    </header>
+
+    <div class="content">
+      {{ content }}
+    </div>
+
+    <footer class="footer">
+      <div class="footer__inner">
+        <div class="copyright">
+          <span>{{ site_footer }}</span>
+          <span>:: <a href="https://github.com/panr/hugo-theme-terminal" target="_blank">Theme</a> made by <a href="https://github.com/panr" target="_blank">panr</a></span>
+        </div>
+      </div>
+    </footer>
+  </div>
+  <script>
+    (function() {
+      var toggle = document.getElementById('scheme_toggle');
+      if (!toggle) return;
+      toggle.addEventListener('click', function() {
+        var current = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', current);
+        try { localStorage.setItem('terminal-scheme', current); } catch (e) {}
+      });
+      try {
+        var saved = localStorage.getItem('terminal-scheme');
+        if (saved) document.documentElement.setAttribute('data-theme', saved);
+      } catch (e) {}
+    })();
+  </script>
+</body>
+
+</html>

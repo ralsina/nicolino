@@ -1,0 +1,18 @@
+{#-
+  title.tmpl - PaperMod page header (title + breadcrumbs)
+
+  Variables: breadcrumbs, link, title, taxonomies
+-#}
+<header class="post-header">
+  {% if breadcrumbs|length > 1 %}
+  <div class="breadcrumbs">
+    {% for item in breadcrumbs %}
+    <a href="{{ item.link }}">{{ item.name }}</a>
+    {% if not loop.last %}<span class="breadcrumbs-sep">»</span>{% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+  <h1 class="post-title">
+    <a href="{{ link }}">{{ title }}</a>
+  </h1>
+</header>

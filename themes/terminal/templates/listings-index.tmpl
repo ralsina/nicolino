@@ -1,0 +1,10 @@
+{#- listings-index.tmpl - Terminal theme code listings index
+    Variables: listings [{title, link}] -#}
+<section class="listings-index">
+  <h1 class="post-title">Code Listings</h1>
+  <ul>
+    {% for item in listings %}
+    <li><a href="{{ item.link }}">{{ item.title }}</a></li>
+    {% endfor %}
+  </ul>
+</section>

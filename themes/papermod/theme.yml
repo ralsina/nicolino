@@ -1,0 +1,12 @@
+name: PaperMod
+version: 1.0.0
+description: Fast, clean and responsive Nicolino theme, ported from the Hugo theme by adityatelange
+author: adityatelange, nanxiaobei (Hugo original), ported to Nicolino
+license: MIT
+screenshot: https://nicolino.ralsina.me/themes/shots/papermod.png
+# Default theme parameters, overridable from conf.yml's theme_params
+params:
+  default_theme: dark
+  show_read_time: false
+  show_share_buttons: false
+  show_scroll_to_top: true

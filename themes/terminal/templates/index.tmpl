@@ -1,0 +1,44 @@
+{#-
+  index.tmpl - Terminal theme post list
+
+  Variables:
+  - posts: Array of post values (link, title, date, summary, tags...)
+  - has_more: Whether older posts exist in the archive
+-#}
+<div class="posts">
+  {% for post in posts %}
+  <article class="post on-list">
+    <h2 class="post-title">
+      <a href="{{ post.link }}">{{ post.title }}</a>
+    </h2>
+    <div class="post-meta">
+      {% if post.date %}
+      <time class="post-date">{{ post.date }}</time>
+      {% endif %}
+    </div>
+    {% if post.taxonomies and post.taxonomies|length > 0 %}
+    <span class="post-tags">
+      {% for taxonomy, terms in post.taxonomies %}
+        {% for term in terms %}
+        #<a href="{{ term.link }}">{{ term.name }}</a>&nbsp;
+        {% endfor %}
+      {% endfor %}
+    </span>
+    {% endif %}
+    <div class="post-content">
+      {{ post.summary|safe }}
+    </div>
+    <div>
+      <a class="read-more button inline" href="{{ post.link }}">[{{ theme.read_more | default("Read more") }}]</a>
+    </div>
+  </article>
+  {% endfor %}
+
+  {% if has_more %}
+  <div class="pagination">
+    <div class="pagination__buttons">
+      <a class="button previous" href="/archive/">[Archive]</a>
+    </div>
+  </div>
+  {% endif %}
+</div>

@@ -68,6 +68,7 @@ tasks:
     commands: |
       rm -rf content/bench/
       rm -rf output/
+      ./scripts/build-theme-registry.sh
       bin/nicolino build -B
       rsync -rzav --delete output/* root@rocky:/data/stacks/web/websites/nicolino.ralsina.me/
     outputs:

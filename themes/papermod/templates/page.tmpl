@@ -1,0 +1,140 @@
+{#-
+  page.tmpl - PaperMod base layout
+
+  Ported from adityatelange's hugo-PaperMod (MIT). Header (logo,
+  theme toggle, language menu, nav), content, footer, scroll-to-top.
+
+  Theme parameters (theme.*):
+  - default_theme: "dark" or "light" initial color scheme
+  - show_scroll_to_top: show the ↑ button (default true)
+-#}
+<!DOCTYPE html>
+<html lang="{{ language }}" data-theme="{{ theme.default_theme | default('dark') }}">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  {% if noindex %}
+  <meta name="robots" content="noindex, nofollow" />{% endif %}
+  <title>{% if title and title|length > 0 %}{{ title }} | {% endif %}{{ site_title }}</title>
+  <meta name="description" content="{% if description %}{{ description }}{% else %}{{ site_description }}{% endif %}" />
+  <meta name="author" content="{{ site_title }}" />
+  <link rel="canonical" href="{{ canonical_url }}" />
+  <link rel="icon" href="/favicon.ico" />
+  <meta name="theme-color" content="#2e2e33" />
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="{% if og_type %}{{ og_type }}{% else %}website{% endif %}" />
+  <meta property="og:site_name" content="{{ site_title }}" />
+  <meta property="og:url" content="{{ canonical_url }}" />
+  <meta property="og:title" content="{% if title and title|length > 0 %}{{ title }}{% else %}{{ site_title }}{% endif %}" />
+  <meta property="og:description" content="{% if description %}{{ description }}{% else %}{{ site_description }}{% endif %}" />
+  {% if preview_image %}
+  <meta property="og:image" content="{{ preview_image }}" />
+  <meta name="twitter:image" content="{{ preview_image }}" />
+  {% endif %}
+  <meta name="twitter:card" content="{% if preview_image %}summary_large_image{% else %}summary{% endif %}" />
+  {% if main_feed %}
+  <link rel="alternate" type="application/rss+xml" href="{{ main_feed.link }}" title="{{ main_feed.title }}" />
+  {% else %}
+  <link rel="alternate" type="application/rss+xml" href="/rss.xml" title="RSS Feed" />
+  {% endif %}
+  {% if extra_feed %}
+  <link rel="alternate" type="application/rss+xml" href="{{ extra_feed.link }}" title="{{ extra_feed.title }}" />
+  {% endif %}
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/papermod.css" />
+  <link rel="stylesheet" href="/css/syntax.css" />
+  <link rel="stylesheet" href="/css/custom.css" />
+</head>
+
+<body class="list" id="top">
+  <header class="header">
+    <nav class="header-nav">
+      <div class="logo">
+        <a href="/" accesskey="h" title="{{ site_title }} (Alt + H)">{{ site_title }}</a>
+        <div class="logo-switches">
+          <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+            <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+          {% if language_links and language_links|length > 0 %}
+          <span class="nav-sep">|</span>
+          <ul class="lang-menu">
+            {% for lang_link in language_links %}
+            <li>
+              <a href="{{ lang_link.link }}" title="{{ lang_link.title }}">{{ lang_link.lang }}</a>
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+      </div>
+      <ul id="menu" class="menu">
+        {% for item in site_nav_items %}
+        <li><a href="/{{ item }}/"><span>{{ item }}</span></a></li>
+        {% endfor %}
+      </ul>
+    </nav>
+  </header>
+  <main class="main">
+    {{ content }}
+  </main>
+  <footer class="footer">
+    <span>&copy; 2026 <a href="/">{{ site_title }}</a></span>
+    ·
+    <span>{{ site_footer }}</span>
+    ·
+    <span>Powered by <a href="https://github.com/ralsina/nicolino" rel="noopener" target="_blank">Nicolino</a> &amp; <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a></span>
+  </footer>
+  {% if (theme.show_scroll_to_top|default(true)) %}
+  <a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+      <polyline points="17 11 12 6 7 11"></polyline>
+      <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+  </a>
+  {% endif %}
+  <script>
+    (function () {
+      const toggle = document.getElementById('theme-toggle');
+      if (toggle) {
+        const stored = localStorage.getItem('pref-theme');
+        if (stored === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        if (stored === 'light') document.documentElement.setAttribute('data-theme', 'light');
+        toggle.addEventListener('click', () => {
+          const current = document.documentElement.getAttribute('data-theme');
+          const next = current === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', next);
+          localStorage.setItem('pref-theme', next);
+        });
+      }
+      const topLink = document.getElementById('top-link');
+      if (topLink) {
+        const toggleVisibility = () => {
+          if (window.scrollY > window.innerHeight) {
+            topLink.classList.remove('hidden');
+          } else {
+            topLink.classList.add('hidden');
+          }
+        };
+        toggleVisibility();
+        window.addEventListener('scroll', toggleVisibility, { passive: true });
+      }
+    })();
+  </script>
+</body>
+
+</html>

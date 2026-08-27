@@ -16,6 +16,7 @@ footer: "Built Using Nicolino 🥊 Default Theme 🥊 Ashes Color Scheme"
 # Navigation items shown in the theme's nav bar
 nav_items:
   - "<span role='button' class='outline'><a href='/books/'>Docs</a></span>"
+  - "<span role='button' class='outline'><a href='/pages/themes-showcase.html'>Themes</a></span>"
   - "<span role='button' class='outline'><a href='/posts/'>News</a></span>"
 
 # Localization options

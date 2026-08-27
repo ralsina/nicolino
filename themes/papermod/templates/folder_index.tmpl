@@ -1,0 +1,40 @@
+{#- folder_index.tmpl - PaperMod folder index
+    Variables: posts or subdirs/files listing -#}
+{% if posts and posts|length > 0 %}
+<header class="page-header">
+  <h1>{{ title|default('Posts') }}</h1>
+</header>
+{% for post in posts %}
+<article class="{% if loop.first %}first-entry{% else %}post-entry{% endif %}">
+  <header class="entry-header">
+    <h2>{{ post.title }}</h2>
+  </header>
+  {% if post.date %}
+  <footer class="entry-footer">{{ post.date }}</footer>
+  {% endif %}
+  <a class="entry-link" aria-label="post link to {{ post.title }}" href="{{ post.link }}"></a>
+</article>
+{% endfor %}
+{% else %}
+<div class="post-content">
+  {% if subdirs %}
+  <h3>Subdirectories</h3>
+  <ul>
+    {% for subdir in subdirs %}
+    <li><a href="{{ subdir.link }}">{{ subdir.name }}/</a></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% if files %}
+  <h3>Pages</h3>
+  <ul>
+    {% for file in files %}
+    <li><a href="{{ file.link }}">{{ file.title }}</a></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% if not subdirs and not files %}
+  <p>This folder is empty.</p>
+  {% endif %}
+</div>
+{% endif %}

@@ -25,7 +25,14 @@ changelog:
 theme-demos: bin
 	scripts/build-theme-demos.sh
 
-site: theme-demos
+screenshots: theme-demos
+	cd scripts && npm install --silent && npx playwright install firefox
+	node scripts/screenshot-themes.js
+
+theme-registry:
+	scripts/build-theme-registry.sh
+
+site: theme-demos screenshots theme-registry
 	./bin/nicolino build
 
-.PHONY: all bin clean test release mt mt-release static lint changelog theme-demos site
+.PHONY: all bin clean test release mt mt-release static lint changelog theme-demos screenshots theme-registry site

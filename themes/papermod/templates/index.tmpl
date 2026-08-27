@@ -1,0 +1,31 @@
+{#-
+  index.tmpl - PaperMod post list
+
+  Variables:
+  - posts: Array of post values (link, title, date, summary, taxonomies)
+  - has_more: Whether older posts exist in the archive
+-#}
+{% for post in posts %}
+<article class="{% if loop.first %}first-entry{% else %}post-entry{% endif %}">
+  <header class="entry-header">
+    <h2>{{ post.title }}</h2>
+  </header>
+  {% if not theme.hide_summary %}
+  <div class="entry-content">
+    <p>{{ post.summary|striptags }}{% if post.has_teaser %}...{% endif %}</p>
+  </div>
+  {% endif %}
+  <footer class="entry-footer">
+    {% if post.date %}{{ post.date }}{% endif %}
+  </footer>
+  <a class="entry-link" aria-label="post link to {{ post.title }}" href="{{ post.link }}"></a>
+</article>
+{% endfor %}
+
+{% if has_more %}
+<footer class="page-footer">
+  <nav class="pagination">
+    <a class="next" href="/archive/">Older posts »</a>
+  </nav>
+</footer>
+{% endif %}

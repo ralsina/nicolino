@@ -1,0 +1,35 @@
+{#- folder_index.tmpl - Terminal theme folder index
+    Variables: posts or subdirs/files listing -#}
+<div class="index-content">
+  {% if posts and posts|length > 0 %}
+  <div class="posts">
+    {% for post in posts %}
+    <article class="post on-list">
+      <h2 class="post-title"><a href="{{ post.link }}">{{ post.title }}</a></h2>
+      <div class="post-meta">
+        {% if post.date %}<time class="post-date">{{ post.date }}</time>{% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% elif subdirs or files %}
+    {% if subdirs %}
+    <h3>Subdirectories</h3>
+    <ul>
+      {% for subdir in subdirs %}
+      <li><a href="{{ subdir.link }}">{{ subdir.name }}/</a></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% if files %}
+    <h3>Pages</h3>
+    <ul>
+      {% for file in files %}
+      <li><a href="{{ file.link }}">{{ file.title }}</a></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  {% else %}
+  <p>This folder is empty.</p>
+  {% endif %}
+</div>

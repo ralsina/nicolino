@@ -1,0 +1,11 @@
+{#- language_switcher.tmpl - PaperMod language switcher
+    Variables: language_links [{lang, link, title}] -#}
+{% if language_links and language_links|length > 0 %}
+<ul class="lang-menu">
+  {% for lang_link in language_links %}
+  <li>
+    <a href="{{ lang_link.link }}" title="{{ lang_link.title }}">{{ lang_link.lang }}</a>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}

@@ -1,0 +1,20 @@
+{#- gallery.tmpl - PaperMod gallery page
+    Variables: breadcrumbs, title, link, html, image_list -#}
+{% include "templates/title.tmpl" %}
+<div class="post-content">
+  {{ html|safe }}
+  <div class="papermod-gallery">
+    {% for image in image_list %}
+    <div class="papermod-gallery-item">
+      <a href="{{ image }}">
+        <img src="{{ image|thumb_url }}" alt="{{ image }}" loading="lazy" />
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+<style>
+.papermod-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--gap); padding: var(--gap) 0; }
+.papermod-gallery-item { background: var(--entry); border-radius: var(--radius); overflow: hidden; }
+.papermod-gallery-item img { width: 100%; height: auto; display: block; }
+</style>

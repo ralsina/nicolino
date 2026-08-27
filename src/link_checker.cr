@@ -143,10 +143,11 @@ module LinkChecker
 
   # Resolve a relative link based on source directory
   private def self.resolve_relative_link(source_dir : String, link : String) : String
-    base_path = Path[source_dir, link].normalize.to_s
+    # Manually resolve ".." components since Path#normalize doesn't
+    base_path = resolve_dots(Path[source_dir, link].to_s)
 
     # If result escapes output directory, treat as broken
-    if !base_path.starts_with?("output/")
+    if !base_path.starts_with?("output/") && base_path != "output"
       return base_path
     end
 
@@ -159,6 +160,20 @@ module LinkChecker
     end
 
     base_path
+  end
+
+  # Resolve ".." and "." components in a path string
+  private def self.resolve_dots(path : String) : String
+    parts = path.split('/')
+    result = [] of String
+    parts.each do |part|
+      if part == ".."
+        result.pop unless result.empty?
+      elsif part != "."
+        result << part
+      end
+    end
+    result.join('/')
   end
 
   # Check all HTML files in the output directory

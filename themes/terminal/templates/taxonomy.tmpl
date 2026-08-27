@@ -1,0 +1,14 @@
+{#-
+  taxonomy.tmpl - Terminal theme taxonomy index
+
+  Variables:
+  - taxonomy: {name, terms: [{name}]}
+-#}
+<div class="terms">
+  <h1>{{ taxonomy.name }}</h1>
+  <ul class="terms-list">
+    {% for term in taxonomy.terms %}
+    <li><a class="terms-title" href="{{ term.name }}/index.html">#{{ term.name }}</a></li>
+    {% endfor %}
+  </ul>
+</div>

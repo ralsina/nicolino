@@ -3,6 +3,9 @@
 # into assets/themes/demo/<themename>/ so the main site serves
 # live theme previews.
 #
+# Each demo builds with url_prefix set so the relativizer computes
+# correct relative paths for the nested location.
+#
 # Usage:  scripts/build-theme-demos.sh
 #   or:   make theme-demos
 set -euo pipefail
@@ -13,15 +16,17 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 THEMES="default minimal terminal papermod"
 DEMO_DIR="$REPO_ROOT/demo"
 ASSETS_DIR="$REPO_ROOT/assets/themes/demo"
+mkdir -p "$ASSETS_DIR"
 
 for theme in $THEMES; do
   echo "🎨 Building demo: $theme"
 
-  # Point demo config at this theme
+  # Set theme and url_prefix so relativize computes correct paths
   sed -i "s/^theme: .*/theme: $theme/" "$DEMO_DIR/conf.yml"
+  sed -i "/^url_prefix:/d" "$DEMO_DIR/conf.yml"
+  sed -i "/^theme: .*/a url_prefix: \"/themes/demo/$theme\"" "$DEMO_DIR/conf.yml"
 
-  # Wipe previous build artefacts so Croupier doesn't carry over
-  # stale task graphs from a different theme
+  # Wipe previous build artefacts
   rm -rf "$DEMO_DIR/output" "$DEMO_DIR/.croupier" "$DEMO_DIR/.kvstore"
 
   # Build the demo site
@@ -37,7 +42,8 @@ for theme in $THEMES; do
   echo "  ✓ $theme → assets/themes/demo/$theme/"
 done
 
-# Restore the nicest-looking theme for manual `demo/` browsing
+# Restore papermod and clean up config
 sed -i "s/^theme: .*/theme: papermod/" "$DEMO_DIR/conf.yml"
+sed -i "/^url_prefix:/d" "$DEMO_DIR/conf.yml"
 
 echo "✅ All theme demos built in assets/themes/demo/"

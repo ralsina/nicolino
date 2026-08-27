@@ -37,10 +37,12 @@ module Utils
 
     # Remove the output dir prefix and convert to link
     link_parts = p.parts[output_parts.size..]
+    prefix = Config.options.url_prefix.chomp("/")
+    base = prefix.empty? ? "" : "/#{prefix}"
     if extension.nil?
-      "/#{link_parts.join("/")}"
+      "#{base}/#{link_parts.join("/")}"
     else
-      "/#{link_parts.join("/").rchop(p.extension)}#{extension}"
+      "#{base}/#{link_parts.join("/").rchop(p.extension)}#{extension}"
     end
   end
 

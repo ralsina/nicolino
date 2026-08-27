@@ -90,7 +90,7 @@ describe HtmlFilters do
       html = %(<a href="https://example.com/x">a</a><a href="/root">b</a><a href="#anchor">c</a>)
       result = HtmlFilters.make_links_relative(parse(html), "posts/page.html").to_html
       result.should contain %(href="https://example.com/x")
-      result.should contain %(href="/root")
+      result.should contain %(href="../root")
       result.should contain %(href="#anchor")
     end
 
@@ -123,7 +123,7 @@ describe HtmlFilters do
       html = %(<a href="https://example.com/raw.md">a</a><a href="/x.md">b</a><a href="y.txt">c</a>)
       result = HtmlFilters.make_links_relative(parse(html), "/books/user-guide/page.html").to_html
       result.should contain %(href="https://example.com/raw.md")
-      result.should contain %(href="/x.md")
+      result.should contain %(href="../../x.md")
       result.should contain %(href="y.txt")
     end
   end
