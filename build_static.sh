@@ -17,7 +17,10 @@ for platform in linux/amd64 linux/arm64; do
 
     echo "==> Building $output"
     docker build -q . -f Dockerfile.static --platform "$platform" -t "$tag"
-    docker run --rm --platform "$platform" -v "$PWD":/app --user="$(id -u)" "$tag" \
+    # lexbor's postinstall also links an unused liblxb.so via `cc -shared`,
+    # which crashes the aarch64 musl linker under QEMU emulation. The static
+    # binary only links liblxb.a, so force LD to a no-op to skip that step.
+    docker run --rm --platform "$platform" -e LD=true -v "$PWD":/app --user="$(id -u)" "$tag" \
         sh -c "cd /app && rm -rf lib && shards install \
                && shards build --release --static -Dnovips --without-development \
                && strip bin/nicolino"
