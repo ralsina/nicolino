@@ -15,7 +15,7 @@ footer: "Powered by Nicolino"
 theme: papermod
 
 # base16 color scheme used by both themes (see `nicolino color_schemes`)
-color_scheme: "gruvbox"
+color_scheme: "catppuccin-mocha"
 
 theme_params:
   center_theme: true
