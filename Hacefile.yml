@@ -109,6 +109,12 @@ tasks:
     commands: |
       scripts/build-theme-registry.sh
 
+  port-next-theme:
+    phony: true
+    always_run: true
+    commands: |
+      scripts/port-next-theme.sh
+
   deploy:
     phony: true
     always_run: true
