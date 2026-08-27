@@ -91,6 +91,13 @@ module Config
     # Leave empty (default) for root-mounted sites.
     property url_prefix : String = ""
 
+    # Normalize url_prefix to a bare path segment ("blog" for
+    # "/blog/" or "/blog"): consumers join it with explicit
+    # slashes, and a leading one would produce "//blog/..." links
+    def after_initialize
+      @url_prefix = @url_prefix.strip("/")
+    end
+
     # Taxonomies and features
     property taxonomies : Taxonomies = Taxonomies.new
     property features : Array(String) = [] of String
