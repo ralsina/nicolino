@@ -58,6 +58,28 @@ tasks:
     always_run: true
     phony: true
 
+  theme-demos:
+    phony: true
+    always_run: true
+    dependencies:
+      - bin/{{NAME}}
+    commands: |
+      scripts/build-theme-demos.sh
+
+  screenshots:
+    phony: true
+    always_run: true
+    commands: |
+      scripts/build-theme-demos.sh
+      (cd scripts && npm install --silent && npx playwright install firefox)
+      node scripts/screenshot-themes.js
+
+  theme-registry:
+    phony: true
+    always_run: true
+    commands: |
+      scripts/build-theme-registry.sh
+
   deploy:
     dependencies:
       - bin/nicolino
@@ -65,10 +87,11 @@ tasks:
       - shard.lock
       - shard.yml
       - content
+      - screenshots
+      - theme-registry
     commands: |
       rm -rf content/bench/
       rm -rf output/
-      ./scripts/build-theme-registry.sh
       bin/nicolino build -B
       rsync -rzav --delete output/* root@rocky:/data/stacks/web/websites/nicolino.ralsina.me/
     outputs:
