@@ -66,11 +66,13 @@ tasks:
       - themes/minimal
       - themes/terminal
       - themes/papermod
+      - themes/blox
     outputs:
       - assets/themes/demo/default
       - assets/themes/demo/minimal
       - assets/themes/demo/terminal
       - assets/themes/demo/papermod
+      - assets/themes/demo/blox
     commands: |
       scripts/build-theme-demos.sh
 
@@ -85,6 +87,7 @@ tasks:
       - assets/themes/shots/minimal.png
       - assets/themes/shots/terminal.png
       - assets/themes/shots/papermod.png
+      - assets/themes/shots/blox.png
     commands: |
       (cd scripts && npm install --silent && npx playwright install firefox)
       node scripts/screenshot-themes.js
@@ -95,12 +98,14 @@ tasks:
       - themes/minimal
       - themes/terminal
       - themes/papermod
+      - themes/blox
     outputs:
       - assets/themes.json
       - assets/themes/registry/default.tar.gz
       - assets/themes/registry/minimal.tar.gz
       - assets/themes/registry/terminal.tar.gz
       - assets/themes/registry/papermod.tar.gz
+      - assets/themes/registry/blox.tar.gz
     commands: |
       scripts/build-theme-registry.sh
 

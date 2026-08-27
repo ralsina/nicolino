@@ -92,4 +92,18 @@ adityatelange. Focused on readability and performance.
 <p><a href="/themes/demo/papermod/" role="button">Live Demo</a></p>
 {{% /card %}}
 
+{{% card %}}
+[![Blox theme screenshot](/themes/shots/blox.png)](/themes/demo/blox/)
+
+### Blox
+
+Card-based blog theme with a sticky navbar, hover-lift cards and a
+sidebar table of contents, ported from Hugo Blox Tailwind.
+
+**Author:** Lore Labs / HugoBlox (original), ported to Nicolino ·
+**License:** MIT · **Version:** 1.0.0
+
+<p><a href="/themes/demo/blox/" role="button">Live Demo</a></p>
+{{% /card %}}
+
 {{% /tag %}}

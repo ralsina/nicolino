@@ -1,0 +1,117 @@
+{#-
+  page.tmpl - Blox theme base layout
+
+  Ported from Hugo Blox Tailwind (HugoBlox/kit, MIT). Provides the
+  HTML document, sticky navbar (brand + menu + scheme toggle +
+  language switcher), content area and centered footer.
+
+  Theme parameters available via `theme.*`:
+  - color_scheme: "light", "dark" or "system" (follows the OS)
+  - sticky_header: keep the navbar pinned to the top
+  - read_more: read-more link label on cards
+-#}
+<!DOCTYPE html>
+<html lang="{{ language }}" data-theme="{{ theme.color_scheme | default('light') }}">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  {% if noindex %}
+  <meta name="robots" content="noindex" />{% endif %}
+  <title>{% if title and title|length > 0 %}{{ title }} :: {{ site_title }}{% else %}{{ site_title }}{% endif %}</title>
+  <meta name="description" content="{% if description %}{{ description }}{% else %}{{ site_description }}{% endif %}" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="canonical" href="{{ canonical_url }}" />
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="{% if og_type %}{{ og_type }}{% else %}website{% endif %}" />
+  <meta property="og:site_name" content="{{ site_title }}" />
+  <meta property="og:url" content="{{ canonical_url }}" />
+  <meta property="og:title" content="{% if title and title|length > 0 %}{{ title }}{% else %}{{ site_title }}{% endif %}" />
+  <meta property="og:description" content="{% if description %}{{ description }}{% else %}{{ site_description }}{% endif %}" />
+  {% if preview_image %}
+  <meta property="og:image" content="{{ preview_image }}" />
+  <meta name="twitter:image" content="{{ preview_image }}" />
+  {% endif %}
+  <meta name="twitter:card" content="{% if preview_image %}summary_large_image{% else %}summary{% endif %}" />
+  {% if main_feed %}
+  <link rel="alternate" type="application/rss+xml" href="{{ main_feed.link }}" title="{{ main_feed.title }}" />
+  {% else %}
+  <link rel="alternate" type="application/rss+xml" href="/rss.xml" title="RSS Feed" />
+  {% endif %}
+  {% if extra_feed %}
+  <link rel="alternate" type="application/rss+xml" href="{{ extra_feed.link }}" title="{{ extra_feed.title }}" />
+  {% endif %}
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/blox.css" />
+  <link rel="stylesheet" href="/css/syntax.css" />
+  <link rel="stylesheet" href="/css/custom.css" />
+  {% if (theme.background_color|default('')) != '' or (theme.foreground_color|default('')) != '' or (theme.accent_color|default('')) != '' %}
+  {# Site-level hue overrides (theme_params). Rendered after the
+     stylesheets on purpose: explicit site hues win over theme and
+     base16 scheme colors alike #}
+  <style>
+    :root {
+      {% if (theme.background_color|default('')) != '' %}--bg: {{ theme.background_color }};{% endif %}
+      {% if (theme.foreground_color|default('')) != '' %}--fg: {{ theme.foreground_color }};{% endif %}
+      {% if (theme.accent_color|default('')) != '' %}--accent: {{ theme.accent_color }};{% endif %}
+    }
+  </style>
+  {% endif %}
+</head>
+
+<body>
+  <header class="site-header{% if theme.sticky_header %} sticky{% endif %}">
+    <nav class="navbar">
+      <a class="brand" href="/">{{ site_title }}</a>
+      {% if site_nav_items and site_nav_items|length > 0 %}
+      <input id="nav-toggle" type="checkbox" class="nav-toggle" />
+      <label class="nav-burger" for="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </label>
+      {% endif %}
+      <ul class="nav-menu">
+        {% for item in site_nav_items %}
+        <li><a href="/{{ item }}/">{{ item }}</a></li>
+        {% endfor %}
+        {% include "templates/language_switcher.tmpl" %}
+        <li class="nav-actions">
+          <button id="scheme_toggle" aria-label="Toggle color scheme" title="Toggle color scheme">◐</button>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="page-body">
+    {{ content }}
+  </main>
+
+  <footer class="site-footer">
+    <p>{{ site_footer }}</p>
+    <p class="powered-by">
+      Theme: <a href="https://github.com/HugoBlox/kit" rel="noopener" target="_blank">Hugo Blox</a>
+      ported to Nicolino
+    </p>
+  </footer>
+
+  <script>
+    (function () {
+      var root = document.documentElement;
+      {# "system" scheme: resolve to the OS preference once, on load #}
+      if (root.getAttribute('data-theme') === 'system') {
+        root.setAttribute('data-theme',
+          window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      }
+      var stored = null;
+      try { stored = localStorage.getItem('blox-theme'); } catch (e) { }
+      if (stored === 'dark' || stored === 'light') root.setAttribute('data-theme', stored);
+      var toggle = document.getElementById('scheme_toggle');
+      if (toggle) toggle.addEventListener('click', function () {
+        var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('blox-theme', next); } catch (e) { }
+      });
+    })();
+  </script>
+</body>
+
+</html>

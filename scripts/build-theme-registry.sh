@@ -20,7 +20,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # All themes that ship with Nicolino and are available in the registry.
-THEMES="default minimal terminal papermod"
+THEMES="default minimal terminal papermod blox"
 SITE_URL="https://nicolino.ralsina.me"
 
 REGISTRY_OUT="$REPO_ROOT/assets/themes.json"
