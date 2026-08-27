@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.25.0] - 2026-08-27
 
 ### 🚀 Features
 
@@ -28,6 +28,13 @@ All notable changes to this project will be documented in this file.
   with base16 palette and highlight.js token mapping
 - Index pages now render with site/theme constants in scope, so
   templates can use `site_*` and `theme.*` in index.tmpl
+- Theme registry: `nicolino theme install/list/remove` fetches themes
+  from a remote registry (default `https://nicolino.ralsina.me/themes.json`),
+  verifying each tarball's SHA256, so themes can be installed without
+  cloning them into the repo by hand
+- Root-relative (and `url_prefix`-aware) link relativization: pages served
+  under a subpath now rewrite `/css/style.css` links to correct relative
+  paths, and the link checker resolves `..` from nested pages
 
 ### 🐛 Bug Fixes
 
