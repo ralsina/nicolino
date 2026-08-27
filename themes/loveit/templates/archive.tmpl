@@ -1,0 +1,22 @@
+{#- archive.tmpl - LoveIt theme yearly archive -#}
+<header class="page-header">
+  <h1>Archive</h1>
+</header>
+<div class="archive">
+  {% for year in years %}
+  <section class="archive-year">
+    <h2 class="archive-year-title">{{ year.year }}</h2>
+    {% for month in year.months %}
+    <h3 class="archive-month-title">{{ month.name }}</h3>
+    <ul class="archive-list">
+      {% for post in month.posts %}
+      <li class="archive-item">
+        <a class="archive-item-link" href="{{ post.link }}">{{ post.title }}</a>
+        <time class="archive-item-date">{{ post.date }}</time>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endfor %}
+  </section>
+  {% endfor %}
+</div>

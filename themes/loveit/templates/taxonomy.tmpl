@@ -1,0 +1,21 @@
+{#-
+  taxonomy.tmpl - LoveIt theme taxonomy index
+
+  Terms are shown as a LoveIt tag cloud: inline links that scale
+  up on hover.
+
+  Variables:
+  - taxonomy: {name, terms: [{name}]}
+
+  NOTE: rendered standalone by the taxonomies feature with a
+  minimal context — do not reference `theme.*` here (see porting
+  guide).
+-#}
+<header class="page-header">
+  <h1 class="terms-title">{{ taxonomy.name }}</h1>
+</header>
+<div class="tag-cloud-tags">
+  {% for term in taxonomy.terms %}
+  <a href="{{ term.name }}/index.html">{{ term.name }}</a>
+  {% endfor %}
+</div>

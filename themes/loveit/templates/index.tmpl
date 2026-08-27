@@ -1,0 +1,47 @@
+{#-
+  index.tmpl - LoveIt theme post list
+
+  Posts are shown as LoveIt home summaries: title link, optional
+  featured image, a text excerpt and a meta footer (tags left,
+  date right), separated by dashed rules.
+
+  Variables:
+  - posts: Array of post values (link, title, date, summary,
+    preview_image, taxonomies, has_teaser)
+  - has_more: Whether older posts exist in the archive
+-#}
+<div class="home-posts">
+  {% for post in posts %}
+  <article class="summary">
+    <h2 class="summary-title"><a href="{{ post.link }}">{{ post.title }}</a></h2>
+    {% if post.preview_image %}
+    <a class="featured-image-preview" href="{{ post.link }}">
+      <img src="{{ post.preview_image }}" alt="{{ post.title }}" loading="lazy" />
+    </a>
+    {% endif %}
+    {% if not theme.hide_summary %}
+    <div class="summary-content">
+      {{ post.summary|striptags }}{% if post.has_teaser %}…{% endif %}
+    </div>
+    {% endif %}
+    <div class="post-footer">
+      <div class="post-tags">
+        {% for taxonomy, terms in post.taxonomies %}
+          {% for term in terms %}
+          <a class="tag" href="{{ term.link }}">#{{ term.name }}</a>
+          {% endfor %}
+        {% endfor %}
+      </div>
+      {% if post.date %}
+      <time class="post-date">{{ post.date }}</time>
+      {% endif %}
+    </div>
+  </article>
+  {% endfor %}
+</div>
+
+{% if has_more %}
+<nav class="list-pagination">
+  <a href="/archive/">{{ theme.read_more | default("Read more") }} <span aria-hidden="true">→</span></a>
+</nav>
+{% endif %}

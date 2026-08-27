@@ -1,0 +1,17 @@
+{#- gallery_cards.tmpl - LoveIt theme gallery card grid
+    Variables: title, description, items [{link, title, thumb_link}] -#}
+<section class="gallery-cards">
+  {% if description %}
+  <p class="index-content">{{ description }}</p>
+  {% endif %}
+  <div class="gallery-card-grid">
+    {% for item in items %}
+    <article class="gallery-card">
+      <a class="featured-image-preview" href="{{ item.link }}">
+        <img src="{{ item.thumb_link }}" alt="{{ item.title }}" loading="lazy" />
+      </a>
+      <h2 class="summary-title"><a href="{{ item.link }}">{{ item.title }}</a></h2>
+    </article>
+    {% endfor %}
+  </div>
+</section>

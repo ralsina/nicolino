@@ -1,0 +1,78 @@
+{#-
+  post.tmpl - LoveIt theme single post
+
+  Centered article with LoveIt's title, meta line, content with
+  "#"-marked headings, tag footer and a table of contents (fixed
+  to the right margin on wide screens, collapsible above it).
+
+  NOTE: rendered with only the post value at runtime — do not
+  reference `theme.*` here (see porting guide).
+
+  Variables: breadcrumbs, title, link, date, metadata, taxonomies,
+  toc, html, related_posts, is_fallback (see Nicolino docs)
+-#}
+{% include "templates/title.tmpl" %}
+
+<article class="single">
+  <h1 class="single-title">{{ title }}</h1>
+  <div class="post-meta">
+    {% if date %}
+    <span class="post-date">{{ date }}</span>
+    {% endif %}
+    {% if metadata.updated and show_updated %}
+    <span>· Updated on {{ metadata.updated }}</span>
+    {% endif %}
+    {% if is_fallback %}
+    <span>· <span title="No translation available for this language">🌐 untranslated</span></span>
+    {% endif %}
+  </div>
+
+  {% if is_fallback %}
+  <p class="fallback-notice">⚠ This page has not been translated yet.</p>
+  {% endif %}
+
+  {% if toc and toc|length > 0 %}
+  <details class="toc toc-static" open>
+    <summary class="toc-title">Contents</summary>
+    <div class="toc-content">
+      {{ toc|safe }}
+    </div>
+  </details>
+  {% endif %}
+
+  <div class="single-content md-content">
+    {{ html|safe }}
+  </div>
+
+  {% if taxonomies|length > 0 %}
+  <footer class="single-footer">
+    <div class="post-tags">
+      {% for taxonomy, terms in taxonomies %}
+        {% for term in terms %}
+        <a class="tag" href="{{ term.link }}">#{{ term.name }}</a>
+        {% endfor %}
+      {% endfor %}
+    </div>
+  </footer>
+  {% endif %}
+
+  {% if related_posts and related_posts|length > 0 %}
+  <section class="related-posts">
+    <h2>Related posts</h2>
+    <ul>
+      {% for related in related_posts %}
+      <li><a href="{{ related.link }}">{{ related.title }}</a></li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+</article>
+
+{% if toc and toc|length > 0 %}
+<aside class="toc toc-auto" aria-label="Table of contents">
+  <h2 class="toc-title">Contents</h2>
+  <div class="toc-content">
+    {{ toc|safe }}
+  </div>
+</aside>
+{% endif %}

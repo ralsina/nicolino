@@ -8,7 +8,7 @@ fetched 2026-08-27.
 
 - [x] papermod (adityatelange/hugo-PaperMod, 13,866 stars) -- ported
 - [x] blox (HugoBlox/kit, 9,654 stars) -- ported
-- [ ] loveit (dillonzq/LoveIt, 3,870 stars)
+- [x] loveit (dillonzq/LoveIt, 3,870 stars) -- ported
 - [ ] hugo-coder (luizdepra/hugo-coder, 3,106 stars)
 - [ ] blowfish (nunocoracao/blowfish, 2,882 stars)
 - [x] terminal (panr/hugo-theme-terminal, 2,799 stars) -- ported

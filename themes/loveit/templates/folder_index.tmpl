@@ -1,0 +1,41 @@
+{#- folder_index.tmpl - LoveIt theme folder index
+    Variables: posts, subdirs [{link, name}], files [{link, title}] -#}
+<div class="index-content">
+  {% if posts and posts|length > 0 %}
+  <div class="home-posts">
+    {% for post in posts %}
+    <article class="summary">
+      <h2 class="summary-title"><a href="{{ post.link }}">{{ post.title }}</a></h2>
+      <div class="post-footer">
+        {% if post.date %}
+        <time class="post-date">{{ post.date }}</time>
+        {% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% elif subdirs or files %}
+    {% if subdirs %}
+    <h2>Subdirectories</h2>
+    <ul class="archive-list">
+      {% for subdir in subdirs %}
+      <li class="archive-item">
+        <a class="archive-item-link" href="{{ subdir.link }}">{{ subdir.name }}/</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% if files %}
+    <h2>Pages</h2>
+    <ul class="archive-list">
+      {% for file in files %}
+      <li class="archive-item">
+        <a class="archive-item-link" href="{{ file.link }}">{{ file.title }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  {% else %}
+  <p>This folder is empty.</p>
+  {% endif %}
+</div>

@@ -67,12 +67,14 @@ tasks:
       - themes/terminal
       - themes/papermod
       - themes/blox
+      - themes/loveit
     outputs:
       - assets/themes/demo/default
       - assets/themes/demo/minimal
       - assets/themes/demo/terminal
       - assets/themes/demo/papermod
       - assets/themes/demo/blox
+      - assets/themes/demo/loveit
     commands: |
       scripts/build-theme-demos.sh
 
@@ -82,12 +84,15 @@ tasks:
       - assets/themes/demo/minimal
       - assets/themes/demo/terminal
       - assets/themes/demo/papermod
+      - assets/themes/demo/blox
+      - assets/themes/demo/loveit
     outputs:
       - assets/themes/shots/default.png
       - assets/themes/shots/minimal.png
       - assets/themes/shots/terminal.png
       - assets/themes/shots/papermod.png
       - assets/themes/shots/blox.png
+      - assets/themes/shots/loveit.png
     commands: |
       (cd scripts && npm install --silent && npx playwright install firefox)
       node scripts/screenshot-themes.js
@@ -99,6 +104,7 @@ tasks:
       - themes/terminal
       - themes/papermod
       - themes/blox
+      - themes/loveit
     outputs:
       - assets/themes.json
       - assets/themes/registry/default.tar.gz
@@ -106,6 +112,7 @@ tasks:
       - assets/themes/registry/terminal.tar.gz
       - assets/themes/registry/papermod.tar.gz
       - assets/themes/registry/blox.tar.gz
+      - assets/themes/registry/loveit.tar.gz
     commands: |
       scripts/build-theme-registry.sh
 

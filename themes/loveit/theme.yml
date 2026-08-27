@@ -1,0 +1,12 @@
+name: LoveIt
+version: 1.0.0
+description: Clean and elegant blog theme with fixed header, centered reading column and blue-to-pink links, ported from Hugo LoveIt
+author: Dillon (dillonzq) original, ported to Nicolino
+license: MIT
+screenshot: https://nicolino.ralsina.me/themes/shots/loveit.png
+# Default theme parameters, overridable from conf.yml's theme_params
+params:
+  color_scheme: light
+  header_normal: false
+  hide_summary: false
+  read_more: "Read more"

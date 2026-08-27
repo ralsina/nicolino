@@ -5,12 +5,12 @@ date: 2026-08-25
 
 Browse live demos of every available Nicolino theme. Each demo is a
 complete site with posts, taxonomies, archive, images, base16 color
-schemes, and multilingual content — the same content rendered by four
+schemes, and multilingual content — the same content rendered by six
 different themes so you can compare them side by side.
 
 ## Installing a theme
 
-All four themes ship through the theme registry. List the
+All six themes ship through the theme registry. List the
 available themes, then install any of them into your site:
 
 ```bash
@@ -104,6 +104,21 @@ sidebar table of contents, ported from Hugo Blox Tailwind.
 **License:** MIT · **Version:** 1.0.0
 
 <p><a href="/themes/demo/blox/" role="button">Live Demo</a></p>
+{{% /card %}}
+
+{{% card %}}
+[![LoveIt theme screenshot](/themes/shots/loveit.png)](/themes/demo/loveit/)
+
+### LoveIt
+
+Clean and elegant blog theme with a fixed header, centered reading
+column and blue links that turn pink on hover, ported from Hugo
+LoveIt.
+
+**Author:** Dillon (dillonzq) (original), ported to Nicolino ·
+**License:** MIT · **Version:** 1.0.0
+
+<p><a href="/themes/demo/loveit/" role="button">Live Demo</a></p>
 {{% /card %}}
 
 {{% /tag %}}

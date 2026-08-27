@@ -1,0 +1,14 @@
+{#- item_list.tmpl - LoveIt theme generic item list -#}
+<section class="index-content">
+  {% if items %}
+  <ul class="archive-list">
+    {% for item in items %}
+    <li class="archive-item">
+      <a class="archive-item-link" href="{{ item.link }}">{{ item.title }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No items found.</p>
+  {% endif %}
+</section>

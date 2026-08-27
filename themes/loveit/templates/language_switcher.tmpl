@@ -1,0 +1,9 @@
+{#- language_switcher.tmpl - LoveIt theme language switcher
+    Variables: language_links [{lang, link, title}] -#}
+{% if language_links and language_links|length > 0 %}
+<li class="menu-item menu-language">
+  {% for lang_link in language_links %}
+  <a href="{{ lang_link.link }}" title="{{ lang_link.title }}">{{ lang_link.lang }}</a>
+  {% endfor %}
+</li>
+{% endif %}
