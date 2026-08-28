@@ -7,7 +7,7 @@ shards:
 
   ameba:
     git: https://github.com/crystal-ameba/ameba.git
-    version: 1.7.0-dev
+    version: 1.7.0
 
   baked_file_system: # Overridden
     git: https://github.com/ralsina/baked_file_system.git

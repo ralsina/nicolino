@@ -15,6 +15,30 @@ Excluded:
   - pocketbase
   - scripts
 
+# Rules that became default-enabled in the ameba 1.7.0 release.
+# They report ~500 issues on this codebase; adopting them (adding
+# type annotations to every method, rewriting literals to %w[]/{}()
+# syntax) is a separate refactor, not a lint fix. Disabled here to
+# keep the 1.6-era lint baseline after the 1.7.0-dev -> 1.7.0 bump.
+Typing/MethodReturnTypeRestriction:
+  Enabled: false
+Typing/MethodParameterTypeRestriction:
+  Enabled: false
+Typing/ProcLiteralReturnTypeRestriction:
+  Enabled: false
+Style/ArrayLiteralSyntax:
+  Enabled: false
+Style/HashLiteralSyntax:
+  Enabled: false
+Style/CallParentheses:
+  Enabled: false
+Style/Elsif:
+  Enabled: false
+Lint/DuplicateBranch:
+  Enabled: false
+Lint/ComparisonToBoolean:
+  Enabled: false
+
 # Problems found: 1
 # Run `ameba --only Metrics/CyclomaticComplexity` for details
 Metrics/CyclomaticComplexity:
