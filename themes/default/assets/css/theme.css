@@ -677,3 +677,15 @@ figure {
     background: var(--pico-primary);
     opacity: 1;
 }
+
+/* Header nav: let the two lists stack and wrap on narrow screens
+   instead of forcing the whole page into horizontal scroll */
+header nav {
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+}
+
+header nav > ul {
+    flex-wrap: wrap;
+    row-gap: 0.25rem;
+}

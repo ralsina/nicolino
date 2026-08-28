@@ -13,11 +13,12 @@ module Nicolino
         have a page open in a browser, it will trigger a reload.
 
         Usage:
-          nicolino auto [--help][TARGET...] [--fast-mode][-c <file>]
-                        [-q|-v <level>]
+          nicolino auto [--help][TARGET...] [--fast-mode][--port <port>]
+                        [-c <file>][-q|-v <level>]
 
         Options:
           --help            Show this help message
+          --port <port>     Port for the preview server [default: 8080]
           -c <file>         Specify a config file to use [default: conf.yml]
           --fast-mode       Use file timestamps rather than contents to
                             decide rebuilds.
@@ -43,7 +44,8 @@ module Nicolino
         # Now run in auto mode
         Log.info { "Running in auto mode, press Ctrl+C to stop" }
         # Launch HTTP server
-        server = make_server(live_reload: true)
+        port = @options.fetch("--port", "8080").as(String).to_i
+        server = make_server(live_reload: true, port: port)
         spawn do
           server.listen
         end
