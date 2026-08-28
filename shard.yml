@@ -35,10 +35,9 @@ dependencies:
     branch: main
   shortcodes:
     github: ralsina/shortcodes
-  # Local checkout with fix/missing-token-abbreviations, not yet pushed.
-  # Revert to github: ralsina/tartrazine once that branch is merged.
   tartrazine:
-    path: /home/ralsina/code/tartrazine
+    github: ralsina/tartrazine
+    version: ~> 0.21.2
   cronic:
     github: nanobowers/cronic
   baked_file_system:

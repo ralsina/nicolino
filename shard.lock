@@ -86,8 +86,8 @@ shards:
     version: 0.8.0
 
   tartrazine:
-    path: /home/ralsina/code/tartrazine
-    version: 0.21.1
+    git: https://github.com/ralsina/tartrazine.git
+    version: 0.21.2
 
   toml:
     git: https://github.com/manastech/crystal-toml.git
