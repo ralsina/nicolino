@@ -51,6 +51,8 @@ module Taxonomies
     def lightweight_value
       {
         "name" => @name,
+        # URL-safe form matching the term page folder (see link)
+        "slug" => Utils.slugify(@name),
       }
     end
 
