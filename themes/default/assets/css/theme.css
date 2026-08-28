@@ -689,3 +689,27 @@ header nav > ul {
     flex-wrap: wrap;
     row-gap: 0.25rem;
 }
+
+/* Language switcher: open horizontally as an overlay so expanding it
+   doesn't push the header or relayout the page */
+header nav details {
+    position: relative;
+}
+
+header nav details[open] ul {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 0.75rem;
+    margin: 0.25rem 0 0;
+    padding: 0.35rem 0.6rem;
+    background: var(--pico-card-background-color);
+    border: 1px solid var(--pico-muted-border-color);
+    border-radius: 0.4rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    list-style: none;
+    white-space: nowrap;
+    z-index: 10;
+}
