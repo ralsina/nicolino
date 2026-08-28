@@ -42,8 +42,16 @@ module Highlight
       lexer = lexer_for(language)
       next match if lexer.nil?
 
-      highlighted = formatter.format(source, lexer)
-      %(<pre class="highlight">#{highlighted}</pre>)
+      begin
+        highlighted = formatter.format(source, lexer)
+        %(<pre class="highlight">#{highlighted}</pre>)
+      rescue ex
+        # A lexer/formatter bug (e.g. a token type missing from the
+        # abbreviation table) must not fail the whole site build:
+        # keep the original block and say why
+        Log.error { "Highlighting failed for a '#{language}' block: #{ex.message}; keeping it unhighlighted" }
+        match
+      end
     end
   end
 
