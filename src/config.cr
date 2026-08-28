@@ -245,15 +245,26 @@ location: "tags/"
         # Start with default config as base
         base_config = @@lang_configs[@@default_lang]
 
-        # Merge: use override values, falling back to base for any unset values
+        # Merge: use override values for keys present in the override
+        # file, falling back to base for anything else (deserialized
+        # fields default to "" / [] / etc., so presence must be checked
+        # against the raw YAML, not the struct)
+        override_keys = YAML.parse(File.read(lang_config_path)).as_h.try(&.keys.map(&.as_s)) || [] of String
+        uses = ->(key : String) do
+          if override_keys.includes?(key)
+            lang_override
+          else
+            base_config
+          end
+        end
         LangConfig.new(
-          title: lang_override.title,
-          description: lang_override.description,
-          footer: lang_override.footer,
-          url: lang_override.url,
-          nav_items: lang_override.nav_items,
-          date_output_format: lang_override.date_output_format,
-          locale: lang_override.locale,
+          title: uses.call("title").title,
+          description: uses.call("description").description,
+          footer: uses.call("footer").footer,
+          url: uses.call("url").url,
+          nav_items: uses.call("nav_items").nav_items,
+          date_output_format: uses.call("date_output_format").date_output_format,
+          locale: uses.call("locale").locale,
           taxonomies: lang_override.taxonomies.empty? ? base_config.taxonomies : lang_override.taxonomies
         )
       rescue ex : Exception
