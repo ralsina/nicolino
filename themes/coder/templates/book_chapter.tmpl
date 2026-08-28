@@ -1,0 +1,28 @@
+{#- book_chapter.tmpl - Coder theme book chapter
+    Variables: book {name, title}, chapter {content}, toc_html,
+    navigation {prev, next} -#}
+<section class="container">
+  <div class="book-layout">
+    <aside class="book-sidebar">
+      <div class="book-title">
+        <a href="/books/{{ book.name }}/">{{ book.title }}</a>
+      </div>
+      <nav class="book-toc">
+        {{ toc_html|safe }}
+      </nav>
+    </aside>
+    <main class="book-content">
+      <article>
+        {{ chapter.content|safe }}
+      </article>
+      <nav class="chapter-nav">
+        {% if navigation.prev %}
+        <a href="{{ navigation.prev.link }}">&larr; {{ navigation.prev.title }}</a>
+        {% endif %}
+        {% if navigation.next %}
+        <a href="{{ navigation.next.link }}">{{ navigation.next.title }} &rarr;</a>
+        {% endif %}
+      </nav>
+    </main>
+  </div>
+</section>

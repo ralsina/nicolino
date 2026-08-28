@@ -1,0 +1,27 @@
+{#-
+  taxonomy.tmpl - Coder theme taxonomy index
+
+  Terms are shown as rounded chips like Hugo Coder's taxonomy
+  pages.
+
+  Variables:
+  - taxonomy: {name, terms: [{name}]}
+
+  NOTE: rendered standalone by the taxonomies feature with a
+  minimal context — do not reference `theme.*` here (see
+  porting guide).
+-#}
+<section class="container taxonomy">
+  <header>
+    <h1 class="title">{{ taxonomy.name }}</h1>
+  </header>
+  <ul>
+    {% for term in taxonomy.terms %}
+    <li>
+      <span class="taxonomy-element">
+        <a href="{{ term.name }}/index.html">{{ term.name }}</a>
+      </span>
+    </li>
+    {% endfor %}
+  </ul>
+</section>

@@ -1,0 +1,20 @@
+{#- gallery_cards.tmpl - Coder theme gallery card grid
+    Variables: title, description, items [{link, title, thumb_link}] -#}
+<section class="container list">
+  <header>
+    <h1 class="title">{{ title }}</h1>
+  </header>
+  {% if description %}
+  <p>{{ description }}</p>
+  {% endif %}
+  <div class="gallery">
+    {% for item in items %}
+    <a class="gallery-item" href="{{ item.link }}">
+      {% if item.thumb_link %}
+      <img src="{{ item.thumb_link }}" alt="{{ item.title }}" loading="lazy" />
+      {% endif %}
+      <span class="taxonomy-element">{{ item.title }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>

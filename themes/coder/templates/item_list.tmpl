@@ -1,0 +1,21 @@
+{#- item_list.tmpl - Coder theme generic item list
+    Variables: title, description, items [{link, title}] -#}
+<section class="container list">
+  <header>
+    <h1 class="title">{{ title }}</h1>
+  </header>
+  {% if description %}
+  <p>{{ description }}</p>
+  {% endif %}
+  {% if items %}
+  <ul>
+    {% for item in items %}
+    <li>
+      <a class="title" href="{{ item.link }}">{{ item.title }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No items found.</p>
+  {% endif %}
+</section>

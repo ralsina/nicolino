@@ -1,0 +1,807 @@
+/*
+ * coder.css - Coder theme for Nicolino
+ *
+ * Hand-ported from the SCSS sources of hugo-coder
+ * (https://github.com/luizdepra/hugo-coder, MIT). Colors become
+ * CSS custom properties mapped onto base16 roles when the site
+ * enables the base16 feature (with the original palette as
+ * fallbacks). Font Awesome icons are replaced by unicode glyphs
+ * and inline SVG so no font binaries ship with the theme.
+ */
+
+:root,
+[data-theme="light"] {
+  --bg: var(--b16-base00, #fafafa);
+  --fg: var(--b16-base05, #212121);
+  --alt-bg: var(--b16-base01, #e0e0e0);
+  --alt-fg: var(--b16-base06, #000);
+  --darker-alt-bg: var(--b16-base02, #ccc);
+  --link: var(--b16-base0D, #1565c0);
+  --code-bg: var(--b16-base01, #ececec);
+  --border: var(--b16-base02, #e0e0e0);
+}
+
+[data-theme="dark"] {
+  --bg: var(--b16-base00, #212121);
+  --fg: var(--b16-base05, #dadada);
+  --alt-bg: var(--b16-base01, #424242);
+  --alt-fg: var(--b16-base06, #dadada);
+  --darker-alt-bg: var(--b16-base02, #4f4f4f);
+  --link: var(--b16-base0D, #42a5f5);
+  --code-bg: var(--b16-base01, #2b2b2b);
+  --border: var(--b16-base02, #424242);
+}
+
+/* Base (ported from _base.scss) */
+
+*,
+*:after,
+*:before {
+  box-sizing: inherit;
+}
+
+html {
+  box-sizing: border-box;
+  font-size: 62.5%;
+}
+
+body {
+  color: var(--fg);
+  background-color: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", Helvetica,
+    "PingFang SC", "Microsoft YaHei", SimSun, Heiti, sans-serif;
+  font-size: 1.8em;
+  font-weight: 400;
+  line-height: 1.8em;
+}
+
+@media only screen and (max-width: 768px) {
+  body {
+    font-size: 1.6em;
+    line-height: 1.6em;
+  }
+}
+
+a {
+  font-weight: 500;
+  color: var(--link);
+  text-decoration: none;
+  transition: all 0.25s ease-in;
+}
+
+a:focus,
+a:hover {
+  text-decoration: underline;
+}
+
+p {
+  margin: 2rem 0 2rem 0;
+}
+
+@media only screen and (max-width: 768px) {
+  p {
+    margin: 1.5rem 0 1.5rem 0;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  color: var(--alt-fg);
+  margin: 4rem 0 2.5rem 0;
+}
+
+h1:hover .heading-link,
+h2:hover .heading-link,
+h3:hover .heading-link,
+h4:hover .heading-link,
+h5:hover .heading-link,
+h6:hover .heading-link {
+  visibility: visible;
+}
+
+h1 .heading-link,
+h2 .heading-link,
+h3 .heading-link,
+h4 .heading-link,
+h5 .heading-link,
+h6 .heading-link {
+  color: var(--link);
+  font-weight: inherit;
+  text-decoration: none;
+  font-size: 80%;
+  visibility: hidden;
+}
+
+h1 .title-link,
+h2 .title-link,
+h3 .title-link,
+h4 .title-link,
+h5 .title-link,
+h6 .title-link {
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: none;
+}
+
+h1 {
+  font-size: 3.2rem;
+  line-height: 3.6rem;
+}
+
+h2 {
+  font-size: 2.8rem;
+  line-height: 3.2rem;
+}
+
+h3 {
+  font-size: 2.4rem;
+  line-height: 2.8rem;
+}
+
+h4 {
+  font-size: 2.2rem;
+  line-height: 2.6rem;
+}
+
+h5 {
+  font-size: 2rem;
+  line-height: 2.4rem;
+}
+
+h6 {
+  font-size: 1.8rem;
+  line-height: 2.2rem;
+}
+
+@media only screen and (max-width: 768px) {
+  h1 {
+    font-size: 3rem;
+    line-height: 3.4rem;
+  }
+
+  h2 {
+    font-size: 2.6rem;
+    line-height: 3rem;
+  }
+
+  h3 {
+    font-size: 2.2rem;
+    line-height: 2.6rem;
+  }
+
+  h4 {
+    font-size: 2rem;
+    line-height: 2.4rem;
+  }
+
+  h5 {
+    font-size: 1.8rem;
+    line-height: 2.2rem;
+  }
+
+  h6 {
+    font-size: 1.6rem;
+    line-height: 2rem;
+  }
+}
+
+b,
+strong {
+  font-weight: 700;
+}
+
+.highlight div,
+.highlight pre {
+  margin: 2rem 0 2rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  overflow-x: auto;
+}
+
+pre {
+  display: block;
+  font-family: "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 2.6rem;
+  overflow-x: auto;
+  margin: 2rem 0 2rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background-color: var(--code-bg);
+}
+
+pre code {
+  display: inline-block;
+  background-color: inherit;
+  color: inherit;
+}
+
+code {
+  font-family: "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 1.6rem;
+  font-weight: 400;
+  border-radius: 0.6rem;
+  padding: 0.3rem 0.6rem;
+  background-color: var(--darker-alt-bg);
+  color: var(--fg);
+}
+
+@media only screen and (max-width: 768px) {
+  code {
+    font-size: 1.5rem;
+  }
+}
+
+blockquote {
+  border-left: 2px solid var(--border);
+  padding-left: 2rem;
+  line-height: 2.2rem;
+  font-weight: 400;
+  font-style: italic;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+th,
+td {
+  padding: 1.6rem;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+table td,
+table th {
+  border: 2px solid var(--alt-fg);
+}
+
+table tr:first-child th {
+  border-top: 0;
+}
+
+table tr:last-child td {
+  border-bottom: 0;
+}
+
+table tr td:first-child,
+table tr th:first-child {
+  border-left: 0;
+}
+
+table tr td:last-child,
+table tr th:last-child {
+  border-right: 0;
+}
+
+img {
+  max-width: 100%;
+}
+
+figure {
+  text-align: center;
+}
+
+.footnotes ol li p {
+  margin: 0;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.container {
+  margin: 1rem auto;
+  max-width: 90rem;
+  width: 100%;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.float-right {
+  float: right;
+}
+
+.float-left {
+  float: left;
+}
+
+/* Content (ported from _content.scss) */
+
+.content {
+  flex: 1;
+  display: flex;
+  margin-top: 1.6rem;
+  margin-bottom: 3.2rem;
+}
+
+@media only screen and (max-width: 768px) {
+  .content {
+    margin-top: 1rem;
+    margin-bottom: 1.6rem;
+  }
+}
+
+.content header {
+  margin-top: 6.4rem;
+  margin-bottom: 3.2rem;
+}
+
+.content header h1 {
+  font-size: 4.2rem;
+  line-height: 4.6rem;
+  margin: 0;
+}
+
+@media only screen and (max-width: 768px) {
+  .content header h1 {
+    font-size: 4rem;
+    line-height: 4.4rem;
+  }
+}
+
+.content article details summary {
+  cursor: pointer;
+}
+
+.content article footer {
+  margin-top: 4rem;
+}
+
+.content article footer .see-also {
+  margin: 3.2rem 0;
+}
+
+.content article footer .see-also h3 {
+  margin: 3.2rem 0;
+}
+
+.content article p {
+  text-align: justify;
+  -ms-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.content figure {
+  margin: 0;
+  padding: 0;
+}
+
+.content figcaption p {
+  text-align: center;
+  font-style: italic;
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+.post .post-title {
+  margin-bottom: 0.75em;
+}
+
+.post .post-meta .icon {
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-left: 0;
+  margin-right: 0.5rem;
+  vertical-align: -0.2rem;
+}
+
+.post .post-meta .date .posted-on {
+  margin-left: 0;
+  margin-right: 1.5rem;
+}
+
+.post .post-meta .tags .tag {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  background-color: var(--alt-bg);
+  border-radius: 0.6rem;
+  line-height: 1.5em;
+  margin: 0.3rem 0.3rem 0.3rem 0;
+}
+
+.post .post-meta .tags .tag a,
+.post .post-meta .tags .tag a:active {
+  color: var(--fg);
+}
+
+/* Lists (posts index, archive; ported from list markup) */
+
+.list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.list ul li {
+  margin: 2rem 0;
+}
+
+.list ul li .date {
+  display: inline-block;
+  min-width: 16rem;
+  text-align: right;
+  margin-right: 1.5rem;
+  font-size: 1.6rem;
+}
+
+@media only screen and (max-width: 768px) {
+  .list ul li .date {
+    display: block;
+    text-align: left;
+    min-width: 0;
+    margin-right: 0;
+    font-size: 1.4rem;
+  }
+}
+
+.list ul li .title {
+  color: var(--fg);
+}
+
+.list ul li .title:hover,
+.list ul li .title:focus {
+  color: var(--link);
+}
+
+/* Taxonomies (ported from _taxonomies.scss) */
+
+.taxonomy li {
+  display: inline-block;
+  margin: 0.9rem;
+}
+
+.taxonomy .taxonomy-element {
+  display: block;
+  padding: 0.3rem 0.9rem;
+  background-color: var(--alt-bg);
+  border-radius: 0.6rem;
+}
+
+.taxonomy .taxonomy-element a,
+.taxonomy .taxonomy-element a:active {
+  color: var(--fg);
+}
+
+.taxonomy-term {
+  margin-top: 6.4rem;
+  margin-bottom: 3.2rem;
+}
+
+/* Pagination (ported from _pagination.scss) */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 6rem;
+  text-align: center;
+}
+
+.pagination li {
+  display: inline;
+  text-align: center;
+  font-weight: 700;
+  margin: 0 2px;
+  width: 2.2rem;
+}
+
+.pagination li a {
+  font-weight: 300;
+}
+
+.list-pagination {
+  text-align: center;
+  margin-top: 4rem;
+}
+
+/* Navigation (ported from _navigation.scss) */
+
+.navigation {
+  height: 6rem;
+  width: 100%;
+}
+
+.navigation a,
+.navigation span {
+  display: inline;
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.navigation a:hover,
+.navigation a:focus {
+  color: var(--link);
+}
+
+.navigation .navigation-title {
+  letter-spacing: 0.1rem;
+  text-transform: uppercase;
+}
+
+.navigation .navigation-list {
+  float: right;
+  list-style: none;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+@media only screen and (max-width: 768px) {
+  .navigation .navigation-list {
+    position: relative;
+    top: 2rem;
+    right: 0;
+    z-index: 5;
+    visibility: hidden;
+    opacity: 0;
+    padding: 0;
+    max-height: 0;
+    width: 100%;
+    background-color: var(--bg);
+    border-top: solid 2px var(--border);
+    border-bottom: solid 2px var(--border);
+    transition: opacity 0.25s, max-height 0.15s linear;
+  }
+}
+
+.navigation .navigation-list .navigation-item {
+  float: left;
+  margin: 0;
+  position: relative;
+}
+
+@media only screen and (max-width: 768px) {
+  .navigation .navigation-list .navigation-item {
+    float: none !important;
+    text-align: center;
+  }
+
+  .navigation .navigation-list .navigation-item a,
+  .navigation .navigation-list .navigation-item span {
+    line-height: 5rem;
+  }
+}
+
+.navigation .navigation-list .navigation-item a,
+.navigation .navigation-list .navigation-item span {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+@media only screen and (max-width: 768px) {
+  .navigation .navigation-list .separator {
+    display: none;
+  }
+
+  .navigation .navigation-list .menu-separator {
+    border-top: 2px solid var(--fg);
+    margin: 0 8rem;
+  }
+
+  .navigation .navigation-list .menu-separator span {
+    display: none;
+  }
+}
+
+.navigation #menu-toggle {
+  display: none;
+}
+
+@media only screen and (max-width: 768px) {
+  .navigation #menu-toggle {
+    display: initial;
+    position: relative;
+    visibility: hidden;
+  }
+
+  .navigation #menu-toggle:checked + label i {
+    color: var(--alt-bg);
+  }
+
+  .navigation #menu-toggle:checked + label + ul {
+    visibility: visible;
+    opacity: 1;
+    max-height: 100rem;
+  }
+
+  .navigation #menu-toggle:focus-visible + label {
+    outline-style: auto;
+  }
+}
+
+.navigation .menu-button {
+  display: none;
+}
+
+@media only screen and (max-width: 768px) {
+  .navigation .menu-button {
+    position: relative;
+    display: block;
+    font-size: 2.4rem;
+    font-weight: 400;
+    cursor: pointer;
+  }
+
+  .navigation .menu-button i {
+    color: var(--fg);
+    font-style: normal;
+  }
+
+  .navigation .menu-button i:hover,
+  .navigation .menu-button i:focus {
+    color: var(--link);
+  }
+}
+
+/* Footer (ported from _footer.scss) */
+
+.footer {
+  width: 100%;
+  text-align: center;
+  font-size: 1.6rem;
+  line-height: 2rem;
+  margin-bottom: 1rem;
+}
+
+@media only screen and (max-width: 768px) {
+  .footer {
+    font-size: 1.5rem;
+  }
+}
+
+.footer a {
+  color: var(--link);
+}
+
+/* Floating color scheme toggle (ported from _float.scss) */
+
+.float-container {
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 100;
+  position: fixed;
+}
+
+.float-container a {
+  position: relative;
+  display: inline-block;
+  width: 3rem;
+  height: 3rem;
+  font-size: 2rem;
+  color: var(--alt-fg);
+  background-color: var(--alt-bg);
+  border-radius: 0.2rem;
+  opacity: 0.5;
+  transition: all 0.25s ease-in;
+}
+
+.float-container a:hover,
+.float-container a:focus {
+  color: var(--link);
+  opacity: 1;
+}
+
+@media only screen and (max-width: 768px) {
+  .float-container a:hover,
+  .float-container a:focus {
+    color: var(--alt-fg);
+    opacity: 0.5;
+  }
+}
+
+.float-container a i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-style: normal;
+  font-weight: 400;
+}
+
+/* Table of contents */
+
+.toc {
+  margin: 2rem 0;
+  padding: 1rem 1.5rem;
+  background-color: var(--alt-bg);
+  border-radius: 1rem;
+}
+
+.toc summary {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toc ul {
+  margin: 1rem 0;
+}
+
+.toc li {
+  margin: 0.5rem 0;
+}
+
+/* Fallback notice for untranslated content */
+
+.fallback-notice {
+  padding: 1rem 1.5rem;
+  background-color: var(--alt-bg);
+  border-radius: 0.6rem;
+  font-style: italic;
+}
+
+/* Gallery */
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0.6rem;
+  transition: all 0.25s ease-in;
+}
+
+.gallery-item:hover img {
+  transform: scale(1.02);
+}
+
+/* Books (sidebar layout for book chapters) */
+
+.book-layout {
+  display: flex;
+  gap: 3rem;
+  align-items: flex-start;
+}
+
+.book-sidebar {
+  flex: 0 0 26rem;
+  position: sticky;
+  top: 2rem;
+}
+
+.book-sidebar .book-title a {
+  font-weight: 600;
+}
+
+.book-content {
+  flex: 1;
+  min-width: 0;
+}
+
+@media only screen and (max-width: 768px) {
+  .book-layout {
+    flex-direction: column;
+  }
+
+  .book-sidebar {
+    position: static;
+    flex: none;
+    width: 100%;
+  }
+}
+
+.chapter-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-top: 4rem;
+}

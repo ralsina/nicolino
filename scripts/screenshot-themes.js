@@ -16,7 +16,7 @@ const path = require('path');
 
 const REPO = path.join(__dirname, '..');
 const ASSETS = path.join(REPO, 'assets');
-const THEMES = ['default', 'minimal', 'terminal', 'papermod', 'blox', 'loveit'];
+const THEMES = ['default', 'minimal', 'terminal', 'papermod', 'blox', 'loveit', 'coder'];
 const VIEWPORT_WIDTH = 1280;
 const OUT_DIR = path.join(ASSETS, 'themes', 'shots');
 

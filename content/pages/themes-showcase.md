@@ -5,12 +5,12 @@ date: 2026-08-25
 
 Browse live demos of every available Nicolino theme. Each demo is a
 complete site with posts, taxonomies, archive, images, base16 color
-schemes, and multilingual content — the same content rendered by six
+schemes, and multilingual content — the same content rendered by seven
 different themes so you can compare them side by side.
 
 ## Installing a theme
 
-All six themes ship through the theme registry. List the
+All seven themes ship through the theme registry. List the
 available themes, then install any of them into your site:
 
 ```bash
@@ -119,6 +119,20 @@ LoveIt.
 **License:** MIT · **Version:** 1.0.0
 
 <p><a href="/themes/demo/loveit/" role="button">Live Demo</a></p>
+{{% /card %}}
+
+{{% card %}}
+[![Coder theme screenshot](/themes/shots/coder.png)](/themes/demo/coder/)
+
+### Coder
+
+Simple and clean blog theme with a light/dark scheme toggle and
+date-aligned post lists, ported from Hugo Coder.
+
+**Author:** Luiz F. A. de Prá (original), ported to Nicolino ·
+**License:** MIT · **Version:** 1.0.0
+
+<p><a href="/themes/demo/coder/" role="button">Live Demo</a></p>
 {{% /card %}}
 
 {{% /tag %}}

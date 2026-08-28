@@ -1,0 +1,35 @@
+{#- folder_index.tmpl - Coder theme folder index
+    Variables: posts, subdirs [{link, name}], files [{link, title}] -#}
+<section class="container list">
+  {% if posts and posts|length > 0 %}
+  <ul>
+    {% for post in posts %}
+    <li>
+      {% if post.date %}
+      <span class="date">{{ post.date }}</span>
+      {% endif %}
+      <a class="title" href="{{ post.link }}">{{ post.title }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% elif subdirs or files %}
+    {% if subdirs %}
+    <h3>Subdirectories</h3>
+    <ul>
+      {% for subdir in subdirs %}
+      <li><a href="{{ subdir.link }}">{{ subdir.name }}/</a></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% if files %}
+    <h3>Pages</h3>
+    <ul>
+      {% for file in files %}
+      <li><a href="{{ file.link }}">{{ file.title }}</a></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  {% else %}
+  <p>This folder is empty.</p>
+  {% endif %}
+</section>

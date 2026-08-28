@@ -1,0 +1,14 @@
+{#- language_switcher.tmpl - Coder theme language switcher
+    Variables: language_links [{lang, link, title}] -#}
+{% if language_links and language_links|length > 0 %}
+{% for lang_link in language_links %}
+{% if loop.first %}
+<li class="navigation-item menu-separator">
+  <span class="separator">|</span>
+</li>
+{% endif %}
+<li class="navigation-item">
+  <a href="{{ lang_link.link }}" title="{{ lang_link.title }}">{{ lang_link.lang }}</a>
+</li>
+{% endfor %}
+{% endif %}

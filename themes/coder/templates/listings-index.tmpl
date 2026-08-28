@@ -1,0 +1,13 @@
+{#- listings-index.tmpl - Coder theme code listings index
+    Deprecated: the listings index renders through item_list.tmpl.
+    Variables: listings [{title, link}] -#}
+<section class="container list">
+  <header>
+    <h1 class="title">Code Listings</h1>
+  </header>
+  <ul>
+    {% for item in listings %}
+    <li><a class="title" href="{{ item.link }}">{{ item.title }}</a></li>
+    {% endfor %}
+  </ul>
+</section>

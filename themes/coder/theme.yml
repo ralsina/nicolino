@@ -1,0 +1,11 @@
+name: Coder
+version: 1.0.0
+description: Simple and clean blog theme with a light/dark toggle, ported from Hugo Coder
+author: Luiz F. A. de Prá (original), ported to Nicolino
+license: MIT
+screenshot: https://nicolino.ralsina.me/themes/shots/coder.png
+# Default theme parameters, overridable from conf.yml's theme_params
+params:
+  color_scheme: auto
+  hide_color_scheme_toggle: false
+  read_more: "Read more"

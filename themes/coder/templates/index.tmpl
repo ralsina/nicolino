@@ -1,0 +1,29 @@
+{#-
+  index.tmpl - Coder theme post list
+
+  Posts are shown like Hugo Coder's list pages: one line per post
+  with the date right-aligned and the title as a link.
+
+  Variables:
+  - posts: Array of post values (link, title, date, summary,
+    preview_image, taxonomies, has_teaser)
+  - has_more: Whether older posts exist in the archive
+-#}
+<section class="container list">
+  <ul>
+    {% for post in posts %}
+    <li>
+      {% if post.date %}
+      <span class="date">{{ post.date }}</span>
+      {% endif %}
+      <a class="title" href="{{ post.link }}">{{ post.title }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+
+  {% if has_more %}
+  <nav class="list-pagination">
+    <a href="/archive/">Older posts &rarr;</a>
+  </nav>
+  {% endif %}
+</section>

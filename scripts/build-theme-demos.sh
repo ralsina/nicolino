@@ -13,7 +13,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-THEMES="default minimal terminal papermod blox loveit"
+THEMES="default minimal terminal papermod blox loveit coder"
 DEMO_DIR="$REPO_ROOT/demo"
 ASSETS_DIR="$REPO_ROOT/assets/themes/demo"
 mkdir -p "$ASSETS_DIR"

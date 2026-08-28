@@ -1,0 +1,81 @@
+{#-
+  post.tmpl - Coder theme single post
+
+  Centered article column with the post title, meta line (date,
+  updated date, taxonomy chips), collapsible table of contents,
+  justified content and a "See also" footer for related posts.
+
+  NOTE: rendered with only the post value at runtime — do not
+  reference `theme.*` here (see porting guide).
+
+  Variables: breadcrumbs, title, link, date, metadata, taxonomies,
+  toc, html, related_posts, is_fallback (see Nicolino docs)
+-#}
+<section class="container post">
+  <article>
+    <header>
+      <div class="post-title">
+        <h1 class="title">
+          <a class="title-link" href="{{ link }}">{{ title }}</a>
+        </h1>
+      </div>
+      <div class="post-meta">
+        {% if date %}
+        <div class="date">
+          <span class="posted-on">
+            <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <time>{{ date }}</time>
+          </span>
+          {% if metadata.updated and show_updated %}
+          <span class="updated-on">
+            <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <time>{{ metadata.updated }}</time>
+          </span>
+          {% endif %}
+        </div>
+        {% endif %}
+        {% if taxonomies|length > 0 %}
+        <div class="tags">
+          <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+          {% for taxonomy, terms in taxonomies %}
+            {% for term in terms %}
+            <span class="tag"><a href="{{ term.link }}">{{ term.name }}</a></span>
+            {% endfor %}
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if is_fallback %}
+        <div class="fallback-marker">🌐 untranslated</div>
+        {% endif %}
+      </div>
+    </header>
+
+    {% if is_fallback %}
+    <p class="fallback-notice">⚠ This page has not been translated yet.</p>
+    {% endif %}
+
+    {% if toc and toc|length > 0 %}
+    <details class="toc" open>
+      <summary>Table of Contents</summary>
+      {{ toc|safe }}
+    </details>
+    {% endif %}
+
+    <div class="post-content">
+      {{ html|safe }}
+    </div>
+
+    {% if related_posts and related_posts|length > 0 %}
+    <footer>
+      <div class="see-also">
+        <h2>See also</h2>
+        <ul>
+          {% for related in related_posts %}
+          <li><a href="{{ related.link }}">{{ related.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </footer>
+    {% endif %}
+  </article>
+</section>

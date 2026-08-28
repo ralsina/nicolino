@@ -1,0 +1,82 @@
+{#-
+  base16.tmpl - Base16 color scheme and font CSS template
+
+  Generates output/css/style.css for the Coder theme:
+  - Base16 palette colors (base00-base0F) as CSS custom
+    properties, which coder.css maps onto the theme palette
+  - Google Fonts imports (if configured)
+  - Font stack CSS custom properties
+
+  Variables:
+  - dark: Dark theme object with scheme_name, scheme_author, color hex values
+  - light: Light theme object with scheme_name, scheme_author, color hex values
+  - google_fonts_url: Google Fonts import URL (optional)
+  - font_sans: Sans-serif font stack CSS
+  - font_mono: Monospace font stack CSS
+  - font_display: Display font stack CSS
+  - font_heading: Heading font stack CSS (same as display)
+  - font_emoji: Emoji font stack CSS
+
+  Used by: Base16 feature for output/css/style.css
+-#}
+
+/* Font configuration */
+{% if google_fonts_url %}
+@import url("https://fonts.googleapis.com/css2?{{ google_fonts_url }}&display=swap");
+{% endif %}
+
+/* Font stacks as CSS custom properties */
+:root {
+    --font-sans: {{ font_sans }};
+    --font-mono: {{ font_mono }};
+    --font-display: {{ font_display }};
+    --font-heading: {{ font_heading }};
+    --font-emoji: {{ font_emoji }};
+}
+
+/* Base16 color scheme integration for Nicolino
+   Generated from: {{dark.scheme_name}} (dark) and {{light.scheme_name}} (light)
+   Authors: {{dark.scheme_author}} / {{light.scheme_author}} */
+
+/* Theme: {{dark.scheme_name}} */
+
+[data-theme=dark] {
+    --b16-base00: #{{dark.base00_hex}}; /* Default background */
+    --b16-base01: #{{dark.base01_hex}}; /* Lighter background */
+    --b16-base02: #{{dark.base02_hex}}; /* Selection background */
+    --b16-base03: #{{dark.base03_hex}}; /* Comments, secondary */
+    --b16-base04: #{{dark.base04_hex}}; /* Darker foreground */
+    --b16-base05: #{{dark.base05_hex}}; /* Default foreground */
+    --b16-base06: #{{dark.base06_hex}}; /* Lighter foreground */
+    --b16-base07: #{{dark.base07_hex}}; /* Lightest foreground */
+    --b16-base08: #{{dark.base08_hex}}; /* Variables, etc */
+    --b16-base09: #{{dark.base09_hex}}; /* Integers, constants */
+    --b16-base0A: #{{dark.base0A_hex}}; /* Classes, search match */
+    --b16-base0B: #{{dark.base0B_hex}}; /* Strings */
+    --b16-base0C: #{{dark.base0C_hex}}; /* Support, regex */
+    --b16-base0D: #{{dark.base0D_hex}}; /* Functions, methods */
+    --b16-base0E: #{{dark.base0E_hex}}; /* Keywords */
+    --b16-base0F: #{{dark.base0F_hex}}; /* Builtin, punctuation */
+}
+
+/* Theme: {{light.scheme_name}} */
+
+:root:not([data-theme=dark]),
+[data-theme=light] {
+    --b16-base00: #{{light.base00_hex}}; /* Default background */
+    --b16-base01: #{{light.base01_hex}}; /* Lighter background */
+    --b16-base02: #{{light.base02_hex}}; /* Selection background */
+    --b16-base03: #{{light.base03_hex}}; /* Comments, secondary */
+    --b16-base04: #{{light.base04_hex}}; /* Darker foreground */
+    --b16-base05: #{{light.base05_hex}}; /* Default foreground */
+    --b16-base06: #{{light.base06_hex}}; /* Lighter foreground */
+    --b16-base07: #{{light.base07_hex}}; /* Lightest foreground */
+    --b16-base08: #{{light.base08_hex}}; /* Variables, etc */
+    --b16-base09: #{{light.base09_hex}}; /* Integers, constants */
+    --b16-base0A: #{{light.base0A_hex}}; /* Classes, search match */
+    --b16-base0B: #{{light.base0B_hex}}; /* Strings */
+    --b16-base0C: #{{light.base0C_hex}}; /* Support, regex */
+    --b16-base0D: #{{light.base0D_hex}}; /* Functions, methods */
+    --b16-base0E: #{{light.base0E_hex}}; /* Keywords */
+    --b16-base0F: #{{light.base0F_hex}}; /* Builtin, punctuation */
+}

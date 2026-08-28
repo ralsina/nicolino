@@ -1,0 +1,23 @@
+{#- archive.tmpl - Coder theme yearly archive
+    Variables: years [{year, months: [{name, posts}]}], latest_year -#}
+<section class="container list">
+  <header>
+    <h1 class="title">Archive</h1>
+  </header>
+  {% for year in years %}
+  <section class="archive-year">
+    <h2>{{ year.year }}</h2>
+    {% for month in year.months %}
+    <h3>{{ month.name }}</h3>
+    <ul>
+      {% for post in month.posts %}
+      <li>
+        <span class="date">{{ post.date }}</span>
+        <a class="title" href="{{ post.link }}">{{ post.title }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endfor %}
+  </section>
+  {% endfor %}
+</section>

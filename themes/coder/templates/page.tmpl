@@ -1,0 +1,139 @@
+{#-
+  page.tmpl - Coder theme base layout
+
+  Ported from Hugo Coder (luizdepra/hugo-coder, MIT). Provides the
+  HTML document, the top navigation bar (site title left, menu and
+  language switcher right, burger menu on mobile), the single
+  content column and the centered footer. The color scheme toggle
+  floats fixed in the bottom-right corner.
+
+  Theme parameters available via `theme.*`:
+  - color_scheme: "light", "dark" or "auto" (follows the OS)
+  - hide_color_scheme_toggle: hide the floating scheme toggle
+-#}
+<!DOCTYPE html>
+<html lang="{{ language }}" data-theme="{% if (theme.color_scheme|default('')) != '' %}{{ theme.color_scheme }}{% else %}auto{% endif %}">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  {% if noindex %}
+  <meta name="robots" content="noindex" />{% endif %}
+  <title>{% if title and title|length > 0 %}{{ title }} · {{ site_title }}{% else %}{{ site_title }}{% endif %}</title>
+  <meta name="description" content="{% if description %}{{ description }}{% else %}{{ site_description }}{% endif %}" />
+  <link rel="canonical" href="{{ canonical_url }}" />
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="{% if og_type %}{{ og_type }}{% else %}website{% endif %}" />
+  <meta property="og:site_name" content="{{ site_title }}" />
+  <meta property="og:url" content="{{ canonical_url }}" />
+  <meta property="og:title" content="{% if title and title|length > 0 %}{{ title }}{% else %}{{ site_title }}{% endif %}" />
+  <meta property="og:description" content="{% if description %}{{ description }}{% else %}{{ site_description }}{% endif %}" />
+  {% if preview_image %}
+  <meta property="og:image" content="{{ preview_image }}" />
+  <meta name="twitter:image" content="{{ preview_image }}" />
+  {% endif %}
+  <meta name="twitter:card" content="{% if preview_image %}summary_large_image{% else %}summary{% endif %}" />
+  {% if main_feed %}
+  <link rel="alternate" type="application/rss+xml" href="{{ main_feed.link }}" title="{{ main_feed.title }}" />
+  {% else %}
+  <link rel="alternate" type="application/rss+xml" href="/rss.xml" title="RSS Feed" />
+  {% endif %}
+  {% if extra_feed %}
+  <link rel="alternate" type="application/rss+xml" href="{{ extra_feed.link }}" title="{{ extra_feed.title }}" />
+  {% endif %}
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/coder.css" />
+  <link rel="stylesheet" href="/css/syntax.css" />
+  {% if listings_css %}
+  <link rel="stylesheet" href="/css/listings.css" />
+  {% endif %}
+  {% if (theme.background_color|default('')) != '' or (theme.foreground_color|default('')) != '' or (theme.accent_color|default('')) != '' %}
+  {# Site-level hue overrides (theme_params). Rendered after the
+     stylesheets on purpose: explicit site hues win over theme and
+     base16 scheme colors alike #}
+  <style>
+    :root {
+      {% if (theme.background_color|default('')) != '' %}--bg: {{ theme.background_color }};{% endif %}
+      {% if (theme.foreground_color|default('')) != '' %}--fg: {{ theme.foreground_color }};{% endif %}
+      {% if (theme.accent_color|default('')) != '' %}--link: {{ theme.accent_color }};{% endif %}
+    }
+  </style>
+  {% endif %}
+</head>
+
+<body>
+  <main class="wrapper">
+    <nav class="navigation">
+      <section class="container">
+        <a class="navigation-title" href="/">{{ site_title }}</a>
+        {% if (site_nav_items and site_nav_items|length > 0) or (language_links and language_links|length > 0) %}
+        <input type="checkbox" id="menu-toggle" />
+        <label class="menu-button float-right" for="menu-toggle" aria-label="Toggle menu">
+          <i aria-hidden="true">&#x2630;</i>
+        </label>
+        <ul class="navigation-list">
+          {% for item in site_nav_items %}
+          <li class="navigation-item">{{ item }}</li>
+          {% endfor %}
+          {% include "templates/language_switcher.tmpl" %}
+        </ul>
+        {% endif %}
+      </section>
+    </nav>
+
+    <div class="content">
+      {{ content }}
+    </div>
+
+    <footer class="footer">
+      <section class="container">
+        {{ site_footer }} · Theme: <a href="https://github.com/luizdepra/hugo-coder" rel="noopener" target="_blank">Coder</a>
+        ported to Nicolino
+      </section>
+    </footer>
+  </main>
+
+  {% if not theme.hide_color_scheme_toggle %}
+  <div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle" href="#" aria-label="Toggle color scheme" title="Toggle color scheme">
+      <i aria-hidden="true">&#x25D0;</i>
+    </a>
+  </div>
+  {% endif %}
+
+  <script>
+    (function () {
+      var root = document.documentElement;
+      var configured = root.getAttribute('data-theme') || 'auto';
+      var stored = null;
+      try { stored = localStorage.getItem('colorscheme'); } catch (e) { }
+
+      function setTheme(theme) {
+        root.setAttribute('data-theme', theme);
+      }
+
+      if (stored === 'dark' || stored === 'light') {
+        setTheme(stored);
+      } else if (configured === 'dark' || configured === 'light') {
+        setTheme(configured);
+      } else {
+        setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        {# auto: follow OS preference changes live, like the original coder.js #}
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (event) {
+          setTheme(event.matches ? 'dark' : 'light');
+        });
+      }
+
+      var toggle = document.getElementById('dark-mode-toggle');
+      if (toggle) toggle.addEventListener('click', function (event) {
+        event.preventDefault();
+        var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        setTheme(next);
+        try { localStorage.setItem('colorscheme', next); } catch (e) { }
+      });
+    })();
+  </script>
+</body>
+
+</html>

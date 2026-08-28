@@ -1,0 +1,18 @@
+{#- gallery.tmpl - Coder theme gallery page
+    Variables: breadcrumbs, title, link, html, image_list -#}
+{% include "templates/title.tmpl" %}
+
+<section class="container">
+  <article>
+    <div class="post-content">
+      {{ html|safe }}
+      <div class="gallery">
+        {% for image in image_list %}
+        <a class="gallery-item" href="{{ image }}">
+          <img src="{{ image|thumb_url }}" alt="{{ image }}" loading="lazy" />
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </article>
+</section>

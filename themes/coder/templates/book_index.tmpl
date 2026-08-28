@@ -1,0 +1,27 @@
+{#- book_index.tmpl - Coder theme book landing page
+    Variables: book {name, title, description}, toc_html, first_chapter -#}
+<section class="container">
+  <div class="book-layout">
+    <aside class="book-sidebar">
+      <div class="book-title">
+        <a href="/books/{{ book.name }}/">{{ book.title }}</a>
+      </div>
+      <nav class="book-toc">
+        {{ toc_html|safe }}
+      </nav>
+    </aside>
+    <main class="book-content">
+      <header>
+        <h1 class="title">{{ book.title }}</h1>
+      </header>
+      {% if book.description %}
+      <p>{{ book.description }}</p>
+      {% endif %}
+      <nav class="chapter-nav">
+        {% if first_chapter %}
+        <a href="{{ first_chapter.link }}">{{ first_chapter.title }} &rarr;</a>
+        {% endif %}
+      </nav>
+    </main>
+  </div>
+</section>

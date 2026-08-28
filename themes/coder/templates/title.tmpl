@@ -1,0 +1,15 @@
+{#-
+  title.tmpl - Coder theme page title header
+
+  Variables: breadcrumbs, link, title, taxonomies
+
+  NOTE: rendered standalone by the taxonomies feature with a minimal
+  context — do not reference `theme.*` here (see porting guide).
+-#}
+<section class="container">
+  <header>
+    <h1 class="title">
+      <a class="title-link" href="{{ link }}">{{ title }}</a>
+    </h1>
+  </header>
+</section>
