@@ -3,6 +3,7 @@ require "./theme"
 require "./render"
 require "json"
 require "crinja"
+require "./thumb"
 
 # Create automatic image galleries
 #
@@ -179,6 +180,22 @@ module Gallery
       breadcrumbs
     end
 
+    # Read an image's dimensions (header only, cheap). Returns 0s when
+    # the file can't be read; templates should skip sizing then.
+    private def image_dimensions(path : String) : {Int32, Int32}
+      {% if flag?(:novips) %}
+        img = CrImage.read(path)
+        {img.width, img.height}
+      {% else %}
+        Images.init_vips_cache
+        img = Vips::Image.new_from_file(path)
+        {img.width, img.height}
+      {% end %}
+    rescue ex
+      Log.warn { "Could not read dimensions of #{path}: #{ex.message}" }
+      {0, 0}
+    end
+
     def value(lang = nil)
       lang ||= Locale.language
       {
@@ -192,7 +209,10 @@ module Gallery
         "title"             => title(lang),
         "toc"               => toc(lang),
         "metadata"          => metadata(lang),
-        "image_list"        => @image_list,
+        "image_list"        => @image_list.map do |name|
+          width, height = image_dimensions((base.parent / name).to_s)
+          {"name" => name, "width" => width, "height" => height}
+        end,
         "has_sub_galleries" => has_sub_galleries?.to_s,
         "has_images"        => has_images?.to_s,
         "language_links"    => language_links(lang),
