@@ -14,8 +14,14 @@ module HTML
       doc = HtmlFilters.make_links_relative(doc, link)
       html_with_classes = HtmlFilters.fix_code_classes(doc).to_html
 
-      # Extract TOC and add anchors to headings
-      Toc.extract_and_annotate(html_with_classes)
+      # TOC is opt-in via `toc` metadata, matching markdown posts:
+      # short HTML posts (book reviews, feed imports) would otherwise
+      # all sprout a one-entry TOC for their single heading
+      if metadata(lang).has_key?("toc")
+        Toc.extract_and_annotate(html_with_classes)
+      else
+        {html_with_classes, ""}
+      end
     end
   end
 
