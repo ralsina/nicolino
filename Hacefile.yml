@@ -141,6 +141,12 @@ tasks:
       - theme-registry
     commands: |
       rm -rf content/bench/
+      bin/nicolino import
+      git add content/posts/releases/
+      git diff --cached --quiet -- content/posts/releases/ || \
+        git commit -m "chore: import release posts" -- content/posts/releases/ || \
+        git commit -m "chore: import release posts" -- content/posts/releases/
+      git push
       rm -rf output/
       bin/nicolino build -B
       rsync -rzav --delete output/* root@rocky:/data/stacks/web/websites/nicolino.ralsina.me/
