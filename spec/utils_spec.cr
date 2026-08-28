@@ -122,4 +122,15 @@ describe Utils do
       Utils.text_excerpt("short and sweet", limit: 50).should eq "short and sweet"
     end
   end
+
+  describe ".word_count" do
+    it "counts words in an HTML fragment, ignoring tags" do
+      Utils.word_count("<p>one two</p><p>three <b>four</b></p>").should eq 4
+    end
+
+    it "returns zero for empty fragments" do
+      Utils.word_count("").should eq 0
+      Utils.word_count("   ").should eq 0
+    end
+  end
 end

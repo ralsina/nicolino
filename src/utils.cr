@@ -24,6 +24,16 @@ module Utils
     string.split(/[-_\s]/).map(&.capitalize).join(" ")
   end
 
+  # Word count of an HTML fragment's text, for reading-time
+  # estimates in themes. Tags are replaced by spaces first: lexbor
+  # joins text at block boundaries without whitespace, which would
+  # merge the last word of one block into the first of the next.
+  def self.word_count(html : String) : Int32
+    return 0 if html.strip.empty?
+    text = Lexbor::Parser.new(html.gsub(/<[^>]+>/, " ")).body.try(&.inner_text) || ""
+    text.scan(/\S+/).size
+  end
+
   # Convert path to link, optionally changing extension
   #
   # >> path_to_link("output/foo/../bar") # => "/bar"

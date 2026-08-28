@@ -17,6 +17,10 @@ theme: papermod
 # base16 color scheme used by both themes (see `nicolino color_schemes`)
 color_scheme: "catppuccin-mocha"
 
+# Humanized dates in the demos (Crystal formats are not localized,
+# so the Spanish config overrides with a numeric format)
+date_output_format: "%B %e, %Y"
+
 theme_params:
   center_theme: true
 

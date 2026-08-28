@@ -660,6 +660,7 @@ module Markdown
     def value(lang = nil)
       lang = lang || Locale.language
       page_html = html(lang)
+      words = Utils.word_count(page_html)
       {
         "breadcrumbs"    => breadcrumbs(lang),
         "date"           => date.try &.as(Time).to_s(Config.options(lang).date_output_format),
@@ -676,6 +677,8 @@ module Markdown
         "language_links" => language_links(lang),
         "has_teaser"     => has_teaser?(page_html, lang),
         "is_fallback"    => fallback?(lang),
+        "word_count"     => words,
+        "reading_time"   => words == 0 ? 0 : [(words / 200.0).ceil.to_i, 1].max,
       }
     end
 
