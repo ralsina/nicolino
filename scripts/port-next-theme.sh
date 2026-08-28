@@ -56,15 +56,33 @@ PORT_MODEL="${PORT_MODEL:-zai-coding-plan/glm-5.2}"
 exec opencode run --auto --model "$PORT_MODEL" --title "port-$THEME" \
   "Port the Hugo theme $REPO (entry \`$THEME\` in THEME-TODO.md) to Nicolino.
 
-Visual fidelity is the top priority: port the LOOK of the original,
-not just its structure. Clone $REPO, study its layouts and CSS, and
-recreate the signature elements readers use to recognize the theme
-(metadata rows with icons, reading time, date presentation,
-typography, colors, layout proportions, navigation style). The
-ported demo must be recognizably that theme side by side with its
-Hugo original, not a generic blog with a different title. Do not
-reuse CSS or markup patterns from the other Nicolino themes except
-where the original itself does.
+TRANSLATE the original design, never reimagine it. Samey ports come
+from writing CSS from generic memory instead of extracting the
+original's actual values. So work like a translator:
+
+1. Clone $REPO AND open the original's themes.gohugo.io page
+   (https://themes.gohugo.io/themes/$THEME/) for its screenshots
+   and demo link.
+2. Mine the original for facts before writing anything:
+   - layouts: the exact DOM of the header, list item, article meta
+     row, footer, pagination (keep the original's class names where
+     practical so CSS maps 1:1)
+   - styles: real values from its SCSS/CSS or compiled assets --
+     color hexes, font stacks and sizes, spacing scale, radii,
+     shadows, transitions. If it uses SCSS variables or Tailwind,
+     resolve them to concrete values and copy those.
+   - icons: which Font Awesome (or other) icons appear where;
+     inline the SVG equivalents
+3. Write the port from those extracted values. The theme palette
+   must literally contain the original's colors (except where
+   base16 hooks are required). Do not reuse CSS values, class names
+   or markup patterns from other Nicolino themes.
+
+Available data: post values carry link, title, date, summary, html,
+toc, taxonomies, metadata, preview_image, has_teaser, word_count,
+reading_time, related_posts, language_links, is_fallback. There are
+no Hugo widgets, search params or i18n catalogs -- hardcode the
+original's English strings where it uses i18n.
 
 Follow docs/theme-porting.md and mirror the structure of themes/blox/
 (the most recent hand-checked port). Do the complete job:
@@ -80,10 +98,11 @@ Follow docs/theme-porting.md and mirror the structure of themes/blox/
    content/pages/themes-showcase.md.
 3. Verify: shards build, crystal spec, bin/ameba, demo build in both
    languages, hace screenshots theme-registry, full site build and
-   check_links with 0 broken links. Then open the generated
-   assets/themes/shots/<name>.png next to the original theme's Hugo
-   screenshot or demo site and check they are recognizably the same
-   design; if not, iterate on the CSS before committing.
+   check_links with 0 broken links. Then audit fidelity
+   programmatically (you cannot see images): diff the ported CSS's
+   hex colors against the original's, and grep the demo HTML for
+   the original's signature elements (meta rows, icons, class
+   names). Iterate until the audit is clean.
 4. Mark it ported in THEME-TODO.md (change \`- [ ] $THEME ...\` to
    \`- [x] <name> ... -- ported\`).
 5. Commit all pertinent files (if a pre-commit hook fails, fix the
@@ -93,9 +112,9 @@ Follow docs/theme-porting.md and mirror the structure of themes/blox/
 Known traps (also in the porting guide): title.tmpl and post.tmpl
 render without the \`theme\` constant; empty strings are truthy in
 Crinja; markdownlint enforces line length; never use not_nil!;
-post values include word_count and reading_time (words/200) for
-metadata rows; dates arrive pre-formatted via the site's
-date_output_format (the demo uses a humanized one).
+dates arrive pre-formatted via the site's date_output_format (the
+demo uses a humanized one); code highlighting is server-side via
+/css/syntax.css, never ship highlight.js.
 
 If the port cannot be completed successfully, clean the working
 tree (git checkout . plus removing any untracked theme dirs you

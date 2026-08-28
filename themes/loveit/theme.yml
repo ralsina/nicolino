@@ -9,4 +9,5 @@ params:
   color_scheme: light
   header_normal: false
   hide_summary: false
-  read_more: "Read more"
+  author: "Roberto Alsina"
+  read_more: "Read More"

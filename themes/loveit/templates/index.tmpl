@@ -1,9 +1,11 @@
 {#-
   index.tmpl - LoveIt theme post list
 
-  Posts are shown as LoveIt home summaries: title link, optional
-  featured image, a text excerpt and a meta footer (tags left,
-  date right), separated by dashed rules.
+  Mirrors LoveIt's summary partial: optional featured image (30%
+  aspect ratio, cover), h1 single-title, post-meta (author icon +
+  "published on"), 3-line-clamped excerpt and a post-footer with
+  "Read More" left and comma-separated tags right, each summary
+  separated by a dashed rule.
 
   Variables:
   - posts: Array of post values (link, title, date, summary,
@@ -12,28 +14,44 @@
 -#}
 <div class="home-posts">
   {% for post in posts %}
-  <article class="summary">
-    <h2 class="summary-title"><a href="{{ post.link }}">{{ post.title }}</a></h2>
+  <article class="single summary">
     {% if post.preview_image %}
-    <a class="featured-image-preview" href="{{ post.link }}">
-      <img src="{{ post.preview_image }}" alt="{{ post.title }}" loading="lazy" />
-    </a>
+    <div class="featured-image-preview">
+      <a href="{{ post.link }}">
+        <img src="{{ post.preview_image }}" alt="{{ post.title }}" loading="lazy" />
+      </a>
+    </div>
     {% endif %}
+    <h1 class="single-title"><a href="{{ post.link }}">{{ post.title }}</a></h1>
+    <div class="post-meta">
+      {% if (theme.author|default('')) != '' %}
+      <span class="post-author">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        {{ theme.author }}
+      </span>
+      {% endif %}
+      {% if post.date %}
+      <span class="post-publish">
+        published on <time>{{ post.date }}</time>
+      </span>
+      {% endif %}
+    </div>
     {% if not theme.hide_summary %}
-    <div class="summary-content">
+    <div class="content">
       {{ post.summary|striptags }}{% if post.has_teaser %}…{% endif %}
     </div>
     {% endif %}
     <div class="post-footer">
+      <a href="{{ post.link }}">{{ theme.read_more | default("Read More") }}</a>
+      {% if post.taxonomies|length > 0 %}
       <div class="post-tags">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
         {% for taxonomy, terms in post.taxonomies %}
           {% for term in terms %}
-          <a class="tag" href="{{ term.link }}">#{{ term.name }}</a>
+          <a href="{{ term.link }}">{{ term.name }}</a>{% if not loop.last %},&nbsp;{% endif %}
           {% endfor %}
         {% endfor %}
       </div>
-      {% if post.date %}
-      <time class="post-date">{{ post.date }}</time>
       {% endif %}
     </div>
   </article>
@@ -41,7 +59,7 @@
 </div>
 
 {% if has_more %}
-<nav class="list-pagination">
-  <a href="/archive/">{{ theme.read_more | default("Read more") }} <span aria-hidden="true">→</span></a>
+<nav class="pagination">
+  <a class="prev" href="/archive/">Older posts</a>
 </nav>
 {% endif %}
