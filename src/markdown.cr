@@ -406,7 +406,9 @@ module Markdown
               LibDiscount::MKD_AUTOLINK |
               LibDiscount::MKD_SAFELINK |
               LibDiscount::MKD_NOPANTS |
-              LibDiscount::MKD_GITHUBTAGS
+              LibDiscount::MKD_GITHUBTAGS |
+              LibDiscount::MKD_DLDISCOUNT |
+              LibDiscount::MKD_DLEXTRA
       flags |= LibDiscount::MKD_TOC if metadata(lang).fetch("toc", nil) != nil
       result = Discount.compile(
         replace_shortcodes(lang),
