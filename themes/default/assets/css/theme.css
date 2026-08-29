@@ -57,8 +57,7 @@ dt {
 
 /* Breadcrumb separator */
 .breadcrumb-sep {
-    margin-left: 0;
-    margin-right: 8px;
+    margin: 0;
     display: inline-block;
 }
 

@@ -20,14 +20,13 @@
 <h1 class="primary">
   {% if breadcrumbs|length > 0 %}
   <nav aria-label="breadcrumb" class="breadcrumb">
-    {% for item in breadcrumbs %}
-      {% if loop.last %}
+    {%- for item in breadcrumbs %}
+      {%- if loop.last %}
       <a href="{{ item.link }}" class="">{{ item.name }}</a>
-      {% else %}
-      <a href="{{ item.link }}" class="breadcrumb-collapsed">{{ item.name }}</a>
-      <span class="breadcrumb-sep breadcrumb-toggle" role="button" tabindex="0" aria-label="Show breadcrumb trail" title="Show path" onclick="this.closest('nav').classList.toggle('expanded')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.closest('nav').classList.toggle('expanded')}">»</span>
-      {% endif %}
-    {% endfor %}
+      {%- else %}
+      <a href="{{ item.link }}" class="breadcrumb-collapsed">{{ item.name }}</a><span class="breadcrumb-sep breadcrumb-toggle" role="button" tabindex="0" aria-label="Show breadcrumb trail" title="Show path" onclick="this.closest('nav').classList.toggle('expanded')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.closest('nav').classList.toggle('expanded')}">|</span>
+      {%- endif %}
+    {%- endfor %}
   </nav>
   {% else %}
   <a href="{{link}}">{{title}}</a>
