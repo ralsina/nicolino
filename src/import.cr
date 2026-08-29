@@ -718,13 +718,11 @@ module Import
     templates_dir = Config.options.import_templates
 
     feeds.each do |name, cfg|
-      begin
-        feed_cfg = FeedConfig.from_any(cfg, name)
-        Log.debug { "Feed #{name}: feed_format=#{feed_cfg.feed_format.inspect}, json_feed?=#{feed_cfg.json_feed?}" }
-        import_feed(name, feed_cfg, templates_dir)
-      rescue ex : Exception
-        Log.error(exception: ex) { "Failed to import feed '#{name}': #{ex.message}" }
-      end
+      feed_cfg = FeedConfig.from_any(cfg, name)
+      Log.debug { "Feed #{name}: feed_format=#{feed_cfg.feed_format.inspect}, json_feed?=#{feed_cfg.json_feed?}" }
+      import_feed(name, feed_cfg, templates_dir)
+    rescue ex : Exception
+      Log.error(exception: ex) { "Failed to import feed '#{name}': #{ex.message}" }
     end
   end
 end

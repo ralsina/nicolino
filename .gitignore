@@ -37,3 +37,4 @@ node_modules
 package-lock.json
 .zcode/
 /bench/results/
+.nicolino.lock

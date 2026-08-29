@@ -34,13 +34,11 @@ module HTML
       Markdown.posts.has_key?(base.to_s) || Utils.should_skip_file?(base)
     end
     Markdown.files_from(todo) do |sources, base|
-      begin
-        File.new(sources, base)
-      rescue ex
-        Log.error { "Error parsing #{base}: #{ex.message}" }
-        Log.debug { ex }
-        nil
-      end
+      File.new(sources, base)
+    rescue ex
+      Log.error { "Error parsing #{base}: #{ex.message}" }
+      Log.debug { ex }
+      nil
     end
   end
 end

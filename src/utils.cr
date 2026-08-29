@@ -106,14 +106,12 @@ module Utils
     channels = Channel(T | Exception).new
     num_chunks.times do |chunk_idx|
       spawn do
-        begin
-          start_idx = chunk_idx * chunk_size
-          end_idx = Math.min(start_idx + chunk_size, inputs.size)
-          chunk_data = inputs[start_idx...end_idx]
-          channels.send(block.call(chunk_data, start_idx))
-        rescue ex
-          channels.send(ex)
-        end
+        start_idx = chunk_idx * chunk_size
+        end_idx = Math.min(start_idx + chunk_size, inputs.size)
+        chunk_data = inputs[start_idx...end_idx]
+        channels.send(block.call(chunk_data, start_idx))
+      rescue ex
+        channels.send(ex)
       end
     end
 

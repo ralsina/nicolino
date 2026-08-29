@@ -831,67 +831,65 @@ module Markdown
           inputs: dependencies[post],
           mergeable: false
         ) do
-          begin
-            # Need to refresh post contents first, before validation
-            # This ensures we check the current metadata, not cached values
-            post.load lang if Croupier::TaskManager.auto_mode?
+          # Need to refresh post contents first, before validation
+          # This ensures we check the current metadata, not cached values
+          post.load lang if Croupier::TaskManager.auto_mode?
 
-            # Validate requirements during task execution
-            if require_date && post.date == nil
-              Log.error { "Error: #{post.source lang} has no date" }
-              next
-            end
-            if require_title && post.title(lang).empty?
-              Log.error { "Error: #{post.source lang} has no title" }
-              next
-            end
-
-            Log.info { "👉 #{post.output lang}" }
-            page_value = post.value(lang)
-            rendered = post.rendered(page_value, lang)
-            template_vars = {
-              "content"        => rendered,
-              "title"          => page_value["title"],
-              "breadcrumbs"    => page_value["breadcrumbs"],
-              "language_links" => page_value["language_links"],
-              "is_fallback"    => post.fallback?(lang),
-              # Social sharing metadata (OpenGraph/Twitter cards)
-              "link"    => post.link(lang),
-              "og_type" => require_date ? "article" : "website",
-            }.merge(post.social_context(lang))
-            t0 = Time.instant
-            html = Render.apply_template(Theme.template_path("page.tmpl"), template_vars, lang)
-            t1 = Time.instant
-            if HtmlFilters.string_rewrite_safe?(html)
-              # Safe for string rewriting: regex-only path, no Lexbor parse.
-              html = HtmlFilters.relativize_links_in_string(html, post.link(lang))
-            else
-              # DOM path: Lexbor parse + make_links_relative + fix_code_classes.
-              # make_links_relative now handles all tags with href/src, so the
-              # regex-based relativize_links_in_string is not needed here.
-              doc = Lexbor::Parser.new(html)
-              doc = HtmlFilters.make_links_relative(doc, post.link(lang))
-              html = HtmlFilters.fix_code_classes(doc).to_html
-            end
-            # pretty_html only controls output formatting: run the
-            # lexbor normalization pass for byte-stable pretty output,
-            # skip it for the faster raw template output
-            if Config.options.pretty_html?
-              doc = Lexbor::Parser.new(html)
-              html = HtmlFilters.fix_code_classes(doc).to_html
-            end
-            t2 = Time.instant
-            Profiler.record_task(
-              (t1 - t0).total_nanoseconds,
-              (t2 - t1).total_nanoseconds
-            )
-            html
-          rescue ex
-            Log.error { "Error rendering post: #{post.source(lang)}" }
-            Log.error { "#{ex.class}: #{ex.message}" }
-            ex.backtrace.each { |line| Log.error { "  #{line}" } }
-            raise ex
+          # Validate requirements during task execution
+          if require_date && post.date == nil
+            Log.error { "Error: #{post.source lang} has no date" }
+            next
           end
+          if require_title && post.title(lang).empty?
+            Log.error { "Error: #{post.source lang} has no title" }
+            next
+          end
+
+          Log.info { "👉 #{post.output lang}" }
+          page_value = post.value(lang)
+          rendered = post.rendered(page_value, lang)
+          template_vars = {
+            "content"        => rendered,
+            "title"          => page_value["title"],
+            "breadcrumbs"    => page_value["breadcrumbs"],
+            "language_links" => page_value["language_links"],
+            "is_fallback"    => post.fallback?(lang),
+            # Social sharing metadata (OpenGraph/Twitter cards)
+            "link"    => post.link(lang),
+            "og_type" => require_date ? "article" : "website",
+          }.merge(post.social_context(lang))
+          t0 = Time.instant
+          html = Render.apply_template(Theme.template_path("page.tmpl"), template_vars, lang)
+          t1 = Time.instant
+          if HtmlFilters.string_rewrite_safe?(html)
+            # Safe for string rewriting: regex-only path, no Lexbor parse.
+            html = HtmlFilters.relativize_links_in_string(html, post.link(lang))
+          else
+            # DOM path: Lexbor parse + make_links_relative + fix_code_classes.
+            # make_links_relative now handles all tags with href/src, so the
+            # regex-based relativize_links_in_string is not needed here.
+            doc = Lexbor::Parser.new(html)
+            doc = HtmlFilters.make_links_relative(doc, post.link(lang))
+            html = HtmlFilters.fix_code_classes(doc).to_html
+          end
+          # pretty_html only controls output formatting: run the
+          # lexbor normalization pass for byte-stable pretty output,
+          # skip it for the faster raw template output
+          if Config.options.pretty_html?
+            doc = Lexbor::Parser.new(html)
+            html = HtmlFilters.fix_code_classes(doc).to_html
+          end
+          t2 = Time.instant
+          Profiler.record_task(
+            (t1 - t0).total_nanoseconds,
+            (t2 - t1).total_nanoseconds
+          )
+          html
+        rescue ex
+          Log.error { "Error rendering post: #{post.source(lang)}" }
+          Log.error { "#{ex.class}: #{ex.message}" }
+          ex.backtrace.each { |line| Log.error { "  #{line}" } }
+          raise ex
         end
       end
     end

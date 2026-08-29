@@ -35,11 +35,9 @@ module DateUtils
     ]
 
     formats.each do |format|
-      begin
-        return format.parse(date_str)
-      rescue
-        # Try next format
-      end
+      return format.parse(date_str)
+    rescue
+      # Try next format
     end
 
     # Try Pocketbase format: "2026-01-29 11:57:28.164Z"

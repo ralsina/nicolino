@@ -116,13 +116,11 @@ module Pandoc
         Markdown.posts.has_key?(base.to_s) || Utils.should_skip_file?(base)
       end
       posts += Markdown.files_from(todo) do |sources, base|
-        begin
-          File.new(sources, base)
-        rescue ex
-          Log.error { "Error parsing #{base}: #{ex.message}" }
-          Log.debug { ex }
-          raise ex
-        end
+        File.new(sources, base)
+      rescue ex
+        Log.error { "Error parsing #{base}: #{ex.message}" }
+        Log.debug { ex }
+        raise ex
       end
     end
     posts

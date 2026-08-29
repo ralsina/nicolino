@@ -199,17 +199,17 @@ module Gallery
     def value(lang = nil)
       lang ||= Locale.language
       {
-        "breadcrumbs"       => breadcrumbs(lang),
-        "date"              => date.try &.as(Time).to_s(Config.options(lang).date_output_format),
-        "html"              => html(lang),
-        "link"              => link(lang),
-        "source"            => source(lang),
-        "summary"           => summary(lang),
-        "taxonomies"        => taxonomies,
-        "title"             => title(lang),
-        "toc"               => toc(lang),
-        "metadata"          => metadata(lang),
-        "image_list"        => @image_list.map do |name|
+        "breadcrumbs" => breadcrumbs(lang),
+        "date"        => date.try &.as(Time).to_s(Config.options(lang).date_output_format),
+        "html"        => html(lang),
+        "link"        => link(lang),
+        "source"      => source(lang),
+        "summary"     => summary(lang),
+        "taxonomies"  => taxonomies,
+        "title"       => title(lang),
+        "toc"         => toc(lang),
+        "metadata"    => metadata(lang),
+        "image_list"  => @image_list.map do |name|
           width, height = image_dimensions((base.parent / name).to_s)
           {"name" => name, "width" => width, "height" => height}
         end,
