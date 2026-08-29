@@ -3,7 +3,8 @@
 
   Renders:
   - Breadcrumb navigation (Home >> Section >> Subsection >> Page)
-    * Breadcrumbs collapse on hover to save space
+    * One clickable » per ancestor level; clicking it expands the
+      full trail (no hover expansion, so the layout never shifts)
     * Last breadcrumb (current page) stays visible
   - Fallback to simple title link if no breadcrumbs
   - Taxonomy links (tags, categories, etc.) if present
@@ -20,8 +21,12 @@
   {% if breadcrumbs|length > 0 %}
   <nav aria-label="breadcrumb" class="breadcrumb">
     {% for item in breadcrumbs %}
-      {% if not loop.first %}<span class="breadcrumb-sep {% if loop.last %}breadcrumb-sep-last{% else %}breadcrumb-collapsed{% endif %}"> » </span>{% endif %}
-      <a href="{{ item.link }}" class="{% if not loop.last %}breadcrumb-collapsed{% endif %}">{{ item.name }}</a>
+      {% if loop.last %}
+      <a href="{{ item.link }}" class="">{{ item.name }}</a>
+      {% else %}
+      <a href="{{ item.link }}" class="breadcrumb-collapsed">{{ item.name }}</a>
+      <span class="breadcrumb-sep breadcrumb-toggle" role="button" tabindex="0" aria-label="Show breadcrumb trail" title="Show path" onclick="this.closest('nav').classList.toggle('expanded')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.closest('nav').classList.toggle('expanded')}">»</span>
+      {% endif %}
     {% endfor %}
   </nav>
   {% else %}

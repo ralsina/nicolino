@@ -87,10 +87,21 @@ dt {
     visibility: hidden;
 }
 
-.breadcrumb:hover .breadcrumb-collapsed {
+/* The trail expands when a » toggle is clicked (see .breadcrumb-toggle),
+   not on hover */
+.breadcrumb.expanded .breadcrumb-collapsed {
     max-width: 200px;
     opacity: 1;
     visibility: visible;
+}
+
+.breadcrumb.expanded .breadcrumb-toggle {
+    display: none;
+}
+
+.breadcrumb-toggle {
+    cursor: pointer;
+    user-select: none;
 }
 
 /* Post metadata section */
