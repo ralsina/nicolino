@@ -27,6 +27,9 @@ module Nicolino
         DOC
 
       def run : Int32
+        lock = BuildLock.acquire
+        return 1 unless lock
+
         create_tasks
         fast_mode = !@options.fetch("--fast-mode", nil).nil?
         Croupier::TaskManager.fast_mode = fast_mode

@@ -12,6 +12,10 @@ module Nicolino
         If you specify one or more TARGETs, only those files will be
         built. If you don't specify any, the whole site will be built.
 
+        While building, a .nicolino.lock file is held in the site
+        directory: concurrent nicolino processes corrupt each other's
+        state, so run one build at a time.
+
         Usage:
           nicolino build [TARGET...] [--fast-mode][-n][-p][--progress]
                                      [-k][-q][-B][-c <file>]
@@ -32,6 +36,9 @@ module Nicolino
         DOC
 
       def run : Int32
+        lock = BuildLock.acquire
+        return 1 unless lock
+
         arguments = options.fetch("TARGET", [] of String).as(Array(String))
         run(
           arguments: arguments,
