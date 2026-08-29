@@ -13,6 +13,9 @@
 
   Used by: Markdown.render_index for generating index pages
 -#}
+{% if has_more %}
+<p class="index-note">Showing the latest {{ posts | length }} posts.</p>
+{% endif %}
 {% for post in posts %}
 <article class="card">
     <h2><a href="{{post.link}}">{{post.title}}</a></h2>

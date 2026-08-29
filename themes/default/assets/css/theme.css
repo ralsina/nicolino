@@ -712,3 +712,10 @@ header nav details[open] ul {
     white-space: nowrap;
     z-index: 10;
 }
+
+/* "Showing the latest N posts" note on capped index pages */
+.index-note {
+    color: var(--pico-muted-color);
+    font-size: 0.9em;
+    margin-bottom: 1.5em;
+}
