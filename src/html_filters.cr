@@ -205,6 +205,13 @@ module HtmlFilters
     end
   end
 
+  # URLs that must never be relativized: in-page anchors, external
+  # URLs (including protocol-relative //host/path)
+  private def self.external_or_anchor?(url : String)
+    url.starts_with?("#") || url.starts_with?("//") ||
+      url.matches?(/^[a-zA-Z][a-zA-Z0-9+.\-]*:/)
+  end
+
   # Make all relative links relative to the page location.
   # base is where the file containing the URIs is located
   # relative to the site root.
@@ -213,34 +220,29 @@ module HtmlFilters
   def self.make_links_relative(doc, base)
     prefix = relative_prefix(base)
     base_uri = URI.parse(base)
+
+    rewrite = ->(node : Lexbor::Node, attr : String) do
+      url = node[attr]
+      if url.starts_with?("/")
+        node[attr] = resolve_root_relative(url, prefix)
+      else
+        node[attr] = md_link_to_html(base_uri.relativize(base_uri.resolve(url)).to_s)
+      end
+    end
+
     {"a", "link"}.each do |tag|
       doc.nodes(tag).each do |node|
         next unless node.has_key? "href"
-        href = node["href"]
-        next if href.starts_with?("#")
-        # Protocol-relative URLs (//host/path) are external
-        next if href.starts_with?("//")
-        next if href.matches?(/^[a-zA-Z][a-zA-Z0-9+.\-]*:/)
+        next if external_or_anchor?(node["href"])
         next if tag == "link" && node.fetch("rel", nil) == "canonical"
-        if href.starts_with?("/")
-          node["href"] = resolve_root_relative(href, prefix)
-        else
-          node["href"] = md_link_to_html(base_uri.relativize(base_uri.resolve(href)).to_s)
-        end
+        rewrite.call(node, "href")
       end
     end
     {"img", "script", "video", "audio", "source", "iframe", "embed"}.each do |tag|
       doc.nodes(tag).each do |node|
         next unless node.has_key? "src"
-        src = node["src"]
-        # Protocol-relative URLs (//host/path) are external
-        next if src.starts_with?("//")
-        next if src.matches?(/^[a-zA-Z][a-zA-Z0-9+.\-]*:/)
-        if src.starts_with?("/")
-          node["src"] = resolve_root_relative(src, prefix)
-        else
-          node["src"] = base_uri.relativize(base_uri.resolve(src)).to_s
-        end
+        next if external_or_anchor?(node["src"])
+        rewrite.call(node, "src")
       end
     end
     doc
