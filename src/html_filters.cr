@@ -218,6 +218,8 @@ module HtmlFilters
         next unless node.has_key? "href"
         href = node["href"]
         next if href.starts_with?("#")
+        # Protocol-relative URLs (//host/path) are external
+        next if href.starts_with?("//")
         next if href.matches?(/^[a-zA-Z][a-zA-Z0-9+.\-]*:/)
         next if tag == "link" && node.fetch("rel", nil) == "canonical"
         if href.starts_with?("/")
@@ -231,6 +233,8 @@ module HtmlFilters
       doc.nodes(tag).each do |node|
         next unless node.has_key? "src"
         src = node["src"]
+        # Protocol-relative URLs (//host/path) are external
+        next if src.starts_with?("//")
         next if src.matches?(/^[a-zA-Z][a-zA-Z0-9+.\-]*:/)
         if src.starts_with?("/")
           node["src"] = resolve_root_relative(src, prefix)

@@ -7,6 +7,9 @@ module Handler
   # Takes a FilterProc which takes the next handler's
   # output and modifies it
   class Filter < IO
+    # Buffered response bytes, transformed once on close
+    @buffer = IO::Memory.new
+
     def initialize(
       @proc : FilterProc,
       @context : HTTP::Server::Context,
@@ -15,17 +18,20 @@ module Handler
     end
 
     def write(slice : Bytes) : Nil
-      @context.response.headers.delete("Content-Length")
-      @io.write(@proc.as(FilterProc).call(slice))
-      @io.flush
+      # Buffer: transforming each write chunk independently would
+      # parse HTML fragments as whole documents (Lexbor "fixes" them
+      # by closing tags and adding html/head scaffolding mid-page)
+      @buffer.write(slice)
     end
 
     def close
+      @context.response.headers.delete("Content-Length")
+      @io.write(@proc.as(FilterProc).call(@buffer.to_slice))
+      @io.flush
       @io.close
     end
 
     def flush
-      @io.flush
     end
 
     def read(slice : Bytes)

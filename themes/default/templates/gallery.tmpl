@@ -18,8 +18,8 @@
 {{html}}
 <div class="pswp-gallery gallery">
 {% for image in image_list %}
-  <a href="{{image}}" data-pswp-width="" data-pswp-height="" target="_blank">
-    <img src="{{image | thumb_url}}" alt="" loading="lazy" />
+  <a href="{{image.name}}" {% if image.width and image.height %}data-pswp-width="{{image.width}}" data-pswp-height="{{image.height}}"{% endif %} target="_blank">
+    <img src="{{image.name | thumb_url}}" alt="" loading="lazy" />
   </a>
 {% endfor %}
 </div>

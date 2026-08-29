@@ -37,6 +37,7 @@ dependencies:
     github: ralsina/shortcodes
   tartrazine:
     github: ralsina/tartrazine
+    version: ~> 0.21.3
   cronic:
     github: nanobowers/cronic
   baked_file_system:

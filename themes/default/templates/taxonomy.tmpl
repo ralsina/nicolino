@@ -6,11 +6,12 @@
 
   Variables:
   - taxonomy: Taxonomy object with terms array
+    (each term has name, slug and posts)
 
   Used by: Taxonomy feature for taxonomy index pages (e.g., /tags/)
 -#}
 <ul>
     {% for term in taxonomy.terms %}
-    <li><a href="{{term.name}}/index.html">{{term.name}}</a></li>
+    <li><a href="{{term.slug}}/index.html">{{term.name}}</a></li>
     {% endfor %}
 </ul>

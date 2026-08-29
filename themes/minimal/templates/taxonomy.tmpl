@@ -11,6 +11,6 @@
 #}
 <ul>
     {% for term in taxonomy.terms %}
-    <li><a href="{{term.name}}/index.html">{{term.name}}</a></li>
+    <li><a href="{{term.slug}}/index.html">{{term.name}}</a></li>
     {% endfor %}
 </ul>

@@ -465,6 +465,15 @@ module Import
     context["lang"] = config.lang
     context["link"] = item.link
 
+    # Feed content is sometimes a full HTML document; strip the
+    # wrapper so the fragment fits inside a post
+    if content_value = item.content.presence
+      stripped = content_value
+        .gsub(/<html><head>.*?<\/head><body>/m, "")
+        .gsub(/<\/body><\/html>\s*/m, "")
+      context["content"] = stripped
+    end
+
     # Render template
     Crinja.render(template_content, context)
   end

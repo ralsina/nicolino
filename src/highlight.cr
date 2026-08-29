@@ -42,8 +42,23 @@ module Highlight
       lexer = lexer_for(language)
       next match if lexer.nil?
 
-      highlighted = formatter.format(source, lexer)
-      %(<pre class="highlight">#{highlighted}</pre>)
+      begin
+        highlighted = formatter.format(source, lexer)
+        # Some lexers tokenize non-ASCII input byte-by-byte and emit
+        # each byte as a separate token, producing invalid UTF-8 that
+        # would blow up much later (and far from the cause)
+        unless highlighted.valid_encoding?
+          Log.error { "Highlighter produced invalid UTF-8 for a '#{language}' block; keeping it unhighlighted" }
+          next match
+        end
+        %(<pre class="highlight">#{highlighted}</pre>)
+      rescue ex
+        # A lexer/formatter bug (e.g. a token type missing from the
+        # abbreviation table) must not fail the whole site build:
+        # keep the original block and say why
+        Log.error { "Highlighting failed for a '#{language}' block: #{ex.message}; keeping it unhighlighted" }
+        match
+      end
     end
   end
 

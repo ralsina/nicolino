@@ -29,7 +29,6 @@ footer.container {
     transition: width 0.3s ease;
 }
 
-.search-input:hover,
 .search-input:focus {
     width: 12em !important;
 }
@@ -676,4 +675,40 @@ figure {
 .gallery-swiper .swiper-pagination-bullet-active {
     background: var(--pico-primary);
     opacity: 1;
+}
+
+/* Header nav: let the two lists stack and wrap on narrow screens
+   instead of forcing the whole page into horizontal scroll */
+header nav {
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+}
+
+header nav > ul {
+    flex-wrap: wrap;
+    row-gap: 0.25rem;
+}
+
+/* Language switcher: open horizontally as an overlay so expanding it
+   doesn't push the header or relayout the page */
+header nav details {
+    position: relative;
+}
+
+header nav details[open] ul {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 0.75rem;
+    margin: 0.25rem 0 0;
+    padding: 0.35rem 0.6rem;
+    background: var(--pico-card-background-color);
+    border: 1px solid var(--pico-muted-border-color);
+    border-radius: 0.4rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    list-style: none;
+    white-space: nowrap;
+    z-index: 10;
 }
