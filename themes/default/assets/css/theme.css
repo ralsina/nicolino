@@ -29,7 +29,6 @@ footer.container {
     transition: width 0.3s ease;
 }
 
-.search-input:hover,
 .search-input:focus {
     width: 12em !important;
 }
