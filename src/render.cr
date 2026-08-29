@@ -19,6 +19,7 @@ module Render
     ctx["site_url"] = Crinja::Value.new(lang_config.url)
     ctx["site_footer"] = Crinja::Value.new(lang_config.footer)
     ctx["site_nav_items"] = Crinja::Value.new(lang_config.nav_items)
+    ctx["lang"] = Crinja::Value.new(lang)
     # Theme parameters from theme.yml, overridden by conf.yml's
     # theme_params (see Theme.params)
     ctx["theme"] = Crinja::Value.new(Theme.params)
