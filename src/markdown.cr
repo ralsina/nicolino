@@ -588,10 +588,10 @@ module Markdown
       # Skip the output directory and build breadcrumbs from remaining path parts
       # For example: output/docs/continuous_import.html -> docs -> continuous_import
       if parts.size >= output_parts.size + 1 && parts[0, output_parts.size] == output_parts
-        # Check if this is the home page (index.html at root)
-        if parts.size == output_parts.size + 1 && parts[-1] == "index.html"
-          # This IS the home page, no breadcrumbs needed
-          return [{name: title(lang), link: link(lang)}]
+        # Check if this is the home page (index.html / index.<lang>.html
+        # at the root): no breadcrumbs needed
+        if parts.size == output_parts.size + 1 && parts[-1].starts_with?("index.")
+          return result
         end
 
         # Not the home page, add "Home" as first breadcrumb
