@@ -17,7 +17,7 @@ module BuildLock
     file.flock_exclusive(blocking: false)
     file.print(Process.pid.to_s)
     file
-  rescue ex : IO::Error
+  rescue IO::Error
     file.close if file
     Log.error { "Another nicolino process is already running in this directory (holding #{PATH}). Stop it before running this command." }
     nil
