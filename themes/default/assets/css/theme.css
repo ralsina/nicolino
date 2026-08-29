@@ -43,7 +43,9 @@ dt {
 .breadcrumb {
     font-size: 0.9em;
     color: var(--pico-muted-color);
-    display: inline-block;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0;
 }
 
 .breadcrumb a {
