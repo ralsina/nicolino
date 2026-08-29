@@ -113,7 +113,10 @@ module Taxonomies
     def lightweight_value(lang)
       {
         "name"  => @name,
-        "terms" => @terms.values.map(&.lightweight_value),
+        # Alphabetical, case-insensitive: terms come in scan order,
+        # which is arbitrary under parallel builds
+        "terms" => @terms.values.map(&.lightweight_value)
+          .sort_by { |term| term["name"].to_s.downcase },
       }
     end
 
