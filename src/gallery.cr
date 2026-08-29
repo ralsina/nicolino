@@ -185,7 +185,7 @@ module Gallery
     private def image_dimensions(path : String) : {Int32, Int32}
       {% if flag?(:novips) %}
         img = CrImage.read(path)
-        {img.width, img.height}
+        {img.bounds.width, img.bounds.height}
       {% else %}
         Images.init_vips_cache
         img = Vips::Image.new_from_file(path)
