@@ -5,6 +5,7 @@
   - class (optional) - Additional CSS classes to add to card
   - id (optional) - CSS ID for the card
 -#}
-{% if args.class and args.class != "card" %}<div class="card {{args.class}}"{% if args.id %} id="{{args.id}}"{% endif %}>{% else %}<div class="card"{% if args.id %} id="{{args.id}}"{% endif %}>{% endif %}
+{#- Pico's card component is <article class="card"> -#}
+{% if args.class and args.class != "card" %}<article class="card {{args.class}}"{% if args.id %} id="{{args.id}}"{% endif %}>{% else %}<article class="card"{% if args.id %} id="{{args.id}}"{% endif %}>{% endif %}
 {{inner}}
-</div>
+</article>
