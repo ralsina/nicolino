@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.26.0] - 2026-08-29
+
+### 🚀 Features
+
+- Showcase cards, nicolino theme install docs, catppuccin demos
+- Blox theme, ported from Hugo Blox Tailwind
+- Port-next-theme hace target
+- LoveIt theme, ported from Hugo LoveIt
+- Coder theme, ported from Hugo Coder
+- Deploy target imports and publishes release posts
+- Add mermaid shortcode for rendering diagrams (#74)
+- Lock the site directory during build and auto runs (#78)
+- Note when an index page is capped to the latest posts
+- Breadcrumbs expand on click, not hover
+- Enable discount and extra definition lists
+
+### 🐛 Bug Fixes
+
+- Pin port-next-theme agent to glm-5.2 endpoint
+- Relativize url_prefix-prefixed links correctly
+- Theme port fidelity - reading time and humanized demo dates
+- LoveIt port fidelity + stronger translation prompt
+- Pin ameba to released 1.7.0 to unbreak CI
+- Card shortcode emits Pico's card component
+- Sort taxonomy term pages by date, newest first
+- Expose the page language to templates
+- Remove comment from mermaid shortcode
+- Sort taxonomy terms alphabetically on the index page
+- Tighten breadcrumb separators
+- Render breadcrumbs as inline-flex
+- Render figure shortcode as verbatim div block, drop DLDISCOUNT flag
+- Drop unused rescue variable in BuildLock.acquire
+- Use image bounds for dimensions in novips builds
+
+### 🚜 Refactor
+
+- Extract URL skip check from make_links_relative (#77)
+
 ## [0.25.0] - 2026-08-27
 
 ### 🚀 Features
