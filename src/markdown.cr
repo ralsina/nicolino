@@ -407,7 +407,8 @@ module Markdown
               LibDiscount::MKD_SAFELINK |
               LibDiscount::MKD_NOPANTS |
               LibDiscount::MKD_GITHUBTAGS |
-              LibDiscount::MKD_DLDISCOUNT |
+              # Only pandoc-style (extra) definition lists; the discount
+              # "=" style parser has aggressive lookahead quirks
               LibDiscount::MKD_DLEXTRA
       flags |= LibDiscount::MKD_TOC if metadata(lang).fetch("toc", nil) != nil
       result = Discount.compile(
