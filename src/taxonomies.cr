@@ -183,9 +183,17 @@ module Taxonomies
             lang: lang,
           )
 
-          # Render term index for each term
+          # Render term index for each term, newest first: the posts
+          # come in scan order, so sort by date (newest first) before
+          # the index caps the listing
+          term_posts = term.@posts.compact_map do |post|
+            post.date.try { |date| {date, post} }
+          end
+          term_posts.sort_by!(&.first)
+          term_posts.reverse!
+          sorted_term_posts = term_posts.map(&.last)
           Markdown.render_index(
-            term.@posts[..10],
+            sorted_term_posts,
             (base_path / "#{Utils.slugify(term.@name)}/index.html").normalize.to_s,
             title,
             extra_feed: {link: Utils.path_to_link(feed_path), title: "#{title} RSS"},
