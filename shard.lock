@@ -79,7 +79,7 @@ shards:
 
   shortcodes:
     git: https://github.com/ralsina/shortcodes.git
-    version: 0.2.2
+    version: 0.3.0
 
   sixteen:
     git: https://github.com/ralsina/sixteen.git
