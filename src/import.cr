@@ -137,6 +137,7 @@ module Import
 
     begin
       doc = XML.parse(response.body)
+      root_name = doc.root.try(&.name) || ""
 
       # Detect feed type - try Atom first (with namespace)
       atom_entries = doc.xpath_nodes("//*[local-name()='feed']/*[local-name()='entry']")
@@ -161,7 +162,13 @@ module Import
           items << item if item
         end
       else
-        Log.warn { "Unknown feed format for #{url}" }
+        # A valid feed root with no items (e.g. the last page of a paginated
+        # feed) is not an error; only unrecognized documents deserve a warning.
+        if root_name.in?("rss", "feed", "RDF")
+          Log.debug { "Feed #{url} contains no items" }
+        else
+          Log.warn { "Unknown feed format for #{url}" }
+        end
       end
     rescue ex : Exception
       Log.error(exception: ex) { "Failed to parse feed #{url}: #{ex.message}" }
