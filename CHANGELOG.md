@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.26.1] - 2026-08-31
+
+### 🐛 Bug Fixes
+
+- Emit absolute URLs in the RSS feed
+- Don't warn on item-less valid feeds during import
+- Extract collect_feed_items to satisfy cyclomatic complexity limit
+
 ## [0.26.0] - 2026-08-29
 
 ### 🚀 Features
