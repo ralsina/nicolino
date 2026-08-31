@@ -248,6 +248,65 @@ module HtmlFilters
     doc
   end
 
+  # Make all relative links absolute against `base` (an absolute URL
+  # like "https://example.com/blog/posts/foo/index.html").
+  # Handles all tags with href/src attributes; external URLs and
+  # in-page anchors are left untouched.
+  # Note: no mutex needed, each call operates on its own document
+  def self.make_links_absolute(doc, base)
+    base_uri = URI.parse(base)
+
+    rewrite = ->(node : Lexbor::Node, attr : String) do
+      url = node[attr]
+      return if external_or_anchor?(url) || url.empty?
+      # Page-relative links follow the site's .md → .html convention,
+      # mirroring make_links_relative; convert BEFORE resolving because
+      # md_link_to_html leaves absolute URLs alone; root-relative
+      # links are resolved as-is
+      node[attr] = url.starts_with?("/") ? base_uri.resolve(url).to_s : base_uri.resolve(md_link_to_html(url)).to_s
+    end
+
+    {"a", "link"}.each do |tag|
+      doc.nodes(tag).each do |node|
+        next unless node.has_key? "href"
+        next if tag == "link" && node.fetch("rel", nil) == "canonical"
+        rewrite.call(node, "href")
+      end
+    end
+    {"img", "script", "video", "audio", "source", "iframe", "embed"}.each do |tag|
+      doc.nodes(tag).each do |node|
+        next unless node.has_key? "src"
+        rewrite.call(node, "src")
+      end
+    end
+    doc
+  end
+
+  # Make all relative href/src values absolute against `base` directly
+  # on the html STRING, mirroring relativize_links_in_string. The
+  # regexes already exclude absolute URLs, protocol-relative URLs and
+  # anchors, so those pass through unchanged.
+  def self.absolutize_links_in_string(html : String, base : String) : String
+    # Nothing to rewrite: skip the gsub scan entirely
+    return html unless html.matches?(NEEDS_LINK_FIX) || html.matches?(ROOT_RELATIVE_FIX)
+    base_uri = URI.parse(base)
+    # Relative links (not starting with /), with the same .md → .html
+    # conversion make_links_relative applies to them
+    html = html.gsub(NEEDS_LINK_FIX_CAPTURE) do |match|
+      quote = $1
+      value = $2
+      resolved = base_uri.resolve(md_link_to_html(value)).to_s
+      "#{match[0, match.size - value.size - 1]}#{resolved}#{quote}"
+    end
+    # Root-relative links (/images/a.png → https://site/images/a.png)
+    html.gsub(ROOT_RELATIVE_FIX) do |match|
+      quote = $1
+      value = "/#{$2}"
+      # match is prefix + "/" + value + quote, so drop 2 (slash+quote)
+      "#{match[0, match.size - $2.size - 2]}#{base_uri.resolve(value)}#{quote}"
+    end
+  end
+
   # Remove empty paragraph tags
   def self.remove_empty_paragraphs(doc)
     # Collect nodes first, then remove to avoid modifying during iteration

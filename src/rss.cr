@@ -1,4 +1,6 @@
 require "RSS"
+require "lexbor"
+require "./html_filters"
 
 module RSSFeed
   # Create a RSS feed task
@@ -19,7 +21,12 @@ module RSSFeed
       inputs: inputs,
       mergeable: false
     ) do
-      feed = RSS.new title: title
+      # Absolute URLs for everything: readers see the feed out of
+      # context, so relative links break. post.link already carries
+      # the url_prefix, so site + link is the public URL even for
+      # sites served under a subpath.
+      site = Config[lang].url.chomp("/")
+      feed = RSS.new title: title, site_url: site, language: lang
       posts
         .select(&.has_language?(lang))
         .select { |post| !post.date.nil? }
@@ -30,10 +37,27 @@ module RSSFeed
         .last(max_items)
         .reverse!
         .each do |post|
+          link = site + post.link(lang)
+          summary = post.summary(lang)
+          # First relativize exactly like the page render does, so the
+          # html matches what a browser sees at the post's public URL
+          # (markdown-relative paths ignore the url_prefix mount); then
+          # absolutize against that public URL
+          summary = if HtmlFilters.string_rewrite_safe?(summary)
+                      HtmlFilters.relativize_links_in_string(summary, post.link(lang))
+                    else
+                      doc = HtmlFilters.make_links_relative(Lexbor::Parser.new(summary), post.link(lang))
+                      HtmlFilters.fix_code_classes(doc).to_html
+                    end
+          if HtmlFilters.string_rewrite_safe?(summary)
+            summary = HtmlFilters.absolutize_links_in_string(summary, link)
+          else
+            summary = HtmlFilters.make_links_absolute(Lexbor::Parser.new(summary), link).to_html
+          end
           feed.item(
             title: post.title(lang),
-            description: post.summary(lang),
-            link: post.link(lang),
+            description: summary,
+            link: link,
             pubDate: post.date.to_s,
           )
         end

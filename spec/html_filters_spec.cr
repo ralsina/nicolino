@@ -166,6 +166,77 @@ describe HtmlFilters do
     end
   end
 
+  describe ".make_links_absolute" do
+    it "makes page-relative and ../ links absolute" do
+      doc = parse(%(<a href="other.html">a</a><a href="../../pic.jpg">b</a>))
+      result = HtmlFilters.make_links_absolute(doc, "https://example.com/blog/posts/foo/index.html").to_html
+      result.should contain %(href="https://example.com/blog/posts/foo/other.html")
+      result.should contain %(href="https://example.com/blog/pic.jpg")
+    end
+
+    it "makes root-relative links absolute" do
+      doc = parse(%(<img src="/images/a.png">))
+      result = HtmlFilters.make_links_absolute(doc, "https://example.com/posts/page.html").to_html
+      result.should contain %(src="https://example.com/images/a.png")
+    end
+
+    it "leaves absolute URLs and anchors alone" do
+      html = %(<a href="https://other.com/x">a</a><a href="#anchor">b</a>)
+      result = HtmlFilters.make_links_absolute(parse(html), "https://example.com/p.html").to_html
+      result.should contain %(href="https://other.com/x")
+      result.should contain %(href="#anchor")
+    end
+
+    it "leaves canonical links alone" do
+      html = %(<link rel="canonical" href="/posts/page/">)
+      result = HtmlFilters.make_links_absolute(parse(html), "https://example.com/posts/page.html").to_html
+      result.should contain %(href="/posts/page/")
+    end
+
+    it "is idempotent" do
+      html = %(<a href="other.html">x</a><img src="../pic.jpg">)
+      once = HtmlFilters.make_links_absolute(parse(html), "https://example.com/posts/page.html").to_html
+      twice = HtmlFilters.make_links_absolute(parse(once), "https://example.com/posts/page.html").to_html
+      twice.should eq once
+    end
+  end
+
+  describe ".absolutize_links_in_string" do
+    it "rewrites relative links without parsing the document" do
+      result = HtmlFilters.absolutize_links_in_string(
+        %(<a href="other.html">x</a><img src="../../pic.jpg">),
+        "https://example.com/blog/posts/foo/index.html"
+      )
+      result.should contain %(href="https://example.com/blog/posts/foo/other.html")
+      result.should contain %(src="https://example.com/blog/pic.jpg")
+    end
+
+    it "rewrites root-relative links" do
+      result = HtmlFilters.absolutize_links_in_string(
+        %(<img src="/images/a.png">), "https://example.com/posts/page.html"
+      )
+      result.should contain %(src="https://example.com/images/a.png")
+    end
+
+    it "leaves absolute URLs, protocol-relative URLs and anchors unchanged" do
+      html = %(<a href="https://other.com/x">a</a><a href="//cdn.com/y">b</a><a href="#anchor">c</a>)
+      HtmlFilters.absolutize_links_in_string(html, "https://example.com/p.html").should eq html
+    end
+
+    it "converts .md links to .html like the page pass does" do
+      result = HtmlFilters.absolutize_links_in_string(
+        %(<a href="other.md">x</a>), "https://example.com/posts/page.html"
+      )
+      result.should contain %(href="https://example.com/posts/other.html")
+    end
+
+    it "is idempotent" do
+      html = %(<a href="other.html">x</a><img src="/img.png">)
+      once = HtmlFilters.absolutize_links_in_string(html, "https://example.com/posts/page.html")
+      HtmlFilters.absolutize_links_in_string(once, "https://example.com/posts/page.html").should eq once
+    end
+  end
+
   describe ".md_link_to_html" do
     it "swaps the extension and keeps anchors" do
       HtmlFilters.md_link_to_html("foo.md").should eq "foo.html"
