@@ -123,6 +123,41 @@ module Import
     end
   end
 
+  # Collect the items of an RSS/Atom document into `items`. Logs a
+  # warning only for unrecognized documents: a valid feed root with no
+  # items (e.g. the last page of a paginated feed) is not an error.
+  def self.collect_feed_items(doc : XML::Node, url : String, items : Array(FeedItem)) : Nil
+    root_name = doc.root.try(&.name) || ""
+
+    # Detect feed type - try Atom first (with namespace)
+    atom_entries = doc.xpath_nodes("//*[local-name()='feed']/*[local-name()='entry']")
+    rss_items = doc.xpath_nodes("//rss/channel/item")
+
+    if !atom_entries.empty?
+      # Atom
+      atom_entries.each do |entry_node|
+        item = parse_atom_item(entry_node)
+        items << item if item
+      end
+    elsif !rss_items.empty?
+      # RSS 2.0
+      rss_items.each do |item_node|
+        item = parse_rss_item(item_node)
+        items << item if item
+      end
+    elsif !doc.xpath_nodes("//item").empty?
+      # RSS 1.0 / 0.9
+      doc.xpath_nodes("//item").each do |item_node|
+        item = parse_rss_item(item_node)
+        items << item if item
+      end
+    elsif root_name.in?("rss", "feed", "RDF")
+      Log.debug { "Feed #{url} contains no items" }
+    else
+      Log.warn { "Unknown feed format for #{url}" }
+    end
+  end
+
   # Parse an RSS/Atom feed from URL
   def self.fetch_feed(url : String) : Array(FeedItem)
     Log.info { "Fetching feed: #{url}" }
@@ -136,40 +171,7 @@ module Import
     items = [] of FeedItem
 
     begin
-      doc = XML.parse(response.body)
-      root_name = doc.root.try(&.name) || ""
-
-      # Detect feed type - try Atom first (with namespace)
-      atom_entries = doc.xpath_nodes("//*[local-name()='feed']/*[local-name()='entry']")
-      rss_items = doc.xpath_nodes("//rss/channel/item")
-
-      if !atom_entries.empty?
-        # Atom
-        atom_entries.each do |entry_node|
-          item = parse_atom_item(entry_node)
-          items << item if item
-        end
-      elsif !rss_items.empty?
-        # RSS 2.0
-        rss_items.each do |item_node|
-          item = parse_rss_item(item_node)
-          items << item if item
-        end
-      elsif !doc.xpath_nodes("//item").empty?
-        # RSS 1.0 / 0.9
-        doc.xpath_nodes("//item").each do |item_node|
-          item = parse_rss_item(item_node)
-          items << item if item
-        end
-      else
-        # A valid feed root with no items (e.g. the last page of a paginated
-        # feed) is not an error; only unrecognized documents deserve a warning.
-        if root_name.in?("rss", "feed", "RDF")
-          Log.debug { "Feed #{url} contains no items" }
-        else
-          Log.warn { "Unknown feed format for #{url}" }
-        end
-      end
+      collect_feed_items(XML.parse(response.body), url, items)
     rescue ex : Exception
       Log.error(exception: ex) { "Failed to parse feed #{url}: #{ex.message}" }
       Log.debug { ex.backtrace.join("\n") }
