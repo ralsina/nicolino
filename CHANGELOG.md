@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.26.2] - 2026-09-02
+
+### 🐛 Bug Fixes
+
+- Update shortcodes to 0.5.0
+
 ## [0.26.1] - 2026-08-31
 
 ### 🐛 Bug Fixes
