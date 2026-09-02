@@ -35,7 +35,7 @@ dependencies:
     branch: main
   shortcodes:
     github: ralsina/shortcodes
-    version: ~> 0.3.0
+    version: ~> 0.5.0
   tartrazine:
     github: ralsina/tartrazine
     version: ~> 0.21.3
