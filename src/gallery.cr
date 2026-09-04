@@ -41,7 +41,7 @@ module Gallery
       next if dir == root
       index_md = dir / "index.md"
       next if ::File.exists?(index_md)
-      next if Dir.glob("#{dir}/*.{jpg,png,webp,gif}").empty?
+      next if Dir.glob("#{dir}/*.{jpg,png,webp,gif,JPG,PNG,WEBP,GIF}").empty?
       ::File.write(index_md, "---\ntitle: #{dir.basename.capitalize}\n---\n\n")
       Log.info { "🖼️  Generated #{index_md} for image-only gallery" }
     end
@@ -53,7 +53,7 @@ module Gallery
     return unless base.basename == "index"
 
     gallery_dir = base.parent
-    image_list = Dir.glob("#{gallery_dir}/*.{jpg,png,webp,gif}").map do |img_path|
+    image_list = Dir.glob("#{gallery_dir}/*.{jpg,png,webp,gif,JPG,PNG,WEBP,GIF}").map do |img_path|
       Path[img_path].basename.to_s
     end
     result = ::Gallery::Gallery.new(sources, base, image_list)

@@ -97,6 +97,12 @@ module LinkChecker
       return LinkResult.new(source_file, link, link_type, :external, nil)
     end
 
+    # Skip scheme-less external links like "github.com/user/repo":
+    # first path segment looks like a domain (has a dotted TLD)
+    if link.matches?(%r{^[^/?#]+\.[a-z]{2,}([/?#]|$)}i)
+      return LinkResult.new(source_file, link, link_type, :external, nil)
+    end
+
     # Convert link to filesystem path
     # Links starting with / are relative to site root
     # Relative links are relative to the source file's directory
@@ -154,8 +160,8 @@ module LinkChecker
     # Handle directories (try index.html)
     if File.directory?(base_path)
       base_path = Path[base_path, "index.html"].to_s
-    elsif !base_path.includes?(".")
-      # No extension, try .html
+    elsif !base_path.includes?(".") && !File.exists?(base_path)
+      # No extension and no such file: try .html
       base_path = base_path + ".html"
     end
 

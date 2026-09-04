@@ -16,7 +16,8 @@ module Nicolino
         internal links point to existing files. This is useful when
         porting a site to ensure no links were broken in the process.
 
-        External links (http://, https://, mailto:, etc.) are skipped.
+        External links (http://, https://, mailto:, etc.) are skipped,
+        including scheme-less ones like "github.com/user/repo".
         Anchors (same-page links starting with #) are also skipped.
 
         Usage:

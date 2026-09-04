@@ -11,7 +11,9 @@ module HTML
       doc = Lexbor::Parser.new(result)
       doc = HtmlFilters.downgrade_headers(doc)
       doc = HtmlFilters.remove_empty_paragraphs(doc)
-      doc = HtmlFilters.make_links_relative(doc, link)
+      # Links stay root-relative here: the same body is embedded in
+      # listing pages at different depths, so links must only be
+      # relativized at the final page render.
       html_with_classes = HtmlFilters.fix_code_classes(doc).to_html
 
       # TOC is opt-in via `toc` metadata, matching markdown posts:

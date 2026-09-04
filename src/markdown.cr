@@ -409,7 +409,8 @@ module Markdown
               LibDiscount::MKD_GITHUBTAGS |
               # Only pandoc-style (extra) definition lists; the discount
               # "=" style parser has aggressive lookahead quirks
-              LibDiscount::MKD_DLEXTRA
+              LibDiscount::MKD_DLEXTRA |
+              LibDiscount::MKD_EXTRA_FOOTNOTE
       flags |= LibDiscount::MKD_TOC if metadata(lang).fetch("toc", nil) != nil
       result = Discount.compile(
         replace_shortcodes(lang),
