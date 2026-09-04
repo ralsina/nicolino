@@ -17,6 +17,7 @@ RUN apk add --no-cache \
     pkgconf \
     ragel \
     shards \
+    upx \
     xz-dev \
     xz-static \
     yaml-dev \

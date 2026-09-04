@@ -2,8 +2,7 @@
 set -e
 
 # Builds statically-linked release binaries inside per-architecture Alpine
-# containers. The whole Crystal build runs under QEMU emulation, so this is
-# slow; it is meant for release days, when it can just run overnight.
+# containers. The arm64 build runs under QEMU emulation.
 #
 # vips is disabled (-Dnovips) because statically linking libvips and its
 # huge dependency tree is not practical.
@@ -23,7 +22,12 @@ for platform in linux/amd64 linux/arm64; do
     docker run --rm --platform "$platform" -e LD=true -v "$PWD":/app --user="$(id -u)" "$tag" \
         sh -c "cd /app && rm -rf lib && shards install \
                && shards build --release --static -Dnovips --without-development \
-               && strip bin/nicolino"
+               && strip bin/nicolino \
+               && if upx -l bin/nicolino >/dev/null 2>&1; then \
+                      echo '==> already UPX-packed, skipping compression'; \
+                  else \
+                      upx --best --lzma bin/nicolino; \
+                  fi"
     mv bin/nicolino "$output"
 done
 
