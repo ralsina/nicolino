@@ -25,7 +25,7 @@ dependencies:
     branch: master
   croupier:
     github: ralsina/croupier
-    branch: main
+    version: ~> 0.15.0
   live_reload:
     github: bcardiff/live_reload.cr
   lexbor:

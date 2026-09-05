@@ -35,7 +35,7 @@ shards:
 
   croupier:
     git: https://github.com/ralsina/croupier.git
-    version: 0.14.1+git.commit.cef89142acfd594e8d86aa7e5be6ecd54b058d1e
+    version: 0.15.0
 
   docopt:
     git: https://github.com/ralsina/docopt.cr.git
@@ -71,7 +71,7 @@ shards:
 
   polydocopt:
     git: https://github.com/ralsina/polydocopt.git
-    version: 0.1.1+git.commit.52edc8790d30e0b6d8fe941adaeb618e97cad30b
+    version: 0.2.0+git.commit.f7e54a6fa545266e103fe3e081b6e6b125b43c47
 
   progress_bar:
     git: https://github.com/mgomes/progress_bar.git
@@ -83,7 +83,7 @@ shards:
 
   sixteen:
     git: https://github.com/ralsina/sixteen.git
-    version: 0.8.0
+    version: 0.9.0
 
   tartrazine:
     git: https://github.com/ralsina/tartrazine.git

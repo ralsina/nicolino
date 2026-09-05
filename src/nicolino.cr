@@ -154,13 +154,23 @@ def run(
   Log.info { "Running tasks..." }
   Log.debug { "About to call run_tasks with #{Croupier::TaskManager.tasks.size} tasks" }
   start_time = Time.instant
-  Croupier::TaskManager.run_tasks(
-    targets: arguments,
-    parallel: parallel,
-    keep_going: keep_going,
-    dry_run: dry_run,
-    run_all: run_all,
-  )
+  begin
+    Croupier::TaskManager.run_tasks(
+      targets: arguments,
+      parallel: parallel,
+      keep_going: keep_going,
+      dry_run: dry_run,
+      run_all: run_all,
+    )
+  rescue error : Croupier::RunFailure
+    elapsed = (Time.instant - start_time).total_milliseconds
+    Log.debug { "run_tasks took #{elapsed}ms" }
+    Log.error { "🏁 Build failed with #{error.errors.size} task failure(s):" }
+    error.errors.each do |task_error|
+      Log.error { "  #{task_error.message}" }
+    end
+    return 1
+  end
   elapsed = (Time.instant - start_time).total_milliseconds
   Log.debug { "run_tasks took #{elapsed}ms" }
 
