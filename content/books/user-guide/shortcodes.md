@@ -174,6 +174,39 @@ This is inside two divs
 Shortcodes may introduce newlines at some point, that's not easy to avoid and should not be a problem in most cases.
 {{% /admonition %}}
 
+## Escaped Shortcodes
+
+Sometimes you want to write a shortcode in your page *without* it being
+executed, for example to talk about it (this very page does that a lot!).
+You can escape a shortcode by wrapping its delimiters in `/*` and `*/`,
+just like in Hugo:
+
+```django
+{{< raw >}}
+{{</* youtube id="dQw4w9WgXcQ" */>}}
+{{< /raw >}}
+```
+
+The escaped shortcode is not rendered. Instead, it is shown as literal
+text, with the escape markers removed:
+
+{{</* youtube id="dQw4w9WgXcQ" */>}}
+
+It works the same for the `%` style:
+
+```django
+{{< raw >}}
+{{%/* admonition type="tip" */%}}
+{{< /raw >}}
+```
+
+{{%/* admonition type="tip" */%}}
+
+Escaped shortcodes are a lightweight alternative to `raw` when you only
+need to show a shortcode or two: they take no closing tag, and no
+template is loaded for them at all, so they work even for shortcodes
+that don't exist.
+
 # Included Shortcodes
 
 ## Figure
@@ -201,7 +234,9 @@ Support for the `<figure>` tag. Example
 ## Raw
 
 Used when you want to show content that looks like shortcodes or to
-avoid processing markdown in a piece of text. Example:
+avoid processing markdown in a piece of text. If you only need to show
+a single shortcode, escaped shortcodes (see above) are a simpler
+alternative. Example:
 
 ```django
 {{< raw >}}

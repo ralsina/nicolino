@@ -127,6 +127,24 @@ describe Markdown::File do
     end
   end
 
+  it "emits escaped shortcodes literally instead of rendering them" do
+    PostSite.in_site do
+      post = PostSite.write_post("escaped.md", <<-MD)
+        ---
+        title: Escaped
+        ---
+
+        Look: {{</* youtube id="x" */>}} done.
+        MD
+
+      # The literal shortcode text (markers stripped) survives, and
+      # nothing gets rendered (no youtube.tmpl exists in this site,
+      # so rendering it would raise)
+      post.replace_shortcodes("en").should contain %q({{< youtube id="x" >}})
+      post.html.should_not contain "iframe"
+    end
+  end
+
   it "downgrades markdown headers in rendered HTML" do
     PostSite.in_site do
       post = PostSite.write_post("headers.md", "---\ntitle: Headers\n---\n\n# Big Title\n")

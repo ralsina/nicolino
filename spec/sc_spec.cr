@@ -20,6 +20,12 @@ describe Sc do
       found.size.should eq 1
       found.first.name.should eq "note"
     end
+
+    it "finds escaped shortcodes and marks them as escaped" do
+      found = Sc.shortcodes_in(%q({{</* youtube id="x" */>}}))
+      found.size.should eq 1
+      found.first.escaped?.should be_true
+    end
   end
 
   describe ".kv_deps_for_file" do
@@ -41,8 +47,51 @@ describe Sc do
       FileUtils.rm_rf(tmp)
     end
 
+    it "ignores escaped shortcodes (they are emitted literally, no template needed)" do
+      tmp = Path["/tmp/opencode", "spec-#{Random::Secure.hex(6)}"]
+      FileUtils.mkdir_p(tmp)
+      path = tmp / "post.md"
+      File.write(path, %q({{</* youtube id="x" */>}}))
+      Sc.kv_deps_for_file(path.to_s).should be_empty
+      FileUtils.rm_rf(tmp)
+    end
+
     it "returns an empty list for missing files" do
       Sc.kv_deps_for_file("/tmp/opencode/does-not-exist.md").should be_empty
+    end
+  end
+
+  describe ".unescape" do
+    it "strips escape markers from angle-style escaped shortcodes" do
+      parsed = Shortcodes.parse(%q({{</* youtube id="x" */>}}))
+      sc = parsed.shortcodes.first
+      Sc.unescape(sc).should eq %q({{< youtube id="x" >}})
+    end
+
+    it "strips escape markers from percent-style escaped shortcodes" do
+      parsed = Shortcodes.parse("{{%/* echo.inline hi */%}}")
+      sc = parsed.shortcodes.first
+      Sc.unescape(sc).should eq "{{% echo.inline hi %}}"
+    end
+  end
+
+  describe ".render_sc" do
+    it "emits escaped shortcodes literally instead of rendering them" do
+      parsed = Shortcodes.parse(%q({{</* youtube id="x" */>}}))
+      parsed.errors.size.should eq 0
+      sc = parsed.shortcodes.first
+      sc.escaped?.should be_true
+      # No template lookup happens: this would raise for a missing
+      # youtube.tmpl if the shortcode were rendered
+      Sc.render_sc(sc, Crinja::Context.new).should eq %q({{< youtube id="x" >}})
+    end
+
+    it "emits escaped percent-style shortcodes literally" do
+      parsed = Shortcodes.parse("{{%/* echo.inline hi */%}}")
+      parsed.errors.size.should eq 0
+      sc = parsed.shortcodes.first
+      sc.escaped?.should be_true
+      Sc.render_sc(sc, Crinja::Context.new).should eq "{{% echo.inline hi %}}"
     end
   end
 

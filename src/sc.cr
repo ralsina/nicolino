@@ -50,11 +50,25 @@ module Sc
            else
              contents
            end
-    shortcodes_in(text).reject(&.is_inline?).map { |scode| "kv://shortcodes/#{scode.name}.tmpl" }
+    shortcodes_in(text).reject { |scode| scode.is_inline? || scode.escaped? }.map { |scode| "kv://shortcodes/#{scode.name}.tmpl" }
+  end
+
+  # Strip Hugo's escape markers from an escaped shortcode's source
+  # span: {{</* name args */>}} becomes literal {{< name args >}},
+  # everything in between is preserved verbatim
+  def self.unescape(sc : Shortcodes::Shortcode) : String
+    sc.whole
+      .sub("{{</*", "{{<")
+      .sub("{{%/*", "{{%")
+      .sub("*/>}}", ">}}")
+      .sub("*/%}}", "%}}")
   end
 
   # Render shortcode using its template
   def self.render_sc(sc, context : Crinja::Context) : String
+    # Escaped shortcodes ({{</* name */>}}) are output literally,
+    # never rendered (same as Hugo)
+    return unescape(sc) if sc.escaped?
     if sc.markdown?
       context["inner"] = Discount.compile(sc.data)[:html]
     else

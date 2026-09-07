@@ -738,7 +738,7 @@ module Markdown
     # kv:// inputs for the shortcode templates this post uses,
     # so tasks that render it can declare them as dependencies
     def shortcode_dependencies(lang = nil) : Array(String)
-      shortcodes(lang).reject(&.is_inline?).map { |scode| "kv://shortcodes/#{scode.name}.tmpl" }
+      shortcodes(lang).reject { |scode| scode.is_inline? || scode.escaped? }.map { |scode| "kv://shortcodes/#{scode.name}.tmpl" }
     end
 
     # List of all files and kv store items this post uses
@@ -752,9 +752,10 @@ module Markdown
       # this page (and puts the scripts on auto mode's watch list)
       result += LuaFilters.dependency_paths
 
-      # Validate that all referenced shortcodes exist
+      # Validate that all referenced shortcodes exist (escaped
+      # shortcodes are emitted literally, so they need no template)
       available = Sc.available_shortcodes
-      shortcodes.reject(&.is_inline?).each do |scode|
+      shortcodes.reject { |scode| scode.is_inline? || scode.escaped? }.each do |scode|
         unless available.includes?(scode.name)
           raise "Unknown shortcode '#{scode.name}' in #{source}\n" +
                 "Available shortcodes: #{available.join(", ")}"
