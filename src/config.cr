@@ -54,6 +54,10 @@ module Config
     property archive : String = "archive/"
     property theme : String = "default"
     property color_scheme : String = "default"
+    # Optional explicit scheme overrides; empty means derive both
+    # variants from color_scheme
+    property dark_scheme : String = ""
+    property light_scheme : String = ""
     property fonts : Fonts = Fonts.new
     property image_large : Int32 = 1920
     property image_thumb : Int32 = 640
@@ -324,6 +328,16 @@ location: "tags/"
     @@global_config.color_scheme
   end
 
+  def self.dark_scheme : String
+    ensure_loaded
+    @@global_config.dark_scheme
+  end
+
+  def self.light_scheme : String
+    ensure_loaded
+    @@global_config.light_scheme
+  end
+
   def self.fonts : Fonts
     ensure_loaded
     @@global_config.fonts
@@ -443,6 +457,8 @@ location: "tags/"
     property date_output_format : String
     property theme : String
     property color_scheme : String
+    property dark_scheme : String
+    property light_scheme : String
     property fonts : Fonts
     property pandoc_formats : Hash(String, String)
     property import_templates : String
@@ -464,6 +480,8 @@ location: "tags/"
       @date_output_format = @lang_config.date_output_format
       @theme = @global.theme
       @color_scheme = @global.color_scheme
+      @dark_scheme = @global.dark_scheme
+      @light_scheme = @global.light_scheme
       @fonts = @global.fonts
       @pandoc_formats = @global.pandoc_formats
       @import_templates = @global.import_templates

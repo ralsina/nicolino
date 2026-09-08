@@ -24,12 +24,19 @@ module Base16
       mergeable: false
     ) do
       Log.info { "base16 task running..." }
-      scheme = Config.color_scheme
-
-      # Always use dark_variant and light_variant to ensure proper variant resolution
-      # This handles auto-generation when variants don't exist
-      dark_theme = Sixteen.dark_variant(scheme)
-      light_theme = Sixteen.light_variant(scheme)
+      # Explicit dark_scheme/light_scheme overrides win; otherwise
+      # both variants are derived from color_scheme (auto-generating
+      # a variant when the family has no hand-made one)
+      dark_theme = if Config.dark_scheme.empty?
+                     Sixteen.dark_variant(Config.color_scheme)
+                   else
+                     Sixteen.theme(Config.dark_scheme)
+                   end
+      light_theme = if Config.light_scheme.empty?
+                      Sixteen.light_variant(Config.color_scheme)
+                    else
+                      Sixteen.theme(Config.light_scheme)
+                    end
 
       # Process fonts configuration
       fonts = Config.fonts
