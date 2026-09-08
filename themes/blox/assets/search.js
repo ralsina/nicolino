@@ -17,18 +17,33 @@ document.addEventListener("DOMContentLoaded", function () {
     },
   });
 
-  // Fetch search documents on focus
-  searchInput.addEventListener("focus", async function () {
-    if (documents.length === 0) {
-      try {
+  // Load the search index exactly once; searches await this so a
+  // quick Enter right after focus can't run against an empty index.
+  let indexLoad = null;
+  function ensureIndex() {
+    if (!indexLoad) {
+      indexLoad = (async function () {
         const response = await fetch("/search.json");
         documents = await response.json();
         miniSearch.addAll(documents);
-      } catch (error) {
+      })().catch(function (error) {
+        // allow retrying after a failed load
+        indexLoad = null;
         console.error("Failed to load search index:", error);
-      }
+      });
     }
+    return indexLoad;
+  }
+
+  // Fetch search documents on focus
+  searchInput.addEventListener("focus", function () {
+    ensureIndex();
     searchInput.style.width = "15em";
+  });
+
+  // Start loading as soon as the user types, not just on focus
+  searchInput.addEventListener("input", function () {
+    ensureIndex();
   });
 
   // Hide results and shrink input on blur (with delay to allow link clicks)
@@ -56,41 +71,43 @@ document.addEventListener("DOMContentLoaded", function () {
     const query = searchInput.value.trim();
     if (query.length < 3) return; // Require at least 3 characters
 
-    const results = miniSearch.search(query);
+    ensureIndex().then(function () {
+      const results = miniSearch.search(query);
 
-    if (searchResults) {
-      searchResults.style.display = "block";
+      if (searchResults) {
+        searchResults.style.display = "block";
 
-      if (results.length > 0) {
-        // Create modal with results list
-        let html = `<dialog open>
-          <article class="search-modal">
-            <header>
-              <button aria-label="Close" rel="prev" onclick="this.closest('dialog').remove()"></button>
-              <h3>Search Results for "${query}"</h3>
-            </header>
-            <ul class="search-results-list">`;
-        results.forEach((result) => {
-          const doc = documents.find((d) => d.id === result.id);
-          if (doc) {
-            html += `<li><a href="${doc.url}"><strong>${doc.title}</strong></a></li>`;
-          }
-        });
-        html += `</ul>
-          </article>
-        </dialog>`;
-        searchResults.innerHTML = html;
-      } else {
-        searchResults.innerHTML = `<dialog open>
-          <article class="search-modal">
-            <header>
-              <button aria-label="Close" rel="prev" onclick="this.closest('dialog').remove()"></button>
-              <h3>Search Results for "${query}"</h3>
-            </header>
-            <p>No results found</p>
-          </article>
-        </dialog>`;
+        if (results.length > 0) {
+          // Create modal with results list
+          let html = `<dialog open>
+            <article class="search-modal">
+              <header>
+                <button aria-label="Close" rel="prev" onclick="this.closest('dialog').remove()"></button>
+                <h3>Search Results for "${query}"</h3>
+              </header>
+              <ul class="search-results-list">`;
+          results.forEach((result) => {
+            const doc = documents.find((d) => d.id === result.id);
+            if (doc) {
+              html += `<li><a href="${doc.url}"><strong>${doc.title}</strong></a></li>`;
+            }
+          });
+          html += `</ul>
+            </article>
+          </dialog>`;
+          searchResults.innerHTML = html;
+        } else {
+          searchResults.innerHTML = `<dialog open>
+            <article class="search-modal">
+              <header>
+                <button aria-label="Close" rel="prev" onclick="this.closest('dialog').remove()"></button>
+                <h3>Search Results for "${query}"</h3>
+              </header>
+              <p>No results found</p>
+            </article>
+          </dialog>`;
+        }
       }
-    }
+    });
   });
 });
