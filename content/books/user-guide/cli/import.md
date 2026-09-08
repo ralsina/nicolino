@@ -68,15 +68,41 @@ import:
 - `static` - Static values added to all items (optional)
 - `output_folder` - Where generated files go (relative to `content/`)
 - `format` - File format: `md`, `html`, etc.
-- `template` - Template filename in `templates/import/`
+- `template` - Template filename, relative to the `import_templates` directory (see below)
 - `lang` - Language code (default: `"en"`)
 - `tags` - Comma-separated tags to add to all items
 - `skip_titles` - Array of titles to skip
 - `start_at` - Only import items after this date
 
+### Template Location
+
+Templates are looked up in the directory configured by the `import_templates` setting in conf.yml, which defaults to `user_templates`. The `template` option in a feed config is a path relative to that directory, so with the default:
+
+```yaml
+import_templates: "user_templates"
+```
+
+and `template: "import/article.tmpl"`, the template is expected at `user_templates/import/article.tmpl`.
+
+### JSON Response Format
+
+When using `feed_format: "json"`, the API response must contain the items either as a top-level array:
+
+```json
+[ { "title": "...", "content": "..." }, ... ]
+```
+
+or wrapped in an `items` key (any extra keys at the top level are ignored):
+
+```json
+{ "items": [ { "title": "...", "content": "..." }, ... ] }
+```
+
+Each element of the array is one item, and its fields are matched against your `fields` mapping.
+
 ### Templates
 
-Templates should be placed in `templates/import/` directory and use Crinja (Jinja2-like) syntax. The template receives variables based on your `fields` mapping:
+Templates use Crinja (Jinja2-like) syntax. The template receives variables based on your `fields` mapping:
 
 ```jinja
 ---
