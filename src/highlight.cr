@@ -63,12 +63,21 @@ module Highlight
   end
 
   # The dark and light syntax themes for this site: derived from the
-  # base16 color_scheme, or the explicit syntax_theme override
+  # base16 color_scheme, from explicit dark_scheme/light_scheme
+  # overrides, or from the explicit syntax_theme override
   def self.themes : {Tartrazine::Theme, Tartrazine::Theme}
     explicit = Config.syntax_theme
     if explicit.empty?
-      scheme = Config.color_scheme
-      {Tartrazine.theme(scheme, "dark"), Tartrazine.theme(scheme, "light")}
+      dark_scheme = Config.dark_scheme
+      light_scheme = Config.light_scheme
+      if dark_scheme.empty? && light_scheme.empty?
+        scheme = Config.color_scheme
+        {Tartrazine.theme(scheme, "dark"), Tartrazine.theme(scheme, "light")}
+      else
+        dark = dark_scheme.empty? ? Tartrazine.theme(Config.color_scheme, "dark") : Tartrazine.theme(dark_scheme, "dark")
+        light = light_scheme.empty? ? Tartrazine.theme(Config.color_scheme, "light") : Tartrazine.theme(light_scheme, "light")
+        {dark, light}
+      end
     else
       theme = Tartrazine.theme(explicit)
       {theme, theme}
