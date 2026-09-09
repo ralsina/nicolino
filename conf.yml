@@ -104,6 +104,7 @@ features:
   - folder_indexes
   - galleries
   - images
+  - videos
   - listings
   - pages
   - pandoc

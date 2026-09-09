@@ -28,6 +28,7 @@ require "./taxonomies"
 require "./template"
 require "./template_preprocessor"
 require "./theme_assets"
+require "./video"
 require "croupier"
 require "live_reload"
 require "yaml"
@@ -120,6 +121,7 @@ def create_tasks
   end
 
   time_feature_enable("images") { Image.enable(features.includes?("images"), content_path) }
+  time_feature_enable("videos") { Video.enable(features.includes?("videos"), content_path) }
   time_feature_enable("listings") { Listings.enable(features.includes?("listings"), content_path) }
   time_feature_enable("books") { Books.enable(features.includes?("books")) }
   time_feature_enable("sitemap") { Sitemap.enable(features.includes?("sitemap")) }

@@ -92,6 +92,7 @@ features:
   - pandoc
   - taxonomies
   - images
+  - videos
   - galleries
   - sitemap
   - search
