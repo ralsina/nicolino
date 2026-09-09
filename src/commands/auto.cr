@@ -13,13 +13,15 @@ module Nicolino
         have a page open in a browser, it will trigger a reload.
 
         Usage:
-          nicolino auto [--help][TARGET...] [--fast-mode][--port <port>]
-                        [-c <file>][-q|-v <level>]
+          nicolino auto [--help][TARGET...] [--fast-mode][--drafts][--future]
+                        [--port <port>][-c <file>][-q|-v <level>]
 
         Options:
           --help            Show this help message
           --port <port>     Port for the preview server [default: 8080]
           -c <file>         Specify a config file to use [default: conf.yml]
+          --drafts          Also build posts marked as draft.
+          --future          Also build posts dated in the future.
           --fast-mode       Use file timestamps rather than contents to
                             decide rebuilds.
           -v level          Control the verbosity, 0 to 6
@@ -29,6 +31,9 @@ module Nicolino
       def run : Int32
         lock = BuildLock.acquire
         return 1 unless lock
+
+        Lifecycle.include_drafts = !@options.fetch("--drafts", nil).nil?
+        Lifecycle.include_future = !@options.fetch("--future", nil).nil?
 
         create_tasks
         fast_mode = !@options.fetch("--fast-mode", nil).nil?

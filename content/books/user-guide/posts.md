@@ -34,6 +34,45 @@ Your markdown content here...
 - `link` - External link URL (for link posts)
 - `description` - Post description/summary
 - `image` - Featured image path
+- `draft` - Set to `true` to keep the post out of builds (see below)
+- `expires` - Date after which the post is excluded from builds (see below)
+
+## Post Lifecycle
+
+Posts can be kept out of the built site in three ways:
+
+**Drafts.** Mark a post with `draft: true` in its frontmatter and it is
+excluded from builds until you remove the flag or build with
+`--drafts`:
+
+```yaml
+---
+title: Work in progress
+draft: true
+---
+```
+
+**Future posts.** A post dated in the future is not built until its
+date arrives, so you can write scheduled posts ahead of time. Build
+with `--future` to include them anyway (useful for previews).
+
+**Expired posts.** Mark a post with an `expires` date and it drops out
+of the site automatically once that date passes, including from RSS
+feeds, listings, tags, and the search index. Any date format works,
+including natural language:
+
+```yaml
+---
+title: Holiday announcement
+expires: 2027-01-15
+---
+```
+
+Both `--drafts` and `--future` work with `nicolino build` and
+`nicolino auto`, so you can preview non-published content locally while
+keeping production builds clean. When a post stops being built (for
+example because it just expired), its previously generated HTML page is
+removed from the output.
 
 ## Social Sharing
 

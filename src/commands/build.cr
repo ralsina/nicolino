@@ -17,7 +17,8 @@ module Nicolino
         state, so run one build at a time.
 
         Usage:
-          nicolino build [TARGET...] [--fast-mode][-n][-p][--progress]
+          nicolino build [TARGET...] [--fast-mode][--drafts][--future]
+                                     [-n][-p][--progress]
                                      [-k][-q][-B][-c <file>]
                                      [-q|-v <level>]
 
@@ -25,6 +26,8 @@ module Nicolino
           --help            Help for this command.
           -B --run-all      Run all tasks, even up-to-date ones
           -c <file>         Specify a config file to use [default: conf.yml]
+          --drafts          Also build posts marked as draft.
+          --future          Also build posts dated in the future.
           -k --keep-going  Keep going when a task fails.
           -n --dry-run     Dry run: don't actually do anything
           -p --parallel    Run tasks in parallel.
@@ -38,6 +41,9 @@ module Nicolino
       def run : Int32
         lock = BuildLock.acquire
         return 1 unless lock
+
+        Lifecycle.include_drafts = !options["--drafts"].nil?
+        Lifecycle.include_future = !options["--future"].nil?
 
         arguments = options.fetch("TARGET", [] of String).as(Array(String))
         run(
