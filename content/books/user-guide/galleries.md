@@ -101,6 +101,31 @@ galleries: "galleries/"  # Directory name within content/
 - WebP (`.webp`)
 - GIF (`.gif` - thumbnails use first frame)
 
+## Videos
+
+Video files are supported in galleries alongside images. Drop them in the
+gallery directory and they are included in the grid automatically:
+
+- MP4 (`.mp4`), QuickTime (`.mov`), WebM (`.webm`), MKV (`.mkv`), M4V (`.m4v`), AVI (`.avi`)
+
+Videos are copied to the output unmodified (no transcoding), so use
+browser-friendly codecs such as H.264 for best compatibility. A poster
+frame is extracted with [ffmpeg](https://ffmpeg.org) at the
+`image_thumb` size and shown in the grid; the video plays in place with
+controls. ffmpeg is only required if your galleries actually contain
+videos.
+
+```text
+content/galleries/my-gallery/
+  index.md
+  clip1.mp4
+  clip1.thumb.jpg   # Poster frame, generated automatically
+```
+
+If an image shares the video's filename (e.g. `clip1.jpg` next to
+`clip1.mp4`), the poster is named `clip1.video.thumb.jpg` to avoid
+clashing with the image's own thumbnail.
+
 ## Gallery Index
 
 A gallery index page is automatically generated at `/galleries/` listing all available galleries.

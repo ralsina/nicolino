@@ -4,6 +4,7 @@ require "./render"
 require "json"
 require "crinja"
 require "./thumb"
+require "./video"
 
 # Create automatic image galleries
 #
@@ -19,6 +20,10 @@ require "./thumb"
 module Gallery
   # Register output folder to exclude from folder_indexes
   FolderIndexes.register_exclude { Config.galleries }
+
+  # Files that make a folder a gallery and show up in its grid:
+  # images plus the video extensions handled by the videos feature
+  MEDIA_GLOB = "{jpg,png,webp,gif,mp4,mov,webm,mkv,m4v,avi,JPG,PNG,WEBP,GIF,MP4,MOV,WEBM,MKV,M4V,AVI}"
 
   # Return glob patterns for gallery content
   # Galleries are index.md files inside galleries/
@@ -41,7 +46,7 @@ module Gallery
       next if dir == root
       index_md = dir / "index.md"
       next if ::File.exists?(index_md)
-      next if Dir.glob("#{dir}/*.{jpg,png,webp,gif,JPG,PNG,WEBP,GIF}").empty?
+      next if Dir.glob("#{dir}/*#{MEDIA_GLOB}").empty?
       ::File.write(index_md, "---\ntitle: #{dir.basename.capitalize}\n---\n\n")
       Log.info { "🖼️  Generated #{index_md} for image-only gallery" }
     end
@@ -53,7 +58,7 @@ module Gallery
     return unless base.basename == "index"
 
     gallery_dir = base.parent
-    image_list = Dir.glob("#{gallery_dir}/*.{jpg,png,webp,gif,JPG,PNG,WEBP,GIF}").map do |img_path|
+    image_list = Dir.glob("#{gallery_dir}/*#{MEDIA_GLOB}").map do |img_path|
       Path[img_path].basename.to_s
     end
     result = ::Gallery::Gallery.new(sources, base, image_list)
@@ -182,7 +187,10 @@ module Gallery
 
     # Read an image's dimensions (header only, cheap). Returns 0s when
     # the file can't be read; templates should skip sizing then.
+    # Videos are not readable by the image libraries at all.
     private def image_dimensions(path : String) : {Int32, Int32}
+      return {0, 0} if Video.video?(path)
+
       {% if flag?(:novips) %}
         img = CrImage.read(path)
         {img.bounds.width, img.bounds.height}
@@ -210,8 +218,13 @@ module Gallery
         "toc"         => toc(lang),
         "metadata"    => metadata(lang),
         "image_list"  => @image_list.map do |name|
-          width, height = image_dimensions((base.parent / name).to_s)
-          {"name" => name, "width" => width, "height" => height}
+          if Video.video?(name)
+            {"name" => name, "width" => 0, "height" => 0,
+             "is_video" => true, "thumb" => Video.poster_name(base.parent / name)}
+          else
+            width, height = image_dimensions((base.parent / name).to_s)
+            {"name" => name, "width" => width, "height" => height}
+          end
         end,
         "has_sub_galleries" => has_sub_galleries?.to_s,
         "has_images"        => has_images?.to_s,
@@ -345,16 +358,28 @@ module Gallery
           gallery_data = {
             "name"   => Path[post.base].basename.to_s,
             "images" => post.@image_list.map do |img|
-              # Generate thumbnail filename: image.jpg -> image.thumb.jpg
-              ext = File.extname(img)
-              base_name = img.sub(ext, "")
-              thumb_name = "#{base_name}.thumb#{ext}"
+              if Video.video?(img)
+                # Videos use the poster frame as their thumbnail
+                poster = Video.poster_name(Path[basedir] / img)
+                {
+                  "filename" => img,
+                  "url"      => "#{gallery_rel_path}/#{img}",
+                  "thumb"    => "#{gallery_rel_path}/#{poster}",
+                  "type"     => "video",
+                }
+              else
+                # Generate thumbnail filename: image.jpg -> image.thumb.jpg
+                ext = File.extname(img)
+                base_name = img.sub(ext, "")
+                thumb_name = "#{base_name}.thumb#{ext}"
 
-              {
-                "filename" => img,
-                "url"      => "#{gallery_rel_path}/#{img}",
-                "thumb"    => "#{gallery_rel_path}/#{thumb_name}",
-              }
+                {
+                  "filename" => img,
+                  "url"      => "#{gallery_rel_path}/#{img}",
+                  "thumb"    => "#{gallery_rel_path}/#{thumb_name}",
+                  "type"     => "image",
+                }
+              end
             end,
             "sub_galleries" => post.sub_galleries.map do |sub|
               {
@@ -402,8 +427,11 @@ module Gallery
           gallery_dir = File.dirname(gallery_output)
           gallery_link = Utils.path_to_link(gallery_dir)
           # Get first image if available and construct full path
-          # image_list contains just basenames, so we need to add the gallery directory
-          first_image = gallery.image_list.first?
+          # image_list contains just basenames, so we need to add the gallery directory.
+          # Videos are skipped: their poster is already a thumb-sized
+          # file and the template's thumb_url filter would mangle its
+          # name (foo.thumb.jpg -> foo.thumb.thumb.jpg)
+          first_image = gallery.image_list.reject { |name| Video.video?(name) }.first?
           thumb_link = nil
           if first_image
             # Construct the full path: /galleries/fancy-turning/lathe-patterns-00030.jpg

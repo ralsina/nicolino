@@ -18,8 +18,12 @@
 {{html}}
 <div class="pswp-gallery gallery">
 {% for image in image_list %}
+{% if image.is_video %}
+  <video class="gallery-video" controls preload="metadata"{% if image.thumb %} poster="{{image.thumb}}"{% endif %} src="{{image.name}}"></video>
+{% else %}
   <a href="{{image.name}}" {% if image.width and image.height %}data-pswp-width="{{image.width}}" data-pswp-height="{{image.height}}"{% endif %} target="_blank">
     <img src="{{image.name | thumb_url}}" alt="" loading="lazy" />
   </a>
+{% endif %}
 {% endfor %}
 </div>
