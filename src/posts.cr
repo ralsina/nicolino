@@ -4,6 +4,7 @@
 require "./markdown"
 require "./similarity"
 require "./rss"
+require "./lifecycle"
 
 module Posts
   # Return glob patterns for posts content
@@ -22,8 +23,9 @@ module Posts
   def self.enable_from_scan(scan_result : Array(Markdown::File)?, feature_set : Set(String)) : Array(Markdown::File)?
     return unless scan_result
 
-    posts = scan_result
+    posts = Lifecycle.apply(scan_result)
     features = feature_set
+    drop_stale_outputs(scan_result - posts)
 
     Log.info { "✓ Found #{posts.size} post#{posts.size == 1 ? "" : "s"}" }
 
@@ -54,5 +56,19 @@ module Posts
       )
     end
     posts
+  end
+
+  # Remove output files left behind by posts excluded from this build
+  # (drafts, future, expired): an expired post must not stay reachable
+  # just because it was published by an earlier build.
+  private def self.drop_stale_outputs(excluded : Array(Markdown::File)) : Nil
+    excluded.each do |post|
+      Config.languages.each do |lang|
+        output = post.output(lang)
+        next unless File.exists?(output)
+        File.delete(output)
+        Log.info { "🗑  Removed stale output #{output}" }
+      end
+    end
   end
 end
