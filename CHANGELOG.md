@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.27.0] - 2026-09-09
+
+### 🚀 Features
+
+- Optional dark_scheme/light_scheme config overrides (#82)
+- Support video files in image galleries (#86)
+- Content lifecycle management for posts (#87)
+
+### 🐛 Bug Fixes
+
+- Link checking and rendering issues
+- Upgrade croupier to 0.15.0 and handle RunFailure
+- Show escaped shortcodes literally instead of rendering them
+- *(search)* Don't run Enter searches against a not-yet-loaded index
+- *(search)* Await index load before Enter searches in all themes
+
+### 📚 Documentation
+
+- *(import)* Document template location and JSON response shape (#83)
+
 ## [0.26.2] - 2026-09-02
 
 ### 🐛 Bug Fixes
