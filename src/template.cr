@@ -160,10 +160,6 @@ module Templates
   # Ensure all baked-in theme files exist in the themes/default/ directory
   # If any are missing, extract them from the baked filesystem
   def self.ensure_theme
-    # Only the default theme is backed by the baked filesystem. Other themes
-    # own their files: backfilling a missing one with the default theme's
-    # version silently mutates the installed theme on every build.
-    return unless Theme.name == "default"
     theme_dir = Path[Theme.path]
     FileUtils.mkdir_p(theme_dir) unless Dir.exists?(theme_dir)
 

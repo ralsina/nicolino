@@ -1,0 +1,5 @@
+/* Intentionally empty placeholder. The blox theme ships no theme.css of its
+   own, but this file must exist: Template.ensure_theme backfills any
+   missing default-theme file into the active theme's directory on every
+   build, so deleting this file would resurrect the default stylesheet here.
+*/
