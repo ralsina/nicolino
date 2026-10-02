@@ -672,9 +672,13 @@ img {
 
 /* ---- Books ---- */
 
+/* book_chapter.tmpl and book_index.tmpl place the sidebar first in the
+   DOM, so the first column is the 16rem sidebar and the content takes
+   the rest. Swapping the tracks would squeeze the body text into the
+   narrow right-hand column. */
 .book-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 16rem;
+  grid-template-columns: 16rem minmax(0, 1fr);
   gap: 3rem;
   max-width: 72rem;
   margin: 0 auto;
