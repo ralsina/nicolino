@@ -13,6 +13,11 @@ jobs:
     steps:
       - name: Download source
         uses: actions/checkout@v5
+      - name: Refresh apt index
+        # The runner image ships a stale apt index; packages it still
+        # references (e.g. libevent-dev) 404 from the mirrors until it
+        # is refreshed, which breaks install-crystal's apt step.
+        run: sudo apt-get update
       - name: Install Crystal
         uses: crystal-lang/install-crystal@v1
       - name: Install native dependencies (libvips, ragel)
