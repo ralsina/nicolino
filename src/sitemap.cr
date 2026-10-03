@@ -51,10 +51,11 @@ module Sitemap
             next if noindex?(input)
             modtime = File.info(input).modification_time
             input_path = input.sub(/^#{Regex.escape(Utils.output_prefix)}/, "")
-            str << %(<url> # ameba:disable Style/MultilineStringLiteral
-              <loc>#{base.resolve(input_path)}</loc>
-              <lastmod>#{modtime}</lastmod>
-            </url>)
+            # lastmod must be W3C Datetime (RFC 3339), not Time#to_s
+            str << "<url>"
+            str << "<loc>#{base.resolve(input_path)}</loc>"
+            str << "<lastmod>#{modtime.to_rfc3339}</lastmod>"
+            str << "</url>"
           end
         end
       end
