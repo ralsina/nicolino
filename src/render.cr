@@ -65,23 +65,20 @@ module Render
                      language_links : Array(Hash(String, String))? = nil,
                      fix_code_classes : Bool = false) : String
     page_template = Theme.template_path("page.tmpl")
+    # Callers pass either filesystem paths (output/foo/index.html) or
+    # already-converted URLs (/foo/). Normalize to a URL so both the
+    # template context (canonical_url, og:url) and the relativizer
+    # get a proper link, no matter which form the caller uses.
+    base = output_path.starts_with?("/") ? output_path : Utils.path_to_link(output_path)
     context = {
       "content"     => content,
       "title"       => title,
       "breadcrumbs" => breadcrumbs,
-      "link"        => output_path,
+      "link"        => base,
     } of String => String | Array(NamedTuple(name: String, link: String)) | Array(Hash(String, String))?
     context["language_links"] = language_links if language_links
     html = apply_template(page_template, context, lang)
     doc = Lexbor::Parser.new(html)
-    # Convert output_path to a link URL for the relativizer.
-    # Some callers pass filesystem paths (output/foo.html), others
-    # already-converted URLs (/foo/).  Detect and handle both.
-    base = if output_path.starts_with?("/")
-             output_path
-           else
-             Utils.path_to_link(output_path)
-           end
     doc = HtmlFilters.make_links_relative(doc, base)
     if fix_code_classes
       HtmlFilters.fix_code_classes(doc).to_html
