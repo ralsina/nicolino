@@ -103,27 +103,29 @@ module LinkChecker
       return LinkResult.new(source_file, link, link_type, :external, nil)
     end
 
+    # Only the path portion of a link maps to a filesystem path.
+    # Strip query strings (cache busters like style.css?v=42) and
+    # fragments (page.html#section) before resolving.
+    path_link = link.split("?")[0].split("#")[0]
+
     # Convert link to filesystem path
     # Links starting with / are relative to site root
     # Relative links are relative to the source file's directory
 
-    target_path = if link.starts_with?("/")
+    target_path = if path_link.starts_with?("/")
                     # Absolute link: /foo/bar.html -> output/foo/bar.html
-                    link_to_fs_path(link)
+                    link_to_fs_path(path_link)
                   else
                     # Relative link: bar.html -> output/dir/bar.html
                     source_dir = Path[source_file].parent
-                    resolve_relative_link(source_dir.to_s, link)
+                    resolve_relative_link(source_dir.to_s, path_link)
                   end
 
-    # Handle anchors in links (e.g., /page.html#section)
-    base_target = target_path.split("#")[0]
-
     # Check if target exists
-    if existing_files.includes?(base_target)
-      LinkResult.new(source_file, link, link_type, :ok, base_target)
+    if existing_files.includes?(target_path)
+      LinkResult.new(source_file, link, link_type, :ok, target_path)
     else
-      LinkResult.new(source_file, link, link_type, :broken, base_target)
+      LinkResult.new(source_file, link, link_type, :broken, target_path)
     end
   end
 
