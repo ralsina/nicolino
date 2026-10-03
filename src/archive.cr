@@ -12,12 +12,12 @@ module Archive
     title : String,
     link : String,
     date : String do
-    def self.from_post(post : Markdown::File) : self
+    def self.from_post(post : Markdown::File, lang : String) : self
       post_date = post.date
       raise "Archive post #{post.source} has no date (required for archive)" unless post_date.is_a?(Time)
       new(
-        title: post.title,
-        link: post.link,
+        title: post.title(lang),
+        link: post.link(lang),
         date: post_date.to_s("%Y-%m-%d")
       )
     end
@@ -35,9 +35,9 @@ module Archive
   record ArchiveMonth,
     name : String,
     posts : Array(ArchivePost) do
-    def self.create(year : Int32, month : Int32, posts : Array(Markdown::File)) : self
+    def self.create(year : Int32, month : Int32, posts : Array(Markdown::File), lang : String) : self
       month_name = "#{year}-#{month.to_s.rjust(2, '0')}"
-      archive_posts = posts.map { |post| ArchivePost.from_post(post) }
+      archive_posts = posts.map { |post| ArchivePost.from_post(post, lang) }
       new(name: month_name, posts: archive_posts)
     end
 
@@ -53,11 +53,11 @@ module Archive
   record ArchiveYear,
     year : String,
     months : Array(ArchiveMonth) do
-    def self.create(year : Int32, months_data : Hash(String, Array(Markdown::File))) : self
+    def self.create(year : Int32, months_data : Hash(String, Array(Markdown::File)), lang : String) : self
       sorted_months = months_data.keys.sort!.reverse!
       archive_months = sorted_months.map do |month_key|
         month_num = month_key.split("-")[1].to_i
-        ArchiveMonth.create(year, month_num, months_data[month_key])
+        ArchiveMonth.create(year, month_num, months_data[month_key], lang)
       end
       new(year: year.to_s, months: archive_months)
     end
@@ -143,7 +143,7 @@ module Archive
         # Create ArchiveYear records
         sorted_years = years_data.keys.sort!.reverse!
         archive_years = sorted_years.map do |year|
-          ArchiveYear.create(year, years_data[year])
+          ArchiveYear.create(year, years_data[year], lang)
         end
 
         # Get the latest year for the default open state
