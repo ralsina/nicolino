@@ -19,6 +19,8 @@ module Nicolino
         External links (http://, https://, mailto:, etc.) are skipped,
         including scheme-less ones like "github.com/user/repo".
         Anchors (same-page links starting with #) are also skipped.
+        Query strings (cache busters like style.css?v=42) are ignored
+        when resolving link targets to files.
 
         Usage:
           nicolino check_links [--help][-c <file>][-q|-v <level>][--output <dir>][--exclude <pattern>]
