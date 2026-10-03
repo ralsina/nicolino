@@ -118,10 +118,10 @@ module Similarity
     matches.to_f / Similarity.num_permutations
   end
 
-  # Tokenize text into words (lowercase, alphanumeric only)
+  # Tokenize text into words (lowercase, letters and numbers in any script)
   private def self.tokenize(text : String) : Array(String)
     text.downcase
-      .gsub(/[^a-z0-9\s]/, "")
+      .gsub(/[^\p{L}\p{N}\s]/, "")
       .split
       .reject(&.blank?)
       .select { |word| word.size >= 3 } # Remove very short words
