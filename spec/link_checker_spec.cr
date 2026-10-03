@@ -70,4 +70,28 @@ describe LinkChecker do
 
     results.select(&.broken?).map(&.link).should contain("/nope.html")
   end
+
+  it "resolves links against a custom output directory" do
+    FileUtils.mkdir_p("public/css")
+    File.write("public/css/theme.css", "body {}")
+    File.write("public/index.html", %(<link rel="stylesheet" href="/css/theme.css">))
+    LinkChecker.output_dir = "public"
+    begin
+      existing = Set{"public/css/theme.css", "public/index.html"}
+      results = LinkChecker.check_file("public/index.html", existing)
+      results.select(&.ok?).map(&.link).should contain("/css/theme.css")
+    ensure
+      LinkChecker.output_dir = "output"
+    end
+  end
+
+  it "check_all uses its output_dir argument" do
+    FileUtils.mkdir_p("site2/css")
+    File.write("site2/css/theme.css", "body {}")
+    File.write("site2/index.html", %(<link rel="stylesheet" href="/css/theme.css">))
+    results = LinkChecker.check_all("site2")
+    LinkChecker.output_dir.should eq "site2"
+    results.select(&.ok?).map(&.link).should contain("/css/theme.css")
+    LinkChecker.output_dir = "output"
+  end
 end
