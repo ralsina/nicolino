@@ -172,18 +172,23 @@ module Markdown
               # Set @link for the other language based on its @output path
               @link[other_lang] = (Path.new ["/", @output[other_lang].split("/")[1..]]).to_s
               @shortcodes[other_lang] = @shortcodes[lang] if @shortcodes.has_key?(lang)
+              # Terms come from the same front matter as the shared
+              # metadata: without this, a fallback language would
+              # have no terms at all and drop out of taxonomy pages
+              @taxonomy_terms[other_lang] = @taxonomy_terms[lang].dup
             end
           end
         end
       end
     end
 
-    def taxonomies
+    def taxonomies(lang = nil)
+      lang ||= Locale.language
       result = Hash({name: String, link: String}, Array({name: String, link: String})).new
       Taxonomies::All.each do |taxo|
-        next unless taxo.@posts.includes? self
-        result[taxo.link] = taxo.@terms.values.select \
-           { |term| term.@posts.includes? self }.map(&.link)
+        terms = taxo.terms_for(self, lang)
+        next if terms.empty?
+        result[taxo.link(lang)] = terms.map(&.link(lang))
       end
       result
     end
@@ -672,7 +677,7 @@ module Markdown
         "link"           => link(lang),
         "source"         => source(lang),
         "summary"        => summary(page_html, lang),
-        "taxonomies"     => taxonomies,
+        "taxonomies"     => taxonomies(lang),
         "title"          => title(lang),
         "toc"            => toc(lang),
         "metadata"       => metadata(lang),
