@@ -1,0 +1,7 @@
+[book]
+title = "A Little Book About Books"
+description = "A miniature book showing how chapters, navigation and nesting render in each theme"
+authors = ["The Nicolino Demo"]
+
+[build]
+create-missing = false

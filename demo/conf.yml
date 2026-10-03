@@ -1,7 +1,8 @@
 # Nicolino Theme Showcase
 #
 # A tiny site that exercises the features a theme should support:
-# posts, taxonomies, archive, images, base16 theming and i18n.
+# posts, taxonomies, archive, images, galleries, books, base16
+# theming and i18n.
 #
 # Switch themes by editing `theme:` below ("terminal" or "default").
 
@@ -41,3 +42,5 @@ features:
   - base16
   - folder_indexes
   - archive
+  - galleries
+  - books

@@ -13,6 +13,9 @@ de contenido realista:
   resaltadas en varios lenguajes
 - [Imágenes y artículos plegados](posts/images-and-teasers.es.html) —
   una imagen, un resumen y el corte
+- [Una galería de imágenes](galleries/shapes/) — una grilla con lightbox
+- [Un pequeño libro](books/little-book/) — capítulos, barra lateral y
+  navegación lineal
 
 También es **multilingüe**: este es el sitio en español. El artículo
 de bloques de código no está traducido, así que aparece marcado como
