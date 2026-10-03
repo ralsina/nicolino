@@ -6,6 +6,12 @@ require "log"
 # Scans HTML files in the output directory and verifies that
 # all in-site links point to existing files.
 module LinkChecker
+  # Directory the checked HTML lives in; links resolve against it.
+  # check_all sets it from its argument (normalized, no trailing
+  # slash) so custom output directories work; check_file callers
+  # that bypass check_all can set it directly.
+  class_property output_dir : String = "output"
+
   # Result of checking a single link
   struct LinkResult
     property source_file : String
@@ -133,7 +139,7 @@ module LinkChecker
   private def self.link_to_fs_path(link : String) : String
     # Remove leading slash and add output prefix
     link = link.lchop("/")
-    path = Path["output", link].to_s
+    path = Path[output_dir, link].to_s
 
     # Directory links resolve to their index page, even when the
     # directory name contains dots (e.g. /tags.es/ language
@@ -155,7 +161,8 @@ module LinkChecker
     base_path = resolve_dots(Path[source_dir, link].to_s)
 
     # If result escapes output directory, treat as broken
-    if !base_path.starts_with?("output/") && base_path != "output"
+    output_dir = self.output_dir
+    if !base_path.starts_with?("#{output_dir}/") && base_path != output_dir
       return base_path
     end
 
@@ -186,6 +193,10 @@ module LinkChecker
 
   # Check all HTML files in the output directory
   def self.check_all(output_dir : String = "output", exclude : Array(String) = [] of String) : Array(LinkResult)
+    # Normalize (drops a trailing slash) so path building and the
+    # escape boundary check agree whatever form the caller passed
+    # (Config.options.output is e.g. "output/", the CLI default "output")
+    self.output_dir = Path[output_dir].normalize.to_s
     Log.info { "Checking links in #{output_dir}/" }
 
     # Build set of all existing files
