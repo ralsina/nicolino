@@ -70,7 +70,10 @@ module Taxonomies
     # Initialize the taxonomy out of descriptive data
     # and a list of posts to be classified
 
-    @terms = Hash(String, Term).new
+    # Terms collected per language: language => term name => Term.
+    # A term only lists the posts that define it in that language,
+    # so translations don't leak across language variants.
+    @terms = Hash(String, Hash(String, Term)).new
     @posts = Array(Markdown::File).new
     @name : String
 
@@ -85,27 +88,40 @@ module Taxonomies
       @path,
       @posts : Array(Markdown::File),
     )
-      @posts.each do |post|
-        # Get pre-parsed taxonomy terms for this post
-        post_taxonomies = post.taxonomy_terms
-        post_terms = post_taxonomies.fetch(@name, nil)
-        next if post_terms.nil?
+      # Collect terms per language from each language's front matter
+      Config.languages.each do |lang|
+        terms = (@terms[lang] ||= Hash(String, Term).new)
+        @posts.each do |post|
+          # Get pre-parsed taxonomy terms for this post and language
+          post_terms = post.taxonomy_terms(lang).fetch(@name, nil)
+          next if post_terms.nil?
 
-        post_terms.each do |term|
-          term = term.strip
-          if !@terms.has_key?(term)
-            @terms[term] = Term.new(term, self)
+          post_terms.each do |term|
+            term = term.strip
+            if !terms.has_key?(term)
+              terms[term] = Term.new(term, self)
+            end
+            terms[term].@posts << post
           end
-          @terms[term].@posts << post
         end
       end
       All << self
     end
 
+    # Terms registered for a language
+    def terms_for_lang(lang : String) : Hash(String, Term)
+      @terms.fetch(lang, Hash(String, Term).new)
+    end
+
+    # Terms of this taxonomy that contain *post* in *lang*
+    def terms_for(post : Markdown::File, lang : String) : Array(Term)
+      terms_for_lang(lang).values.select { |term| term.@posts.includes?(post) }
+    end
+
     def value(lang)
       {
         "name"  => @name,
-        "terms" => @terms.values.map(&.value),
+        "terms" => terms_for_lang(lang).values.map(&.value),
       }
     end
 
@@ -115,7 +131,7 @@ module Taxonomies
         "name" => @name,
         # Alphabetical, case-insensitive: terms come in scan order,
         # which is arbitrary under parallel builds
-        "terms" => @terms.values.map(&.lightweight_value)
+        "terms" => terms_for_lang(lang).values.map(&.lightweight_value)
           .sort_by!(&.["name"].to_s.downcase),
       }
     end
@@ -173,7 +189,7 @@ module Taxonomies
           )
         end
 
-        @terms.values.each do |term|
+        @terms.fetch(lang, Hash(String, Term).new).values.each do |term|
           feed_path = (base_path / "#{Utils.slugify(term.@name)}/index.rss").normalize.to_s
           title = Crinja.render(@term_title, {
             "term" => term.lightweight_value,
