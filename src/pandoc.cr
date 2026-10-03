@@ -8,9 +8,11 @@ module Pandoc
     return unless is_enabled
 
     return unless Process.find_executable("pandoc").nil?
-    Log.error { "The 'pandoc' feature is enabled but pandoc is not installed or not in PATH" }
-    Log.error { "Please install pandoc or disable the 'pandoc' feature in conf.yml" }
-    exit 1
+    # Library code raises instead of exiting (see src/config.cr);
+    # the command layer maps the exception to an exit code.
+    raise Config::ConfigError.new(
+      "The 'pandoc' feature is enabled but pandoc is not installed or not in PATH. " \
+      "Please install pandoc or disable the 'pandoc' feature in conf.yml")
   end
 
   # A file written in markdown

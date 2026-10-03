@@ -23,9 +23,11 @@ module Video
     return if videos.empty?
 
     if Process.find_executable("ffmpeg").nil?
-      Log.error { "Video files found but ffmpeg is not installed, so poster frames can't be generated" }
-      Log.error { "Please install ffmpeg or remove the videos from your content" }
-      exit 1
+      # Library code raises instead of exiting (see src/config.cr);
+      # the command layer maps the exception to an exit code.
+      raise Config::ConfigError.new(
+        "Video files found but ffmpeg is not installed, so poster frames can't be generated. " \
+        "Please install ffmpeg or remove the videos from your content")
     end
 
     Log.info { "🎬 Processing videos..." }
