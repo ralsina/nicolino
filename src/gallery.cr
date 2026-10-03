@@ -454,7 +454,9 @@ module Gallery
           "items"       => items,
         })
 
-        Render.page_html(output_path.to_s, title_html + content, "Galleries", breadcrumbs, lang)
+        # Pass a URL (not a filesystem path) so page.tmpl builds a
+        # correct canonical URL from it, like the books feature does.
+        Render.page_html(Utils.path_to_link(output_path.to_s), title_html + content, "Galleries", breadcrumbs, lang)
       end
     end
   end

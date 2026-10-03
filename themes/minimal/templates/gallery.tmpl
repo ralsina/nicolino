@@ -4,14 +4,34 @@
   Renders a gallery with:
   - Simple title (no breadcrumbs)
   - Gallery description/content
-  - VenoBox lightbox integration
+  - Barebones image grid, lightbox via VenoBox (div.lightbox div a)
 
   Variables:
   - title: Gallery title
   - html: Gallery content HTML
+  - image_list: Array of {name, width, height, is_video?} hashes
 
   Used by: Gallery feature for rendering gallery pages
 #}
 <h1 class="primary">{{title}}</h1>
 
 {{html}}
+
+<div class="gallery lightbox">
+  {% for image in image_list %}
+  {% if image.is_video %}
+  <video class="gallery-video" controls preload="metadata" src="{{ image.name }}"></video>
+  {% else %}
+  <div>
+    <a href="{{ image.name }}">
+      <img src="{{ image.name | thumb_url }}" alt="{{ image.name }}" loading="lazy" />
+    </a>
+  </div>
+  {% endif %}
+  {% endfor %}
+</div>
+
+<style>
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0; }
+.gallery img { width: 100%; height: auto; display: block; }
+</style>

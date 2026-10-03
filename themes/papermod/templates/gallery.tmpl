@@ -6,9 +6,13 @@
   <div class="papermod-gallery">
     {% for image in image_list %}
     <div class="papermod-gallery-item">
-      <a href="{{ image }}">
-        <img src="{{ image|thumb_url }}" alt="{{ image }}" loading="lazy" />
+      {% if image.is_video %}
+      <video class="gallery-video" controls preload="metadata" src="{{ image.name }}"></video>
+      {% else %}
+      <a href="{{ image.name }}">
+        <img src="{{ image.name | thumb_url }}" alt="{{ image.name }}" loading="lazy" />
       </a>
+      {% endif %}
     </div>
     {% endfor %}
   </div>
