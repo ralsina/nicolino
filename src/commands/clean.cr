@@ -24,8 +24,15 @@ module Nicolino
       def run : Int32
         create_tasks
         existing = Set.new(Dir.glob(Path[Config.options.output] / "**/*"))
-        targets = Set.new(Croupier::TaskManager.tasks.keys)
-        targets = targets.map { |path| Path[path].normalize.to_s }
+        # Task keys are unique IDs ("markdown:output/foo.html"), not
+        # filesystem paths; collect the tasks' actual outputs instead,
+        # dropping virtual kv:// entries.
+        targets = Set.new(
+          Croupier::TaskManager.tasks.values
+            .flat_map(&.outputs)
+            .reject(&.starts_with?("kv://"))
+            .map { |path| Path[path].normalize.to_s }
+        )
         to_clean = existing - targets
         # Only delete files
         to_clean.each do |path|
