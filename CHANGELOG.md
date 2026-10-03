@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.28.0] - 2026-10-03
+
+### 🚀 Features
+
+- *(demo)* Add a gallery and a book to the theme demos
+
+### 🐛 Bug Fixes
+
+- *(blox)* Put book content in the wide column (#88)
+- Stop ensure_theme from backfilling non-default themes
+- Replace stale blox theme.css with an empty placeholder
+- *(ci)* Refresh apt index before install-crystal
+- *(gallery)* Repair gallery rendering in non-default themes
+- *(check_links)* Stop flagging cache-buster query strings as broken (#98)
+- *(taxonomies)* Scope terms per language (#106)
+- *(archive)* Use each language's post titles and links (#105)
+- *(render)* Normalize output_path to a URL in page_html (#99)
+- *(similarity)* Keep non-ASCII words when tokenizing (#100)
+- *(video)* Raise instead of exiting when a dependency is missing (#101)
+- *(clean)* Derive clean targets from task outputs, not registry keys (#104)
+- *(link-checker)* Stop hardcoding the output directory (#102)
+- *(sitemap)* Emit valid XML with W3C lastmod timestamps (#103)
+
 ## [0.27.0] - 2026-09-09
 
 ### 🚀 Features
