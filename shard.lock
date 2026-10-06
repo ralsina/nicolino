@@ -11,7 +11,7 @@ shards:
 
   baked_file_system: # Overridden
     git: https://github.com/ralsina/baked_file_system.git
-    version: 0.11.1+git.commit.6bb39b02405d3768fd2e063a6b447966b6728cba
+    version: 0.11.2
 
   base58:
     git: https://github.com/crystal-china/base58.cr.git
