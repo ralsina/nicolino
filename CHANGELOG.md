@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.28.1] - 2026-10-06
+
+### 🐛 Bug Fixes
+
+- Parallel builds crash or hang (thread-safety fixes, docopt 1.5) (#107)
+- *(deps)* Update croupier to 0.17
+
 ## [0.28.0] - 2026-10-03
 
 ### 🚀 Features
