@@ -16,7 +16,8 @@ module Markdown
   # unlike the default context, Parallel lets any scheduler resume
   # any fiber, so the workers spread across the thread pool
   @@files_context : Fiber::ExecutionContext::Parallel? = nil
-  # Guards registry insertion during parallel content loading
+  # Guards every registry access: files register from parallel
+  # content loading and from book chapter tasks during a run
   @@posts_mutex = Mutex.new
 
   # Profiling accumulators
@@ -73,8 +74,20 @@ module Markdown
     end
   end
 
-  def self.posts
-    @@posts
+  # A snapshot of the posts registry. Tasks on parallel workers
+  # register files (book chapters) while others read, so callers get
+  # a copy taken under the lock rather than the live Hash. For single
+  # lookups use post? / has_post?, which don't copy.
+  def self.posts : Hash(String, File)
+    @@posts_mutex.synchronize { @@posts.dup }
+  end
+
+  def self.post?(base : String) : File?
+    @@posts_mutex.synchronize { @@posts[base]? }
+  end
+
+  def self.has_post?(base : String) : Bool
+    @@posts_mutex.synchronize { @@posts.has_key?(base) }
   end
 
   # Register a file in the global posts registry (thread-safe)
@@ -1071,7 +1084,7 @@ module Markdown
     Log.debug { "Reading Markdown from #{path}" }
     all_sources = Utils.find_all(path, "md")
     todo = all_sources.reject do |base, _|
-      Markdown.posts.has_key?(base.to_s) || Utils.should_skip_file?(base)
+      Markdown.has_post?(base.to_s) || Utils.should_skip_file?(base)
     end
     files_from(todo) { |sources, base| File.new(sources, base) }
   end

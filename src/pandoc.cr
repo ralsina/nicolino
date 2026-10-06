@@ -115,7 +115,7 @@ module Pandoc
     Config.options.pandoc_formats.keys.each do |ext|
       all_sources = Utils.find_all(path, ext[1..])
       todo = all_sources.reject do |base, _|
-        Markdown.posts.has_key?(base.to_s) || Utils.should_skip_file?(base)
+        Markdown.has_post?(base.to_s) || Utils.should_skip_file?(base)
       end
       posts += Markdown.files_from(todo) do |sources, base|
         File.new(sources, base)

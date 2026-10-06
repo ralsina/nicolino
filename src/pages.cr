@@ -193,7 +193,7 @@ module Pages
           # Try relative path first (content/pages/10.md)
           item_relative = item_path.sub(/^.*\/content\//, "content/")
           # Try direct match with relative path
-          file = Markdown.posts[item_relative]?
+          file = Markdown.post?(item_relative)
           # If not found, try matching against all sources
           unless file
             file = Markdown.posts.values.find do |md_file|

@@ -33,7 +33,7 @@ module HTML
     Log.debug { "Reading HTML files from #{path}" }
     all_sources = Utils.find_all(path, "html")
     todo = all_sources.reject do |base, _|
-      Markdown.posts.has_key?(base.to_s) || Utils.should_skip_file?(base)
+      Markdown.has_post?(base.to_s) || Utils.should_skip_file?(base)
     end
     Markdown.files_from(todo) do |sources, base|
       File.new(sources, base)

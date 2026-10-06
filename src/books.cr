@@ -160,7 +160,7 @@ module Books
       end
 
       # Register in posts hash
-      Markdown.posts[base.to_s] = self
+      Markdown.register(base.to_s, self)
 
       # Load for each language
       Config.languages.each do |lang|

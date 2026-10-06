@@ -127,7 +127,7 @@ module Gallery
       @base = base
       super(sources, base)
       @parent_gallery = nil
-      Markdown.posts[base.to_s] = self
+      Markdown.register(base.to_s, self)
 
       # Patch title if it's missing, special case for galleries
       Config.languages.each do |lang|

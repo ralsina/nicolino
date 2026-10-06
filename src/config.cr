@@ -228,15 +228,21 @@ location: "tags/"
     @@global_config.folder_indexes.exclude_dirs
   end
 
+  # Guards @@lang_configs: tasks on parallel workers can be the first
+  # to ask for a language, and a Hash read racing an insert can crash
+  @@lang_configs_mutex = Mutex.new
+
   # Load or get cached LangConfig for a specific language
   def self.[](lang : String) : LangConfig
     ensure_loaded
-    unless @@lang_configs.has_key?(lang)
-      raise "Default language config not loaded." if lang == @@default_lang
-      # Load from conf.LANG.yml for overrides
-      @@lang_configs[lang] = load_lang_config(lang)
+    @@lang_configs_mutex.synchronize do
+      unless @@lang_configs.has_key?(lang)
+        raise "Default language config not loaded." if lang == @@default_lang
+        # Load from conf.LANG.yml for overrides
+        @@lang_configs[lang] = load_lang_config(lang)
+      end
+      @@lang_configs[lang]
     end
-    @@lang_configs[lang]
   end
 
   # Load language-specific config from conf.LANG.yml
@@ -502,9 +508,8 @@ location: "tags/"
   def self.options(lang = nil)
     lang ||= @@default_lang
     ensure_loaded
-    cached = @@options_cache[lang]?
-    return cached if cached
-
+    # Reads take the lock too: an unlocked read racing the insert
+    # below (from another worker thread) can crash
     @@options_mutex.synchronize do
       @@options_cache[lang] ||= OptionsWrapper.new(self[lang], @@global_config)
     end
