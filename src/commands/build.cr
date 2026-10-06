@@ -42,17 +42,17 @@ module Nicolino
         lock = BuildLock.acquire
         return 1 unless lock
 
-        Lifecycle.include_drafts = !options["--drafts"].nil?
-        Lifecycle.include_future = !options["--future"].nil?
+        Lifecycle.include_drafts = options.bool("--drafts")
+        Lifecycle.include_future = options.bool("--future")
 
         arguments = options.fetch("TARGET", [] of String).as(Array(String))
         run(
           arguments: arguments,
-          parallel: !options["--parallel"].nil?,
-          keep_going: !options["--keep-going"].nil?,
-          dry_run: !options["--dry-run"].nil?,
-          run_all: !options["--run-all"].nil?,
-          fast_mode: !options["--fast-mode"].nil?,
+          parallel: options.bool("--parallel"),
+          keep_going: options.bool("--keep-going"),
+          dry_run: options.bool("--dry-run"),
+          run_all: options.bool("--run-all"),
+          fast_mode: options.bool("--fast-mode"),
         )
       rescue ex : Exception
         Log.error(exception: ex) { "Error running build: #{ex.message}" }

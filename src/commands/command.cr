@@ -1,13 +1,13 @@
 require "colorize"
 require "log"
 require "oplog"
-require "polydocopt"
+require "docopt/dispatch"
 require "progress_bar"
 
 module Nicolino
   module Commands
     # Base for command structs
-    abstract struct Command < Polydocopt::Command
+    abstract struct Command < Docopt::Dispatch::Command
       def initialize(@options)
         # Load config and setup logging
         config_file = @options["-c"]? ? @options["-c"].as(String) : "conf.yml"

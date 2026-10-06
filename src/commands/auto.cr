@@ -32,11 +32,11 @@ module Nicolino
         lock = BuildLock.acquire
         return 1 unless lock
 
-        Lifecycle.include_drafts = !@options.fetch("--drafts", nil).nil?
-        Lifecycle.include_future = !@options.fetch("--future", nil).nil?
+        Lifecycle.include_drafts = @options.bool("--drafts")
+        Lifecycle.include_future = @options.bool("--future")
 
         create_tasks
-        fast_mode = !@options.fetch("--fast-mode", nil).nil?
+        fast_mode = @options.bool("--fast-mode")
         Croupier::TaskManager.fast_mode = fast_mode
         arguments = @options.fetch("TARGET", [] of String).as(Array(String))
 

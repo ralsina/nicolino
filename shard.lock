@@ -11,7 +11,7 @@ shards:
 
   baked_file_system: # Overridden
     git: https://github.com/ralsina/baked_file_system.git
-    version: 0.10.0+git.commit.beb373124c7a235cfb9cd94e36849d8168eaa04b
+    version: 0.11.2
 
   base58:
     git: https://github.com/crystal-china/base58.cr.git
@@ -39,7 +39,11 @@ shards:
 
   docopt:
     git: https://github.com/ralsina/docopt.cr.git
-    version: 0.3.1
+    version: 1.5.0
+
+  hansa:
+    git: https://github.com/ralsina/hansa.git
+    version: 0.2.1
 
   inotify:
     git: https://github.com/petoem/inotify.cr.git
@@ -69,10 +73,6 @@ shards:
     git: https://github.com/ralsina/oplog.git
     version: 0.1.1
 
-  polydocopt:
-    git: https://github.com/ralsina/polydocopt.git
-    version: 0.2.0+git.commit.f7e54a6fa545266e103fe3e081b6e6b125b43c47
-
   progress_bar:
     git: https://github.com/mgomes/progress_bar.git
     version: 1.0.1+git.commit.aa5ebab89d31167208387640db06d3964ec7922b
@@ -87,7 +87,7 @@ shards:
 
   tartrazine:
     git: https://github.com/ralsina/tartrazine.git
-    version: 0.21.3
+    version: 0.27.2
 
   toml:
     git: https://github.com/manastech/crystal-toml.git

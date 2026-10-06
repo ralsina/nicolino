@@ -1,7 +1,7 @@
 require "./commands/*"
 require "./*"
 
-exit Polydocopt.main("nicolino", ["--help"]) if ARGV.empty?
+exit Docopt::Dispatch.main("nicolino", ["--help"]) if ARGV.empty?
 cmdname = ARGV[0]
 
 if cmdname == "version" || cmdname == "--version"
@@ -9,4 +9,4 @@ if cmdname == "version" || cmdname == "--version"
   exit 0
 end
 
-exit(Polydocopt.main("nicolino", ARGV))
+exit(Docopt::Dispatch.main("nicolino", ARGV))

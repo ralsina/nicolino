@@ -38,7 +38,8 @@ dependencies:
     version: ~> 0.5.0
   tartrazine:
     github: ralsina/tartrazine
-    version: ~> 0.21.3
+    # 0.27.2: thread-safe tokenizers, formatters and lexer caches
+    version: ~> 0.27.2
   cronic:
     github: nanobowers/cronic
   baked_file_system:
@@ -54,9 +55,9 @@ dependencies:
     github: naqvis/crimage
   oplog:
     github: ralsina/oplog
-  polydocopt:
-    github: ralsina/polydocopt
-    branch: main
+  docopt:
+    github: ralsina/docopt.cr
+    version: ~> 1.5.0
   toml:
     github: manastech/crystal-toml
     version: ~> 0.8.0

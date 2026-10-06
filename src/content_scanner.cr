@@ -35,7 +35,7 @@ module ContentScanner
           next if claimed_bases.includes?(base)
 
           # Skip if already registered
-          next if Markdown.posts.has_key?(base.to_s)
+          next if Markdown.has_post?(base.to_s)
 
           # Skip if should be skipped
           next if Utils.should_skip_file?(base)

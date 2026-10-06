@@ -6,6 +6,9 @@ module FeatureTiming
   @@enable_timings = Hash(String, Time::Span).new
   @@task_timings = Hash(String, Time::Span).new
   @@task_counts = Hash(String, Int32).new
+  # record_task runs at the end of every task, on whichever worker
+  # thread ran it: concurrent Hash updates would corrupt memory
+  @@task_mutex = Mutex.new
 
   # Record time spent in a feature's enable() method
   def self.record_enable(feature_name : String, duration : Time::Span)
@@ -15,10 +18,10 @@ module FeatureTiming
 
   # Record time spent executing a task for a feature
   def self.record_task(feature_name : String, duration : Time::Span)
-    @@task_timings[feature_name] ||= Time::Span.zero
-    @@task_timings[feature_name] += duration
-    @@task_counts[feature_name] ||= 0
-    @@task_counts[feature_name] += 1
+    @@task_mutex.synchronize do
+      @@task_timings[feature_name] = (@@task_timings[feature_name]? || Time::Span.zero) + duration
+      @@task_counts[feature_name] = (@@task_counts[feature_name]? || 0) + 1
+    end
   end
 
   # Generate timing report as a table

@@ -1,3 +1,6 @@
 dependencies:
   baked_file_system:
     github: ralsina/baked_file_system
+    # 0.11.2: independent BakedFile per get, so parallel tasks can
+    # read the same baked file
+    version: ~> 0.11.2

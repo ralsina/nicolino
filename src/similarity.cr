@@ -28,18 +28,21 @@ module Similarity
   class_property ngram_size : Int32 = 3
 
   # Cache for all signatures across all languages
-  @@all_signatures_cache : Hash(String, Array(Signature))? = nil
+  @@all_signatures_cache = Hash(String, Array(Signature)).new
 
   # Cache for computed related posts results
-  @@related_posts_cache : Hash(String, Array(RelatedPost))? = nil
+  @@related_posts_cache = Hash(String, Array(RelatedPost)).new
+
+  # Guards both caches: posts render (and look up related posts) in
+  # tasks on parallel workers. Only the Hash operations are locked,
+  # not the work of filling them, so a miss may be computed twice.
+  @@cache_mutex = Mutex.new
 
   # Get all signatures from the kv store with caching
   def self.get_all_signatures(lang : String) : Array(Signature)
     # Initialize cache if needed
-    sig_cache = @@all_signatures_cache ||= Hash(String, Array(Signature)).new
-
     # Return cached value if available
-    if cached = sig_cache[lang]?
+    if cached = @@cache_mutex.synchronize { @@all_signatures_cache[lang]? }
       return cached
     end
 
@@ -59,7 +62,7 @@ module Similarity
     end
 
     # Cache the result
-    sig_cache[lang] = signatures
+    @@cache_mutex.synchronize { @@all_signatures_cache[lang] = signatures }
     signatures
   end
 
@@ -282,9 +285,7 @@ module Similarity
 
     # Check cache first
     cache_key = "#{signature.post_link}|#{lang}|#{limit}"
-    related_cache = @@related_posts_cache ||= Hash(String, Array(RelatedPost)).new
-
-    if cached = related_cache[cache_key]?
+    if cached = @@cache_mutex.synchronize { @@related_posts_cache[cache_key]? }
       return cached
     end
 
@@ -332,7 +333,7 @@ module Similarity
     result = by_base.values.sort_by! { |item| -item.score }[0...limit] || [] of RelatedPost
 
     # Cache the result
-    related_cache[cache_key] = result
+    @@cache_mutex.synchronize { @@related_posts_cache[cache_key] = result }
     result
   end
 
