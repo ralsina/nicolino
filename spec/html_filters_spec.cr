@@ -213,7 +213,7 @@ describe HtmlFilters do
       end
     end
 
-    it "agrees with string_rewrite_safe? on every probe" do
+    it "takes the parser path whenever string_rewrite_safe? would" do
       [
         %(<script src="/js/app.js"></script>),
         %(<script>no links</script><a href="/x">x</a>),
@@ -221,12 +221,33 @@ describe HtmlFilters do
         %(<!-- note --><a href="/x">x</a>),
         %(<!-- href = 'x' -->),
         %(<a HREF = "x">),
-        %(<p>HREF is a word, SRC too</p>),
         %(<scriptx>href="y"),
+        %(x"<script</script>href='-->),
+        %(data---><script<</script>href='<script><a <scri),
         %(<script),
       ].each do |html|
-        HtmlFilters.relativize_page_links(html, "/a/b.html").nil?.should eq(!HtmlFilters.string_rewrite_safe?(html)), html
+        unless HtmlFilters.string_rewrite_safe?(html)
+          HtmlFilters.relativize_page_links(html, "/a/b.html").should be_nil, html
+        end
       end
+    end
+
+    it "is conservative: some safe pages also take the parser path" do
+      # string_rewrite_safe? accepts these; the cheap check does not
+      HtmlFilters.string_rewrite_safe?(%(<p>HREF is a word</p>)).should be_true
+      HtmlFilters.relativize_page_links(%(<p>HREF is a word</p>), "/a/b.html").should be_nil
+      HtmlFilters.relativize_page_links(%(<script>// an href without assignment</script>), "/a/b.html").should be_nil
+      # pages without lookalikes in scripts or comments keep the fast path
+      HtmlFilters.relativize_page_links(%(<script src="/a.js"></script><!-- x --><a href="/y">y</a>), "/p/q.html").should eq %(<script src="../a.js"></script><!-- x --><a href="../y">y</a>)
+    end
+
+    it "handles long text full of href lookalikes" do
+      lookalikes = %(see href="#top" here ) * 5_000
+      safe = "<p>#{lookalikes}</p><a href=\"x.html\">x</a>"
+      HtmlFilters.string_rewrite_safe?(safe).should be_true
+      HtmlFilters.relativize_page_links(safe, "/a/b.html").should eq HtmlFilters.relativize_links_in_string(safe, "/a/b.html")
+      unsafe = "<script>#{lookalikes}</script>"
+      HtmlFilters.relativize_page_links(unsafe, "/a/b.html").should be_nil
     end
 
     it "leaves values with a newline or no closing quote alone, like the regex did" do

@@ -215,48 +215,58 @@ module HtmlFilters
     out.to_s
   end
 
-  # Byte-level equivalent of string_rewrite_safe?. Both of its regexes
-  # end in `\s*=\s*["']`, so every match sits on an "=": visit them all
-  # (memchr), independently of which values the rewrite visits, and
-  # flag an uppercase HREF/SRC assignment, or an href assignment in the
-  # text right after a `<script ...>` tag or inside a comment.
+  # Conservative stand-in for string_rewrite_safe?: false whenever it
+  # would be false, and occasionally when it would not. A false here
+  # only sends the page down the parser path, which is always correct,
+  # so a few extra parser-path pages are an acceptable price for a
+  # check that is linear and cheap. It looks for any "HREF" or "SRC"
+  # (the regex wanted an assignment), and for "href" anywhere in the
+  # regions LINK_FIX_UNSAFE_CONTEXT can reach (it wanted an assignment
+  # there): `<script[^>]*>[^<]*` and `<!--[^>]*`.
   private def self.page_rewrite_safe?(html : String) : Bool
     bytes = html.to_slice
-    equals = bytes.index(EQUALS, 0)
-    while equals
-      quote = skip_whitespace(bytes, equals + 1)
-      if quote < bytes.size && (bytes[quote] === '"' || bytes[quote] === '\'')
-        name_end = skip_whitespace_back(bytes, equals)
-        return false if ends_with?(bytes, name_end, "HREF") || ends_with?(bytes, name_end, "SRC")
-        return false if ends_with?(bytes, name_end, "href") && href_in_script_or_comment?(bytes, name_end - 4)
-      end
-      equals = bytes.index(EQUALS, equals + 1)
-    end
-    true
+    return false if find(bytes, "HREF", 0) || find(bytes, "SRC", 0)
+    !href_in_script_text?(bytes) && !href_in_comment?(bytes)
   end
 
-  # The two shapes LINK_FIX_UNSAFE_CONTEXT matches for an href starting
-  # at *href*:
-  #
-  # - `<!--[^>]*href`: a "<!--" after the last ">" before the href.
-  # - `<script[^>]*>[^<]*href`: no "<" between the tag's first ">" and
-  #   the href. With L the last "<" before the href, that ">" must lie
-  #   after L, so the "<script" starts at or before L with no ">"
-  #   between it and L, and some ">" sits between L and the href (the
-  #   text after it may hold more ">", which `[^<]*` allows).
-  private def self.href_in_script_or_comment?(bytes : Bytes, href : Int32) : Bool
-    tag_close = last_index(bytes, GREATER_THAN, href)
-    return true if contains?(bytes, (tag_close || -1) + 1, href, "<!--")
-    return false unless tag_close
-    tag_open = last_index(bytes, LESS_THAN, href)
-    return false unless tag_open && tag_open < tag_close
-    run_start = (last_index(bytes, GREATER_THAN, tag_open) || -1) + 1
-    index = run_start
-    while index <= tag_open
-      return true if starts_with?(bytes, index, "<script")
-      index += 1
+  # "href" between a "<script" and the first "<" after that tag's ">"
+  private def self.href_in_script_text?(bytes : Bytes) : Bool
+    href = find(bytes, "href", 0)
+    position = 0
+    while href && (start = find(bytes, "<script", position))
+      # `<script[^>]*>` needs a ">"; without one no later tag has it either
+      return false unless tag_end = bytes.index(GREATER_THAN, start)
+      region_end = bytes.index(LESS_THAN, tag_end + 1) || bytes.size
+      href = find(bytes, "href", start) if href < start
+      return true if href && href + 4 <= region_end
+      # A "<script" inside this region shares its end, so skip past it
+      position = region_end
     end
     false
+  end
+
+  # "href" between a "<!--" and the next ">"
+  private def self.href_in_comment?(bytes : Bytes) : Bool
+    href = find(bytes, "href", 0)
+    position = 0
+    while href && (start = find(bytes, "<!--", position))
+      region_end = bytes.index(GREATER_THAN, start) || bytes.size
+      href = find(bytes, "href", start) if href < start
+      return true if href && href + 4 <= region_end
+      position = region_end
+    end
+    false
+  end
+
+  # First index of *literal* at or after *from*: memchr for its first
+  # byte, then a compare (String#byte_index scans byte by byte)
+  private def self.find(bytes : Bytes, literal : String, from : Int32) : Int32?
+    first = literal.byte_at(0)
+    while candidate = bytes.index(first, from)
+      return candidate if starts_with?(bytes, candidate, literal)
+      from = candidate + 1
+    end
+    nil
   end
 
   # The href/src attribute around the "=" at *equals*, if any:
@@ -314,31 +324,6 @@ module HtmlFilters
       offset += 1
     end
     true
-  end
-
-  # Whether *literal* ends right before *index*
-  private def self.ends_with?(bytes : Bytes, index : Int32, literal : String) : Bool
-    index >= literal.bytesize && starts_with?(bytes, index - literal.bytesize, literal)
-  end
-
-  # Last index of *byte* before *before*, or nil
-  private def self.last_index(bytes : Bytes, byte : UInt8, before : Int32) : Int32?
-    index = before - 1
-    while index >= 0
-      return index if bytes[index] == byte
-      index -= 1
-    end
-    nil
-  end
-
-  # Whether *literal* lies entirely inside bytes[from, to)
-  private def self.contains?(bytes : Bytes, from : Int32, to : Int32, literal : String) : Bool
-    index = from
-    while index + literal.bytesize <= to
-      return true if starts_with?(bytes, index, literal)
-      index += 1
-    end
-    false
   end
 
   # What every link of one page is rewritten against
