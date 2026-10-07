@@ -114,7 +114,8 @@ module Taxonomies
     end
 
     # Terms of this taxonomy that contain *post* in *lang*, in the
-    # order the post's front matter lists them.
+    # order the post's front matter lists them, each once (front
+    # matter may repeat a term, with or without stray whitespace).
     #
     # Looked up from the post's own parsed terms: scanning every
     # term's post list for the post instead was O(terms x posts) per
@@ -123,7 +124,7 @@ module Taxonomies
       names = post.taxonomy_terms(lang)[@name]?
       return [] of Term if names.nil?
       table = terms_for_lang(lang)
-      names.compact_map { |name| table[name.strip]? }
+      names.compact_map { |name| table[name.strip]? }.uniq!
     end
 
     def value(lang)
