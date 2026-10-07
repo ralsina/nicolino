@@ -132,6 +132,12 @@ describe Utils do
       Utils.text_excerpt("<H2>Title</H2><p>body</p>").should eq "Title body"
     end
 
+    it "does not confuse custom elements with script or style" do
+      Utils.text_excerpt("<script-widget>visible</script-widget><p>after</p>").should eq "visible after"
+      Utils.text_excerpt("<style-guide>shown</style-guide> too").should eq "shown too"
+      Utils.text_excerpt("<my-h1>a</my-h1><h1 id=x>b</h1><br/>c").should eq "a b c"
+    end
+
     it "drops script and style contents" do
       Utils.text_excerpt("<style>.hero{display:none}</style><p>Hello</p>").should eq "Hello"
       Utils.text_excerpt(%(<p>Hi</p><script type="module">var x = "<p>not text</p>";</script><p>there</p>)).should eq "Hi there"

@@ -119,15 +119,19 @@ module Utils
       close_tag(index) if byte === '>'
     end
 
+    # A tag name runs from the first byte after "<" (or "</") up to
+    # HTML's name delimiters: whitespace, "/" or ">". Stopping at the
+    # first punctuation instead would read a custom element such as
+    # <script-widget> as <script> and swallow everything after it.
     private def track_name(byte : UInt8, index : Int32) : Nil
       return unless @name_end == 0
-      if byte.unsafe_chr.ascii_alphanumeric?
-        @name_start = index if @name_start == 0
-      elsif byte === '/' && @name_start == 0
+      if byte === '/' && @name_start == 0
         @closing = true
-      else
-        # First other byte after the name (or a nameless tag) ends it
+      elsif byte === '>' || byte === '/' || byte.unsafe_chr.ascii_whitespace?
+        # Delimiter: ends the name (or marks a nameless tag)
         @name_end = index
+      elsif @name_start == 0
+        @name_start = index
       end
     end
 
