@@ -9,11 +9,14 @@ module Utils
   # ...) don't: "<a>Nicolino</a>," must read "Nicolino," not
   # "Nicolino ,", which is how Lexbor's inner_text joined them too.
   BLOCK_TAGS = Set{
-    "p", "div", "br", "hr", "li", "ul", "ol", "dl", "dt", "dd",
-    "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "pre",
-    "table", "thead", "tbody", "tr", "td", "th", "section", "article",
-    "header", "footer", "nav", "aside", "figure", "figcaption",
-    "details", "summary", "main", "address",
+    "address", "article", "aside", "blockquote", "body", "br", "caption",
+    "center", "colgroup", "dd", "details", "dialog", "div", "dl", "dt",
+    "fieldset", "figcaption", "figure", "footer", "form", "h1", "h2",
+    "h3", "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html",
+    "legend", "li", "main", "menu", "nav", "noscript", "ol", "optgroup",
+    "option", "p", "pre", "search", "section", "summary", "table",
+    "tbody", "td", "textarea", "tfoot", "th", "thead", "title", "tr",
+    "ul",
   }
 
   # Plain text of an HTML fragment: block-level tags become spaces (so

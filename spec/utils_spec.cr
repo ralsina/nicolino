@@ -121,6 +121,12 @@ describe Utils do
       Utils.text_excerpt("<p>fish<!-- 2 > 1 --> chips</p>").should eq "fish chips"
     end
 
+    it "separates words at every block container" do
+      Utils.text_excerpt("<span>before</span><form>inside</form><span>after</span>").should eq "before inside after"
+      Utils.text_excerpt("<fieldset><legend>Name</legend>value</fieldset><dialog>hi</dialog>").should eq "Name value hi"
+      Utils.text_excerpt("<menu><li>a</li><li>b</li></menu><hgroup><h1>T</h1></hgroup>").should eq "a b T"
+    end
+
     it "separates words at heading boundaries" do
       Utils.text_excerpt("<span>before</span><h1>title</h1><span>after</span>").should eq "before title after"
       Utils.text_excerpt("<H2>Title</H2><p>body</p>").should eq "Title body"
