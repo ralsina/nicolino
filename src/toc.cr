@@ -31,7 +31,7 @@ module Toc
     toc_html = build_nested_toc(toc_items)
 
     # Get the modified HTML
-    modified_html = doc.to_html
+    modified_html = HtmlFilters.fragment_html(doc)
 
     {modified_html, toc_html}
   end

@@ -47,12 +47,12 @@ module RSSFeed
                       HtmlFilters.relativize_links_in_string(summary, post.link(lang))
                     else
                       doc = HtmlFilters.make_links_relative(Lexbor::Parser.new(summary), post.link(lang))
-                      HtmlFilters.fix_code_classes(doc).to_html
+                      HtmlFilters.fragment_html(HtmlFilters.fix_code_classes(doc))
                     end
           if HtmlFilters.string_rewrite_safe?(summary)
             summary = HtmlFilters.absolutize_links_in_string(summary, link)
           else
-            summary = HtmlFilters.make_links_absolute(Lexbor::Parser.new(summary), link).to_html
+            summary = HtmlFilters.fragment_html(HtmlFilters.make_links_absolute(Lexbor::Parser.new(summary), link))
           end
           feed.item(
             title: post.title(lang),

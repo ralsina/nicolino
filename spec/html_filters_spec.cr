@@ -166,6 +166,24 @@ describe HtmlFilters do
     end
   end
 
+  describe ".fragment_html" do
+    it "serializes a fragment without the document wrapper" do
+      html = HtmlFilters.fragment_html(Lexbor::Parser.new(%(<h2>Title</h2><p>Body</p>)))
+      html.should eq %(<h2>Title</h2><p>Body</p>)
+      html.should_not contain "<html"
+      html.should_not contain "<body"
+    end
+
+    it "keeps leading elements the parser moves into the head" do
+      html = HtmlFilters.fragment_html(Lexbor::Parser.new(%(<style>p{color:red}</style><p>Body</p>)))
+      html.should eq %(<style>p{color:red}</style><p>Body</p>)
+    end
+
+    it "returns an empty string for an empty fragment" do
+      HtmlFilters.fragment_html(Lexbor::Parser.new("")).should eq ""
+    end
+  end
+
   describe ".make_links_absolute" do
     it "makes page-relative and ../ links absolute" do
       doc = parse(%(<a href="other.html">a</a><a href="../../pic.jpg">b</a>))

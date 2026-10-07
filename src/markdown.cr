@@ -455,7 +455,7 @@ module Markdown
         doc = HtmlFilters.remove_empty_paragraphs(doc)
         doc = HtmlFilters.fix_code_classes(doc) if needs_code_fix
         t3 = Time.instant
-        html = doc.to_html
+        html = HtmlFilters.fragment_html(doc)
         t4 = Time.instant
       else
         t2 = t1
@@ -927,9 +927,10 @@ module Markdown
             doc = HtmlFilters.make_links_relative(doc, post.link(lang))
             html = HtmlFilters.fix_code_classes(doc).to_html
           end
-          # pretty_html only controls output formatting: run the
-          # lexbor normalization pass for byte-stable pretty output,
-          # skip it for the faster raw template output
+          # pretty_html (off by default) only controls output
+          # formatting: run the lexbor normalization pass for
+          # byte-stable normalized output, skip it for the faster raw
+          # template output
           if Config.options.pretty_html?
             doc = Lexbor::Parser.new(html)
             html = HtmlFilters.fix_code_classes(doc).to_html

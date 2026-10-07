@@ -64,6 +64,19 @@ module HtmlFilters
     doc
   end
 
+  # Serialize a document parsed from an HTML *fragment* back into a
+  # fragment. Parser#to_html emits the whole document Lexbor builds
+  # around it (`<html><head></head><body>...</body></html>`), which
+  # used to leak into pages and feeds when the content was embedded
+  # elsewhere. Leading <style>, <script>, <link> or <meta> elements end
+  # up in the parsed <head>, so its contents come first.
+  def self.fragment_html(doc : Lexbor::Parser) : String
+    String.build do |io|
+      doc.head.try &.inner_html(io)
+      doc.body.try &.inner_html(io)
+    end
+  end
+
   # A href/src attribute value that make_links_relative would rewrite:
   # anything not starting with "/", "#", a URL scheme (scheme'd values
   # are absolute URLs; resolve+relativize round-trips a different-host
