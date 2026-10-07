@@ -25,9 +25,8 @@ module Utils
   #
   # A single pass over the bytes: about 20x faster than parsing with
   # Lexbor and 5x faster than a regex strip, on a typical page. Tag
-  # and comment contents are dropped wholesale; ">" inside an
-  # attribute value would end the tag early, which the HTML the
-  # markdown engines emit never contains.
+  # and comment contents are dropped wholesale, quoted attribute
+  # values and "-->" included.
   def self.plain_text(html : String) : String
     return "" if html.empty?
     scanner = PlainTextScanner.new(html.to_slice)
