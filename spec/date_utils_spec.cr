@@ -28,6 +28,36 @@ describe DateUtils do
       parsed.try(&.day).should eq(29)
     end
 
+    it "parses date-only strings as local midnight" do
+      DateUtils.parse("2020-02-02").should eq(Time.local(2020, 2, 2))
+    end
+
+    it "parses date and time strings without a zone as local time" do
+      DateUtils.parse("2020-02-02 10:30").should eq(Time.local(2020, 2, 2, 10, 30))
+      DateUtils.parse("2020-02-02 10:30:15").should eq(Time.local(2020, 2, 2, 10, 30, 15))
+      DateUtils.parse("2020-02-02T10:30:15").should eq(Time.local(2020, 2, 2, 10, 30, 15))
+    end
+
+    it "keeps the offset of zoned ISO 8601 strings" do
+      parsed = DateUtils.parse("2024-07-23T15:00:00.000Z")
+      parsed.should eq(Time.utc(2024, 7, 23, 15, 0, 0))
+      parsed = DateUtils.parse("2020-02-02T10:30:00-03:00")
+      parsed.try(&.to_utc).should eq(Time.utc(2020, 2, 2, 13, 30, 0))
+    end
+
+    it "parses the Time#to_s shapes the front matter loader produces" do
+      DateUtils.parse(Time.utc(2020, 2, 2).to_s).should eq(Time.utc(2020, 2, 2))
+      DateUtils.parse("2020-02-02 10:30:00 -03:00").try(&.to_utc).should eq(Time.utc(2020, 2, 2, 13, 30))
+    end
+
+    it "parses the common shapes without the natural language parser" do
+      # 1000 strict parses must stay far below one Cronic parse (~2.5ms)
+      start = Time.instant
+      1000.times { DateUtils.parse("2020-02-02T10:30:15") }
+      1000.times { DateUtils.parse("2020-02-02 00:00:00 UTC") }
+      (Time.instant - start).should be < 50.milliseconds
+    end
+
     it "parses natural language dates via Cronic" do
       parsed = DateUtils.parse("2 weeks ago")
       parsed.should_not be_nil
