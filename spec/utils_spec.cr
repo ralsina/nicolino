@@ -106,6 +106,49 @@ describe Utils do
       Utils.text_excerpt("<p>Hello   <b>world</b></p>\n\n<p>again</p>").should eq "Hello world again"
     end
 
+    it "treats block tags as separators but not inline tags" do
+      Utils.text_excerpt("<p>Hello</p><p>world</p>").should eq "Hello world"
+      Utils.text_excerpt("<p>A <a href='x'>link</a>, then <em>more</em>.</p>").should eq "A link, then more."
+      Utils.text_excerpt("<ul><li>one</li><li>two</li></ul>").should eq "one two"
+    end
+
+    it "decodes entities and drops comments" do
+      Utils.text_excerpt("<p>fish &amp; chips&nbsp;<!-- note --> now</p>").should eq "fish & chips now"
+    end
+
+    it "treats comments as invisible inline content" do
+      Utils.text_excerpt("<span>inter<!-- note -->national</span>").should eq "international"
+      Utils.text_excerpt("<p>fish<!-- 2 > 1 --> chips</p>").should eq "fish chips"
+    end
+
+    it "separates words at every block container" do
+      Utils.text_excerpt("<span>before</span><form>inside</form><span>after</span>").should eq "before inside after"
+      Utils.text_excerpt("<fieldset><legend>Name</legend>value</fieldset><dialog>hi</dialog>").should eq "Name value hi"
+      Utils.text_excerpt("<menu><li>a</li><li>b</li></menu><hgroup><h1>T</h1></hgroup>").should eq "a b T"
+    end
+
+    it "separates words at heading boundaries" do
+      Utils.text_excerpt("<span>before</span><h1>title</h1><span>after</span>").should eq "before title after"
+      Utils.text_excerpt("<H2>Title</H2><p>body</p>").should eq "Title body"
+    end
+
+    it "does not confuse custom elements with script or style" do
+      Utils.text_excerpt("<script-widget>visible</script-widget><p>after</p>").should eq "visible after"
+      Utils.text_excerpt("<style-guide>shown</style-guide> too").should eq "shown too"
+      Utils.text_excerpt("<my-h1>a</my-h1><h1 id=x>b</h1><br/>c").should eq "a b c"
+    end
+
+    it "drops script and style contents" do
+      Utils.text_excerpt("<style>.hero{display:none}</style><p>Hello</p>").should eq "Hello"
+      Utils.text_excerpt(%(<p>Hi</p><script type="module">var x = "<p>not text</p>";</script><p>there</p>)).should eq "Hi there"
+      Utils.text_excerpt("<SCRIPT>alert(1)</SCRIPT ><p>ok</p>").should eq "ok"
+    end
+
+    it "keeps a > inside a quoted attribute value out of the text" do
+      Utils.text_excerpt(%(<p><a title="1 > 0">link</a> here</p>)).should eq "link here"
+      Utils.text_excerpt(%(<p><a title='1 > 0'>link</a> here</p>)).should eq "link here"
+    end
+
     it "returns empty string for empty input" do
       Utils.text_excerpt("").should eq ""
       Utils.text_excerpt("   ").should eq ""
@@ -126,6 +169,8 @@ describe Utils do
   describe ".word_count" do
     it "counts words in an HTML fragment, ignoring tags" do
       Utils.word_count("<p>one two</p><p>three <b>four</b></p>").should eq 4
+      Utils.word_count("<p>inter<!-- note -->national <a title='x > y'>link</a></p>").should eq 2
+      Utils.word_count("<style>a b c</style><h1>one</h1><p>two</p>").should eq 2
     end
 
     it "returns zero for empty fragments" do
