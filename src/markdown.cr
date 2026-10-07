@@ -668,9 +668,23 @@ module Markdown
     # accepts `cover_image` or `image`) for the card thumbnail.
     def social_context(lang = nil)
       lang ||= Locale.language
+      social_context(html(lang), nil, lang)
+    end
+
+    # Social metadata from an already-built page: *plain* is the plain
+    # text of *page_html* when the caller has it (see value), so the
+    # description excerpt doesn't strip the HTML a second time
+    def social_context(page_html : String, plain : String?, lang : String)
       meta = metadata(lang)
       description = meta["description"]?
-      description ||= Utils.text_excerpt(summary(html(lang), lang))
+      description ||= begin
+        teaser = summary(page_html, lang)
+        if plain && teaser.same?(page_html)
+          Utils.excerpt_from_text(plain)
+        else
+          Utils.text_excerpt(teaser)
+        end
+      end
       preview_image = meta["preview_image"]? || meta["cover_image"]? || meta["image"]?
       {
         "description"   => description,
@@ -682,8 +696,13 @@ module Markdown
     def value(lang = nil)
       lang = lang || Locale.language
       page_html = html(lang)
-      words = Utils.word_count(page_html)
+      # One tag strip serves both the word count and the description
+      plain = Utils.plain_text(page_html)
+      words = Utils.words_in(plain)
+      social = social_context(page_html, plain, lang)
       {
+        "description"    => social["description"],
+        "preview_image"  => social["preview_image"],
         "breadcrumbs"    => breadcrumbs(lang),
         "date"           => date.try &.as(Time).to_s(Config.options(lang).date_output_format),
         "html"           => page_html,
@@ -889,9 +908,11 @@ module Markdown
             "language_links" => page_value["language_links"],
             "is_fallback"    => post.fallback?(lang),
             # Social sharing metadata (OpenGraph/Twitter cards)
-            "link"    => post.link(lang),
-            "og_type" => require_date ? "article" : "website",
-          }.merge(post.social_context(lang))
+            "link"          => post.link(lang),
+            "og_type"       => require_date ? "article" : "website",
+            "description"   => page_value["description"],
+            "preview_image" => page_value["preview_image"],
+          }
           t0 = Time.instant
           html = Render.apply_template(Theme.template_path("page.tmpl"), template_vars, lang)
           t1 = Time.instant

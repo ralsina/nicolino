@@ -106,6 +106,16 @@ describe Utils do
       Utils.text_excerpt("<p>Hello   <b>world</b></p>\n\n<p>again</p>").should eq "Hello world again"
     end
 
+    it "treats block tags as separators but not inline tags" do
+      Utils.text_excerpt("<p>Hello</p><p>world</p>").should eq "Hello world"
+      Utils.text_excerpt("<p>A <a href='x'>link</a>, then <em>more</em>.</p>").should eq "A link, then more."
+      Utils.text_excerpt("<ul><li>one</li><li>two</li></ul>").should eq "one two"
+    end
+
+    it "decodes entities and drops comments" do
+      Utils.text_excerpt("<p>fish &amp; chips&nbsp;<!-- note --> now</p>").should eq "fish & chips now"
+    end
+
     it "returns empty string for empty input" do
       Utils.text_excerpt("").should eq ""
       Utils.text_excerpt("   ").should eq ""
