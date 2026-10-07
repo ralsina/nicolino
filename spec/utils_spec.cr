@@ -121,6 +121,17 @@ describe Utils do
       Utils.text_excerpt("<p>fish<!-- 2 > 1 --> chips</p>").should eq "fish chips"
     end
 
+    it "separates words at heading boundaries" do
+      Utils.text_excerpt("<span>before</span><h1>title</h1><span>after</span>").should eq "before title after"
+      Utils.text_excerpt("<H2>Title</H2><p>body</p>").should eq "Title body"
+    end
+
+    it "drops script and style contents" do
+      Utils.text_excerpt("<style>.hero{display:none}</style><p>Hello</p>").should eq "Hello"
+      Utils.text_excerpt(%(<p>Hi</p><script type="module">var x = "<p>not text</p>";</script><p>there</p>)).should eq "Hi there"
+      Utils.text_excerpt("<SCRIPT>alert(1)</SCRIPT ><p>ok</p>").should eq "ok"
+    end
+
     it "keeps a > inside a quoted attribute value out of the text" do
       Utils.text_excerpt(%(<p><a title="1 > 0">link</a> here</p>)).should eq "link here"
       Utils.text_excerpt(%(<p><a title='1 > 0'>link</a> here</p>)).should eq "link here"
@@ -147,6 +158,7 @@ describe Utils do
     it "counts words in an HTML fragment, ignoring tags" do
       Utils.word_count("<p>one two</p><p>three <b>four</b></p>").should eq 4
       Utils.word_count("<p>inter<!-- note -->national <a title='x > y'>link</a></p>").should eq 2
+      Utils.word_count("<style>a b c</style><h1>one</h1><p>two</p>").should eq 2
     end
 
     it "returns zero for empty fragments" do

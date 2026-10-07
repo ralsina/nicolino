@@ -37,24 +37,26 @@ module Utils
     text
   end
 
-  # Whether the tag name in *name* (ASCII bytes, any case) is block-level
-  def self.block_tag?(name : Bytes) : Bool
-    return false if name.empty? || name.size > 10
-    BLOCK_TAGS.includes?(String.new(name).downcase)
-  end
+  # Elements whose raw text content is never visible
+  RAW_TEXT_TAGS = Set{"script", "style"}
 
   # The byte-level state machine behind plain_text
   private struct PlainTextScanner
     @out : String::Builder
     @in_tag = false
     @in_comment = false
+    # Inside <script> or <style>: the lowercase tag name whose closing
+    # tag ends the raw text (nil = not in one)
+    @raw_tag : String? = nil
     # The quote character open inside the current tag (0 = none), so
     # a ">" inside an attribute value doesn't end the tag
     @quote = 0_u8
     @pending_space = false
-    # Byte range of the current tag's name (0 = not seen yet)
+    # Byte range of the current tag's name (0 = not seen yet), and
+    # whether the tag is a closing one (</p>)
     @name_start = 0
     @name_end = 0
+    @closing = false
     getter? has_entity = false
 
     def initialize(@bytes : Bytes)
@@ -65,6 +67,8 @@ module Utils
       @bytes.each_with_index do |byte, index|
         if @in_comment
           comment_byte(byte, index)
+        elsif @raw_tag
+          raw_byte(byte, index)
         elsif @in_tag
           tag_byte(byte, index)
         else
@@ -80,6 +84,25 @@ module Utils
       @in_comment = false if byte === '>' && index >= 2 && @bytes[index - 1] === '-' && @bytes[index - 2] === '-'
     end
 
+    # Skip script/style contents until the matching closing tag starts
+    private def raw_byte(byte : UInt8, index : Int32) : Nil
+      return unless byte === '<' && index + 1 < @bytes.size && @bytes[index + 1] === '/'
+      return unless closing_tag_at?(index + 2, @raw_tag.to_s)
+      @raw_tag = nil
+      open_tag
+    end
+
+    # Whether *name* (lowercase) sits at *index*, in any case, followed
+    # by the end of the tag or an attribute separator
+    private def closing_tag_at?(index : Int32, name : String) : Bool
+      return false if index + name.bytesize >= @bytes.size
+      name.each_byte.with_index do |expected, offset|
+        return false unless @bytes[index + offset].unsafe_chr.downcase.ord == expected
+      end
+      following = @bytes[index + name.bytesize]
+      following === '>' || following.unsafe_chr.ascii_whitespace?
+    end
+
     private def tag_byte(byte : UInt8, index : Int32) : Nil
       if @quote != 0
         @quote = 0_u8 if byte == @quote
@@ -90,22 +113,37 @@ module Utils
         return
       end
       track_name(byte, index)
-      return unless byte === '>'
-      @in_tag = false
-      @name_end = index if @name_end == 0
-      # Only block-level tags separate words; inline tags, doctype
-      # and processing instructions do not
-      @pending_space = true if @name_start > 0 && Utils.block_tag?(@bytes[@name_start, @name_end - @name_start])
+      close_tag(index) if byte === '>'
     end
 
     private def track_name(byte : UInt8, index : Int32) : Nil
       return unless @name_end == 0
-      if byte.unsafe_chr.ascii_letter?
+      if byte.unsafe_chr.ascii_alphanumeric?
         @name_start = index if @name_start == 0
-      elsif !(byte === '/' && @name_start == 0)
-        # First non-letter after the name (or a nameless tag) ends it
+      elsif byte === '/' && @name_start == 0
+        @closing = true
+      else
+        # First other byte after the name (or a nameless tag) ends it
         @name_end = index
       end
+    end
+
+    private def close_tag(index : Int32) : Nil
+      @in_tag = false
+      @name_end = index if @name_end == 0
+      return if @name_start == 0 # doctype, processing instruction
+      name = String.new(@bytes[@name_start, @name_end - @name_start]).downcase
+      # Only block-level tags separate words; inline tags do not
+      @pending_space = true if Utils::BLOCK_TAGS.includes?(name)
+      @raw_tag = name if !@closing && Utils::RAW_TEXT_TAGS.includes?(name)
+    end
+
+    private def open_tag : Nil
+      @in_tag = true
+      @quote = 0_u8
+      @name_start = 0
+      @name_end = 0
+      @closing = false
     end
 
     private def text_byte(byte : UInt8, index : Int32) : Nil
@@ -114,10 +152,7 @@ module Utils
         if comment_start?(index)
           @in_comment = true
         else
-          @in_tag = true
-          @quote = 0_u8
-          @name_start = 0
-          @name_end = 0
+          open_tag
         end
       when ' ', '\n', '\t', '\r', '\f', '\v'
         @pending_space = true
