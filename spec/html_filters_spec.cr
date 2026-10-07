@@ -239,6 +239,8 @@ describe HtmlFilters do
         %(<pre><code>FOREACH ( MANSRC ${MANSOURCES} )</code></pre>),
         %(<script>// an href without assignment</script>),
         %(<!-- mentions href but assigns nothing -->),
+        # an attribute of the script tag itself, as pygal SVG charts emit
+        %(<script type="text/javascript" xlink:href="https://x/y.js"></script><a href="/z">z</a>),
       ].each do |html|
         HtmlFilters.relativize_page_links(html, "/a/b.html").should_not be_nil, html
       end

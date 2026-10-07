@@ -231,7 +231,9 @@ module HtmlFilters
     !href_in_script_text?(bytes) && !href_in_comment?(bytes)
   end
 
-  # `href\s*=` between a "<script" and the first "<" after that tag's ">"
+  # `href\s*=` in the text after a `<script ...>` tag, up to the next
+  # "<". The tag's own attributes (`<script xlink:href="...">`) are not
+  # part of it: the regex's `[^>]*>` consumes them first.
   private def self.href_in_script_text?(bytes : Bytes) : Bool
     href = find_assignment(bytes, "href", 0)
     position = 0
@@ -239,7 +241,7 @@ module HtmlFilters
       # `<script[^>]*>` needs a ">"; without one no later tag has it either
       return false unless tag_end = bytes.index(GREATER_THAN, start)
       region_end = bytes.index(LESS_THAN, tag_end + 1) || bytes.size
-      href = find_assignment(bytes, "href", start) if href < start
+      href = find_assignment(bytes, "href", tag_end + 1) if href <= tag_end
       return true if href && href + 4 <= region_end
       # A "<script" inside this region shares its end, so skip past it
       position = region_end
