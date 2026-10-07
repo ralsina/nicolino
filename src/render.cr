@@ -39,7 +39,7 @@ module Render
       end
     end
     tmpl = Templates.get_template(template, lang)
-    TemplatePreprocessor.render_with(Templates.environment, tmpl, ctx)
+    TemplatePreprocessor.render_with(tmpl, ctx)
   end
 
   # Standard "Home / Section" breadcrumbs
