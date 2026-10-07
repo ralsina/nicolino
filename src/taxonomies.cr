@@ -113,9 +113,18 @@ module Taxonomies
       @terms.fetch(lang, Hash(String, Term).new)
     end
 
-    # Terms of this taxonomy that contain *post* in *lang*
+    # Terms of this taxonomy that contain *post* in *lang*, in the
+    # order the post's front matter lists them, each once (front
+    # matter may repeat a term, with or without stray whitespace).
+    #
+    # Looked up from the post's own parsed terms: scanning every
+    # term's post list for the post instead was O(terms x posts) per
+    # page, which on a 4000-post site made taxonomies 6% of the build.
     def terms_for(post : Markdown::File, lang : String) : Array(Term)
-      terms_for_lang(lang).values.select { |term| term.@posts.includes?(post) }
+      names = post.taxonomy_terms(lang)[@name]?
+      return [] of Term if names.nil?
+      table = terms_for_lang(lang)
+      names.compact_map { |name| table[name.strip]? }.uniq!
     end
 
     def value(lang)
