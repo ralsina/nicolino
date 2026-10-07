@@ -759,8 +759,19 @@ module Markdown
       shortcodes(lang).reject { |scode| scode.is_inline? || scode.escaped? }.map { |scode| "kv://shortcodes/#{scode.name}.tmpl" }
     end
 
-    # List of all files and kv store items this post uses
+    # List of all files and kv store items this post uses.
+    #
+    # Memoized: Markdown.render computes it once per post in parallel,
+    # and the archive and every taxonomy then ask again for every post
+    # per language, on the main fiber. Nothing it depends on (source,
+    # template, shortcodes) changes while tasks are being declared.
     def dependencies : Array(String)
+      @dependencies ||= compute_dependencies
+    end
+
+    @dependencies : Array(String)? = nil
+
+    private def compute_dependencies : Array(String)
       page_template = Theme.template_path("page.tmpl")
       result = ["conf.yml", "kv://#{page_template}"]
       result << source
