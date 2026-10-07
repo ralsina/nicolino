@@ -217,27 +217,29 @@ module HtmlFilters
 
   # Conservative stand-in for string_rewrite_safe?: false whenever it
   # would be false, and occasionally when it would not. A false here
-  # only sends the page down the parser path, which is always correct,
-  # so a few extra parser-path pages are an acceptable price for a
-  # check that is linear and cheap. It looks for any "HREF" or "SRC"
-  # (the regex wanted an assignment), and for "href" anywhere in the
-  # regions LINK_FIX_UNSAFE_CONTEXT can reach (it wanted an assignment
-  # there): `<script[^>]*>[^<]*` and `<!--[^>]*`.
+  # sends the page down the parser path, which is correct but
+  # re-serializes the whole page, so the check only gives up on
+  # assignments, as the regexes did: an uppercase `HREF\s*=` or
+  # `SRC\s*=` anywhere, or `href\s*=` in the regions
+  # LINK_FIX_UNSAFE_CONTEXT can reach (`<script[^>]*>[^<]*` and
+  # `<!--[^>]*`). The regexes also wanted a quote after the "=", which
+  # is the only thing dropped. It is a handful of memchr-anchored
+  # searches with forward-only cursors, so it stays linear.
   private def self.page_rewrite_safe?(html : String) : Bool
     bytes = html.to_slice
-    return false if find(bytes, "HREF", 0) || find(bytes, "SRC", 0)
+    return false if find_assignment(bytes, "HREF", 0) || find_assignment(bytes, "SRC", 0)
     !href_in_script_text?(bytes) && !href_in_comment?(bytes)
   end
 
-  # "href" between a "<script" and the first "<" after that tag's ">"
+  # `href\s*=` between a "<script" and the first "<" after that tag's ">"
   private def self.href_in_script_text?(bytes : Bytes) : Bool
-    href = find(bytes, "href", 0)
+    href = find_assignment(bytes, "href", 0)
     position = 0
     while href && (start = find(bytes, "<script", position))
       # `<script[^>]*>` needs a ">"; without one no later tag has it either
       return false unless tag_end = bytes.index(GREATER_THAN, start)
       region_end = bytes.index(LESS_THAN, tag_end + 1) || bytes.size
-      href = find(bytes, "href", start) if href < start
+      href = find_assignment(bytes, "href", start) if href < start
       return true if href && href + 4 <= region_end
       # A "<script" inside this region shares its end, so skip past it
       position = region_end
@@ -245,17 +247,27 @@ module HtmlFilters
     false
   end
 
-  # "href" between a "<!--" and the next ">"
+  # `href\s*=` between a "<!--" and the next ">"
   private def self.href_in_comment?(bytes : Bytes) : Bool
-    href = find(bytes, "href", 0)
+    href = find_assignment(bytes, "href", 0)
     position = 0
     while href && (start = find(bytes, "<!--", position))
       region_end = bytes.index(GREATER_THAN, start) || bytes.size
-      href = find(bytes, "href", start) if href < start
+      href = find_assignment(bytes, "href", start) if href < start
       return true if href && href + 4 <= region_end
       position = region_end
     end
     false
+  end
+
+  # First index at or after *from* where *name* is followed by `\s*=`
+  private def self.find_assignment(bytes : Bytes, name : String, from : Int32) : Int32?
+    while index = find(bytes, name, from)
+      after = skip_whitespace(bytes, index + name.bytesize)
+      return index if after < bytes.size && bytes[after] === '='
+      from = index + 1
+    end
+    nil
   end
 
   # First index of *literal* at or after *from*: memchr for its first

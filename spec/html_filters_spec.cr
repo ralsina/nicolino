@@ -232,12 +232,23 @@ describe HtmlFilters do
       end
     end
 
-    it "is conservative: some safe pages also take the parser path" do
-      # string_rewrite_safe? accepts these; the cheap check does not
-      HtmlFilters.string_rewrite_safe?(%(<p>HREF is a word</p>)).should be_true
-      HtmlFilters.relativize_page_links(%(<p>HREF is a word</p>), "/a/b.html").should be_nil
-      HtmlFilters.relativize_page_links(%(<script>// an href without assignment</script>), "/a/b.html").should be_nil
-      # pages without lookalikes in scripts or comments keep the fast path
+    it "keeps the fast path for names that are not assignments" do
+      # prose, identifiers and code that merely mention the names
+      [
+        %(<p>HREF is a word, SRC too</p>),
+        %(<pre><code>FOREACH ( MANSRC ${MANSOURCES} )</code></pre>),
+        %(<script>// an href without assignment</script>),
+        %(<!-- mentions href but assigns nothing -->),
+      ].each do |html|
+        HtmlFilters.relativize_page_links(html, "/a/b.html").should_not be_nil, html
+      end
+    end
+
+    it "is conservative: an assignment without a quote also takes the parser path" do
+      # string_rewrite_safe? wanted a quote after the "="; this does not
+      HtmlFilters.string_rewrite_safe?(%(<p>SRC = x</p>)).should be_true
+      HtmlFilters.relativize_page_links(%(<p>SRC = x</p>), "/a/b.html").should be_nil
+      # pages without assignments in scripts or comments keep the fast path
       HtmlFilters.relativize_page_links(%(<script src="/a.js"></script><!-- x --><a href="/y">y</a>), "/p/q.html").should eq %(<script src="../a.js"></script><!-- x --><a href="../y">y</a>)
     end
 
