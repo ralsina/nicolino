@@ -1,5 +1,4 @@
 require "html"
-require "lexbor"
 
 module Utils
   def self.slugify(string)
@@ -49,6 +48,10 @@ module Utils
   private struct PlainTextScanner
     @out : String::Builder
     @in_tag = false
+    @in_comment = false
+    # The quote character open inside the current tag (0 = none), so
+    # a ">" inside an attribute value doesn't end the tag
+    @quote = 0_u8
     @pending_space = false
     # Byte range of the current tag's name (0 = not seen yet)
     @name_start = 0
@@ -61,18 +64,39 @@ module Utils
 
     def run : String
       @bytes.each_with_index do |byte, index|
-        @in_tag ? tag_byte(byte, index) : text_byte(byte)
+        if @in_comment
+          comment_byte(byte, index)
+        elsif @in_tag
+          tag_byte(byte, index)
+        else
+          text_byte(byte, index)
+        end
       end
       @out.to_s
     end
 
+    # Comments are invisible inline content: "inter<!-- x -->national"
+    # reads "international", so they end at "-->" without a separator
+    private def comment_byte(byte : UInt8, index : Int32) : Nil
+      @in_comment = false if byte === '>' && index >= 2 && @bytes[index - 1] === '-' && @bytes[index - 2] === '-'
+    end
+
     private def tag_byte(byte : UInt8, index : Int32) : Nil
+      if @quote != 0
+        @quote = 0_u8 if byte == @quote
+        return
+      end
+      if byte === '"' || byte === '\''
+        @quote = byte
+        return
+      end
       track_name(byte, index)
       return unless byte === '>'
       @in_tag = false
       @name_end = index if @name_end == 0
-      # Comments and other nameless markup separate words like blocks do
-      @pending_space = true if @name_start == 0 || Utils.block_tag?(@bytes[@name_start, @name_end - @name_start])
+      # Only block-level tags separate words; inline tags, doctype
+      # and processing instructions do not
+      @pending_space = true if @name_start > 0 && Utils.block_tag?(@bytes[@name_start, @name_end - @name_start])
     end
 
     private def track_name(byte : UInt8, index : Int32) : Nil
@@ -85,12 +109,17 @@ module Utils
       end
     end
 
-    private def text_byte(byte : UInt8) : Nil
+    private def text_byte(byte : UInt8, index : Int32) : Nil
       case byte
       when '<'
-        @in_tag = true
-        @name_start = 0
-        @name_end = 0
+        if comment_start?(index)
+          @in_comment = true
+        else
+          @in_tag = true
+          @quote = 0_u8
+          @name_start = 0
+          @name_end = 0
+        end
       when ' ', '\n', '\t', '\r', '\f', '\v'
         @pending_space = true
       else
@@ -99,6 +128,10 @@ module Utils
         @has_entity = true if byte === '&'
         @out.write_byte(byte)
       end
+    end
+
+    private def comment_start?(index : Int32) : Bool
+      index + 3 < @bytes.size && @bytes[index + 1] === '!' && @bytes[index + 2] === '-' && @bytes[index + 3] === '-'
     end
   end
 
@@ -132,16 +165,6 @@ module Utils
 
   def self.titlecase(string)
     string.split(/[-_\s]/).map(&.capitalize).join(" ")
-  end
-
-  # Word count of an HTML fragment's text, for reading-time
-  # estimates in themes. Tags are replaced by spaces first: lexbor
-  # joins text at block boundaries without whitespace, which would
-  # merge the last word of one block into the first of the next.
-  def self.word_count(html : String) : Int32
-    return 0 if html.strip.empty?
-    text = Lexbor::Parser.new(html.gsub(/<[^>]+>/, " ")).body.try(&.inner_text) || ""
-    text.scan(/\S+/).size
   end
 
   # Convert path to link, optionally changing extension

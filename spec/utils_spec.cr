@@ -116,6 +116,16 @@ describe Utils do
       Utils.text_excerpt("<p>fish &amp; chips&nbsp;<!-- note --> now</p>").should eq "fish & chips now"
     end
 
+    it "treats comments as invisible inline content" do
+      Utils.text_excerpt("<span>inter<!-- note -->national</span>").should eq "international"
+      Utils.text_excerpt("<p>fish<!-- 2 > 1 --> chips</p>").should eq "fish chips"
+    end
+
+    it "keeps a > inside a quoted attribute value out of the text" do
+      Utils.text_excerpt(%(<p><a title="1 > 0">link</a> here</p>)).should eq "link here"
+      Utils.text_excerpt(%(<p><a title='1 > 0'>link</a> here</p>)).should eq "link here"
+    end
+
     it "returns empty string for empty input" do
       Utils.text_excerpt("").should eq ""
       Utils.text_excerpt("   ").should eq ""
@@ -136,6 +146,7 @@ describe Utils do
   describe ".word_count" do
     it "counts words in an HTML fragment, ignoring tags" do
       Utils.word_count("<p>one two</p><p>three <b>four</b></p>").should eq 4
+      Utils.word_count("<p>inter<!-- note -->national <a title='x > y'>link</a></p>").should eq 2
     end
 
     it "returns zero for empty fragments" do
