@@ -50,22 +50,26 @@ module LuaFilters
   # Site files sort last so their exports win name collisions.
   # Internal (used by State); not part of the public API.
   #
-  # Memoized for the life of the process: every post asks for these
+  # Memoized per theme filters directory: every post asks for these
   # while computing its task inputs (dependency_paths), which made it
   # two directory globs per post, from parallel workers. The set of
   # script files can't change under a running build (auto mode
   # re-executes the process when a script is added or removed; edits
-  # to existing scripts are tracked by content, see State).
+  # to existing scripts are tracked by content, see State). Keying by
+  # the directory keeps a config reload that switches theme (auto mode
+  # calls Theme.reset without restarting) from serving the old theme's
+  # scripts.
   def self.script_paths : Array(String)
+    dir = filters_dir
     @@script_paths_mutex.synchronize do
-      @@script_paths ||= combine_paths(
-        Dir.glob("#{filters_dir}/*.lua"),
+      @@script_paths[dir] ||= combine_paths(
+        Dir.glob("#{dir}/*.lua"),
         Dir.glob("filters/*.lua"),
       )
     end
   end
 
-  @@script_paths : Array(String)? = nil
+  @@script_paths = {} of String => Array(String)
   @@script_paths_mutex = Mutex.new
 
   # Merge theme and site script lists; both groups stay alphabetically
