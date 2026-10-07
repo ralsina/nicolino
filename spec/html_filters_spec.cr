@@ -166,6 +166,46 @@ describe HtmlFilters do
     end
   end
 
+  describe ".relativize_page_links" do
+    it "matches the regex implementation on a mixed page" do
+      html = %(<html><head><link rel="stylesheet" href="/css/a.css"><link rel="canonical" href="https://x.y/p/q.html"></head>
+<body><a href="./other.md#top">a</a> <img src="img/pic.png"> <img data-src="lazy.jpg">
+<a href="//cdn.example/x.js">c</a> <a href="mailto:a@b.c">m</a> <a href="#frag">f</a> <a href="">e</a>
+<a href = 'single.html'>s</a></body></html>)
+      base = "/posts/foo/index.html"
+      expected = HtmlFilters.relativize_links_in_string(html, base)
+      HtmlFilters.relativize_page_links(html, base).should eq expected
+      expected.should contain %(href="../../css/a.css")
+      expected.should contain %(href="other.html#top")
+      expected.should contain %(data-src="lazy.jpg")
+    end
+
+    it "returns the very same string when nothing needs rewriting" do
+      html = %(<p><a href="https://example.com/">x</a> <a href="#top">t</a></p>)
+      HtmlFilters.relativize_page_links(html, "/a/b.html").should be(html)
+    end
+
+    it "defers to the parser path exactly when string_rewrite_safe? says so" do
+      [
+        %(<script>var h = "href='x'";</script>),
+        %(<!-- href="x" -->),
+        %(<A HREF="x.html">x</A>),
+        %(<img SRC="x.png">),
+      ].each do |html|
+        HtmlFilters.string_rewrite_safe?(html).should be_false
+        HtmlFilters.relativize_page_links(html, "/a/b.html").should be_nil
+      end
+      safe = %(<script src="/js/app.js"></script><p>href="not-in-script.html"</p><!-- note --><a href="x.html">x</a>)
+      HtmlFilters.string_rewrite_safe?(safe).should be_true
+      HtmlFilters.relativize_page_links(safe, "/a/b.html").should eq HtmlFilters.relativize_links_in_string(safe, "/a/b.html")
+    end
+
+    it "leaves values with a newline or no closing quote alone, like the regex did" do
+      html = %(<a href="two\nlines.html">x</a> <a href="open.html>y</a>)
+      HtmlFilters.relativize_page_links(html, "/a/b.html").should eq HtmlFilters.relativize_links_in_string(html, "/a/b.html")
+    end
+  end
+
   describe ".make_links_absolute" do
     it "makes page-relative and ../ links absolute" do
       doc = parse(%(<a href="other.html">a</a><a href="../../pic.jpg">b</a>))

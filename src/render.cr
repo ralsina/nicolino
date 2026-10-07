@@ -27,7 +27,7 @@ module Render
     # the site URL plus the page's root-relative link, with index.html
     # normalized away (e.g. "/foo/index.html" -> "/foo/")
     if raw_link = ctx["link"]?.try(&.as_s?)
-      link = raw_link.sub(/index\.html$/, "")
+      link = raw_link.rchop("index.html")
       base_url = lang_config.url.chomp("/")
       ctx["canonical_url"] = Crinja::Value.new("#{base_url}#{link}")
     end

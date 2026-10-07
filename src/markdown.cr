@@ -421,7 +421,6 @@ module Markdown
       # Only ask discount to generate a TOC when the page's metadata
       # requests one; the engine skips mkd_toc entirely otherwise.
       flags = LibDiscount::MKD_FENCEDCODE |
-              LibDiscount::MKD_AUTOLINK |
               LibDiscount::MKD_SAFELINK |
               LibDiscount::MKD_NOPANTS |
               LibDiscount::MKD_GITHUBTAGS |
@@ -430,10 +429,11 @@ module Markdown
               LibDiscount::MKD_DLEXTRA |
               LibDiscount::MKD_EXTRA_FOOTNOTE
       flags |= LibDiscount::MKD_TOC if metadata(lang).fetch("toc", nil) != nil
-      result = Discount.compile(
-        replace_shortcodes(lang),
-        flags: flags
-      )
+      text = replace_shortcodes(lang)
+      # Autolinking is the most expensive part of the compile and can
+      # only act on URL or e-mail lookalikes; skip it when there are none
+      flags |= LibDiscount::MKD_AUTOLINK if Utils.autolink_candidate?(text)
+      result = Discount.compile(text, flags: flags)
       compiled = result[:html]
       toc = result[:toc]
       # Server-side syntax highlighting (no-op when disabled or
@@ -442,9 +442,7 @@ module Markdown
       t1 = Time.instant
       # Check if any filter would change the HTML. Cheap string checks
       # avoid a full Lexbor parse + filter walk + re-serialize.
-      needs_headers = compiled.matches?(/<\/?h[1-6]/)
-      needs_empty_p = compiled.matches?(/<p>\s*<\/p>/)
-      needs_code_fix = compiled.matches?(HtmlFilters::NEEDS_CODE_FIX)
+      needs_headers, needs_empty_p, needs_code_fix = lexbor_passes_needed(compiled)
       if needs_headers || needs_empty_p || needs_code_fix
         doc = Lexbor::Parser.new(compiled)
         t2 = Time.instant
@@ -470,6 +468,18 @@ module Markdown
         (t4 - t3).total_nanoseconds
       )
       {html, toc}
+    end
+
+    # Which Lexbor filters the compiled body needs (header downgrade,
+    # empty paragraph removal, code class fix). Cheap substring checks
+    # come first: most pages have no headings or code, and a regex pass
+    # costs more than a byte search.
+    private def lexbor_passes_needed(compiled : String) : {Bool, Bool, Bool}
+      {
+        compiled.includes?("<h") && compiled.matches?(/<\/?h[1-6]/),
+        compiled.includes?("<p>") && compiled.matches?(/<p>\s*<\/p>/),
+        compiled.includes?("<code") && compiled.matches?(HtmlFilters::NEEDS_CODE_FIX),
+      }
     end
 
     def date : Time?
@@ -916,9 +926,9 @@ module Markdown
           t0 = Time.instant
           html = Render.apply_template(Theme.template_path("page.tmpl"), template_vars, lang)
           t1 = Time.instant
-          if HtmlFilters.string_rewrite_safe?(html)
-            # Safe for string rewriting: regex-only path, no Lexbor parse.
-            html = HtmlFilters.relativize_links_in_string(html, post.link(lang))
+          if relativized = HtmlFilters.relativize_page_links(html, post.link(lang))
+            # Safe for string rewriting: one pass over the bytes, no Lexbor parse.
+            html = relativized
           else
             # DOM path: Lexbor parse + make_links_relative + fix_code_classes.
             # make_links_relative now handles all tags with href/src, so the

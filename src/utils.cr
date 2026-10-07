@@ -208,6 +208,44 @@ module Utils
     string.split(/[-_\s]/).map(&.capitalize).join(" ")
   end
 
+  # Whether Discount's MKD_AUTOLINK can produce anything for *text*:
+  # it only linkifies tokens that start with one of these prefixes
+  # (case-insensitive) or look like an e-mail address. The autolink
+  # scan costs more than the rest of the markdown compile together, so
+  # the flag is only switched on when it can matter.
+  AUTOLINK_PREFIXES = {"http:", "https:", "news:", "ftp:", "mailto:"}
+
+  def self.autolink_candidate?(text : String) : Bool
+    return true if text.includes?('@')
+    bytes = text.to_slice
+    index = 0
+    while colon = index_of_colon(bytes, index)
+      AUTOLINK_PREFIXES.each do |prefix|
+        start = colon - (prefix.bytesize - 1)
+        next if start < 0
+        matched = true
+        prefix.each_byte.with_index do |expected, offset|
+          if bytes[start + offset].unsafe_chr.downcase.ord != expected
+            matched = false
+            break
+          end
+        end
+        return true if matched
+      end
+      index = colon + 1
+    end
+    false
+  end
+
+  private def self.index_of_colon(bytes : Bytes, from : Int32) : Int32?
+    index = from
+    while index < bytes.size
+      return index if bytes[index] === ':'
+      index += 1
+    end
+    nil
+  end
+
   # Convert path to link, optionally changing extension
   #
   # >> path_to_link("output/foo/../bar") # => "/bar"

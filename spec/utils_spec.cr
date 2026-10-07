@@ -178,4 +178,19 @@ describe Utils do
       Utils.word_count("   ").should eq 0
     end
   end
+
+  describe ".autolink_candidate?" do
+    it "is true for text that can hold an autolink" do
+      Utils.autolink_candidate?("see http://example.com now").should be_true
+      Utils.autolink_candidate?("HTTPS://X.Y").should be_true
+      Utils.autolink_candidate?("ftp:x news:y").should be_true
+      Utils.autolink_candidate?("write to me at a@b.c").should be_true
+      Utils.autolink_candidate?("mailto:a").should be_true
+    end
+
+    it "is false for plain prose, colons included" do
+      Utils.autolink_candidate?("Note: this is fine. Ratio 3:1.").should be_false
+      Utils.autolink_candidate?("").should be_false
+    end
+  end
 end

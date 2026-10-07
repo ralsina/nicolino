@@ -34,7 +34,7 @@ module Highlight
   # Highlight every fenced code block in *html*. Blocks whose
   # language has no lexer are returned untouched (logged at debug).
   def self.html(html : String) : String
-    return html unless enabled?
+    return html unless enabled? && html.includes?("<pre><code")
     html.gsub(CODE_BLOCK) do |match|
       language = $1
       source = HTML.unescape($2)
