@@ -156,8 +156,10 @@ module Config
     end
   end
 
-  # Store all loaded language configs
-  @@lang_configs = Hash(String, LangConfig).new
+  # Store all loaded language configs. Read without a lock on every
+  # page from every worker, so it is never mutated once published: a
+  # new language is added to a copy that then replaces it (see `[]`).
+  @@lang_configs = Atomic(Hash(String, LangConfig)).new(Hash(String, LangConfig).new)
   @@global_config : SiteConfig = SiteConfig.from_yaml("{}")
   @@features : Array(String) = [] of String
   @@loaded : Bool = false
@@ -184,7 +186,7 @@ module Config
     @@default_lang = @@global_config.language
 
     # Build LangConfig for default language from translatable parts
-    @@lang_configs[@@default_lang] = LangConfig.new(
+    default_config = LangConfig.new(
       title: @@global_config.title,
       description: @@global_config.description,
       footer: @@global_config.footer,
@@ -205,15 +207,23 @@ module Config
     end
 
     # Set default taxonomies if empty
-    return unless @@lang_configs[@@default_lang].taxonomies.empty?
-    default_taxonomy_yaml = %( # ameba:disable Style/MultilineStringLiteral
+    if default_config.taxonomies.empty?
+      default_taxonomy_yaml = %( # ameba:disable Style/MultilineStringLiteral
 title: "🏷Tags"
 term_title: "Posts tagged {{term.name}}"
 location: "tags/"
 )
-    @@lang_configs[@@default_lang].taxonomies = {
-      "tags" => Taxonomy.from_yaml(default_taxonomy_yaml),
-    }
+      default_config.taxonomies = {
+        "tags" => Taxonomy.from_yaml(default_taxonomy_yaml),
+      }
+    end
+
+    # Publish fresh caches (a reload must not mutate tables that
+    # readers may be holding), then build every configured language's
+    # entries up front, single-threaded, so builds only ever read them
+    @@lang_configs.set({@@default_lang => default_config}, :release)
+    @@options_cache.set(Hash(String, OptionsWrapper).new, :release)
+    languages.each { |lang| options(lang) }
   end
 
   # Ensure config is loaded before accessing
@@ -228,21 +238,39 @@ location: "tags/"
     @@global_config.folder_indexes.exclude_dirs
   end
 
-  # Guards @@lang_configs: tasks on parallel workers can be the first
-  # to ask for a language, and a Hash read racing an insert can crash
+  # Serializes the rare writers of @@lang_configs (a language nobody
+  # asked for yet); readers never take it
   @@lang_configs_mutex = Mutex.new
 
-  # Load or get cached LangConfig for a specific language
+  # Load or get cached LangConfig for a specific language.
+  #
+  # Called for every page, often several times, from every worker, so
+  # the hit path takes no lock: it reads the current published table,
+  # which is never mutated. A miss builds a copy with the new entry
+  # under the mutex and publishes it with release ordering, so a
+  # reader that sees the new table also sees its contents.
   def self.[](lang : String) : LangConfig
     ensure_loaded
-    @@lang_configs_mutex.synchronize do
-      unless @@lang_configs.has_key?(lang)
-        raise "Default language config not loaded." if lang == @@default_lang
-        # Load from conf.LANG.yml for overrides
-        @@lang_configs[lang] = load_lang_config(lang)
-      end
-      @@lang_configs[lang]
+    if config = @@lang_configs.get(:acquire)[lang]?
+      return config
     end
+    @@lang_configs_mutex.synchronize do
+      current = @@lang_configs.get(:acquire)
+      if config = current[lang]?
+        next config
+      end
+      raise "Default language config not loaded." if lang == @@default_lang
+      # Load from conf.LANG.yml for overrides
+      config = load_lang_config(lang)
+      updated = current.dup
+      updated[lang] = config
+      @@lang_configs.set(updated, :release)
+      config
+    end
+  end
+
+  private def self.default_lang_config : LangConfig
+    @@lang_configs.get(:acquire)[@@default_lang]
   end
 
   # Load language-specific config from conf.LANG.yml
@@ -253,7 +281,7 @@ location: "tags/"
       begin
         lang_override = LangConfig.from_yaml(File.read(lang_config_path))
         # Start with default config as base
-        base_config = @@lang_configs[@@default_lang]
+        base_config = default_lang_config
 
         # Merge: use override values for keys present in the override
         # file, falling back to base for anything else (deserialized
@@ -279,11 +307,11 @@ location: "tags/"
         )
       rescue ex : Exception
         Log.warn { "Failed to load #{lang_config_path}: #{ex.message}, using default config" }
-        @@lang_configs[@@default_lang]
+        default_lang_config
       end
     else
       # No override file, use default config
-      @@lang_configs[@@default_lang]
+      default_lang_config
     end
   end
 
@@ -500,18 +528,29 @@ location: "tags/"
   end
 
   # Memoized per-language OptionsWrapper: building one copies ~17
-  # fields, and hot paths (per-page value()/breadcrumbs) call this
-  # several times per page
-  @@options_cache = Hash(String, OptionsWrapper).new
+  # fields, and hot paths (per-page value()/breadcrumbs, link
+  # relativizing) call this several times per page. Published like
+  # @@lang_configs: lock-free reads of a table that is never mutated,
+  # copy-on-write under the mutex for a new language.
+  @@options_cache = Atomic(Hash(String, OptionsWrapper)).new(Hash(String, OptionsWrapper).new)
   @@options_mutex = Mutex.new
 
   def self.options(lang = nil)
     lang ||= @@default_lang
     ensure_loaded
-    # Reads take the lock too: an unlocked read racing the insert
-    # below (from another worker thread) can crash
+    if options = @@options_cache.get(:acquire)[lang]?
+      return options
+    end
     @@options_mutex.synchronize do
-      @@options_cache[lang] ||= OptionsWrapper.new(self[lang], @@global_config)
+      current = @@options_cache.get(:acquire)
+      if options = current[lang]?
+        next options
+      end
+      options = OptionsWrapper.new(self[lang], @@global_config)
+      updated = current.dup
+      updated[lang] = options
+      @@options_cache.set(updated, :release)
+      options
     end
   end
 
@@ -544,11 +583,10 @@ location: "tags/"
   def self.reload
     path = config_path
     Log.info { "Reloading config from #{path}" }
-    # Clear cached configs
-    @@lang_configs.clear
+    # Config.config publishes fresh caches; nothing is cleared in
+    # place, since a reader may still hold the old tables
     @@loaded = false
     @@languages = nil
-    @@options_cache.clear
     # Load again
     Config.config(path)
   end
