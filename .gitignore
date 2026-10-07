@@ -9,6 +9,7 @@
 /assets/themes/shots/
 /assets/themes.json
 .croupier
+.croupier.lock
 .kvstore
 .rucksack
 .rucksack.toc
@@ -20,6 +21,7 @@ content/posts/ralsina/
 /bench/site-nicolino/themes/default/
 /bench/site-nicolino/.kvstore
 /bench/site-nicolino/.croupier
+/bench/site-nicolino/.croupier.lock
 /bench/site-zola/public/
 /bench/site-zola/content/
 /bench/hugo/public/
