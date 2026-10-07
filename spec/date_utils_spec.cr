@@ -50,14 +50,6 @@ describe DateUtils do
       DateUtils.parse("2020-02-02 10:30:00 -03:00").try(&.to_utc).should eq(Time.utc(2020, 2, 2, 13, 30))
     end
 
-    it "parses the common shapes without the natural language parser" do
-      # 1000 strict parses must stay far below one Cronic parse (~2.5ms)
-      start = Time.instant
-      1000.times { DateUtils.parse("2020-02-02T10:30:15") }
-      1000.times { DateUtils.parse("2020-02-02 00:00:00 UTC") }
-      (Time.instant - start).should be < 50.milliseconds
-    end
-
     it "parses natural language dates via Cronic" do
       parsed = DateUtils.parse("2 weeks ago")
       parsed.should_not be_nil
@@ -67,6 +59,43 @@ describe DateUtils do
 
     it "returns nil for unparseable input" do
       DateUtils.parse("not a date at all 42 ??").should be_nil
+    end
+  end
+
+  describe ".strict_parse" do
+    it "handles every common shape without the natural language parser" do
+      [
+        "2020-02-02",
+        "2020-02-02 10:30",
+        "2020-02-02 10:30:15",
+        "2020-02-02T10:30:15",
+        "2020-02-02 00:00:00 UTC",
+        "2020-02-02 10:30:00 -03:00",
+        "2022-01-01T00:00:00Z",
+        "2024-07-23T15:00:00.000Z",
+        "2026-01-29 11:57:28.164Z",
+        "Wed, 02 Oct 2002 13:00:00 GMT",
+        "Sun, 06 Nov 1994 08:49:37 GMT",
+      ].each do |date_str|
+        DateUtils.strict_parse(date_str).should_not be_nil, "strict path rejected #{date_str.inspect}"
+      end
+    end
+
+    it "rejects trailing content instead of parsing a prefix" do
+      DateUtils.strict_parse("2020-02-02 trailing").should be_nil
+      DateUtils.strict_parse("2022-01-01T00:00:00Z trailing").should be_nil
+      DateUtils.strict_parse("Wed, 02 Oct 2002 13:00:00 GMT trailing").should be_nil
+    end
+
+    it "returns nil for well-shaped but invalid dates rather than raising" do
+      DateUtils.strict_parse("2020-13-45").should be_nil
+      DateUtils.strict_parse("2020-02-02 25:61:00").should be_nil
+      DateUtils.strict_parse("2020-02-02 10:30:00 +99:99").should be_nil
+      DateUtils.strict_parse("2020-02-02T10:30:00+99:99").should be_nil
+    end
+
+    it "does not raise from parse on invalid dates either" do
+      DateUtils.parse("2020-02-02 10:30:00 +99:99")
     end
   end
 end
