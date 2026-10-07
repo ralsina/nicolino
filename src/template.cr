@@ -240,8 +240,14 @@ module Templates
   # unpooled environment is created instead; its template cache dies
   # with the task, which only costs a re-parse of the few templates
   # it uses.
+  #
+  # Croupier runs up to cpu_count tasks at once, and the main fiber
+  # also renders at declaration time (taxonomy indexes, book TOCs,
+  # title.tmpl for section pages) and never releases its slot, so the
+  # pool keeps a few spare slots beyond the worker count: with exactly
+  # cpu_count slots one worker was permanently on the transient path.
   class EnvCache
-    @@size : Int32 = Math.min(Math.max(System.cpu_count, 4), 64)
+    @@size : Int32 = Math.min(Math.max(System.cpu_count, 4) + 4, 64)
     @@envs : Array(Crinja?) = Array(Crinja?).new(@@size, nil)
     @@owners : Array(Fiber?) = Array(Fiber?).new(@@size, nil)
     @@free_mask = Atomic(UInt64).new((@@size == 64 ? ~0u64 : ((1u64 << @@size) - 1)))

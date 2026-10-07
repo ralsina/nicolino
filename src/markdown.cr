@@ -506,7 +506,7 @@ module Markdown
     # language links) build it once per page
     def rendered(val, lang : String)
       tmpl = Templates.get_template(template(lang), lang)
-      TemplatePreprocessor.render_with(Templates.environment, tmpl, val)
+      TemplatePreprocessor.render_with(tmpl, val)
     end
 
     def _replace_shortcodes(text : String) : String
@@ -992,7 +992,6 @@ module Markdown
       bindings["posts"] = Crinja::Value.new(display_posts.map(&.value(lang)))
       bindings["has_more"] = Crinja::Value.new(has_more)
       content = TemplatePreprocessor.render_with(
-        Templates.environment,
         Templates.get_template(index_template, lang),
         bindings)
 

@@ -59,11 +59,21 @@ module TemplatePreprocessor
     end
   end
 
-  # Render a (possibly folded) template with the CURRENT fiber's
-  # environment. Template#render would use the env that parsed the
-  # template, which for pooled environments is another fiber's env.
-  def self.render_with(env : Crinja, template : Crinja::Template,
-                       bindings) : String
+  # Render a (possibly folded) template with *bindings* in scope.
+  #
+  # The scope is pushed onto the template's OWN environment, never a
+  # caller-supplied one: Crinja's Template#render(io, env) ignores its
+  # env argument and evaluates against template.env (the env that
+  # parsed it). Templates are cached per environment, so normally the
+  # fiber's pooled env and the template's env are the same object; but
+  # when the pool is exhausted every Templates.environment call hands
+  # out a fresh transient env, and pushing the bindings onto one env
+  # while rendering against another made every variable undefined.
+  # Pages then silently rendered without their title, description or
+  # canonical link (a few percent of pages on every parallel build of
+  # a site whose declaration phase also renders, see EnvCache).
+  def self.render_with(template : Crinja::Template, bindings) : String
+    env = template.env
     env.with_scope(bindings) do
       String.build do |io|
         template.render(io, env)
