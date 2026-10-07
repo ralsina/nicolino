@@ -246,12 +246,22 @@ describe HtmlFilters do
       end
     end
 
-    it "is conservative: an assignment without a quote also takes the parser path" do
-      # string_rewrite_safe? wanted a quote after the "="; this does not
+    it "takes the parser path for exactly the pages string_rewrite_safe? rejects" do
+      # the cheap check flags this one, the regex confirms it is safe
       HtmlFilters.string_rewrite_safe?(%(<p>SRC = x</p>)).should be_true
-      HtmlFilters.relativize_page_links(%(<p>SRC = x</p>), "/a/b.html").should be_nil
+      HtmlFilters.relativize_page_links(%(<p>SRC = x</p>), "/a/b.html").should_not be_nil
       # pages without assignments in scripts or comments keep the fast path
       HtmlFilters.relativize_page_links(%(<script src="/a.js"></script><!-- x --><a href="/y">y</a>), "/p/q.html").should eq %(<script src="../a.js"></script><!-- x --><a href="../y">y</a>)
+    end
+
+    it "keeps rewriting links the parser path would skip on pages the cheap check flags" do
+      base = "/p/q/r.html"
+      area = %(<p>SRC = x</p><map name="m"><area href="guide.md"></map>)
+      HtmlFilters.relativize_page_links(area, base).should eq HtmlFilters.relativize_links_in_string(area, base)
+      HtmlFilters.relativize_page_links(area, base).to_s.should contain %(href="guide.html")
+      lazy = %(<p>SRC = x</p><img data-src="/images/lazy.png">)
+      HtmlFilters.relativize_page_links(lazy, base).should eq HtmlFilters.relativize_links_in_string(lazy, base)
+      HtmlFilters.relativize_page_links(lazy, base).to_s.should contain %(data-src="../../images/lazy.png")
     end
 
     it "handles long text full of href lookalikes" do

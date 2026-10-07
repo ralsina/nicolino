@@ -178,8 +178,12 @@ module HtmlFilters
 
   def self.relativize_page_links(html : String, base : String) : String?
     # Decided for the whole page before any rewriting, independently of
-    # which values the traversal below visits or skips
-    return nil unless page_rewrite_safe?(html)
+    # which values the traversal below visits or skips. The cheap check
+    # clears almost every page; the few it flags are confirmed with the
+    # exact regexes, so the parser path (which rewrites fewer tags, e.g.
+    # no <area href> or data-src) is chosen for exactly the pages it
+    # always was.
+    return nil unless page_rewrite_safe?(html) || string_rewrite_safe?(html)
     bytes = html.to_slice
     out = nil.as(String::Builder?)
     copied = 0
@@ -215,11 +219,10 @@ module HtmlFilters
     out.to_s
   end
 
-  # Conservative stand-in for string_rewrite_safe?: false whenever it
-  # would be false, and occasionally when it would not. A false here
-  # sends the page down the parser path, which is correct but
-  # re-serializes the whole page, so the check only gives up on
-  # assignments, as the regexes did: an uppercase `HREF\s*=` or
+  # Cheap pre-check for string_rewrite_safe?: false whenever it would
+  # be false, and occasionally when it would not (those pages are then
+  # confirmed with the regexes, see relativize_page_links). It only
+  # flags assignments, as the regexes did: an uppercase `HREF\s*=` or
   # `SRC\s*=` anywhere, or `href\s*=` in the regions
   # LINK_FIX_UNSAFE_CONTEXT can reach (`<script[^>]*>[^<]*` and
   # `<!--[^>]*`). The regexes also wanted a quote after the "=", which
