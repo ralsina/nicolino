@@ -171,10 +171,15 @@ module HtmlFilters
   # the page. Returns nil when the page needs the parser path instead
   # (an uppercase HREF/SRC spelling, or an href inside script text or a
   # comment), and the page itself when nothing had to change.
-  EQUALS  = '='.ord.to_u8
-  NEWLINE = '\n'.ord.to_u8
+  EQUALS       = '='.ord.to_u8
+  LESS_THAN    = '<'.ord.to_u8
+  GREATER_THAN = '>'.ord.to_u8
+  NEWLINE      = '\n'.ord.to_u8
 
   def self.relativize_page_links(html : String, base : String) : String?
+    # Decided for the whole page before any rewriting, independently of
+    # which values the traversal below visits or skips
+    return nil unless page_rewrite_safe?(html)
     bytes = html.to_slice
     out = nil.as(String::Builder?)
     copied = 0
@@ -190,10 +195,7 @@ module HtmlFilters
         position = equals + 1
         next
       end
-      attribute_start, name_length, value_start, value_end = span
-      # Same bail-outs as string_rewrite_safe?, decided before looking
-      # at the value, as the regexes did
-      return nil if unsafe_link_attribute?(bytes, attribute_start, name_length)
+      value_start, value_end = span
       if value_end.nil?
         position = equals + 1
         next
@@ -213,28 +215,68 @@ module HtmlFilters
     out.to_s
   end
 
+  # Byte-level equivalent of string_rewrite_safe?: false when the page
+  # has an uppercase HREF/SRC assignment anywhere, or an href
+  # assignment in the text right after a `<script ...>` tag (up to the
+  # next "<") or inside a comment (up to the next ">"). Those are the
+  # exact shapes of its two regexes, found without running them.
+  private def self.page_rewrite_safe?(html : String) : Bool
+    bytes = html.to_slice
+    return false if assignment_in?(html, "HREF", 0, bytes.size) || assignment_in?(html, "SRC", 0, bytes.size)
+    start = 0
+    while start = html.byte_index("<script", start)
+      # `<script[^>]*>` needs a ">"; without one no later tag has it either
+      break unless tag_end = bytes.index(GREATER_THAN, start)
+      text_end = bytes.index(LESS_THAN, tag_end + 1) || bytes.size
+      return false if assignment_in?(html, "href", tag_end + 1, text_end)
+      start += 1
+    end
+    start = 0
+    while start = html.byte_index("<!--", start)
+      span_end = bytes.index(GREATER_THAN, start + 4) || bytes.size
+      return false if assignment_in?(html, "href", start + 4, span_end)
+      start += 1
+    end
+    true
+  end
+
+  # Whether `name\s*=\s*["']` starts anywhere in html[from, to). None
+  # of those characters is "<" or ">", so a match that starts inside a
+  # span bounded by one of them also ends inside it.
+  private def self.assignment_in?(html : String, name : String, from : Int32, to : Int32) : Bool
+    bytes = html.to_slice
+    index = from
+    while (index = html.byte_index(name, index)) && index < to
+      j = skip_whitespace(bytes, index + name.bytesize)
+      if j < bytes.size && bytes[j] === '='
+        j = skip_whitespace(bytes, j + 1)
+        return true if j < bytes.size && (bytes[j] === '"' || bytes[j] === '\'')
+      end
+      index += 1
+    end
+    false
+  end
+
   # The href/src attribute around the "=" at *equals*, if any:
-  # {attribute start, name length, value start, value end}, where value
-  # end is the closing quote's index or nil when the value is unusable
-  # (no closing quote, or a newline inside: the regexes' `(.*?)` never
-  # matched those). The regex form was `(?:href|src)\s*=\s*["']`.
-  private def self.link_attribute_span(bytes : Bytes, equals : Int32) : {Int32, Int32, Int32, Int32?}?
-    name_end = skip_whitespace_back(bytes, equals)
-    name_length = link_attribute_length(bytes, name_end)
-    return nil if name_length == 0
+  # {value start, value end}, where value end is the closing quote's
+  # index or nil when the value is unusable (no closing quote, or a
+  # newline inside: the regexes' `(.*?)` never matched those). The
+  # regex form was `(?:href|src)\s*=\s*["']`.
+  private def self.link_attribute_span(bytes : Bytes, equals : Int32) : {Int32, Int32?}?
+    return nil unless link_attribute?(bytes, skip_whitespace_back(bytes, equals))
     quote_index = skip_whitespace(bytes, equals + 1)
     return nil unless quote_index < bytes.size && (bytes[quote_index] === '"' || bytes[quote_index] === '\'')
-    {name_end - name_length, name_length, quote_index + 1, quoted_value_end(bytes, quote_index)}
+    {quote_index + 1, quoted_value_end(bytes, quote_index)}
   end
 
   # Index of the quote closing the value that opens at *quote_index*,
-  # or nil when there is none or a newline comes first
+  # or nil when there is none or the value holds a newline. Only the
+  # value itself is searched, so a page full of links stays linear.
   private def self.quoted_value_end(bytes : Bytes, quote_index : Int32) : Int32?
     value_start = quote_index + 1
     value_end = bytes.index(bytes[quote_index], value_start)
     return nil unless value_end
-    newline = bytes.index(NEWLINE, value_start)
-    newline && newline < value_end ? nil : value_end
+    bytes[value_start, value_end - value_start].index(NEWLINE) ? nil : value_end
   end
 
   # First index at or after *index* that is not ASCII whitespace
@@ -253,55 +295,12 @@ module HtmlFilters
     index
   end
 
-  # 4 when "href"/"HREF" ends at *name_end*, 3 for "src"/"SRC", 0
-  # otherwise. The regexes matched these spellings anywhere (data-src
-  # included), with no word boundary, so neither does this.
-  private def self.link_attribute_length(bytes : Bytes, name_end : Int32) : Int32
-    if name_end >= 4 && (starts_with?(bytes, name_end - 4, "href") || starts_with?(bytes, name_end - 4, "HREF"))
-      4
-    elsif name_end >= 3 && (starts_with?(bytes, name_end - 3, "src") || starts_with?(bytes, name_end - 3, "SRC"))
-      3
-    else
-      0
-    end
-  end
-
-  # An uppercase HREF/SRC spelling, or an href inside script text or a
-  # comment: the page goes through the parser path instead
-  private def self.unsafe_link_attribute?(bytes : Bytes, index : Int32, name_length : Int32) : Bool
-    bytes[index].unsafe_chr.ascii_uppercase? || (name_length == 4 && href_in_script_or_comment?(bytes, index))
-  end
-
-  # Index of *byte* in bytes[from, to), or nil
-  private def self.index_of(bytes : Bytes, byte : UInt8, from : Int32, to : Int32) : Int32?
-    index = from
-    while index < to
-      return index if bytes[index] == byte
-      index += 1
-    end
-    nil
-  end
-
-  # Last index of *byte* before *before*, or nil
-  private def self.last_index_of(bytes : Bytes, byte : UInt8, before : Int32) : Int32?
-    index = before - 1
-    while index >= 0
-      return index if bytes[index] == byte
-      index -= 1
-    end
-    nil
-  end
-
-  # The two shapes LINK_FIX_UNSAFE_CONTEXT matches for an href at
-  # *index*: `<script...>` followed by text with no "<" up to the href,
-  # or `<!--` with no ">" between it and the href
-  private def self.href_in_script_or_comment?(bytes : Bytes, index : Int32) : Bool
-    if (tag = last_index_of(bytes, '<'.ord.to_u8, index)) && starts_with?(bytes, tag, "<script") &&
-       index_of(bytes, '>'.ord.to_u8, tag, index)
-      return true
-    end
-    comment_from = (last_index_of(bytes, '>'.ord.to_u8, index) || -1) + 1
-    contains?(bytes, comment_from, index, "<!--")
+  # Whether "href" or "src" ends at *name_end*. The regexes matched
+  # these spellings anywhere (data-src included), with no word
+  # boundary, so neither does this.
+  private def self.link_attribute?(bytes : Bytes, name_end : Int32) : Bool
+    (name_end >= 4 && starts_with?(bytes, name_end - 4, "href")) ||
+      (name_end >= 3 && starts_with?(bytes, name_end - 3, "src"))
   end
 
   private def self.starts_with?(bytes : Bytes, index : Int32, literal : String) : Bool
@@ -317,15 +316,6 @@ module HtmlFilters
 
   # What every link of one page is rewritten against
   private record LinkPage, base_uri : URI, prefix : String, url_prefix : String
-
-  private def self.contains?(bytes : Bytes, from : Int32, to : Int32, literal : String) : Bool
-    index = from
-    while index + literal.bytesize <= to
-      return true if starts_with?(bytes, index, literal)
-      index += 1
-    end
-    false
-  end
 
   # Same decision as NEEDS_LINK_FIX_CAPTURE + ROOT_RELATIVE_FIX for one
   # attribute value; nil when the value stays as it is

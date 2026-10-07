@@ -476,7 +476,7 @@ module Markdown
     # costs more than a byte search.
     private def lexbor_passes_needed(compiled : String) : {Bool, Bool, Bool}
       {
-        compiled.includes?("<h") && compiled.matches?(/<\/?h[1-6]/),
+        (compiled.includes?("<h") || compiled.includes?("</h")) && compiled.matches?(/<\/?h[1-6]/),
         compiled.includes?("<p>") && compiled.matches?(/<p>\s*<\/p>/),
         compiled.includes?("<code") && compiled.matches?(HtmlFilters::NEEDS_CODE_FIX),
       }

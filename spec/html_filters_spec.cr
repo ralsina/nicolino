@@ -200,6 +200,35 @@ describe HtmlFilters do
       HtmlFilters.relativize_page_links(safe, "/a/b.html").should eq HtmlFilters.relativize_links_in_string(safe, "/a/b.html")
     end
 
+    it "keeps the page-wide safety check independent of the values it visits" do
+      [
+        # the nearest "<" before the href is inside an attribute value
+        %(<script data-marker="<">const h = "href='/css/a.css'";</script>),
+        # the href sits inside a src value the traversal would skip
+        %(<script>const s = `src="/asset.svg?href='x'"`;</script>),
+        %(<p>x</p><!-- a > b --><!-- see src="/y" href="/z" -->),
+      ].each do |html|
+        HtmlFilters.string_rewrite_safe?(html).should be_false
+        HtmlFilters.relativize_page_links(html, "/a/b/c.html").should be_nil
+      end
+    end
+
+    it "agrees with string_rewrite_safe? on every probe" do
+      [
+        %(<script src="/js/app.js"></script>),
+        %(<script>no links</script><a href="/x">x</a>),
+        %(<script>a</script>text href="x"),
+        %(<!-- note --><a href="/x">x</a>),
+        %(<!-- href = 'x' -->),
+        %(<a HREF = "x">),
+        %(<p>HREF is a word, SRC too</p>),
+        %(<scriptx>href="y"),
+        %(<script),
+      ].each do |html|
+        HtmlFilters.relativize_page_links(html, "/a/b.html").nil?.should eq(!HtmlFilters.string_rewrite_safe?(html)), html
+      end
+    end
+
     it "leaves values with a newline or no closing quote alone, like the regex did" do
       html = %(<a href="two\nlines.html">x</a> <a href="open.html>y</a>)
       HtmlFilters.relativize_page_links(html, "/a/b.html").should eq HtmlFilters.relativize_links_in_string(html, "/a/b.html")
