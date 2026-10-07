@@ -687,7 +687,11 @@ module Markdown
       end
       preview_image = meta["preview_image"]? || meta["cover_image"]? || meta["image"]?
       {
-        "description"   => description,
+        # Plain text (front matter, or an excerpt with its entities
+        # decoded) going into HTML: themes interpolate it raw, mostly
+        # inside content="..." attributes, where a bare quote or ">"
+        # breaks the tag and can spill the rest into the visible page
+        "description"   => HTML.escape(description),
         "preview_image" => preview_image,
       } of String => String?
     end
