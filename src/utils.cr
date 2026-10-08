@@ -292,7 +292,7 @@ module Utils
     # Chunks finish in any order: slot each result by its index. A
     # result is boxed in a Tuple so an empty slot (nil) can't be
     # mistaken for a block that returned nil.
-    slots = Array({T} | Exception | Nil).new(num_chunks, nil)
+    slots = Array({T} | Exception?).new(num_chunks, nil)
     num_chunks.times do
       chunk_idx, result = channels.receive
       slots[chunk_idx] = result.is_a?(Exception) ? result : {result}
