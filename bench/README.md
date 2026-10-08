@@ -29,7 +29,9 @@ The corpus is a snapshot of Zach Leat's static-site build benchmark
 ## Usage
 
 ```sh
-shards build --release --output bench/release-bin/nicolino
+shards build --release            # writes to bin/nicolino (no --output flag)
+mkdir -p bench/release-bin && cp bin/nicolino bench/release-bin/nicolino
+shards build                      # rebuild the dev binary for bin/nicolino
 NICOLINO_BIN="$PWD/bin/nicolino" \
 NICOLINO_RELEASE_BIN="$PWD/bench/release-bin/nicolino" \
 ./bench/run.sh
