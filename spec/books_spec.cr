@@ -83,6 +83,25 @@ describe Books do
     end
   end
 
+  describe ".markers_survive?" do
+    it "is true only when every marker parsed as a comment" do
+      m = Books::TOC_MARKER
+      {
+        %(<nav>#{m}</nav>)                          => true,
+        %(<nav>#{m}</nav><aside>#{m}</aside>)       => true,
+        %(<p>no toc here</p>)                       => true,
+        %(<textarea>#{m}</textarea>)                => false,
+        %(<script>var t = "#{m}";</script>)         => false,
+        %(<title>#{m}</title>)                      => false,
+        %(<nav>#{m}</nav><textarea>#{m}</textarea>) => false,
+      }.each do |html, expected|
+        doc = Lexbor::Parser.new(html)
+        Books.markers_survive?(doc, html).should eq(expected), html
+        doc.free
+      end
+    end
+  end
+
   describe ".toc_spliceable?" do
     it "rejects titles lexbor would parse or decode" do
       ["A <b>bold</b> title", "Q&amp;A", %(The "quoted" one)].each do |title|

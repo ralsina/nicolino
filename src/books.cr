@@ -429,53 +429,51 @@ module Books
         {name: entry.title, link: entry.link(book.name)},
       ] of NamedTuple(name: String, link: String)
 
-      # Render chapter with book template
-      book_chapter_template = Theme.template_path("book_chapter.tmpl")
-      template = Templates.environment.get_template(book_chapter_template)
+      # Render the chapter and page templates around *toc_html*
+      page_title = entry.formatted_number.empty? ? entry.title : "#{entry.formatted_number} #{entry.title}"
+      page_link = Utils.path_to_link(output_path.to_s)
+      render_page = ->(toc_html : String) do
+        book_chapter_template = Theme.template_path("book_chapter.tmpl")
+        template = Templates.environment.get_template(book_chapter_template)
+        ctx = {
+          "chapter" => {
+            "title"            => entry.title,
+            "formatted_number" => entry.formatted_number,
+            "content"          => html_content,
+            "link"             => entry.link(book.name),
+          },
+          "book"       => book.to_context,
+          "navigation" => nav.to_h,
+          "toc_html"   => toc_html,
+        }
+        # title.tmpl handles the breadcrumbs
+        content_html = Render.title_html(page_title, entry.link(book.name), breadcrumbs) + template.render(ctx)
+        Render.apply_template(Theme.template_path("page.tmpl"), {
+          "content"         => content_html,
+          "title"           => page_title,
+          "breadcrumbs"     => breadcrumbs,
+          "sidebar_content" => toc_html,
+          "link"            => page_link,
+        })
+      end
 
       # The TOC links every chapter, so it is most of each page: keep
       # it out of the template and lexbor passes when it can be
-      # spliced in afterwards
-      # Templates are checked on every run: in auto mode they can
-      # change while this task stays registered
+      # spliced in afterwards. Templates are checked on every run: in
+      # auto mode they can change while this task stays registered.
       splice = book.splice_toc? && templates_print_toc_verbatim?
-      toc_html = splice ? TOC_MARKER : render_toc_html(book.chapters, entry, book.name)
-
-      ctx = {
-        "chapter" => {
-          "title"            => entry.title,
-          "formatted_number" => entry.formatted_number,
-          "content"          => html_content,
-          "link"             => entry.link(book.name),
-        },
-        "book"       => book.to_context,
-        "navigation" => nav.to_h,
-        "toc_html"   => toc_html,
-      }
-
-      html = template.render(ctx)
-
-      # Apply page template wrapper with title.tmpl for breadcrumbs
-      page_title = entry.formatted_number.empty? ? entry.title : "#{entry.formatted_number} #{entry.title}"
-
-      # Include title.tmpl which handles breadcrumbs
-      title_html = Render.title_html(page_title, entry.link(book.name), breadcrumbs)
-
-      # Combine title HTML with content
-      content_html = title_html + html
-
-      page_template = Theme.template_path("page.tmpl")
-      html = Render.apply_template(page_template, {
-        "content"         => content_html,
-        "title"           => page_title,
-        "breadcrumbs"     => breadcrumbs,
-        "sidebar_content" => toc_html,
-        "link"            => Utils.path_to_link(output_path.to_s),
-      })
+      html = render_page.call(splice ? TOC_MARKER : render_toc_html(book.chapters, entry, book.name))
+      doc = Lexbor::Parser.new(html)
+      if splice && !markers_survive?(doc, html)
+        # A marker landed where lexbor doesn't keep comments (inside
+        # <textarea>, <script>, ...): render this page the regular way
+        doc.free
+        splice = false
+        html = render_page.call(render_toc_html(book.chapters, entry, book.name))
+        doc = Lexbor::Parser.new(html)
+      end
 
       # Process HTML filters
-      page_link = Utils.path_to_link(output_path.to_s)
-      doc = Lexbor::Parser.new(html)
       doc = HtmlFilters.make_links_relative(doc, page_link)
       result = HtmlFilters.to_html(HtmlFilters.fix_code_classes(doc))
       result = result.gsub(TOC_MARKER, serialized_toc(book, entry, page_link)) if splice
@@ -629,6 +627,19 @@ module Books
     result = {verbatim, dependencies}
     @@template_toc_checks_mutex.synchronize { @@template_toc_checks[key] = result }
     result
+  end
+
+  # Whether every TOC marker in *html* parsed as a comment node, so it
+  # comes out of serialization unchanged where the TOC belongs
+  def self.markers_survive?(doc : Lexbor::Parser, html : String) : Bool
+    expected = 0
+    position = 0
+    while found = html.index(TOC_MARKER, position)
+      expected += 1
+      position = found + TOC_MARKER.size
+    end
+    body = TOC_MARKER[4...-3]
+    doc.nodes(:_em_comment).count(&.tag_text.==(body)) == expected
   end
 
   # Whether a template's only uses of toc_html / sidebar_content are
