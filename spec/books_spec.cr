@@ -71,6 +71,18 @@ describe Books do
     end
   end
 
+  describe "Templates::DependencyVisitor#dynamic_references?" do
+    it "is set only when an include can't be resolved statically" do
+      static = Templates::DependencyVisitor.new("kv://t.tmpl")
+      static.dependencies(%({% include "title.tmpl" %}))
+      static.dynamic_references?.should be_false
+
+      dynamic = Templates::DependencyVisitor.new("kv://t.tmpl")
+      dynamic.dependencies(%({% include sidebar_template %}))
+      dynamic.dynamic_references?.should be_true
+    end
+  end
+
   describe ".toc_spliceable?" do
     it "rejects titles lexbor would parse or decode" do
       ["A <b>bold</b> title", "Q&amp;A", %(The "quoted" one)].each do |title|

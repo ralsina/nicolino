@@ -54,6 +54,10 @@ module Templates
     # Tags whose string literal arguments name other templates
     REFERENCE_TAGS = {"include", "extends", "import", "from"}
 
+    # Whether a dynamic reference was skipped: the template may pull
+    # in others that dependencies doesn't list
+    getter? dynamic_references = false
+
     def initialize(@current_template : String)
       @dependencies = [] of String
     end
@@ -84,6 +88,7 @@ module Templates
       literals = node.arguments.select(&.kind.string?)
       if literals.empty?
         Log.debug { "Skipping untrackable dynamic #{node.name} reference in #{@current_template}" }
+        @dynamic_references = true
         return
       end
       # An include may name a list of alternative templates; taking

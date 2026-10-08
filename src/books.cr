@@ -586,8 +586,10 @@ module Books
   end
 
   # Whether book_chapter.tmpl, page.tmpl and every template they pull
-  # in only print toc_html / sidebar_content with `|safe`. Anything
-  # else (a filter, a test, a Lua filter) must see the real TOC.
+  # in only print toc_html / sidebar_content verbatim (see
+  # prints_toc_verbatim?), with no dynamic includes we can't follow.
+  # Anything else (a filter, a test, a Lua filter) must see the real
+  # TOC.
   def self.templates_print_toc_verbatim? : Bool
     pending = [Theme.template_path("book_chapter.tmpl"), Theme.template_path("page.tmpl")]
     seen = Set(String).new
@@ -595,9 +597,11 @@ module Books
       next unless seen.add?(path)
       source = File.read(path)
       return false unless prints_toc_verbatim?(source, Crinja::Config.new.autoescape?(path))
-      Templates::DependencyVisitor.new("kv://#{path}").dependencies(source).each do |dependency|
-        pending << dependency.lchop("kv://")
-      end
+      visitor = Templates::DependencyVisitor.new("kv://#{path}")
+      dependencies = visitor.dependencies(source)
+      # An include we can't resolve could do anything with the TOC
+      return false if visitor.dynamic_references?
+      dependencies.each { |dependency| pending << dependency.lchop("kv://") }
     end
     true
   rescue ex
