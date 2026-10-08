@@ -193,8 +193,9 @@ module Books
     property description : String?
     property chapters : Array(ChapterEntry)
     property config : BookConfig?
-    # Whether chapter pages can splice in a pre-serialized TOC (see
-    # Books.toc_spliceable?). Set once, before the tasks run.
+    # Whether this book's TOC can be spliced into chapter pages (see
+    # Books.toc_spliceable?). Set once, before the tasks run; the
+    # templates are checked on each run.
     property? splice_toc : Bool = false
 
     def initialize(@name, @title, @chapters, @description = nil, @config : BookConfig? = nil)
@@ -435,7 +436,10 @@ module Books
       # The TOC links every chapter, so it is most of each page: keep
       # it out of the template and lexbor passes when it can be
       # spliced in afterwards
-      toc_html = book.splice_toc? ? TOC_MARKER : render_toc_html(book.chapters, entry, book.name)
+      # Templates are checked on every run: in auto mode they can
+      # change while this task stays registered
+      splice = book.splice_toc? && templates_print_toc_verbatim?
+      toc_html = splice ? TOC_MARKER : render_toc_html(book.chapters, entry, book.name)
 
       ctx = {
         "chapter" => {
@@ -474,7 +478,7 @@ module Books
       doc = Lexbor::Parser.new(html)
       doc = HtmlFilters.make_links_relative(doc, page_link)
       result = HtmlFilters.to_html(HtmlFilters.fix_code_classes(doc))
-      result = result.gsub(TOC_MARKER, serialized_toc(book, entry, page_link)) if book.splice_toc?
+      result = result.gsub(TOC_MARKER, serialized_toc(book, entry, page_link)) if splice
       Log.info { "👉 #{output_path}" }
       result
     end
@@ -573,10 +577,10 @@ module Books
   # template and lexbor with every chapter page. Titles and links are
   # raw text: lexbor would parse tags and decode entities in them, so
   # any <, & or " sends the book down the regular path. An empty TOC
-  # does too: the marker would make it truthy in templates. So do
-  # templates that do anything with the TOC besides printing it.
+  # does too: the marker would make it truthy in templates. The
+  # templates are checked separately, on every run
+  # (templates_print_toc_verbatim?).
   def self.toc_spliceable?(book : Book) : Bool
-    return false unless templates_print_toc_verbatim?
     return false if render_toc_html(book.chapters, nil, book.name).empty?
     flatten_entries(book.chapters).none? do |entry|
       {entry.title, entry.link(book.name)}.any? do |text|
@@ -595,18 +599,36 @@ module Books
     seen = Set(String).new
     while path = pending.pop?
       next unless seen.add?(path)
-      source = File.read(path)
-      return false unless prints_toc_verbatim?(source, Crinja::Config.new.autoescape?(path))
-      visitor = Templates::DependencyVisitor.new("kv://#{path}")
-      dependencies = visitor.dependencies(source)
-      # An include we can't resolve could do anything with the TOC
-      return false if visitor.dynamic_references?
-      dependencies.each { |dependency| pending << dependency.lchop("kv://") }
+      verbatim, dependencies = template_toc_check(path, File.read(path))
+      return false unless verbatim
+      pending.concat(dependencies)
     end
     true
   rescue ex
     Log.debug { "Book TOC splicing off: #{ex.message}" }
     false
+  end
+
+  # Per-template part of templates_print_toc_verbatim?, memoized by
+  # source: every chapter task asks, and only an edit changes the
+  # answer. Returns whether the template prints the TOC verbatim (and
+  # has no dynamic includes we can't follow), and the templates it
+  # includes.
+  @@template_toc_checks = Hash({String, String}, {Bool, Array(String)}).new
+  @@template_toc_checks_mutex = Mutex.new
+
+  private def self.template_toc_check(path : String, source : String) : {Bool, Array(String)}
+    key = {path, source}
+    if cached = @@template_toc_checks_mutex.synchronize { @@template_toc_checks[key]? }
+      return cached
+    end
+    visitor = Templates::DependencyVisitor.new("kv://#{path}")
+    dependencies = visitor.dependencies(source).map(&.lchop("kv://"))
+    verbatim = prints_toc_verbatim?(source, Crinja::Config.new.autoescape?(path)) &&
+               !visitor.dynamic_references?
+    result = {verbatim, dependencies}
+    @@template_toc_checks_mutex.synchronize { @@template_toc_checks[key] = result }
+    result
   end
 
   # Whether a template's only uses of toc_html / sidebar_content are
