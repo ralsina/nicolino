@@ -14,7 +14,7 @@ module HTML
       # Links stay root-relative here: the same body is embedded in
       # listing pages at different depths, so links must only be
       # relativized at the final page render.
-      html_with_classes = HtmlFilters.fix_code_classes(doc).to_html
+      html_with_classes = HtmlFilters.fragment_html(HtmlFilters.fix_code_classes(doc))
 
       # TOC is opt-in via `toc` metadata, matching markdown posts:
       # short HTML posts (book reviews, feed imports) would otherwise
