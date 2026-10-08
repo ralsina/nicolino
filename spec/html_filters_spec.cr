@@ -180,6 +180,8 @@ describe HtmlFilters do
         %(<pre><code class=crystal>x</code></pre>)                    => true,
         %(<pre><code class=language-crystal>x</code></pre>)           => false,
         %(<pre><code class="LANGUAGE-x">x</code></pre>)               => true,
+        %(<pre><code title="a > b" class="crystal">x</code></pre>)    => true,
+        %(<pre><code title='x class="y"'>x</code></pre>)              => false,
       }.each do |html, unfixed|
         html.matches?(HtmlFilters::UNFIXED_CODE_CLASS).should eq(unfixed), html
         fixed = HtmlFilters.fix_code_classes(Lexbor::Parser.new(html)).to_html

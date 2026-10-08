@@ -110,10 +110,11 @@ module HtmlFilters
   # match, so whole pages can be checked cheaply. It cannot tell
   # whether the <code> sits in a <pre>, so a match is only a reason to
   # parse and try (see fix_code_classes?). Tag and attribute
-  # names are case-insensitive and the value may be unquoted (one
-  # token then); the value check stays case-sensitive, like
+  # names are case-insensitive, quoted values of earlier attributes
+  # may hold ">" (or a "class=" that is not one), and the value may be
+  # unquoted (one token then); the value check stays case-sensitive, like
   # fix_code_classes.
-  UNFIXED_CODE_CLASS = /(?i:<code)[^>]*\s(?i:class)\s*=\s*(?:["'](?![^"'>]*(?<=["'\s])(?:language-|tz-))|(?!["']|language-|tz-)[^\s>])/
+  UNFIXED_CODE_CLASS = /(?i:<code)(?:[^>"']|"[^"]*"|'[^']*')*?\s(?i:class)\s*=\s*(?:["'](?![^"'>]*(?<=["'\s])(?:language-|tz-))|(?!["']|language-|tz-)[^\s>])/
 
   # Capture form of NEEDS_LINK_FIX: matches a href/src value that
   # make_links_relative would rewrite, capturing the value and the
