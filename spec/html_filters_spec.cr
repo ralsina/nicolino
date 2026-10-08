@@ -166,6 +166,24 @@ describe HtmlFilters do
     end
   end
 
+  describe "UNFIXED_CODE_CLASS" do
+    it "matches exactly the code classes fix_code_classes rewrites" do
+      {
+        %(<pre><code class="crystal">x</code></pre>)                  => true,
+        %(<pre><code class="x-language-y">x</code></pre>)             => true,
+        %(<pre><code id="a" class='ruby lineno'>x</code></pre>)       => true,
+        %(<pre><code class="crystal language-crystal">x</code></pre>) => false,
+        %(<pre><code class="language-crystal">x</code></pre>)         => false,
+        %(<pre><code class="tz-chroma">x</code></pre>)                => false,
+        %(<pre><code>x</code></pre>)                                  => false,
+      }.each do |html, unfixed|
+        html.matches?(HtmlFilters::UNFIXED_CODE_CLASS).should eq(unfixed), html
+        fixed = HtmlFilters.fix_code_classes(Lexbor::Parser.new(html)).to_html
+        (fixed != Lexbor::Parser.new(html).to_html).should eq(unfixed), html
+      end
+    end
+  end
+
   describe ".fragment_html" do
     it "serializes a fragment without the document wrapper" do
       html = HtmlFilters.fragment_html(Lexbor::Parser.new(%(<h2>Title</h2><p>Body</p>)))
@@ -187,6 +205,11 @@ describe HtmlFilters do
       ].each do |fragment|
         HtmlFilters.fragment_html(Lexbor::Parser.new(fragment)).should eq(fragment), fragment
       end
+    end
+
+    it "drops a doctype, which the enclosing page already has" do
+      html = HtmlFilters.fragment_html(Lexbor::Parser.new(%(<!DOCTYPE html><!--more--><p>Body</p>)))
+      html.should eq %(<!--more--><p>Body</p>)
     end
 
     it "returns an empty string for an empty fragment" do

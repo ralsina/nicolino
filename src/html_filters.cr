@@ -71,7 +71,9 @@ module HtmlFilters
   # elsewhere. Leading <style>, <script>, <link> or <meta> elements end
   # up in the parsed <head>, so its contents come first. A comment
   # opening the fragment (a leading <!--more-->) is a child of the
-  # document itself, outside <html>, so the walk starts there.
+  # document itself, outside <html>, so the walk starts there; a
+  # doctype also lands there and is dropped, since the fragment gets
+  # embedded in a page that has its own.
   def self.fragment_html(doc : Lexbor::Parser) : String
     String.build do |io|
       doc.document.children do |node|
@@ -83,7 +85,7 @@ module HtmlFilters
               child.to_html(io)
             end
           end
-        else
+        elsif node.is_comment?
           node.to_html(io)
         end
       end
@@ -101,6 +103,12 @@ module HtmlFilters
   # A code tag whose class doesn't already start with language-,
   # which fix_code_classes would rewrite.
   NEEDS_CODE_FIX = /<code[^>]*\sclass\s*=\s*["'](?!language-|tz-)/
+
+  # Stricter than NEEDS_CODE_FIX: a code class none of whose tokens
+  # starts with language- or tz-, the only ones fix_code_classes still
+  # rewrites. Already fixed blocks ("crystal language-crystal") do not
+  # match, so whole pages can be checked cheaply.
+  UNFIXED_CODE_CLASS = /<code[^>]*\sclass\s*=\s*["'](?![^"'>]*(?<=["'\s])(?:language-|tz-))/
 
   # Capture form of NEEDS_LINK_FIX: matches a href/src value that
   # make_links_relative would rewrite, capturing the value and the

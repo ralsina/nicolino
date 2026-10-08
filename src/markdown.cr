@@ -919,6 +919,12 @@ module Markdown
           if HtmlFilters.string_rewrite_safe?(html)
             # Safe for string rewriting: regex-only path, no Lexbor parse.
             html = HtmlFilters.relativize_links_in_string(html, post.link(lang))
+            # The content's code blocks were fixed when it was compiled;
+            # a template can still emit an unprefixed one, which the
+            # full-page pass used to catch when it was on by default
+            if html.matches?(HtmlFilters::UNFIXED_CODE_CLASS)
+              html = HtmlFilters.fix_code_classes(Lexbor::Parser.new(html)).to_html
+            end
           else
             # DOM path: Lexbor parse + make_links_relative + fix_code_classes.
             # make_links_relative now handles all tags with href/src, so the
