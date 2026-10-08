@@ -35,6 +35,11 @@ module TemplatePreprocessor
 
   @@cache = Hash({UInt64, String, String, UInt64}, Crinja::Template).new
   @@mutex = Mutex.new
+  # Last output size per template, so the next render's buffer starts
+  # about right instead of doubling its way up from String.build's
+  # default (every doubling copies the page so far)
+  @@size_hints = Hash(String, Int32).new
+  @@size_mutex = Mutex.new
 
   # The folded template for *name* in *lang*, loading the source
   # through the loader of *env*. The returned Template belongs to
@@ -74,11 +79,14 @@ module TemplatePreprocessor
   # a site whose declaration phase also renders, see EnvCache).
   def self.render_with(template : Crinja::Template, bindings) : String
     env = template.env
-    env.with_scope(bindings) do
-      String.build do |io|
+    hint = @@size_mutex.synchronize { @@size_hints[template.name]? } || 1024
+    html = env.with_scope(bindings) do
+      String.build(hint) do |io|
         template.render(io, env)
       end
     end
+    @@size_mutex.synchronize { @@size_hints[template.name] = html.bytesize + html.bytesize // 8 }
+    html
   end
 
   # -- Source-level include inlining ------------------------------------

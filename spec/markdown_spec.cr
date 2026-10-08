@@ -123,6 +123,38 @@ describe Markdown::File do
     end
   end
 
+  describe "#value" do
+    it "reuses the word count and description until the page changes" do
+      PostSite.in_site do
+        post = PostSite.write_post("facts.md", <<-MD)
+          ---
+          title: Facts
+          date: 2024-05-01
+          ---
+
+          One two three.
+          MD
+
+        first = post.value("en")
+        first["word_count"].should eq 3
+        post.value("en")["description"].should eq first["description"]
+
+        ::File.write("content/posts/facts.md", <<-MD)
+          ---
+          title: Facts
+          date: 2024-05-01
+          ---
+
+          One two three four five.
+          MD
+        post.load("en")
+        changed = post.value("en")
+        changed["word_count"].should eq 5
+        changed["description"].to_s.should contain "four five"
+      end
+    end
+  end
+
   it "parses frontmatter metadata and title" do
     PostSite.in_site do
       post = PostSite.write_post("hello.md", <<-MD)
