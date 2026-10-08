@@ -43,6 +43,37 @@ describe Markdown::File do
       end
     end
 
+    it "escapes a hand written description for use in HTML" do
+      PostSite.in_site do
+        post = PostSite.write_post("hello.md", <<-MD)
+          ---
+          title: Hello World
+          date: 2024-05-01
+          description: Call it a "configuration" > files & such
+          ---
+
+          Body.
+          MD
+
+        post.social_context["description"].should eq "Call it a &quot;configuration&quot; &gt; files &amp; such"
+      end
+    end
+
+    it "escapes an excerpt for use in HTML" do
+      PostSite.in_site do
+        post = PostSite.write_post("hello.md", <<-MD)
+          ---
+          title: Hello World
+          date: 2024-05-01
+          ---
+
+          He said "hi" & left, since a < b.
+          MD
+
+        post.social_context["description"].should eq "He said &quot;hi&quot; &amp; left, since a &lt; b."
+      end
+    end
+
     it "falls back to a plain text excerpt of the summary" do
       PostSite.in_site do
         post = PostSite.write_post("hello.md", <<-MD)
