@@ -16,7 +16,8 @@
 {% if args['css_class'] %}
   {% set gallery_class = args['css_class'] %}
 {% endif %}
-{% set gallery_id = 'gallery-' ~ gallery_name ~ '-' ~ range(0, 100000) | random %}
+{# Unique per page, stable across builds: reproducible output #}
+{% set gallery_id = 'gallery-' ~ gallery_name ~ '-' ~ scOrdinal %}
 
 <!-- Swiper CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />

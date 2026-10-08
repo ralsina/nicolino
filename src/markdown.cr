@@ -526,6 +526,11 @@ module Markdown
       # Build output efficiently using IO::Memory instead of string concatenation
       output = IO::Memory.new
       last_pos = 0
+      # Per-page occurrence counter per shortcode name, exposed to
+      # templates as scOrdinal (0-based, like Hugo's .Ordinal): lets a
+      # template build ids that are unique within a page but stable
+      # across builds, so output stays reproducible.
+      ordinals = Hash(String, Int32).new(0)
 
       sc_list.shortcodes.each do |scode|
         if scode.markdown? # Recurse for nested shortcodes
@@ -544,6 +549,8 @@ module Markdown
         # Create a context with the environment's global context as parent
         # This ensures access to filters, macros, and other global features
         shortcode_context = Crinja::Context.new(Templates.environment.context)
+        shortcode_context["scOrdinal"] = ordinals[scode.name]
+        ordinals[scode.name] += 1
         middle = Sc.render_sc(scode, shortcode_context)
         output << middle
 
