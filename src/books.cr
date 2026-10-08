@@ -193,6 +193,9 @@ module Books
     property description : String?
     property chapters : Array(ChapterEntry)
     property config : BookConfig?
+    # Whether chapter pages can splice in a pre-serialized TOC (see
+    # Books.toc_spliceable?). Set once, before the tasks run.
+    property? splice_toc : Bool = false
 
     def initialize(@name, @title, @chapters, @description = nil, @config : BookConfig? = nil)
     end
@@ -344,6 +347,7 @@ module Books
   # Create Croupier tasks for a single book
   private def self.create_book_tasks(book : Book, book_dir : String, flat_chapters : Array(ChapterEntry))
     summary_path = File.join(book_dir, "SUMMARY.md")
+    book.splice_toc = toc_spliceable?(book)
 
     # Create tasks for each chapter that has content
     create_chapter_tasks(book.chapters, book, book_dir, summary_path, flat_chapters)
@@ -428,7 +432,10 @@ module Books
       book_chapter_template = Theme.template_path("book_chapter.tmpl")
       template = Templates.environment.get_template(book_chapter_template)
 
-      toc_html = render_toc_html(book.chapters, entry, book.name)
+      # The TOC links every chapter, so it is most of each page: keep
+      # it out of the template and lexbor passes when it can be
+      # spliced in afterwards
+      toc_html = book.splice_toc? ? TOC_MARKER : render_toc_html(book.chapters, entry, book.name)
 
       ctx = {
         "chapter" => {
@@ -463,9 +470,11 @@ module Books
       })
 
       # Process HTML filters
+      page_link = Utils.path_to_link(output_path.to_s)
       doc = Lexbor::Parser.new(html)
-      doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output_path.to_s))
+      doc = HtmlFilters.make_links_relative(doc, page_link)
       result = HtmlFilters.to_html(HtmlFilters.fix_code_classes(doc))
+      result = result.gsub(TOC_MARKER, serialized_toc(book, entry, page_link)) if book.splice_toc?
       Log.info { "👉 #{output_path}" }
       result
     end
@@ -544,8 +553,119 @@ module Books
     NavigationLink.new(title: entry_title, link: entry_link)
   end
 
+  # Stands in for the TOC in chapter templates; lexbor keeps comments
+  # as they are, so it survives the HTML filters for splicing
+  TOC_MARKER = "<!--nicolino:book-toc-->"
+
+  # Whether the TOC can be written directly in the form lexbor would
+  # serialize it (serialized_toc), instead of going through the
+  # template and lexbor with every chapter page. Titles and links are
+  # raw text: lexbor would parse tags and decode entities in them, so
+  # any <, & or " sends the book down the regular path. An empty TOC
+  # does too: the marker would make it truthy in templates.
+  def self.toc_spliceable?(book : Book) : Bool
+    return false if render_toc_html(book.chapters, nil, book.name).empty?
+    flatten_entries(book.chapters).none? do |entry|
+      {entry.title, entry.link(book.name)}.any? do |text|
+        text.includes?('<') || text.includes?('&') || text.includes?('"')
+      end
+    end
+  end
+
+  # The TOC for a chapter page exactly as render_toc_html's output
+  # comes out of make_links_relative and lexbor serialization on the
+  # page at *page_link*: links relativized, `open` written as
+  # `open=""`, the empty attribute dropped, > and no-break spaces
+  # escaped. Only valid for books where toc_spliceable? holds.
+  def self.serialized_toc(book : Book, current : ChapterEntry, page_link : String) : String
+    prefix = HtmlFilters.relative_prefix(page_link)
+    open_entries = Set(ChapterEntry).new
+    collect_ancestors(book.chapters, current, open_entries)
+    String.build do |io|
+      book.chapters.each_with_index do |entry, i|
+        io << '\n' if i > 0
+        write_toc_item(io, entry, current, open_entries, book.name, prefix)
+      end
+    end
+  end
+
+  # Add *target* and its ancestors to *found*; true if it is in *entries*
+  private def self.collect_ancestors(entries : Array(ChapterEntry), target : ChapterEntry, found : Set(ChapterEntry)) : Bool
+    entries.each do |entry|
+      if entry == target || collect_ancestors(entry.children, target, found)
+        found << entry
+        return true
+      end
+    end
+    false
+  end
+
+  # Serialized counterpart of render_toc_item_html
+  private def self.write_toc_item(io : IO, entry : ChapterEntry, current : ChapterEntry,
+                                  open_entries : Set(ChapterEntry), book_name : String, prefix : String) : Nil
+    return if entry.part?
+
+    io << %(<div class="toc-item toc-level-) << entry.level << %(">\n)
+    if entry.children.empty?
+      if entry.has_content?
+        write_toc_link(io, entry, current, book_name, prefix)
+      else
+        io << %(<span class="toc-title disabled">)
+        write_toc_text(io, entry.title)
+        io << "</span>"
+      end
+      io << "\n</div>"
+      return
+    end
+
+    io << %(<details class="toc-group")
+    io << %( open="") if open_entries.includes?(entry)
+    io << %(>\n  <summary class="toc-summary">\n    )
+    if entry.has_content?
+      write_toc_link(io, entry, current, book_name, prefix)
+    else
+      io << %(<span class="toc-title">)
+      write_toc_label(io, entry)
+      io << "</span>"
+    end
+    io << %(\n  </summary>\n  <div class="toc-children">\n    )
+    entry.children.each_with_index do |child, i|
+      io << '\n' if i > 0
+      write_toc_item(io, child, current, open_entries, book_name, prefix)
+    end
+    io << "\n  </div>\n</details>\n</div>"
+  end
+
+  private def self.write_toc_link(io : IO, entry : ChapterEntry, current : ChapterEntry, book_name : String, prefix : String) : Nil
+    io << %(<a href=")
+    write_toc_text(io, HtmlFilters.resolve_root_relative(entry.link(book_name), prefix))
+    io << %(" class="toc-link )
+    io << "active" if entry == current
+    io << %(">)
+    write_toc_label(io, entry)
+    io << "</a>"
+  end
+
+  private def self.write_toc_label(io : IO, entry : ChapterEntry) : Nil
+    number = entry.formatted_number
+    io << number << ' ' unless number.empty?
+    write_toc_text(io, entry.title)
+  end
+
+  # Lexbor's text and attribute escaping, for strings without <, &
+  # or " (see toc_spliceable?)
+  private def self.write_toc_text(io : IO, text : String) : Nil
+    text.each_char do |char|
+      case char
+      when '>'      then io << "&gt;"
+      when '\u00A0' then io << "&nbsp;"
+      else               io << char
+      end
+    end
+  end
+
   # Render TOC as HTML string - avoids recursive template includes
-  private def self.render_toc_html(entries : Array(ChapterEntry), current : ChapterEntry?, book_name : String) : String
+  def self.render_toc_html(entries : Array(ChapterEntry), current : ChapterEntry?, book_name : String) : String
     entries.map do |entry|
       render_toc_item_html(entry, current, book_name)
     end.join("\n")

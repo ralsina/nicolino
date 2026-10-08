@@ -160,7 +160,7 @@ module HtmlFilters
   # "/posts/foo/index.html") to the site root.  Used to turn
   # root-relative links (/css/style.css) into page-relative ones
   # (../../css/style.css).
-  private def self.relative_prefix(base : String) : String
+  def self.relative_prefix(base : String) : String
     # Strip url_prefix if present — it's a virtual mount point,
     # not a real directory in the output tree
     site_prefix = Config.options.url_prefix.chomp("/")
@@ -253,7 +253,7 @@ module HtmlFilters
     path.starts_with?("#{prefixed}/") ? path.lchop(prefixed) : path
   end
 
-  private def self.resolve_root_relative(path : String, prefix : String) : String
+  def self.resolve_root_relative(path : String, prefix : String) : String
     path = strip_url_prefix(path)
     stripped = path[1..]
     if prefix.empty? && !Config.options.url_prefix.empty?
