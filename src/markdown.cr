@@ -456,7 +456,7 @@ module Markdown
         doc = HtmlFilters.remove_empty_paragraphs(doc)
         doc = HtmlFilters.fix_code_classes(doc) if needs_code_fix
         t3 = Time.instant
-        html = doc.to_html
+        html = HtmlFilters.fragment_html(doc)
         t4 = Time.instant
       else
         t2 = t1
@@ -938,6 +938,15 @@ module Markdown
           if HtmlFilters.string_rewrite_safe?(html)
             # Safe for string rewriting: regex-only path, no Lexbor parse.
             html = HtmlFilters.relativize_links_in_string(html, post.link(lang))
+            # The content's code blocks were fixed when it was compiled;
+            # a template can still emit an unprefixed one, which the
+            # full-page pass used to catch when it was on by default
+            # (an inline <code class> matches too, but changes nothing,
+            # so the raw template output is kept then)
+            if html.matches?(HtmlFilters::UNFIXED_CODE_CLASS)
+              doc = Lexbor::Parser.new(html)
+              html = doc.to_html if HtmlFilters.fix_code_classes?(doc)
+            end
           else
             # DOM path: Lexbor parse + make_links_relative + fix_code_classes.
             # make_links_relative now handles all tags with href/src, so the
@@ -946,9 +955,10 @@ module Markdown
             doc = HtmlFilters.make_links_relative(doc, post.link(lang))
             html = HtmlFilters.fix_code_classes(doc).to_html
           end
-          # pretty_html only controls output formatting: run the
-          # lexbor normalization pass for byte-stable pretty output,
-          # skip it for the faster raw template output
+          # pretty_html (off by default) only controls output
+          # formatting: run the lexbor normalization pass for
+          # byte-stable normalized output, skip it for the faster raw
+          # template output
           if Config.options.pretty_html?
             doc = Lexbor::Parser.new(html)
             html = HtmlFilters.fix_code_classes(doc).to_html
