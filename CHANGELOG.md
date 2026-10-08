@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.29.0] - 2026-10-08
+
+### 🐛 Bug Fixes
+
+- *(render)* Pages lost their title and metadata in parallel builds (#110)
+- *(render)* Escape page descriptions for HTML (#116)
+- *(render)* Free lexbor documents after serializing (#118)
+- *(deps)* Update croupier to 0.17.1 (#120)
+- *(deps)* Rebuild pages when their own template changes (#122)
+
+### 📚 Documentation
+
+- *(bench)* Fix release-binary build instructions
+
+### ⚡ Performance
+
+- *(dates)* Try strict date formats before Cronic (#108)
+- *(taxonomies)* Look up a post's terms instead of scanning every term (#111)
+- *(deps)* Stop recomputing per-post task inputs (#113)
+- *(render)* Derive word count and description from one text pass (#109)
+- *(config)* [**breaking**] Turn pretty_html off by default (#115)
+- *(render)* Stop redoing per-page template work (#117)
+- *(search)* Free parsed pages and extract text in one walk (#119)
+
+### 🎨 Styling
+
+- Prefer ? over | Nil in union
+
 ## [0.28.1] - 2026-10-06
 
 ### 🐛 Bug Fixes
