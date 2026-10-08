@@ -273,6 +273,18 @@ describe HtmlFilters do
       HtmlFilters.relativize_page_links(unsafe, "/a/b.html").should be_nil
     end
 
+    it "rewrites href/src assignments nested in another value like the regexes" do
+      base = "/blog/posts/page.html"
+      [
+        %(<!-- src="https://cdn.example/ --><a href="/guide.html">g</a>),
+        %(<a href="/redirect?src='guide.md'">r</a>),
+        %(<a href="https://x.example/?src='img.png'">x</a><img src="pic.png">),
+        %(<img alt="x" src="a.png href="><a href="b.html">b</a>),
+      ].each do |html|
+        HtmlFilters.relativize_page_links(html, base).should eq(HtmlFilters.relativize_links_in_string(html, base)), html
+      end
+    end
+
     it "leaves values with a newline or no closing quote alone, like the regex did" do
       html = %(<a href="two\nlines.html">x</a> <a href="open.html>y</a>)
       HtmlFilters.relativize_page_links(html, "/a/b.html").should eq HtmlFilters.relativize_links_in_string(html, "/a/b.html")

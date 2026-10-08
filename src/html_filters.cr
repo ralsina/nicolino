@@ -204,6 +204,11 @@ module HtmlFilters
         position = equals + 1
         next
       end
+      # The regexes resumed right after each match, so they also saw
+      # href/src assignments inside a value (a comment holding a stray
+      # quote, a query string with src=...). Those rare pages get the
+      # regex pass itself.
+      return relativize_links_in_string(html, base) if nested_link_assignment?(bytes, value_start, value_end)
       value = String.new(bytes[value_start, value_end - value_start])
       page ||= LinkPage.new(URI.parse(base), relative_prefix(base), Config.options.url_prefix)
       if rewritten = rewrite_link_value(value, page)
@@ -306,6 +311,19 @@ module HtmlFilters
     value_end = bytes.index(bytes[quote_index], value_start)
     return nil unless value_end
     bytes[value_start, value_end - value_start].index(NEWLINE) ? nil : value_end
+  end
+
+  # Whether an href/src name followed by "=" sits inside the value
+  # spanning *value_start* up to the closing quote at *value_end*. The
+  # "=" may be the last byte, its own opening quote being the closing
+  # one, so no quote check: false positives only cost the slow path.
+  private def self.nested_link_assignment?(bytes : Bytes, value_start : Int32, value_end : Int32) : Bool
+    position = value_start
+    while (equals = bytes.index(EQUALS, position)) && equals < value_end
+      return true if link_attribute?(bytes, skip_whitespace_back(bytes, equals))
+      position = equals + 1
+    end
+    false
   end
 
   # First index at or after *index* that is not ASCII whitespace
