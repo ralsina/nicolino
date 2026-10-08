@@ -179,6 +179,16 @@ describe HtmlFilters do
       html.should eq %(<style>p{color:red}</style><p>Body</p>)
     end
 
+    it "keeps comments the parser puts outside the body" do
+      [
+        %(<!--more--><h1>Title</h1><p>Body</p>),
+        %(<!-- a --><!-- b --><p>Body</p><!-- c -->),
+        %(<style>p{color:red}</style><!-- x --><p>Body</p>),
+      ].each do |fragment|
+        HtmlFilters.fragment_html(Lexbor::Parser.new(fragment)).should eq(fragment), fragment
+      end
+    end
+
     it "returns an empty string for an empty fragment" do
       HtmlFilters.fragment_html(Lexbor::Parser.new("")).should eq ""
     end

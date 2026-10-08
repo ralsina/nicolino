@@ -69,11 +69,24 @@ module HtmlFilters
   # around it (`<html><head></head><body>...</body></html>`), which
   # used to leak into pages and feeds when the content was embedded
   # elsewhere. Leading <style>, <script>, <link> or <meta> elements end
-  # up in the parsed <head>, so its contents come first.
+  # up in the parsed <head>, so its contents come first. A comment
+  # opening the fragment (a leading <!--more-->) is a child of the
+  # document itself, outside <html>, so the walk starts there.
   def self.fragment_html(doc : Lexbor::Parser) : String
     String.build do |io|
-      doc.head.try &.inner_html(io)
-      doc.body.try &.inner_html(io)
+      doc.document.children do |node|
+        if node.is_tag_html?
+          node.children do |child|
+            if child.is_tag_head? || child.is_tag_body?
+              child.inner_html(io)
+            else
+              child.to_html(io)
+            end
+          end
+        else
+          node.to_html(io)
+        end
+      end
     end
   end
 
