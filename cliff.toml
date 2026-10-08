@@ -73,3 +73,8 @@ filter_commits = false
 topo_order = false
 # sort the commits inside sections by oldest/newest order
 sort_commits = "oldest"
+
+
+[bump]
+# Pre-1.0: a breaking (!) commit bumps minor, not major
+breaking_always_bump_major = false
