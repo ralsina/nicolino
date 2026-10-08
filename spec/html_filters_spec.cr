@@ -181,7 +181,7 @@ describe HtmlFilters do
     end
 
     it "returns the very same string when nothing needs rewriting" do
-      html = %(<p><a href="https://example.com/">x</a> <a href="#top">t</a></p>)
+      html = %(<p><a href="https://example.com/">x</a> <a href="#top">t</a> <a href="//cdn.example/x.js">c</a> <img src="data:image/png;base64,iVBORw0KGgo="> <a href="">e</a></p>)
       HtmlFilters.relativize_page_links(html, "/a/b.html").should be(html)
     end
 

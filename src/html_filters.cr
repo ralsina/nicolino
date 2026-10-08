@@ -209,7 +209,14 @@ module HtmlFilters
       # quote, a query string with src=...). Those rare pages get the
       # regex pass itself.
       return relativize_links_in_string(html, base) if nested_link_assignment?(bytes, value_start, value_end)
-      value = String.new(bytes[value_start, value_end - value_start])
+      value_bytes = bytes[value_start, value_end - value_start]
+      # Values that are never rewritten (anchors, absolute and
+      # protocol-relative URLs, data: payloads) are not copied at all
+      if fixed_link_value?(value_bytes)
+        position = value_end + 1
+        next
+      end
+      value = String.new(value_bytes)
       page ||= LinkPage.new(URI.parse(base), relative_prefix(base), Config.options.url_prefix)
       if rewritten = rewrite_link_value(value, page)
         builder = (out ||= String::Builder.new(bytes.size + 64))
@@ -372,7 +379,7 @@ module HtmlFilters
       # Protocol-relative URLs are left alone
       value.starts_with?("//") ? nil : rewrite_root_relative(value, page)
     else
-      return nil if value.starts_with?('#') || scheme?(value)
+      return nil if value.starts_with?('#') || scheme?(value.to_slice)
       base_uri = page.base_uri
       rewritten = md_link_to_html(base_uri.relativize(base_uri.resolve(value)).to_s)
       rewritten == value ? nil : rewritten
@@ -390,9 +397,16 @@ module HtmlFilters
     end
   end
 
+  # Whether rewrite_link_value leaves this value alone whatever the
+  # page: empty, an anchor, protocol-relative, or with a URL scheme
+  private def self.fixed_link_value?(value : Bytes) : Bool
+    return true if value.empty? || value[0] === '#'
+    return value.size > 1 && value[1] === '/' if value[0] === '/'
+    scheme?(value)
+  end
+
   # `^[a-zA-Z][a-zA-Z0-9+.\-]*:` without a regex
-  private def self.scheme?(value : String) : Bool
-    bytes = value.to_slice
+  private def self.scheme?(bytes : Bytes) : Bool
     return false if bytes.empty? || !bytes[0].unsafe_chr.ascii_letter?
     index = 1
     while index < bytes.size
