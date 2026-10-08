@@ -103,6 +103,7 @@ module Markdown
     # share post objects, and Hash is not safe for concurrent
     # writes. The compile itself runs outside the lock (see #html).
     @html_mutex = Mutex.new
+    @text_facts = Hash(String, {String, Int32, Hash(String, String?)}).new
     @link = Hash(String, String).new
     @base = Path.new
     # Reader used for canonical ordering of parallel-read posts
@@ -696,14 +697,28 @@ module Markdown
       } of String => String?
     end
 
-    # Return a value Crinja can use in templates
-    def value(lang = nil)
-      lang = lang || Locale.language
-      page_html = html(lang)
+    # Word count and social metadata of *page_html*, memoized per
+    # language. value runs once for the post's own page and again for
+    # every listing that shows it (taxonomy terms, indexes), and these
+    # only depend on the HTML, unlike the rest of value (related posts,
+    # taxonomies). The entry is tied to the very String it came from,
+    # so a recompiled page (auto mode) never gets stale facts.
+    private def text_facts(page_html : String, lang : String) : {Int32, Hash(String, String?)}
+      cached = @html_mutex.synchronize { @text_facts[lang]? }
+      return {cached[1], cached[2]} if cached && cached[0].same?(page_html)
       # One tag strip serves both the word count and the description
       plain = Utils.plain_text(page_html)
       words = Utils.words_in(plain)
       social = social_context(page_html, plain, lang)
+      @html_mutex.synchronize { @text_facts[lang] = {page_html, words, social} }
+      {words, social}
+    end
+
+    # Return a value Crinja can use in templates
+    def value(lang = nil)
+      lang = lang || Locale.language
+      page_html = html(lang)
+      words, social = text_facts(page_html, lang)
       {
         "description"    => social["description"],
         "preview_image"  => social["preview_image"],

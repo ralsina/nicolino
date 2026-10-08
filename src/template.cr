@@ -3,6 +3,10 @@ require "./lua_filters"
 require "./theme"
 
 module Templates
+  # Folded template per {environment, name, language} for one-shot
+  # builds (see get_template)
+  @@resolved = Hash({UInt64, String, String}, Crinja::Template).new
+  @@resolved_mutex = Mutex.new
   extend self
 
   # Compute the kv:// dependencies of a template file: every other
@@ -412,6 +416,16 @@ module Templates
   def self.get_template(name : String, lang : String) : Crinja::Template
     env = environment
     return env.get_template(name) if ENV["NO_FOLD"]?
-    TemplatePreprocessor.get_template(env, name, lang, constants_for(lang))
+    # Auto mode must see template edits, which the preprocessor's
+    # source-keyed cache catches; a one-shot build can't have any, so
+    # it skips re-inlining the includes and rebuilding the constants
+    # on every page
+    return TemplatePreprocessor.get_template(env, name, lang, constants_for(lang)) if Croupier::TaskManager.auto_mode?
+    key = {env.object_id, name, lang}
+    if cached = @@resolved_mutex.synchronize { @@resolved[key]? }
+      return cached
+    end
+    template = TemplatePreprocessor.get_template(env, name, lang, constants_for(lang))
+    @@resolved_mutex.synchronize { @@resolved[key] = template }
   end
 end
