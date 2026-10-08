@@ -176,6 +176,10 @@ describe HtmlFilters do
         %(<pre><code class="language-crystal">x</code></pre>)         => false,
         %(<pre><code class="tz-chroma">x</code></pre>)                => false,
         %(<pre><code>x</code></pre>)                                  => false,
+        %(<PRE><CODE CLASS="crystal">x</CODE></PRE>)                  => true,
+        %(<pre><code class=crystal>x</code></pre>)                    => true,
+        %(<pre><code class=language-crystal>x</code></pre>)           => false,
+        %(<pre><code class="LANGUAGE-x">x</code></pre>)               => true,
       }.each do |html, unfixed|
         html.matches?(HtmlFilters::UNFIXED_CODE_CLASS).should eq(unfixed), html
         fixed = HtmlFilters.fix_code_classes(Lexbor::Parser.new(html)).to_html

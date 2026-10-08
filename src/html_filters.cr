@@ -107,8 +107,11 @@ module HtmlFilters
   # Stricter than NEEDS_CODE_FIX: a code class none of whose tokens
   # starts with language- or tz-, the only ones fix_code_classes still
   # rewrites. Already fixed blocks ("crystal language-crystal") do not
-  # match, so whole pages can be checked cheaply.
-  UNFIXED_CODE_CLASS = /<code[^>]*\sclass\s*=\s*["'](?![^"'>]*(?<=["'\s])(?:language-|tz-))/
+  # match, so whole pages can be checked cheaply. Tag and attribute
+  # names are case-insensitive and the value may be unquoted (one
+  # token then); the value check stays case-sensitive, like
+  # fix_code_classes.
+  UNFIXED_CODE_CLASS = /(?i:<code)[^>]*\s(?i:class)\s*=\s*(?:["'](?![^"'>]*(?<=["'\s])(?:language-|tz-))|(?!["']|language-|tz-)[^\s>])/
 
   # Capture form of NEEDS_LINK_FIX: matches a href/src value that
   # make_links_relative would rewrite, capturing the value and the
