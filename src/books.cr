@@ -465,7 +465,7 @@ module Books
       # Process HTML filters
       doc = Lexbor::Parser.new(html)
       doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output_path.to_s))
-      result = HtmlFilters.fix_code_classes(doc).to_html
+      result = HtmlFilters.to_html(HtmlFilters.fix_code_classes(doc))
       Log.info { "👉 #{output_path}" }
       result
     end

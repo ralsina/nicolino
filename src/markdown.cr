@@ -945,7 +945,7 @@ module Markdown
             # so the raw template output is kept then)
             if html.matches?(HtmlFilters::UNFIXED_CODE_CLASS)
               doc = Lexbor::Parser.new(html)
-              html = doc.to_html if HtmlFilters.fix_code_classes?(doc)
+              html = HtmlFilters.to_html(doc) if HtmlFilters.fix_code_classes?(doc)
             end
           else
             # DOM path: Lexbor parse + make_links_relative + fix_code_classes.
@@ -953,7 +953,7 @@ module Markdown
             # regex-based relativize_links_in_string is not needed here.
             doc = Lexbor::Parser.new(html)
             doc = HtmlFilters.make_links_relative(doc, post.link(lang))
-            html = HtmlFilters.fix_code_classes(doc).to_html
+            html = HtmlFilters.to_html(HtmlFilters.fix_code_classes(doc))
           end
           # pretty_html (off by default) only controls output
           # formatting: run the lexbor normalization pass for
@@ -961,7 +961,7 @@ module Markdown
           # template output
           if Config.options.pretty_html?
             doc = Lexbor::Parser.new(html)
-            html = HtmlFilters.fix_code_classes(doc).to_html
+            html = HtmlFilters.to_html(HtmlFilters.fix_code_classes(doc))
           end
           t2 = Time.instant
           Profiler.record_task(
@@ -1073,7 +1073,7 @@ module Markdown
         lang)
       doc = Lexbor::Parser.new(html)
       doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))
-      HtmlFilters.fix_code_classes(doc).to_html
+      HtmlFilters.to_html(HtmlFilters.fix_code_classes(doc))
     end
   end
 

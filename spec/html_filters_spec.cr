@@ -198,7 +198,22 @@ describe HtmlFilters do
     end
   end
 
+  describe ".to_html" do
+    it "serializes the whole document and frees it" do
+      doc = Lexbor::Parser.new(%(<p>Body</p>))
+      expected = doc.to_html
+      HtmlFilters.to_html(doc).should eq expected
+      doc.@finalized.should be_true
+    end
+  end
+
   describe ".fragment_html" do
+    it "frees the document" do
+      doc = Lexbor::Parser.new(%(<p>Body</p>))
+      HtmlFilters.fragment_html(doc)
+      doc.@finalized.should be_true
+    end
+
     it "serializes a fragment without the document wrapper" do
       html = HtmlFilters.fragment_html(Lexbor::Parser.new(%(<h2>Title</h2><p>Body</p>)))
       html.should eq %(<h2>Title</h2><p>Body</p>)

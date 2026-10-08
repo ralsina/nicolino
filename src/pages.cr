@@ -134,7 +134,7 @@ module Pages
              "link" => Utils.path_to_link(output)}, lang)
           doc = Lexbor::Parser.new(html)
           doc = HtmlFilters.make_links_relative(doc, Utils.path_to_link(output))
-          doc.to_html
+          HtmlFilters.to_html(doc)
         end
       end
     end

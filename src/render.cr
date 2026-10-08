@@ -81,9 +81,9 @@ module Render
     doc = Lexbor::Parser.new(html)
     doc = HtmlFilters.make_links_relative(doc, base)
     if fix_code_classes
-      HtmlFilters.fix_code_classes(doc).to_html
+      HtmlFilters.to_html(HtmlFilters.fix_code_classes(doc))
     else
-      doc.to_html
+      HtmlFilters.to_html(doc)
     end
   end
 end

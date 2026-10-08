@@ -48,7 +48,7 @@ module Handler
       @proc = FilterProc.new do |slice|
         parser = Lexbor::Parser.new(slice)
         htmlproc.call(parser)
-        parser.to_html.to_slice
+        HtmlFilters.to_html(parser).to_slice
       end
     end
   end
