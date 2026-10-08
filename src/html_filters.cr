@@ -107,7 +107,9 @@ module HtmlFilters
   # Stricter than NEEDS_CODE_FIX: a code class none of whose tokens
   # starts with language- or tz-, the only ones fix_code_classes still
   # rewrites. Already fixed blocks ("crystal language-crystal") do not
-  # match, so whole pages can be checked cheaply. Tag and attribute
+  # match, so whole pages can be checked cheaply. It cannot tell
+  # whether the <code> sits in a <pre>, so a match is only a reason to
+  # parse and try (see fix_code_classes?). Tag and attribute
   # names are case-insensitive and the value may be unquoted (one
   # token then); the value check stays case-sensitive, like
   # fix_code_classes.
@@ -365,6 +367,13 @@ module HtmlFilters
   # again on the page render), since it only adds the language- prefix
   # when no token already carries one.
   def self.fix_code_classes(doc)
+    fix_code_classes?(doc)
+    doc
+  end
+
+  # fix_code_classes, telling whether any code block changed
+  def self.fix_code_classes?(doc) : Bool
+    changed = false
     doc.css("pre code").each do |node|
       next unless node.has_key? "class"
       classes = node["class"].to_s
@@ -376,7 +385,8 @@ module HtmlFilters
       node["data-lang"] = split_classes[0]
       split_classes[0] = "#{split_classes[0]} language-#{split_classes[0]}"
       node["class"] = split_classes.join(" ")
+      changed = true
     end
-    doc
+    changed
   end
 end

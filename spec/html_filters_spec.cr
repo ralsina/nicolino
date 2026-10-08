@@ -188,6 +188,14 @@ describe HtmlFilters do
     end
   end
 
+  describe ".fix_code_classes?" do
+    it "tells whether a code block under pre changed" do
+      HtmlFilters.fix_code_classes?(Lexbor::Parser.new(%(<pre><div><code class="crystal">x</code></div></pre>))).should be_true
+      HtmlFilters.fix_code_classes?(Lexbor::Parser.new(%(<p><code class="inline">x</code></p>))).should be_false
+      HtmlFilters.fix_code_classes?(Lexbor::Parser.new(%(<pre><code class="crystal language-crystal">x</code></pre>))).should be_false
+    end
+  end
+
   describe ".fragment_html" do
     it "serializes a fragment without the document wrapper" do
       html = HtmlFilters.fragment_html(Lexbor::Parser.new(%(<h2>Title</h2><p>Body</p>)))

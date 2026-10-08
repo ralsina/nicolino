@@ -922,8 +922,11 @@ module Markdown
             # The content's code blocks were fixed when it was compiled;
             # a template can still emit an unprefixed one, which the
             # full-page pass used to catch when it was on by default
+            # (an inline <code class> matches too, but changes nothing,
+            # so the raw template output is kept then)
             if html.matches?(HtmlFilters::UNFIXED_CODE_CLASS)
-              html = HtmlFilters.fix_code_classes(Lexbor::Parser.new(html)).to_html
+              doc = Lexbor::Parser.new(html)
+              html = doc.to_html if HtmlFilters.fix_code_classes?(doc)
             end
           else
             # DOM path: Lexbor parse + make_links_relative + fix_code_classes.
