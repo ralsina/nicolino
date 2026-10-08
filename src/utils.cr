@@ -277,26 +277,33 @@ module Utils
   # Errors in a chunk are logged and that chunk is skipped.
   def self.parallel_chunks(inputs : Array(String), chunk_size : Int32 = 100, &block : Array(String), Int32 -> T) : Array(T) forall T
     num_chunks = (inputs.size // chunk_size) + 1
-    channels = Channel(T | Exception).new
+    channels = Channel({Int32, T | Exception}).new
     num_chunks.times do |chunk_idx|
       spawn do
         start_idx = chunk_idx * chunk_size
         end_idx = Math.min(start_idx + chunk_size, inputs.size)
         chunk_data = inputs[start_idx...end_idx]
-        channels.send(block.call(chunk_data, start_idx))
+        channels.send({chunk_idx, block.call(chunk_data, start_idx)})
       rescue ex
-        channels.send(ex)
+        channels.send({chunk_idx, ex})
       end
     end
 
-    results = [] of T
+    # Chunks finish in any order: slot each result by its index. A
+    # result is boxed in a Tuple so an empty slot (nil) can't be
+    # mistaken for a block that returned nil.
+    slots = Array({T} | Exception | Nil).new(num_chunks, nil)
     num_chunks.times do
-      result = channels.receive
-      case result
+      chunk_idx, result = channels.receive
+      slots[chunk_idx] = result.is_a?(Exception) ? result : {result}
+    end
+    results = [] of T
+    slots.each do |slot|
+      case slot
       when Exception
-        Log.error(exception: result) { "Error in parallel chunk; skipping it" }
-      else
-        results << result
+        Log.error(exception: slot) { "Error in parallel chunk; skipping it" }
+      when Tuple
+        results << slot[0]
       end
     end
     results
