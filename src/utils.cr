@@ -289,20 +289,21 @@ module Utils
       end
     end
 
-    # Chunks finish in any order: slot each result by its index
-    slots = Array(T | Exception | Nil).new(num_chunks, nil)
+    # Chunks finish in any order: slot each result by its index. A
+    # result is boxed in a Tuple so an empty slot (nil) can't be
+    # mistaken for a block that returned nil.
+    slots = Array({T} | Exception | Nil).new(num_chunks, nil)
     num_chunks.times do
       chunk_idx, result = channels.receive
-      slots[chunk_idx] = result
+      slots[chunk_idx] = result.is_a?(Exception) ? result : {result}
     end
     results = [] of T
-    slots.each do |result|
-      case result
+    slots.each do |slot|
+      case slot
       when Exception
-        Log.error(exception: result) { "Error in parallel chunk; skipping it" }
-      when Nil
-      else
-        results << result
+        Log.error(exception: slot) { "Error in parallel chunk; skipping it" }
+      when Tuple
+        results << slot[0]
       end
     end
     results

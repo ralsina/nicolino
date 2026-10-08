@@ -190,5 +190,12 @@ describe Utils do
       chunks.map(&.[0]).should eq((0...inputs.size).step(7).to_a)
       chunks.flat_map(&.[1]).should eq inputs
     end
+
+    it "keeps chunks whose block returned nil" do
+      results = Utils.parallel_chunks((1..250).map(&.to_s)) do |_chunk, start_idx|
+        start_idx == 100 ? nil : start_idx
+      end
+      results.should eq [0, nil, 200]
+    end
   end
 end
