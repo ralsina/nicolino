@@ -137,7 +137,8 @@ describe Markdown::File do
 
         first = post.value("en")
         first["word_count"].should eq 3
-        post.value("en")["description"].should eq first["description"]
+        # The very same String: recomputing would build a new one
+        post.value("en")["description"].as(String).same?(first["description"].as(String)).should be_true
 
         ::File.write("content/posts/facts.md", <<-MD)
           ---
