@@ -42,6 +42,35 @@ describe Books do
     end
   end
 
+  describe ".prints_toc_verbatim?" do
+    it "accepts templates that only print or truth-test the TOC" do
+      [
+        %(<nav>{{ toc_html|safe }}</nav>{{- sidebar_content | safe -}}),
+        %(<p>{{ chapter.content|safe }}</p>),
+        %({# Variables: toc_html, chapter #}<nav>{{ toc_html|safe }}</nav>),
+        %({% if sidebar_content %}<div>{{ sidebar_content }}</div>{% endif %}),
+      ].each do |source|
+        Books.prints_toc_verbatim?(source).should be_true, source
+      end
+    end
+
+    it "rejects templates that do anything else with it" do
+      [
+        %({{ toc_html|replace("toc-link", "x")|safe }}),
+        %({% if toc_html|length > 10 %}x{% endif %}),
+        %({% set t = sidebar_content %}),
+        %({% if not toc_html %}x{% endif %}),
+      ].each do |source|
+        Books.prints_toc_verbatim?(source).should be_false, source
+      end
+    end
+
+    it "rejects plain prints when the template autoescapes" do
+      Books.prints_toc_verbatim?(%({{ toc_html }}), autoescape: true).should be_false
+      Books.prints_toc_verbatim?(%({{ toc_html|safe }}), autoescape: true).should be_true
+    end
+  end
+
   describe ".toc_spliceable?" do
     it "rejects titles lexbor would parse or decode" do
       ["A <b>bold</b> title", "Q&amp;A", %(The "quoted" one)].each do |title|

@@ -554,22 +554,64 @@ module Books
   end
 
   # Stands in for the TOC in chapter templates; lexbor keeps comments
-  # as they are, so it survives the HTML filters for splicing
-  TOC_MARKER = "<!--nicolino:book-toc-->"
+  # as they are, so it survives the HTML filters for splicing. The
+  # per-run token keeps page content from matching it by accident.
+  TOC_MARKER = "<!--nicolino:book-toc-#{Random::Secure.hex(8)}-->"
+
+  # Template uses of a TOC variable the marker can stand in for:
+  # printing it as it is (`|safe`, or plain where nothing is
+  # autoescaped) and a bare truth test (the marker is truthy, and so
+  # is every TOC toc_spliceable? accepts)
+  TOC_PRINT_SAFE   = /\{\{-?\s*(?:toc_html|sidebar_content)\s*\|\s*safe\s*-?\}\}/
+  TOC_PRINT_PLAIN  = /\{\{-?\s*(?:toc_html|sidebar_content)\s*-?\}\}/
+  TOC_TEST         = /\{%-?\s*if\s+(?:toc_html|sidebar_content)\s*-?%\}/
+  TEMPLATE_COMMENT = /\{#.*?#\}/m
+  TOC_VARIABLE     = /\b(?:toc_html|sidebar_content)\b/
 
   # Whether the TOC can be written directly in the form lexbor would
   # serialize it (serialized_toc), instead of going through the
   # template and lexbor with every chapter page. Titles and links are
   # raw text: lexbor would parse tags and decode entities in them, so
   # any <, & or " sends the book down the regular path. An empty TOC
-  # does too: the marker would make it truthy in templates.
+  # does too: the marker would make it truthy in templates. So do
+  # templates that do anything with the TOC besides printing it.
   def self.toc_spliceable?(book : Book) : Bool
+    return false unless templates_print_toc_verbatim?
     return false if render_toc_html(book.chapters, nil, book.name).empty?
     flatten_entries(book.chapters).none? do |entry|
       {entry.title, entry.link(book.name)}.any? do |text|
         text.includes?('<') || text.includes?('&') || text.includes?('"')
       end
     end
+  end
+
+  # Whether book_chapter.tmpl, page.tmpl and every template they pull
+  # in only print toc_html / sidebar_content with `|safe`. Anything
+  # else (a filter, a test, a Lua filter) must see the real TOC.
+  def self.templates_print_toc_verbatim? : Bool
+    pending = [Theme.template_path("book_chapter.tmpl"), Theme.template_path("page.tmpl")]
+    seen = Set(String).new
+    while path = pending.pop?
+      next unless seen.add?(path)
+      source = File.read(path)
+      return false unless prints_toc_verbatim?(source, Crinja::Config.new.autoescape?(path))
+      Templates::DependencyVisitor.new("kv://#{path}").dependencies(source).each do |dependency|
+        pending << dependency.lchop("kv://")
+      end
+    end
+    true
+  rescue ex
+    Log.debug { "Book TOC splicing off: #{ex.message}" }
+    false
+  end
+
+  # Whether a template's only uses of toc_html / sidebar_content are
+  # verbatim prints and bare truth tests (see TOC_PRINT_SAFE).
+  # *autoescape*: whether the template's plain prints are escaped.
+  def self.prints_toc_verbatim?(source : String, autoescape : Bool = false) : Bool
+    rest = source.gsub(TEMPLATE_COMMENT, "").gsub(TOC_PRINT_SAFE, "").gsub(TOC_TEST, "")
+    rest = rest.gsub(TOC_PRINT_PLAIN, "") unless autoescape
+    !rest.matches?(TOC_VARIABLE)
   end
 
   # The TOC for a chapter page exactly as render_toc_html's output
