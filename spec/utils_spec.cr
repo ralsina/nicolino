@@ -178,4 +178,17 @@ describe Utils do
       Utils.word_count("   ").should eq 0
     end
   end
+
+  describe ".parallel_chunks" do
+    it "returns chunk results in input order" do
+      inputs = (1..1000).map(&.to_s)
+      chunks = Utils.parallel_chunks(inputs, chunk_size: 7) do |chunk, start_idx|
+        # Later chunks finish first
+        sleep (0.2 - start_idx / 5000.0).seconds if start_idx < 50
+        {start_idx, chunk}
+      end
+      chunks.map(&.[0]).should eq((0...inputs.size).step(7).to_a)
+      chunks.flat_map(&.[1]).should eq inputs
+    end
+  end
 end
