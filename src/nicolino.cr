@@ -1,4 +1,3 @@
-require "./lexbor_keepalive"
 require "./assets"
 require "./archive"
 require "./creatable"

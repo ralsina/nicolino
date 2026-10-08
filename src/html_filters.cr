@@ -74,6 +74,8 @@ module HtmlFilters
   # document itself, outside <html>, so the walk starts there; a
   # doctype also lands there and is dropped, since the fragment gets
   # embedded in a page that has its own.
+  #
+  # Frees *doc* (see `to_html`): don't use it afterwards.
   def self.fragment_html(doc : Lexbor::Parser) : String
     String.build do |io|
       doc.document.children do |node|
@@ -90,6 +92,22 @@ module HtmlFilters
         end
       end
     end
+  ensure
+    doc.free
+  end
+
+  # Serialize a whole document and free it; don't use *doc* afterwards.
+  # Lexbor's Node#to_html hands only the raw element pointer to C, so
+  # without a later use of *doc* nothing keeps the Parser reachable
+  # while lexbor serializes. The serialize callback allocates, a
+  # collection can run, and the Parser's finalizer destroys the
+  # document mid-walk (LXB_STATUS_ERROR or a segfault in parallel
+  # builds). Freeing it here is that later use, and returns lexbor's
+  # memory right away instead of at the next GC.
+  def self.to_html(doc : Lexbor::Parser) : String
+    doc.to_html
+  ensure
+    doc.free
   end
 
   # A href/src attribute value that make_links_relative would rewrite:

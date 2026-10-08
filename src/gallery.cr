@@ -325,7 +325,7 @@ module Gallery
           html = Render.apply_template(page_template, template_context, lang)
           doc = Lexbor::Parser.new(html)
           doc = HtmlFilters.make_links_relative(doc, post.link(lang))
-          doc.to_html
+          HtmlFilters.to_html(doc)
         end
 
         # Create gallery.json for this gallery (only once, not per language)
