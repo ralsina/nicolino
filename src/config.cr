@@ -76,11 +76,12 @@ module Config
     # When false, untranslated content is simply absent from that
     # language's site.
     property? content_fallback : Bool = true
-    # When true (default), every page goes through a lexbor
-    # parse/serialize round trip that normalizes its HTML formatting.
-    # When false, pages that need no link or code-class fixing are
-    # written as the raw template output (faster, same DOM).
-    property? pretty_html : Bool = true
+    # When true, every page goes through a lexbor parse/serialize
+    # round trip that normalizes its HTML formatting. When false
+    # (default), pages that need no link or code-class fixing are
+    # written as the raw template output: same DOM, and about 20% less
+    # build time, since that round trip ran on every page.
+    property? pretty_html : Bool = false
     # Server-side syntax highlighter for markdown code blocks:
     # "tartrazine" (default) or "none" (leaves language-* classes
     # for client-side highlighting)

@@ -86,6 +86,10 @@ pandoc_formats:
   .txt: rst
 ```
 
+**Output:**
+
+- `pretty_html` - Run every page through an HTML parser and write it back out, normalizing its formatting (default: `false`). The rendered page is the same either way; this only changes whitespace and markup style (for example `<meta charset="utf-8" />` becomes `<meta charset="utf-8">`). It costs about 20% of build time, so it is off unless you need byte-stable normalized output.
+
 **Logging:**
 
 - `verbosity` - Output verbosity (0=fatal, 1=errors, 2=warnings, 3=info, 4=debug, 5=trace)

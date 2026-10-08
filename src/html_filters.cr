@@ -64,6 +64,34 @@ module HtmlFilters
     doc
   end
 
+  # Serialize a document parsed from an HTML *fragment* back into a
+  # fragment. Parser#to_html emits the whole document Lexbor builds
+  # around it (`<html><head></head><body>...</body></html>`), which
+  # used to leak into pages and feeds when the content was embedded
+  # elsewhere. Leading <style>, <script>, <link> or <meta> elements end
+  # up in the parsed <head>, so its contents come first. A comment
+  # opening the fragment (a leading <!--more-->) is a child of the
+  # document itself, outside <html>, so the walk starts there; a
+  # doctype also lands there and is dropped, since the fragment gets
+  # embedded in a page that has its own.
+  def self.fragment_html(doc : Lexbor::Parser) : String
+    String.build do |io|
+      doc.document.children do |node|
+        if node.is_tag_html?
+          node.children do |child|
+            if child.is_tag_head? || child.is_tag_body?
+              child.inner_html(io)
+            else
+              child.to_html(io)
+            end
+          end
+        elsif node.is_comment?
+          node.to_html(io)
+        end
+      end
+    end
+  end
+
   # A href/src attribute value that make_links_relative would rewrite:
   # anything not starting with "/", "#", a URL scheme (scheme'd values
   # are absolute URLs; resolve+relativize round-trips a different-host
@@ -75,6 +103,18 @@ module HtmlFilters
   # A code tag whose class doesn't already start with language-,
   # which fix_code_classes would rewrite.
   NEEDS_CODE_FIX = /<code[^>]*\sclass\s*=\s*["'](?!language-|tz-)/
+
+  # Stricter than NEEDS_CODE_FIX: a code class none of whose tokens
+  # starts with language- or tz-, the only ones fix_code_classes still
+  # rewrites. Already fixed blocks ("crystal language-crystal") do not
+  # match, so whole pages can be checked cheaply. It cannot tell
+  # whether the <code> sits in a <pre>, so a match is only a reason to
+  # parse and try (see fix_code_classes?). Tag and attribute
+  # names are case-insensitive, quoted values of earlier attributes
+  # may hold ">" (or a "class=" that is not one), and the value may be
+  # unquoted (one token then); the value check stays case-sensitive, like
+  # fix_code_classes.
+  UNFIXED_CODE_CLASS = /(?i:<code)(?:[^>"']|"[^"]*"|'[^']*')*?\s(?i:class)\s*=\s*(?:["'](?![^"'>]*(?<=["'\s])(?:language-|tz-))|(?!["']|language-|tz-)[^\s>])/
 
   # Capture form of NEEDS_LINK_FIX: matches a href/src value that
   # make_links_relative would rewrite, capturing the value and the
@@ -582,6 +622,13 @@ module HtmlFilters
   # again on the page render), since it only adds the language- prefix
   # when no token already carries one.
   def self.fix_code_classes(doc)
+    fix_code_classes?(doc)
+    doc
+  end
+
+  # fix_code_classes, telling whether any code block changed
+  def self.fix_code_classes?(doc) : Bool
+    changed = false
     doc.css("pre code").each do |node|
       next unless node.has_key? "class"
       classes = node["class"].to_s
@@ -593,7 +640,8 @@ module HtmlFilters
       node["data-lang"] = split_classes[0]
       split_classes[0] = "#{split_classes[0]} language-#{split_classes[0]}"
       node["class"] = split_classes.join(" ")
+      changed = true
     end
-    doc
+    changed
   end
 end

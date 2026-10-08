@@ -43,6 +43,14 @@ describe Config do
         Config.content.should eq "content/"
         Config.language.should eq "en"
         Config.default_lang.should eq "en"
+        Config.options.pretty_html?.should be_false
+      end
+    end
+
+    it "turns the full-page HTML normalization back on with pretty_html" do
+      SpecSite.in_site("pretty_html: true\n") do
+        Config.config
+        Config.options.pretty_html?.should be_true
       end
     end
 
