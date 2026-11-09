@@ -22,10 +22,10 @@
   },
   "homepage": "https://github.com/ralsina/nicolino#readme",
   "dependencies": {
-    "tinacms": "^3.3.2"
+    "tinacms": "^3.15.2"
   },
   "devDependencies": {
-    "@tinacms/cli": "^2.1.2",
+    "@tinacms/cli": "4.0.5",
     "@types/node": "^25.1.0"
   }
 }
